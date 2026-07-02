@@ -1,0 +1,221 @@
+/* goblub 공용 스타일 */
+:root {
+  --coral: #ff6b6b;
+  --yellow: #ffd93d;
+  --mint: #6bcb77;
+  --sky: #4d96ff;
+  --purple: #b983ff;
+  --cream: #fff9ec;
+  --ink: #38352f;
+  --ink-soft: #7a766d;
+  --card-radius: 22px;
+  --shadow: 0 6px 18px rgba(56, 53, 47, 0.1);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--cream);
+  color: var(--ink);
+  font-family: "Jua", "Malgun Gothic", sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* 헤더 */
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 24px;
+  max-width: 960px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.logo {
+  font-size: 1.9rem;
+  letter-spacing: 1px;
+}
+
+.logo .l1 { color: var(--coral); }
+.logo .l2 { color: var(--yellow); }
+.logo .l3 { color: var(--mint); }
+.logo .l4 { color: var(--sky); }
+.logo .l5 { color: var(--purple); }
+.logo .l6 { color: var(--coral); }
+
+.site-nav a {
+  margin-left: 18px;
+  font-size: 1.05rem;
+  color: var(--ink-soft);
+}
+
+.site-nav a:hover {
+  color: var(--ink);
+}
+
+/* 본문 공통 */
+main {
+  flex: 1;
+  max-width: 960px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 16px 24px 48px;
+}
+
+.hero {
+  text-align: center;
+  padding: 36px 0 28px;
+}
+
+.hero h1 {
+  font-size: 2.4rem;
+  margin-bottom: 10px;
+}
+
+.hero p {
+  color: var(--ink-soft);
+  font-size: 1.15rem;
+}
+
+/* 카드 그리드 */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  border-radius: var(--card-radius);
+  padding: 28px 22px;
+  box-shadow: var(--shadow);
+  background: #fff;
+  position: relative;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+a.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 24px rgba(56, 53, 47, 0.16);
+}
+
+.card .icon {
+  font-size: 2.6rem;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.card h2 {
+  font-size: 1.3rem;
+  margin-bottom: 6px;
+}
+
+.card p {
+  color: var(--ink-soft);
+  font-size: 0.98rem;
+  line-height: 1.45;
+}
+
+.card.tint-coral { background: #ffe3e3; }
+.card.tint-yellow { background: #fff3c4; }
+.card.tint-mint { background: #dcf5e1; }
+.card.tint-sky { background: #dfeaff; }
+.card.tint-purple { background: #efe2ff; }
+
+/* 준비 중 카드 */
+.card.soon {
+  opacity: 0.65;
+  cursor: default;
+}
+
+.badge-soon {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: var(--ink);
+  color: #fff;
+  font-size: 0.75rem;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+/* 앱 카드 */
+.app-card {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  background: #fff;
+  border-radius: var(--card-radius);
+  padding: 22px;
+  box-shadow: var(--shadow);
+  margin-bottom: 18px;
+}
+
+.app-card .app-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.2rem;
+  flex-shrink: 0;
+}
+
+.app-card .app-info {
+  flex: 1;
+}
+
+.app-card h2 {
+  font-size: 1.25rem;
+  margin-bottom: 4px;
+}
+
+.app-card p {
+  color: var(--ink-soft);
+  font-size: 0.95rem;
+}
+
+.btn-download {
+  background: var(--sky);
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  padding: 10px 20px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn-download:disabled {
+  background: #cfccc4;
+  cursor: default;
+}
+
+/* 푸터 */
+.site-footer {
+  text-align: center;
+  padding: 22px;
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+}
+
+/* 모바일 */
+@media (max-width: 480px) {
+  .hero h1 { font-size: 1.9rem; }
+  .site-header { padding: 14px 16px; }
+  main { padding: 8px 16px 40px; }
+  .app-card { flex-wrap: wrap; }
+}
