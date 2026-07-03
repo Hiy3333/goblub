@@ -217,6 +217,12 @@ a.card:hover {
   cursor: default;
 }
 
+/* 카드 그리드 안의 다운로드 버튼 */
+.card .btn-download {
+  margin-top: 16px;
+  align-self: flex-start;
+}
+
 /* 푸터 */
 .site-footer {
   text-align: center;
