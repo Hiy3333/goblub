@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>오늘의 사주 — goblub</title>
+  <meta name="description" content="오늘은 무슨 날? 오늘의 간지와 기운, 좋은 것과 조심할 것" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+  <div id="site-header"></div>
+  <main>
+    <section class="hero">
+      <h1>📅 오늘의 사주</h1>
+      <p id="date-label"></p>
+    </section>
+
+    <section class="panel">
+      <h2>오늘의 간지</h2>
+      <div class="pillar-grid" id="t-pillars" style="grid-template-columns:repeat(3,1fr)"></div>
+      <p id="t-gan" style="line-height:1.7; margin-top:8px"></p>
+      <p id="t-ji" style="line-height:1.7; margin-top:8px"></p>
+    </section>
+
+    <section class="panel">
+      <h2>👍 오늘 하면 좋은 것</h2>
+      <ul class="tag-list" id="t-good"></ul>
+      <h2 style="margin-top:18px">⚠️ 오늘 조심할 것</h2>
+      <ul class="tag-list" id="t-care"></ul>
+    </section>
+
+    <div class="result-actions">
+      <a class="btn-primary" href="fortune.html">내 운세도 보기</a>
+    </div>
+    <p class="fine-print" id="t-err">재미로 봐주세요 🙂</p>
+  </main>
+  <div id="site-footer"></div>
+  <script src="../js/common.js" data-root=".."></script>
+  <script src="js/saju.js"></script>
+  <script src="js/fortune.js"></script>
+  <script>
+    (function () {
+      var $ = function (id) { return document.getElementById(id); };
+      var now = new Date();
+      $("date-label").textContent = now.getFullYear() + "년 " + (now.getMonth() + 1) + "월 " + now.getDate() + "일, 오늘은 무슨 날?";
+      fetch("data/saju-terms.json")
+        .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+        .then(function (data) {
+          var td = Fortune.todayGanji(data, now);
+          var roles = [["오늘의 해", td.pillars.year], ["이달", td.pillars.month], ["오늘", td.pillars.day]];
+          var html = "";
+          roles.forEach(function (pair) {
+            var t = Saju.pillarText(pair[1]);
+            html += '<div class="pillar"><span class="role">' + pair[0] + '</span><span class="hanja">' + t.hanja +
+              '</span><span class="hangul">' + t.hangul + "</span></div>";
+          });
+          $("t-pillars").innerHTML = html;
+          var dt = Fortune.dayText(td);
+          $("t-gan").textContent = "🌤️ " + dt.gan;
+          $("t-ji").textContent = dt.ji;
+          $("t-good").innerHTML = dt.dos.good.map(function (g) { return "<li>" + g + "</li>"; }).join("");
+          $("t-care").innerHTML = dt.dos.care.map(function (c) { return "<li>" + c + "</li>"; }).join("");
+        })
+        .catch(function () { $("t-err").textContent = "데이터를 불러오지 못했어요. 새로고침 해주세요."; });
+    })();
+  </script>
+</body>
+</html>
