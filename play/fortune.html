@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>오늘의 운세 — goblub</title>
+  <meta name="description" content="내 사주 기반 오늘의 총운·연애운·재물운·이번 달 운세" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+  <div id="site-header"></div>
+  <main>
+    <section class="hero">
+      <h1>🌞 오늘의 운세</h1>
+      <p id="today-label">내 사주로 보는 진짜 운세 — 매일 달라져요</p>
+    </section>
+
+    <section class="panel" id="input-panel">
+      <h2>생일을 알려주세요 (한 번만!)</h2>
+      <div class="field-row">
+        <select id="in-year"></select>
+        <select id="in-month"></select>
+        <select id="in-day"></select>
+        <select id="in-hour"><option value="">태어난 시 몰라요</option></select>
+      </div>
+      <button class="btn-primary" id="btn-go">운세 보기</button>
+      <p class="error-msg" id="err"></p>
+      <p class="fine-print" style="text-align:left">생일은 이 브라우저에만 저장돼요. 서버로 전송되지 않아요.</p>
+    </section>
+
+    <div id="result-area" style="display:none">
+      <section class="panel">
+        <h2 id="r-head"></h2>
+        <p id="r-iljin" style="color:var(--ink-soft)"></p>
+        <p id="r-mod" style="margin-top:8px; line-height:1.6"></p>
+      </section>
+      <section class="panel"><h2>🍀 오늘의 총운 <span class="stars" id="s-total"></span></h2><p class="result-desc" id="t-total"></p></section>
+      <section class="panel"><h2>💘 오늘의 연애운 <span class="stars" id="s-love"></span></h2><p class="result-desc" id="t-love"></p></section>
+      <section class="panel"><h2>💰 오늘의 재물운 <span class="stars" id="s-money"></span></h2><p class="result-desc" id="t-money"></p></section>
+      <section class="panel"><h2>📆 이번 달의 운세 <span class="stars" id="s-month"></span></h2><p class="result-desc" id="t-month"></p></section>
+      <div class="result-actions">
+        <button class="btn-ghost" id="btn-reset">생일 바꾸기</button>
+        <a class="btn-primary" href="saju.html">내 사주 전체 보기</a>
+      </div>
+    </div>
+
+    <p class="fine-print">운세는 재미로 봐주세요 🙂</p>
+  </main>
+  <div id="site-footer"></div>
+  <script src="../js/common.js" data-root=".."></script>
+  <script src="js/saju.js"></script>
+  <script src="js/fortune.js"></script>
+  <script>
+    (function () {
+      var $ = function (id) { return document.getElementById(id); };
+      var KEY = "goblub_birth";
+      var data = null;
+
+      var y = $("in-year"), m = $("in-month"), d = $("in-day"), h = $("in-hour");
+      for (var i = 2100; i >= 1900; i--) y.add(new Option(i + "년", i));
+      y.value = 1995;
+      for (i = 1; i <= 12; i++) m.add(new Option(i + "월", i));
+      for (i = 1; i <= 31; i++) d.add(new Option(i + "일", i));
+      for (i = 0; i <= 23; i++) h.add(new Option(i + "시", i));
+
+      function showErr(msg) { var e = $("err"); e.textContent = msg; e.style.display = "block"; }
+
+      function savedBirth() {
+        try {
+          var b = JSON.parse(localStorage.getItem(KEY));
+          if (b && b.y >= 1900 && b.y <= 2100 && b.m >= 1 && b.m <= 12 && b.d >= 1 && b.d <= 31) return b;
+        } catch (e) {}
+        return null;
+      }
+
+      function show(birth) {
+        var f = Fortune.get(data, birth, new Date());
+        var tt = Saju.pillarText(f.today.pillars.day);
+        var now = new Date();
+        $("r-head").textContent = (now.getMonth() + 1) + "월 " + now.getDate() + "일, " +
+          birth.y + "년생 " + f.me.zodiac + "띠님의 운세";
+        $("r-iljin").textContent = "오늘의 일진: " + tt.hanja + " (" + tt.hangul + ")";
+        $("r-mod").textContent = f.modMsg || "";
+        $("r-mod").style.display = f.modMsg ? "block" : "none";
+        function stars(n) { return "★★★★★".slice(0, n) + "☆☆☆☆☆".slice(0, 5 - n); }
+        $("s-total").textContent = stars(f.total.score); $("t-total").textContent = f.total.text;
+        $("s-love").textContent = stars(f.love.score); $("t-love").textContent = f.love.text;
+        $("s-money").textContent = stars(f.money.score); $("t-money").textContent = f.money.text;
+        $("s-month").textContent = stars(f.month.score); $("t-month").textContent = f.month.text;
+        $("input-panel").style.display = "none";
+        $("result-area").style.display = "block";
+      }
+
+      fetch("data/saju-terms.json")
+        .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+        .then(function (dd) {
+          data = dd;
+          var b = savedBirth();
+          if (b) show(b);
+        })
+        .catch(function () { showErr("데이터를 불러오지 못했어요. 새로고침 해주세요."); });
+
+      $("btn-go").onclick = function () {
+        $("err").style.display = "none";
+        if (!data) { showErr("데이터를 불러오지 못했어요. 새로고침 해주세요."); return; }
+        var yy = +y.value, mm = +m.value, dd2 = +d.value;
+        var date = new Date(yy, mm - 1, dd2);
+        if (date.getFullYear() !== yy || date.getMonth() !== mm - 1 || date.getDate() !== dd2) {
+          showErr("없는 날짜예요. 다시 확인해주세요!"); return;
+        }
+        var birth = { y: yy, m: mm, d: dd2, hour: h.value === "" ? null : +h.value, min: 0 };
+        try { localStorage.setItem(KEY, JSON.stringify(birth)); } catch (e) {}
+        show(birth);
+      };
+
+      $("btn-reset").onclick = function () {
+        try { localStorage.removeItem(KEY); } catch (e) {}
+        $("result-area").style.display = "none";
+        $("input-panel").style.display = "block";
+      };
+    })();
+  </script>
+</body>
+</html>
