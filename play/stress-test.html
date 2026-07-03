@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>스트레스 유형 테스트 — goblub</title>
+  <meta name="description" content="스트레스 받을 때 나는 어떤 모습일까? 10문항으로 확인" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+  <div id="site-header"></div>
+  <main>
+    <section class="hero">
+      <h1>🔥 스트레스 유형 테스트</h1>
+      <p>스트레스 받을 때 나는 어떤 모습일까? 10문항으로 확인!</p>
+    </section>
+    <section class="panel" id="quiz"></section>
+    <p class="fine-print">재미로 봐주세요 🙂</p>
+  </main>
+  <div id="site-footer"></div>
+  <script src="../js/common.js" data-root=".."></script>
+  <script src="js/quiz.js"></script>
+  <script>
+    Quiz.init(document.getElementById("quiz"), {
+      emoji: "🔥",
+      title: "스트레스 유형 테스트",
+      intro: "스트레스 상황에서 내가 보이는 진짜 반응 패턴을 알려드려요.",
+      questions: [
+        { q: "월요일 아침, 눈 뜨자마자 드는 생각은?", choices: [
+          { text: "아 진짜! (이불을 발로 참)", scores: { volcano: 1 } },
+          { text: "휴… 가야지 뭐 (조용히 한숨)", scores: { sponge: 1 } },
+          { text: "5분만 더… 10분만 더… (현실 도피)", scores: { runner: 1 } },
+          { text: "오늘 할 일부터 머릿속으로 정리", scores: { solver: 1 } } ] },
+        { q: "일이 몰려서 터질 것 같을 때 나는?", choices: [
+          { text: "\"이걸 왜 다 나한테!\" 짜증부터 남", scores: { volcano: 1 } },
+          { text: "말없이 다 떠안고 밤새 함", scores: { sponge: 1 } },
+          { text: "일단 유튜브 켬. 나중의 내가 하겠지", scores: { runner: 1 } },
+          { text: "우선순위 정하고 급한 것부터 처리", scores: { solver: 1 } } ] },
+        { q: "친구가 약속을 당일 취소했다!", choices: [
+          { text: "서운함을 바로 표현한다", scores: { volcano: 1 } },
+          { text: "\"괜찮아~\" 하고 혼자 곱씹는다", scores: { sponge: 1 } },
+          { text: "잘됐다, 집에서 쉬자! 금방 잊는다", scores: { runner: 1 } },
+          { text: "다음 약속을 바로 다시 잡는다", scores: { solver: 1 } } ] },
+        { q: "스트레스가 극에 달했을 때 몸의 신호는?", choices: [
+          { text: "심장이 빨리 뛰고 얼굴이 뜨거워짐", scores: { volcano: 1 } },
+          { text: "어깨·목이 뭉치고 소화가 안 됨", scores: { sponge: 1 } },
+          { text: "무기력. 눕고 싶고 아무것도 하기 싫음", scores: { runner: 1 } },
+          { text: "머리가 오히려 차가워지고 말이 빨라짐", scores: { solver: 1 } } ] },
+        { q: "나의 스트레스 해소법에 가장 가까운 것은?", choices: [
+          { text: "운동이나 노래방에서 폭발적으로 발산", scores: { volcano: 1 } },
+          { text: "친한 사람에게 털어놓기 (근데 잘 못함)", scores: { sponge: 1 } },
+          { text: "잠, 넷플릭스, 게임 — 일단 꺼두기", scores: { runner: 1 } },
+          { text: "원인을 적어보고 해결책 리스트 만들기", scores: { solver: 1 } } ] },
+        { q: "단톡방에서 나를 저격하는 듯한 말을 봤다", choices: [
+          { text: "바로 물어본다. \"그거 나 얘기야?\"", scores: { volcano: 1 } },
+          { text: "밤새 그 메시지를 다시 읽는다", scores: { sponge: 1 } },
+          { text: "알림 끄고 못 본 척한다", scores: { runner: 1 } },
+          { text: "따로 개인톡으로 차분히 확인한다", scores: { solver: 1 } } ] },
+        { q: "중요한 발표 전날 밤, 나는?", choices: [
+          { text: "긴장돼서 예민 폭발. 건드리면 위험", scores: { volcano: 1 } },
+          { text: "잘해야 한다는 부담을 혼자 삭힘", scores: { sponge: 1 } },
+          { text: "준비는 미뤄뒀고… 갑자기 방 청소 시작", scores: { runner: 1 } },
+          { text: "리허설 한 번 더 하고 일찍 잔다", scores: { solver: 1 } } ] },
+        { q: "화가 났던 일, 얼마나 오래 가나요?", choices: [
+          { text: "그 자리에서 폭발하고 금방 풀림", scores: { volcano: 1 } },
+          { text: "겉으론 괜찮은데 몇 주씩 남아 있음", scores: { sponge: 1 } },
+          { text: "생각 안 하려고 해서 잘 모르겠음", scores: { runner: 1 } },
+          { text: "원인이 해결되면 딱 끝남", scores: { solver: 1 } } ] },
+        { q: "번아웃이 온 것 같을 때 나는?", choices: [
+          { text: "\"다 그만둘래!\" 선언부터 하고 봄", scores: { volcano: 1 } },
+          { text: "그래도 해야지… 하며 계속 버팀", scores: { sponge: 1 } },
+          { text: "연락 두절, 잠수 모드 돌입", scores: { runner: 1 } },
+          { text: "휴가를 내고 회복 계획을 짠다", scores: { solver: 1 } } ] },
+        { q: "주변 사람들이 말하는 나는?", choices: [
+          { text: "\"화끈해. 뒤끝은 없어\"", scores: { volcano: 1 } },
+          { text: "\"착한데… 좀 참는 것 같아\"", scores: { sponge: 1 } },
+          { text: "\"연락 안 되면 충전 중인 거야\"", scores: { runner: 1 } },
+          { text: "\"어른스러워. 기댈 수 있어\"", scores: { solver: 1 } } ] }
+      ],
+      results: {
+        volcano: { emoji: "🌋", name: "화산 폭발형", desc: "스트레스가 쌓이면 바로바로 분출하는 타입! 뒤끝 없이 시원한 게 장점이지만, 폭발 순간의 파편이 주변에 튈 수 있어요. 터지기 전에 운동·노래방 같은 안전한 분화구를 미리 만들어두면 최고예요." },
+        sponge: { emoji: "🧽", name: "스펀지 흡수형", desc: "싫은 소리 못 하고 다 빨아들이는 타입. 배려심 만렙이지만 스펀지도 다 차면 무거워져요. 참는 게 미덕이 아니라는 것, 짜서 비워내는 시간(수다, 일기, 눈물 뭐든!)이 꼭 필요해요." },
+        runner: { emoji: "🏃", name: "일단 도망형", desc: "스트레스 원인에서 일단 거리를 두는 타입. 회피처럼 보여도 사실 재충전 본능이에요! 다만 도망간 곳에서 눕기만 하면 원인이 그대로 기다리고 있으니, 충전 후 한 가지만 처리하고 다시 쉬어보세요." },
+        solver: { emoji: "🛠️", name: "해결사 직면형", desc: "스트레스를 문제로 정의하고 풀어버리는 타입. 멋있지만, 세상엔 해결 안 되는 일도 있다는 게 함정. 가끔은 해결 말고 그냥 '느끼는' 것도 회복이에요. 오늘은 리스트 접고 푹 쉬어도 돼요." }
+      },
+      resolve: function (t) {
+        var best = "volcano";
+        ["volcano", "sponge", "runner", "solver"].forEach(function (k) { if ((t[k] || 0) > (t[best] || 0)) best = k; });
+        return best;
+      },
+      extraResultHTML: '<p class="result-desc" style="margin-top:14px">🩺 힘든 순간이 계속된다면 — 즉시 도움을 연결해주는 앱 <a href="../apps.html" style="text-decoration:underline">Golden time</a>도 준비 중이에요.</p>'
+    });
+  </script>
+</body>
+</html>
