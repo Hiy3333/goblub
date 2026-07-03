@@ -104,5 +104,56 @@
     }
   };
 
-  window.Gunghap = { score: score, TEXTS: TEXTS };
+  // 부적 축원 2줄: 관계의 강점(실제 합 결과 기반) + 등급별 축원
+  function blessing(s) {
+    var line1 =
+      s.ilgan.type === "천간합" ? "하늘이 맺어준 합, 서로의 빈칸을 채우는 인연" :
+      s.ilji.type === "육합" ? "마음의 뿌리가 맞닿아 정이 깊어지는 인연" :
+      s.ilji.type === "삼합" ? "같은 곳을 바라보며 뜻을 모으는 인연" :
+      s.ilgan.type === "상생" ? "함께할수록 서로를 자라게 하는 인연" :
+      s.oheng.type === "보완" ? "없는 기운을 서로 채워주는 인연" :
+      s.oheng.type === "균형" ? "고른 두 기운이 잔잔히 오래가는 인연" :
+      "부딪힌 자리마다 정이 드는 인연";
+    var line2 = {
+      천생연분: "이대로만 가면 사랑운이 흘러넘칩니다",
+      찰떡궁합: "두 사람의 연애운이 나날이 부풀어 오릅니다",
+      "노력하면 꿀떡": "다가서는 걸음마다 연애운이 두 배로 찹니다",
+      "서로 배우는 사이": "알아가는 만큼 사랑의 그릇이 커집니다",
+      "파란만장 드라마": "고비를 넘을 때마다 인연이 더 질겨집니다"
+    }[s.grade];
+    return [line1, line2];
+  }
+
+  // 오늘/이번 달 커플운: 해당 기둥(일주/월주)과 두 사람 일주의 합충으로 산출
+  function coupleLuck(rA, rB, rT) {
+    function one(pillar) {
+      var pt = 3;
+      [rA, rB].forEach(function (r) {
+        var rel = jiRel(pillar[1], r.pillars.day[1]);
+        if (rel === "육합" || rel === "삼합") pt += 1;
+        else if (rel === "충") pt -= 1;
+        if ((pillar[0] - r.pillars.day[0] + 10) % 10 === 5) pt += 1; // 천간합 보너스
+      });
+      return Math.max(1, Math.min(5, pt));
+    }
+    var d = one(rT.pillars.day);
+    var m = one(rT.pillars.month);
+    var DAY_TXT = {
+      5: "오늘은 둘이 함께일수록 운이 배가 되는 날! 미뤄둔 데이트가 있다면 바로 오늘이에요.",
+      4: "오늘 함께 보내는 시간이 순하게 흘러가요. 소소한 약속 하나 잡기 좋은 날.",
+      3: "무난한 하루 — 특별한 이벤트보다 편안한 연락 한 통이 딱 좋아요.",
+      2: "오늘은 사소한 말에 서로 예민해질 수 있어요. 중요한 대화는 내일로 미루는 게 상책!",
+      1: "오늘은 사소한 말에 서로 예민해질 수 있어요. 중요한 대화는 내일로 미루는 게 상책!"
+    };
+    var MONTH_TXT = {
+      5: "이번 달은 두 사람 사이에 순풍이 붑니다. 관계의 다음 걸음을 떼기 좋은 달이에요.",
+      4: "이번 달은 함께 도모하는 일마다 합이 잘 맞아요.",
+      3: "이번 달은 잔잔한 흐름 — 꾸준한 안부가 관계를 지켜줍니다.",
+      2: "이번 달은 서로의 페이스가 어긋나기 쉬워요. 기대보다 배려를 앞세우면 무사통과!",
+      1: "이번 달은 서로의 페이스가 어긋나기 쉬워요. 기대보다 배려를 앞세우면 무사통과!"
+    };
+    return { day: { score: d, text: DAY_TXT[d] }, month: { score: m, text: MONTH_TXT[m] } };
+  }
+
+  window.Gunghap = { score: score, TEXTS: TEXTS, blessing: blessing, coupleLuck: coupleLuck };
 })();
