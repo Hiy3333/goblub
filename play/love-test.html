@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>연애 스타일 테스트 — goblub</title>
+  <meta name="description" content="10문항으로 알아보는 나의 연애 스타일" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+  <div id="site-header"></div>
+  <main>
+    <section class="hero">
+      <h1>💘 연애 스타일 테스트</h1>
+      <p>연애할 때 나는 어떤 사람일까? 10문항이면 끝!</p>
+    </section>
+    <section class="panel" id="quiz"></section>
+    <p class="fine-print">재미로 봐주세요 🙂</p>
+  </main>
+  <div id="site-footer"></div>
+  <script src="../js/common.js" data-root=".."></script>
+  <script src="js/quiz.js"></script>
+  <script>
+    Quiz.init(document.getElementById("quiz"), {
+      emoji: "💘",
+      title: "연애 스타일 테스트",
+      intro: "10개 질문에 솔직하게 답하면, 연애할 때의 진짜 내 모습을 알려드려요.",
+      questions: [
+        { q: "짝사랑이 생겼다! 나의 첫 행동은?", choices: [
+          { text: "바로 고백 각 재기. 밀당은 시간 낭비!", scores: { fire: 1 } },
+          { text: "그 사람의 SNS를 정독하며 취향 조사", scores: { pure: 1 } },
+          { text: "관심 없는 척하면서 자꾸 근처에 등장", scores: { tsun: 1 } },
+          { text: "인연이면 어떻게든 되겠지~ 일단 내 할 일", scores: { free: 1 } } ] },
+        { q: "연인과의 연락 빈도, 나의 이상향은?", choices: [
+          { text: "수시로! 아침 인사부터 잘 자까지 풀코스", scores: { fire: 1 } },
+          { text: "정해진 시간에 꼬박꼬박, 성실한 연락", scores: { pure: 1 } },
+          { text: "필요할 때만. 대신 만나면 확실하게", scores: { tsun: 1 } },
+          { text: "서로 자유롭게. 안 와도 불안하지 않음", scores: { free: 1 } } ] },
+        { q: "기념일에 나는?", choices: [
+          { text: "깜짝 이벤트 대규모로 준비!", scores: { fire: 1 } },
+          { text: "몇 주 전부터 선물·편지 정성껏 준비", scores: { pure: 1 } },
+          { text: "\"별거 아냐\"라며 은근 신경 쓴 선물 툭", scores: { tsun: 1 } },
+          { text: "기념일보다 평소가 중요하지 않아?", scores: { free: 1 } } ] },
+        { q: "연인과 싸웠을 때 나는?", choices: [
+          { text: "그 자리에서 다 풀어야 함. 냉전 못 견딤", scores: { fire: 1 } },
+          { text: "내가 뭘 잘못했나 곱씹으며 먼저 사과", scores: { pure: 1 } },
+          { text: "말은 퉁명해도 슬쩍 화해 신호 보냄", scores: { tsun: 1 } },
+          { text: "각자 시간 갖고 식은 뒤에 얘기하자", scores: { free: 1 } } ] },
+        { q: "이상형에 가까운 사람은?", choices: [
+          { text: "매 순간 설레게 하는 사람", scores: { fire: 1 } },
+          { text: "한결같이 나만 바라봐주는 사람", scores: { pure: 1 } },
+          { text: "겉은 시크한데 나한테만 다정한 사람", scores: { tsun: 1 } },
+          { text: "서로의 세계를 존중해주는 사람", scores: { free: 1 } } ] },
+        { q: "데이트 코스를 정할 때 나는?", choices: [
+          { text: "핫플 뚫기! 새로운 곳 도장깨기", scores: { fire: 1 } },
+          { text: "상대가 좋아할 만한 곳을 미리 조사", scores: { pure: 1 } },
+          { text: "\"아무데나\"라고 하고 결국 내가 정함", scores: { tsun: 1 } },
+          { text: "발 닿는 대로! 계획 없는 게 계획", scores: { free: 1 } } ] },
+        { q: "연인의 휴대폰이 궁금할 때 나는?", choices: [
+          { text: "궁금하면 바로 물어봄. 뭐 숨겨?", scores: { fire: 1 } },
+          { text: "불안해도 믿는 게 사랑이니까 참기", scores: { pure: 1 } },
+          { text: "안 궁금한 척하지만 사실 다 보고 있음", scores: { tsun: 1 } },
+          { text: "전혀 안 궁금. 내 폰도 보여줄 수 있음", scores: { free: 1 } } ] },
+        { q: "사랑 표현 방식, 나는?", choices: [
+          { text: "말로! \"좋아해\"를 하루 열 번도 가능", scores: { fire: 1 } },
+          { text: "행동으로. 챙겨주고 기억해주는 것", scores: { pure: 1 } },
+          { text: "놀리는 게 애정 표현. 미안, 이게 나야", scores: { tsun: 1 } },
+          { text: "함께 있는 시간 자체가 표현", scores: { free: 1 } } ] },
+        { q: "권태기가 온 것 같다. 나의 대처는?", choices: [
+          { text: "여행이든 이벤트든 새 불씨를 만든다", scores: { fire: 1 } },
+          { text: "처음 마음을 떠올리며 더 노력한다", scores: { pure: 1 } },
+          { text: "티는 안 내고 혼자 끙끙 고민한다", scores: { tsun: 1 } },
+          { text: "자연스러운 흐름. 각자 시간을 늘린다", scores: { free: 1 } } ] },
+        { q: "친구들이 말하는 나의 연애는?", choices: [
+          { text: "\"쟤 연애하면 세상이 다 아는 애\"", scores: { fire: 1 } },
+          { text: "\"진짜 잘해줘. 아까울 정도로\"", scores: { pure: 1 } },
+          { text: "\"연애하는 거 맞아? 근데 오래 가\"", scores: { tsun: 1 } },
+          { text: "\"연애해도 자기 삶이 확실한 애\"", scores: { free: 1 } } ] }
+      ],
+      results: {
+        fire: { emoji: "🔥", name: "불꽃 열정형", desc: "사랑에 빠지면 온 세상이 그 사람 중심으로 도는 타입! 표현도 화끈, 이벤트도 화끈. 당신과의 연애는 심장이 남아나질 않아요. 다만 불꽃이 큰 만큼 산소(내 시간)도 챙겨야 오래 타요." },
+        pure: { emoji: "🌷", name: "순정 헌신형", desc: "한 사람에게 진심을 다하는 로맨티스트. 기억력도 정성도 만렙이라 상대는 세상에서 제일 사랑받는 기분이 들어요. 단, 주기만 하다 지치지 않게 받는 연습도 필요해요." },
+        tsun: { emoji: "🦔", name: "츤데레 고슴도치형", desc: "겉은 까칠, 속은 순두부. 좋아할수록 퉁명해지는 신비한 타입이에요. 알아주는 사람에겐 세상 다정한 반전 매력! 가끔은 속마음을 소리 내어 말해주면 상대가 덜 헷갈려요." },
+        free: { emoji: "🪁", name: "자유로운 연형", desc: "사랑도 중요하지만 나의 세계도 소중한 쿨한 타입. 집착 없는 건강한 거리감이 당신 연애의 매력이에요. 다만 상대가 서운해할 땐 연줄을 살짝 당겨주는 센스!" }
+      },
+      resolve: function (t) {
+        var best = "fire";
+        ["fire", "pure", "tsun", "free"].forEach(function (k) { if ((t[k] || 0) > (t[best] || 0)) best = k; });
+        return best;
+      }
+    });
+  </script>
+</body>
+</html>
