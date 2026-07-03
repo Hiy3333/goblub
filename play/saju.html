@@ -52,6 +52,11 @@
       <p id="r-strength" style="line-height:1.7; margin-top:10px"></p>
       <p id="r-sipseong" style="line-height:1.7; margin-top:10px"></p>
       <div id="r-daeun" style="margin-top:16px"></div>
+      <div id="dosa-box" style="margin-top:18px; text-align:center">
+        <button class="btn-primary" id="btn-dosa">🧙 고블럽 도사의 심층 풀이 듣기</button>
+        <p id="dosa-status" class="fine-print" style="display:none"></p>
+        <div id="dosa-text" style="display:none; white-space:pre-wrap; line-height:1.8; margin-top:12px; background:var(--cream); border-radius:14px; padding:18px; text-align:left"></div>
+      </div>
       <div class="result-actions">
         <button class="btn-ghost" onclick="document.getElementById('result-panel').style.display='none'; document.getElementById('input-panel').scrollIntoView();">다시 보기</button>
       </div>
@@ -63,6 +68,7 @@
   <div id="site-footer"></div>
   <script src="../js/common.js" data-root=".."></script>
   <script src="js/saju.js"></script>
+  <script src="js/dosa.js"></script>
   <script>
     (function () {
       var $ = function (id) { return document.getElementById(id); };
@@ -97,6 +103,11 @@
         var trueSolar = $("in-truesolar").checked;
         var r = Saju.compute(data, { y: yy, m: mm, d: dd, hour: hour, min: min },
           { trueSolar: trueSolar, gender: gender });
+        lastCtx = { r: r, birth: { y: yy, m: mm, d: dd, hour: hour, min: min }, gender: gender, trueSolar: trueSolar };
+        $("dosa-text").style.display = "none";
+        $("dosa-text").textContent = "";
+        $("dosa-status").style.display = "none";
+        $("btn-dosa").disabled = false;
         render(r);
         $("result-panel").style.display = "block";
         $("result-panel").scrollIntoView({ behavior: "smooth" });
@@ -155,6 +166,32 @@
         if (none.length) txt += " " + SajuText.ohengNone[none[0]];
         $("r-oheng-txt").textContent = txt;
       }
+
+      var lastCtx = null;
+      $("btn-dosa").onclick = function () {
+        if (!lastCtx) return;
+        var btn = $("btn-dosa"), txt = $("dosa-text"), st = $("dosa-status");
+        btn.disabled = true;
+        st.style.display = "block";
+        st.textContent = "🧙 도사님이 팔자를 찬찬히 들여다보는 중…";
+        txt.style.display = "block";
+        txt.textContent = "";
+        var payload = Dosa.buildPayload(lastCtx.r, lastCtx.birth, lastCtx.gender, lastCtx.trueSolar);
+        Dosa.fetchReading(payload, {
+          onChunk: function (t) { txt.textContent += t; },
+          onDone: function (fromCache) {
+            st.textContent = fromCache ? "🧙 (지난번에 봐드린 풀이예요)" : "🧙 풀이 끝! 재미로 봐주세요.";
+          },
+          onError: function (code, sec) {
+            txt.style.display = "none";
+            st.textContent =
+              code === "not_configured" ? "도사님이 아직 수련 중이에요. 곧 찾아옵니다!" :
+              code === "cooldown" ? "도사님이 숨 고르는 중… " + sec + "초 후에 다시 눌러주세요!" :
+              "도사님이 지금 손님이 많아요. 잠시 후 다시 시도해 주세요.";
+            btn.disabled = false;
+          }
+        });
+      };
 
       function zodiacEmoji(z) {
         return { 쥐: "🐭", 소: "🐮", 호랑이: "🐯", 토끼: "🐰", 용: "🐲", 뱀: "🐍", 말: "🐴", 양: "🐑", 원숭이: "🐵", 닭: "🐔", 개: "🐶", 돼지: "🐷" }[z] || "🔮";
