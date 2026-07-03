@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>우리 궁합 — goblub</title>
+  <meta name="description" content="두 사람의 사주로 보는 궁합 점수와 풀이, 연애운 증폭 부적까지" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    .person-box { border: 2px dashed #e8e2d4; border-radius: 14px; padding: 14px; margin-bottom: 14px; }
+    .person-box h3 { font-size: 1.05rem; margin-bottom: 10px; }
+    .score-big { text-align: center; font-size: 3.2rem; margin: 6px 0 0; }
+    .score-grade { text-align: center; font-size: 1.4rem; margin-bottom: 12px; }
+    .gauge { background: #efe9db; border-radius: 999px; height: 16px; margin: 10px 0 18px; overflow: hidden; }
+    .gauge > div { height: 16px; border-radius: 999px; background: linear-gradient(90deg, var(--coral), var(--purple)); transition: width 0.6s; }
+    .pair { display: flex; justify-content: center; gap: 18px; margin-bottom: 14px; }
+    .pair .pillar { min-width: 100px; }
+    .cat-line { line-height: 1.7; margin-bottom: 8px; }
+    .cat-line .pt { color: var(--ink-soft); font-size: 0.88rem; }
+  </style>
+</head>
+<body>
+  <div id="site-header"></div>
+  <main>
+    <section class="hero">
+      <h1>💑 우리 궁합</h1>
+      <p>두 사람의 사주팔자로 보는 케미 — 절기 경계까지 정확한 만세력 기반</p>
+    </section>
+
+    <section class="panel" id="input-panel">
+      <div class="person-box">
+        <h3>🙋 나</h3>
+        <div class="field-row">
+          <select id="a-year"></select><select id="a-month"></select><select id="a-day"></select>
+          <select id="a-hour"><option value="">시 몰라요</option></select>
+        </div>
+      </div>
+      <div class="person-box">
+        <h3>💘 상대방</h3>
+        <div class="field-row">
+          <select id="b-year"></select><select id="b-month"></select><select id="b-day"></select>
+          <select id="b-hour"><option value="">시 몰라요</option></select>
+        </div>
+      </div>
+      <button class="btn-primary" id="btn-go">궁합 보기</button>
+      <p class="error-msg" id="err"></p>
+      <p class="fine-print" style="text-align:left">두 분의 정보는 이 브라우저에서만 계산되고 저장되지 않아요.</p>
+    </section>
+
+    <section class="panel" id="result-panel" style="display:none">
+      <p class="score-big" id="r-score"></p>
+      <p class="score-grade" id="r-grade"></p>
+      <div class="gauge"><div id="r-gauge" style="width:0%"></div></div>
+      <div class="pair" id="r-pair"></div>
+      <div id="r-cats"></div>
+      <p class="cat-line" id="r-advice" style="margin-top:10px"></p>
+
+      <div id="gh-dosa" style="margin-top:18px; text-align:center">
+        <div class="result-actions">
+          <button class="btn-primary" id="btn-bujeok">🧧 연애운 증폭 부적 받기</button>
+          <button class="btn-ghost" id="btn-ghdosa">🧙 도사의 궁합 리포트</button>
+          <button class="btn-ghost" id="btn-retry">다시 보기</button>
+        </div>
+        <p id="gh-status" class="fine-print" style="display:none"></p>
+        <div id="gh-text" style="display:none; white-space:pre-wrap; line-height:1.8; margin-top:12px; background:var(--cream); border-radius:14px; padding:18px; text-align:left"></div>
+      </div>
+    </section>
+
+    <p class="fine-print">궁합은 재미로 봐주세요 🙂</p>
+  </main>
+  <div id="site-footer"></div>
+  <script src="../js/common.js" data-root=".."></script>
+  <script src="js/saju.js"></script>
+  <script src="js/gunghap.js"></script>
+  <script src="js/dosa.js"></script>
+  <script>
+    (function () {
+      var $ = function (id) { return document.getElementById(id); };
+      var data = null, last = null;
+
+      function fillSelects(prefix) {
+        var y = $(prefix + "-year"), m = $(prefix + "-month"), d = $(prefix + "-day"), h = $(prefix + "-hour");
+        for (var i = 2100; i >= 1900; i--) y.add(new Option(i + "년", i));
+        y.value = 1995;
+        for (i = 1; i <= 12; i++) m.add(new Option(i + "월", i));
+        for (i = 1; i <= 31; i++) d.add(new Option(i + "일", i));
+        for (i = 0; i <= 23; i++) h.add(new Option(i + "시", i));
+      }
+      fillSelects("a"); fillSelects("b");
+
+      // 운세 페이지에 저장된 내 생일 프리필
+      try {
+        var mine = JSON.parse(localStorage.getItem("goblub_birth"));
+        if (mine && mine.y) {
+          $("a-year").value = mine.y; $("a-month").value = mine.m; $("a-day").value = mine.d;
+          if (mine.hour != null) $("a-hour").value = mine.hour;
+        }
+      } catch (e) {}
+
+      function showErr(msg) { var e = $("err"); e.textContent = msg; e.style.display = "block"; }
+
+      function readBirth(prefix) {
+        var yy = +$(prefix + "-year").value, mm = +$(prefix + "-month").value, dd = +$(prefix + "-day").value;
+        var date = new Date(yy, mm - 1, dd);
+        if (date.getFullYear() !== yy || date.getMonth() !== mm - 1 || date.getDate() !== dd) return null;
+        var hv = $(prefix + "-hour").value;
+        return { y: yy, m: mm, d: dd, hour: hv === "" ? null : +hv, min: 0 };
+      }
+
+      fetch("data/saju-terms.json")
+        .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+        .then(function (d) { data = d; })
+        .catch(function () { showErr("데이터를 불러오지 못했어요. 새로고침 해주세요."); });
+
+      $("btn-go").onclick = function () {
+        $("err").style.display = "none";
+        if (!data) { showErr("데이터를 불러오지 못했어요. 새로고침 해주세요."); return; }
+        var ba = readBirth("a"), bb = readBirth("b");
+        if (!ba || !bb) { showErr("없는 날짜가 있어요. 다시 확인해주세요!"); return; }
+        var rA = Saju.compute(data, ba, {});
+        var rB = Saju.compute(data, bb, {});
+        var s = Gunghap.score(rA, rB);
+        last = { rA: rA, rB: rB, ba: ba, bb: bb, s: s };
+        render(rA, rB, s);
+        $("gh-text").style.display = "none"; $("gh-text").textContent = "";
+        $("gh-status").style.display = "none"; $("btn-ghdosa").disabled = false;
+        $("input-panel").style.display = "none";
+        $("result-panel").style.display = "block";
+      };
+
+      function pillarBox(label, r) {
+        var t = Saju.pillarText(r.pillars.day);
+        return '<div class="pillar"><span class="role">' + label + '</span><span class="hanja">' + t.hanja +
+          '</span><span class="hangul">' + t.hangul + " · " + r.zodiac + "띠</span></div>";
+      }
+
+      function render(rA, rB, s) {
+        $("r-score").textContent = s.total + "점";
+        $("r-grade").textContent = "「" + s.grade + "」";
+        setTimeout(function () { $("r-gauge").style.width = s.total + "%"; }, 50);
+        $("r-pair").innerHTML = pillarBox("나", rA) + '<div style="align-self:center; font-size:1.6rem">❤️</div>' + pillarBox("상대", rB);
+        var T = Gunghap.TEXTS;
+        $("r-cats").innerHTML =
+          '<p class="cat-line">🌟 일간 케미 <span class="pt">(' + s.ilgan.pt + "/" + s.ilgan.max + ")</span> — " + T.ilgan[s.ilgan.type] + "</p>" +
+          '<p class="cat-line">🏠 일지 케미 <span class="pt">(' + s.ilji.pt + "/" + s.ilji.max + ")</span> — " + T.ilji[s.ilji.type] + "</p>" +
+          '<p class="cat-line">⚖️ 오행 케미 <span class="pt">(' + s.oheng.pt + "/" + s.oheng.max + ")</span> — " + T.oheng[s.oheng.type] + "</p>" +
+          '<p class="cat-line">🐭 띠 케미 <span class="pt">(' + s.tti.pt + "/" + s.tti.max + ")</span> — " + T.tti[s.tti.type] + "</p>" +
+          '<p class="cat-line" style="margin-top:10px">' + T.grade[s.grade] + "</p>";
+        $("r-advice").textContent = T.advice[s.grade];
+      }
+
+      $("btn-retry").onclick = function () {
+        $("result-panel").style.display = "none";
+        $("input-panel").style.display = "block";
+      };
+
+      // 🧧 부적 카드
+      $("btn-bujeok").onclick = function () {
+        if (!last) return;
+        var tA = Saju.pillarText(last.rA.pillars.day), tB = Saju.pillarText(last.rB.pillars.day);
+        var c = document.createElement("canvas");
+        c.width = 720; c.height = 1080;
+        var g = c.getContext("2d");
+        g.fillStyle = "#ffe9a8"; g.fillRect(0, 0, 720, 1080);
+        g.strokeStyle = "#d64545"; g.lineWidth = 10; g.strokeRect(28, 28, 664, 1024);
+        g.lineWidth = 3; g.strokeRect(48, 48, 624, 984);
+        g.fillStyle = "#d64545"; g.textAlign = "center";
+        g.font = "76px 'Jua', 'Malgun Gothic', serif";
+        var title = "戀愛運上昇符";
+        for (var i = 0; i < title.length; i++) g.fillText(title[i], 360, 160 + i * 84);
+        g.font = "58px 'Segoe UI Emoji', sans-serif";
+        g.fillText("👾❤️👾", 360, 720);
+        g.font = "54px 'Jua', 'Malgun Gothic', serif";
+        g.fillText(tA.hanja + "  ♥  " + tB.hanja, 360, 800);
+        g.font = "40px 'Jua', 'Malgun Gothic', sans-serif";
+        g.fillText(last.s.total + "점 · " + last.s.grade, 360, 865);
+        g.font = "26px 'Jua', 'Malgun Gothic', sans-serif";
+        g.fillStyle = "#8a4a2b";
+        g.fillText("이 부적을 배경화면으로 하면 연애운이 커진대요", 360, 940);
+        g.fillText("🍞 goblub.vercel.app", 360, 985);
+        c.toBlob(function (blob) {
+          if (!blob) { window.open(c.toDataURL("image/png")); return; }
+          var a = document.createElement("a");
+          a.href = URL.createObjectURL(blob);
+          a.download = "goblub-bujeok-" + last.s.total + ".png";
+          document.body.appendChild(a); a.click(); a.remove();
+          setTimeout(function () { URL.revokeObjectURL(a.href); }, 5000);
+        }, "image/png");
+      };
+
+      // 🧙 도사의 궁합 리포트
+      $("btn-ghdosa").onclick = function () {
+        if (!last) return;
+        var btn = $("btn-ghdosa"), txt = $("gh-text"), st = $("gh-status");
+        btn.disabled = true;
+        st.style.display = "block";
+        st.textContent = "🧙 도사님이 두 사주를 나란히 펼쳐보는 중…";
+        txt.style.display = "block"; txt.textContent = "";
+        var payload = {
+          a: Dosa.buildPayload(last.rA, last.ba, null, false),
+          b: Dosa.buildPayload(last.rB, last.bb, null, false),
+          score: { total: last.s.total, grade: last.s.grade,
+            ilgan: last.s.ilgan.type, ilji: last.s.ilji.type,
+            oheng: last.s.oheng.type, tti: last.s.tti.type }
+        };
+        Dosa.fetchGunghap(payload, {
+          onChunk: function (t) { txt.textContent += t; },
+          onDone: function (fromCache) {
+            st.textContent = fromCache ? "🧙 (지난번에 봐드린 리포트예요)" : "🧙 리포트 끝! 재미로 봐주세요.";
+          },
+          onError: function (code, sec) {
+            txt.style.display = "none";
+            st.textContent =
+              code === "not_configured" ? "도사님이 아직 수련 중이에요. 곧 찾아옵니다!" :
+              code === "cooldown" ? "도사님이 숨 고르는 중… " + sec + "초 후에 다시!" :
+              "도사님이 지금 손님이 많아요. 잠시 후 다시 시도해 주세요.";
+            btn.disabled = false;
+          }
+        });
+      };
+    })();
+  </script>
+</body>
+</html>

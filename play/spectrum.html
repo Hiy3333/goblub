@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>스펙트럼 찾기 — goblub</title>
+  <meta name="description" content="끌림의 스펙트럼 위 나의 자리를 비춰보는 자기탐색 테스트" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    .rainbow-bar { position: relative; height: 18px; border-radius: 999px; margin: 22px 0 6px;
+      background: linear-gradient(90deg, #ff6b6b, #ffd93d, #6bcb77, #4d96ff, #b983ff); }
+    .rainbow-marker { position: absolute; top: -8px; width: 6px; height: 34px; border-radius: 3px;
+      background: var(--ink); transform: translateX(-50%); }
+    .bar-labels { display: flex; justify-content: space-between; color: var(--ink-soft); font-size: 0.82rem; margin-bottom: 16px; }
+    .principle { background: var(--cream); border-radius: 14px; padding: 14px 16px; line-height: 1.7;
+      color: var(--ink-soft); font-size: 0.95rem; margin: 14px 0; }
+    .term-box { line-height: 1.7; margin-top: 12px; }
+  </style>
+</head>
+<body>
+  <div id="site-header"></div>
+  <main>
+    <section class="hero">
+      <h1>🌈 스펙트럼 찾기</h1>
+      <p>끌림의 스펙트럼 위, 오늘의 나는 어디쯤일까?</p>
+    </section>
+
+    <section class="panel">
+      <div id="st-intro">
+        <h2 style="text-align:center">나를 비추는 거울 🪞</h2>
+        <div class="principle">
+          🧭 <b>시작 전에 딱 세 가지만.</b><br />
+          ① 정체성은 테스트가 정해주는 게 아니라, 스스로 알아가는 거예요. 이 테스트는 거울일 뿐.<br />
+          ② 응답과 결과는 <b>이 화면에만 표시되고 어디에도 저장·전송되지 않아요.</b> 새로고침하면 사라져요.<br />
+          ③ 정답도, 좋은 결과도 없어요. 솔직할수록 거울이 맑아질 뿐이에요.
+        </div>
+        <p class="result-desc" style="text-align:center; margin-bottom:18px">
+          성과학의 자기보고 틀(킨제이 스케일·클라인 그리드)을 바탕으로 한 12문항이에요.
+        </p>
+        <div class="result-actions"><button class="btn-primary" id="btn-start">거울 들여다보기</button></div>
+      </div>
+
+      <div id="st-quiz" style="display:none">
+        <div class="progress-track"><div class="progress-fill" id="q-fill" style="width:0%"></div></div>
+        <p class="quiz-q" id="q-text"></p>
+        <div id="q-choices"></div>
+      </div>
+
+      <div id="st-result" style="display:none">
+        <span class="result-emoji" id="r-emoji"></span>
+        <p class="result-name" id="r-name"></p>
+        <div id="r-bar-wrap">
+          <div class="rainbow-bar"><div class="rainbow-marker" id="r-marker"></div></div>
+          <div class="bar-labels"><span>다른 젠더 쪽</span><span>양쪽 들판</span><span>같은 젠더 쪽</span></div>
+        </div>
+        <p class="result-desc" id="r-desc"></p>
+        <p class="result-desc term-box" id="r-terms"></p>
+        <p class="result-desc term-box" id="r-extra" style="display:none"></p>
+        <p class="result-desc" style="margin-top:14px"><b>라벨은 도구일 뿐, 주인은 언제나 너야.</b> 오늘의 결과는 오늘의 거울 — 내일의 너는 내일 다시 비춰보면 돼.</p>
+        <div class="result-actions"><button class="btn-primary" id="btn-retry">다시 비춰보기</button></div>
+        <p class="fine-print" style="margin-top:14px">더 알아보고 싶다면 — <a href="https://kscrc.org" target="_blank" rel="noopener" style="text-decoration:underline">한국성적소수자문화인권센터</a> · <a href="https://www.ddingdong.kr" target="_blank" rel="noopener" style="text-decoration:underline">청소년 성소수자 지원센터 띵동</a></p>
+      </div>
+    </section>
+
+    <p class="fine-print">이 테스트는 진단이 아닌 자기탐색 도구예요 🙂</p>
+  </main>
+  <div id="site-footer"></div>
+  <script src="../js/common.js" data-root=".."></script>
+  <script>
+    (function () {
+      var $ = function (id) { return document.getElementById(id); };
+
+      // 스코어 키: same(같은 젠더), other(다른 젠더), both(=same1+other1), ace, fluid
+      var QUESTIONS = [
+        // 끌림 축
+        { q: "길에서 나도 모르게 한 번 더 눈이 가는 사람은?", c: [
+          ["다른 젠더인 사람", { other: 2 }],
+          ["같은 젠더인 사람", { same: 2 }],
+          ["젠더와 상관없이, 분위기 있는 사람", { same: 1, other: 1 }],
+          ["글쎄… 눈이 잘 안 가는 편이야", { ace: 2 }] ] },
+        { q: "심장이 '쿵' 했던 순간을 떠올려보면, 그 상대는?", c: [
+          ["다른 젠더였어", { other: 2 }],
+          ["같은 젠더였어", { same: 2 }],
+          ["둘 다 있었어", { same: 1, other: 1 }],
+          ["그런 순간이 잘 기억나지 않아", { ace: 2 }] ] },
+        { q: "영화나 드라마를 보다가 나를 설레게 하는 인물은?", c: [
+          ["주로 다른 젠더의 인물", { other: 2 }],
+          ["주로 같은 젠더의 인물", { same: 2 }],
+          ["매력 있으면 젠더는 상관없어", { same: 1, other: 1 }],
+          ["설렘보다는 스토리에 집중하는 편", { ace: 2 }] ] },
+        { q: "가벼운 상상 속에서 손을 잡고 걷는 사람이 있다면?", c: [
+          ["다른 젠더의 누군가", { other: 2 }],
+          ["같은 젠더의 누군가", { same: 2 }],
+          ["그때그때 달라", { same: 1, other: 1 }],
+          ["그런 상상 자체를 잘 안 해", { ace: 2 }] ] },
+        // 로맨스 축
+        { q: "연애 감정(두근거림+계속 보고 싶음)을 느껴본 대상은?", c: [
+          ["다른 젠더", { other: 2 }],
+          ["같은 젠더", { same: 2 }],
+          ["둘 다 겪어봤어", { same: 1, other: 1 }],
+          ["아직 없거나, 아주 드물어", { ace: 2 }] ] },
+        { q: "'이 사람과 사귀면 어떨까' 진지하게 그려본 상대는?", c: [
+          ["다른 젠더였어", { other: 2 }],
+          ["같은 젠더였어", { same: 2 }],
+          ["둘 다 있었어", { same: 1, other: 1 }],
+          ["그려본 적이 거의 없어", { ace: 2 }] ] },
+        { q: "질투 비슷한 감정이 들었던 상황을 떠올려보면?", c: [
+          ["다른 젠더인 사람과 얽혀 있었어", { other: 2 }],
+          ["같은 젠더인 사람과 얽혀 있었어", { same: 2 }],
+          ["둘 다 있었던 것 같아", { same: 1, other: 1 }],
+          ["질투라는 감정을 잘 모르겠어", { ace: 2 }] ] },
+        { q: "미래의 연인을 자유롭게 상상한다면, 그 사람의 젠더는?", c: [
+          ["다른 젠더일 것 같아", { other: 2 }],
+          ["같은 젠더일 것 같아", { same: 2 }],
+          ["누구든 될 수 있을 것 같아", { same: 1, other: 1 }],
+          ["연인이라는 그림 자체가 흐릿해", { ace: 2 }] ] },
+        // 자기인식 축
+        { q: "내 끌림의 방향에 대해, 지금의 나는?", c: [
+          ["꽤 확실하게 알고 있어", {}],
+          ["대체로 알지만 가끔 흔들려", { fluid: 1 }],
+          ["잘 모르겠고, 그게 불편하지 않아", { fluid: 2 }],
+          ["지금 알아가는 중이야", { fluid: 2 }] ] },
+        { q: "끌림의 방향이 시간이 지나며 변할 수 있다고 생각해?", c: [
+          ["나는 안 변할 것 같아", {}],
+          ["변할 수도 있을 것 같아", { fluid: 2 }],
+          ["이미 변해본 적 있어", { fluid: 2, same: 1, other: 1 }],
+          ["생각해본 적 없어", { fluid: 1 }] ] },
+        { q: "나를 설명하는 라벨(이성애자, 바이 등)에 대해 나는?", c: [
+          ["딱 맞는 라벨이 있어", {}],
+          ["비슷한 라벨은 있지만 갇히긴 싫어", { fluid: 1 }],
+          ["라벨 없이 그냥 나로 있고 싶어", { fluid: 2 }],
+          ["어떤 라벨들이 있는지 궁금해", { fluid: 1 }] ] },
+        { q: "만약 예상 밖의 사람에게 설렌다면, 나는?", c: [
+          ["꽤 혼란스러울 것 같아", {}],
+          ["놀랍지만 받아들일 것 같아", { fluid: 1 }],
+          ["설렘엔 이유가 없지. 자연스럽게!", { fluid: 1, same: 1, other: 1 }],
+          ["그럴 일은 없을 거야", {}] ] }
+      ];
+
+      var PROFILES = {
+        edgeOther: { emoji: "🧭", name: "한끝 자리 — 다른 젠더 쪽",
+          desc: "끌림의 나침반이 한 방향을 또렷하게 가리키고 있어요. 다른 젠더를 향한 설렘이 당신의 중심이네요. 뚜렷하다는 건 그 자체로 편안한 일이에요.",
+          terms: "곁에 있는 단어들: 이성애(헤테로). 물론 단어가 전부는 아니에요." },
+        leanOther: { emoji: "🌗", name: "기울어진 들판 — 다른 젠더 쪽으로",
+          desc: "중심은 다른 젠더를 향해 있지만, 반대쪽에서도 이따금 바람이 불어오는 들판이에요. 그 바람을 이상하게 여길 필요는 전혀 없어요 — 스펙트럼은 원래 흑백이 아니거든요.",
+          terms: "곁에 있는 단어들: 헤테로플렉시블, 바이(양성애). 끌림의 비율은 사람마다 달라요." },
+        middle: { emoji: "🌈", name: "가운데 들판",
+          desc: "젠더보다 사람이 먼저 보이는 자리예요. 양쪽 모두에게 열려 있는 이 들판은 좁은 길이 아니라 넓은 광장이에요.",
+          terms: "곁에 있는 단어들: 양성애(바이), 범성애(팬). 광장에는 생각보다 많은 사람이 있어요." },
+        leanSame: { emoji: "🌓", name: "기울어진 들판 — 같은 젠더 쪽으로",
+          desc: "중심은 같은 젠더를 향해 있고, 반대쪽 바람도 가끔 스치는 들판이에요. 방향이 어느 쪽이든, 끌림은 설명이 아니라 느낌으로 충분해요.",
+          terms: "곁에 있는 단어들: 호모플렉시블, 바이(양성애). 이름표보다 마음이 먼저예요." },
+        edgeSame: { emoji: "🧭", name: "한끝 자리 — 같은 젠더 쪽",
+          desc: "끌림의 나침반이 같은 젠더를 또렷하게 가리키고 있어요. 그 또렷함은 당신이 스스로를 잘 들여다봤다는 증거이기도 해요.",
+          terms: "곁에 있는 단어들: 동성애(게이·레즈비언). 당신의 자리는 언제나 유효해요." },
+        ace: { emoji: "🌊", name: "고요한 호수",
+          desc: "성적인 끌림의 물결이 잔잔하거나 드물게 이는 호수예요. 끌림이 적다는 건 부족한 게 아니라, 다른 방식으로 깊이 연결되는 사람이라는 뜻이에요.",
+          terms: "곁에 있는 단어들: 무성애(에이스), 회색 무성애(그레이에이스), 데미섹슈얼. 호수도 스펙트럼이에요." }
+      };
+
+      var idx = 0, S = {};
+
+      function show(state) {
+        $("st-intro").style.display = state === "intro" ? "block" : "none";
+        $("st-quiz").style.display = state === "quiz" ? "block" : "none";
+        $("st-result").style.display = state === "result" ? "block" : "none";
+      }
+
+      function renderQ() {
+        var q = QUESTIONS[idx];
+        $("q-fill").style.width = Math.round(idx / QUESTIONS.length * 100) + "%";
+        $("q-text").textContent = "Q" + (idx + 1) + ". " + q.q;
+        var box = $("q-choices");
+        box.innerHTML = "";
+        q.c.forEach(function (pair) {
+          var b = document.createElement("button");
+          b.className = "choice-btn";
+          b.textContent = pair[0];
+          b.onclick = function () {
+            for (var k in pair[1]) S[k] = (S[k] || 0) + pair[1][k];
+            idx++;
+            if (idx < QUESTIONS.length) renderQ();
+            else renderResult();
+          };
+          box.appendChild(b);
+        });
+      }
+
+      function renderResult() {
+        var same = S.same || 0, other = S.other || 0, ace = S.ace || 0, fluid = S.fluid || 0;
+        var p, pos = null;
+        if (ace >= 6 || (same + other) === 0) {
+          p = PROFILES.ace;
+        } else {
+          pos = same / (same + other) * 100;
+          p = pos < 20 ? PROFILES.edgeOther :
+              pos < 40 ? PROFILES.leanOther :
+              pos <= 60 ? PROFILES.middle :
+              pos <= 80 ? PROFILES.leanSame : PROFILES.edgeSame;
+        }
+        $("r-emoji").textContent = p.emoji;
+        $("r-name").textContent = p.name;
+        $("r-desc").textContent = p.desc;
+        $("r-terms").textContent = "💬 " + p.terms;
+        if (pos == null) {
+          $("r-bar-wrap").style.display = "none";
+        } else {
+          $("r-bar-wrap").style.display = "block";
+          $("r-marker").style.left = pos + "%";
+        }
+        var extras = [];
+        if (p !== PROFILES.ace && ace >= 3) extras.push("🌊 끌림의 볼륨이 잔잔한 편이기도 해요. 강도 역시 사람마다 다른 스펙트럼이에요.");
+        if (fluid >= 5) extras.push("🖌 그리고 당신의 지도는 아직 그려지는 중 — 탐색하고 있다는 것 자체가 건강하다는 신호예요.");
+        var ex = $("r-extra");
+        if (extras.length) { ex.style.display = "block"; ex.textContent = extras.join(" "); }
+        else ex.style.display = "none";
+        show("result");
+      }
+
+      $("btn-start").onclick = function () { idx = 0; S = {}; renderQ(); show("quiz"); };
+      $("btn-retry").onclick = function () { show("intro"); };
+      show("intro");
+    })();
+  </script>
+</body>
+</html>

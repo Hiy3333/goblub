@@ -1,7 +1,7 @@
 // 고블럽 도사 심층 풀이 클라이언트.
-// window.Dosa = { buildPayload, fetchReading }
+// window.Dosa = { buildPayload, fetchReading, fetchGunghap }
 (function () {
-  var API = "https://goblub.vercel.app/api/saju-reading";
+  var API_BASE = "https://goblub.vercel.app";
   var COOLDOWN_KEY = "goblub_dosa_last";
   var COOLDOWN_MS = 60000;
 
@@ -54,8 +54,8 @@
   }
 
   // cb = { onChunk(text), onDone(fromCache), onError(code, sec?) }
-  function fetchReading(payload, cb) {
-    var key = "goblub_dosa_" + hash(JSON.stringify(payload));
+  function fetchStream(path, body, cacheKeyPrefix, cb) {
+    var key = cacheKeyPrefix + hash(JSON.stringify(body));
     try {
       var cached = localStorage.getItem(key);
       if (cached) { cb.onChunk(cached); cb.onDone(true); return; }
@@ -67,10 +67,10 @@
     if (wait > 0) { cb.onError("cooldown", Math.ceil(wait / 1000)); return; }
     try { localStorage.setItem(COOLDOWN_KEY, String(Date.now())); } catch (e) {}
 
-    fetch(API, {
+    fetch(API_BASE + path, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ saju: payload })
+      body: JSON.stringify(body)
     })
       .then(function (resp) {
         if (resp.status === 501) { cb.onError("not_configured"); return; }
@@ -97,5 +97,13 @@
       .catch(function () { cb.onError("busy"); });
   }
 
-  window.Dosa = { buildPayload: buildPayload, fetchReading: fetchReading };
+  function fetchReading(payload, cb) {
+    fetchStream("/api/saju-reading", { saju: payload }, "goblub_dosa_", cb);
+  }
+
+  function fetchGunghap(payload, cb) {
+    fetchStream("/api/gunghap-reading", { gunghap: payload }, "goblub_gh_", cb);
+  }
+
+  window.Dosa = { buildPayload: buildPayload, fetchReading: fetchReading, fetchGunghap: fetchGunghap };
 })();
