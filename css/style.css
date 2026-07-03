@@ -231,10 +231,123 @@ a.card:hover {
   font-size: 0.9rem;
 }
 
+/* ===== 콘텐츠 페이지 공용 (사주·퀴즈) ===== */
+.panel {
+  background: #fff;
+  border-radius: var(--card-radius);
+  box-shadow: var(--shadow);
+  padding: 28px 24px;
+  max-width: 620px;
+  margin: 0 auto 20px;
+}
+
+.panel h2 { margin-bottom: 14px; font-size: 1.25rem; }
+
+.field-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.field-row label { align-self: center; color: var(--ink-soft); }
+
+select, input[type="number"] {
+  font-family: inherit;
+  font-size: 1rem;
+  padding: 8px 10px;
+  border: 2px solid #e8e2d4;
+  border-radius: 10px;
+  background: #fff;
+  color: var(--ink);
+}
+
+.btn-primary {
+  background: var(--coral);
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  padding: 12px 26px;
+  font-family: inherit;
+  font-size: 1.05rem;
+  cursor: pointer;
+}
+
+.btn-primary:hover { filter: brightness(1.05); }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--ink-soft);
+  border: 2px solid #e8e2d4;
+  border-radius: 999px;
+  padding: 10px 22px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.error-msg { color: #d64545; margin-top: 8px; display: none; }
+
+.pillar-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  text-align: center;
+  margin: 18px 0;
+}
+
+.pillar {
+  background: var(--cream);
+  border-radius: 14px;
+  padding: 14px 6px;
+}
+
+.pillar .hanja { font-size: 1.7rem; display: block; }
+.pillar .hangul { color: var(--ink-soft); font-size: 0.9rem; }
+.pillar .role { font-size: 0.78rem; color: var(--ink-soft); display: block; margin-bottom: 6px; }
+
+.oheng-bars { margin: 14px 0; }
+.oheng-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.oheng-row .name { width: 3.2em; }
+.oheng-row .bar { height: 14px; border-radius: 7px; }
+.oheng-row .cnt { color: var(--ink-soft); font-size: 0.9rem; }
+.oheng-목 { background: var(--mint); }
+.oheng-화 { background: var(--coral); }
+.oheng-토 { background: var(--yellow); }
+.oheng-금 { background: #c9c9c9; }
+.oheng-수 { background: var(--sky); }
+
+.fine-print { text-align: center; color: var(--ink-soft); font-size: 0.85rem; margin-top: 18px; }
+
+/* 퀴즈 */
+.progress-track { background: #efe9db; border-radius: 999px; height: 10px; margin-bottom: 20px; }
+.progress-fill { background: var(--mint); height: 10px; border-radius: 999px; transition: width 0.2s; }
+.quiz-q { font-size: 1.2rem; margin-bottom: 18px; }
+.choice-btn {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: var(--cream);
+  border: 2px solid transparent;
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  font-family: inherit;
+  font-size: 1rem;
+  color: var(--ink);
+  cursor: pointer;
+}
+.choice-btn:hover { border-color: var(--sky); }
+.result-emoji { font-size: 3.2rem; text-align: center; display: block; margin-bottom: 8px; }
+.result-name { text-align: center; font-size: 1.5rem; margin-bottom: 10px; }
+.result-desc { color: var(--ink-soft); line-height: 1.6; }
+.result-actions { display: flex; gap: 10px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
+
 /* 모바일 */
 @media (max-width: 480px) {
   .hero h1 { font-size: 1.9rem; }
   .site-header { padding: 14px 16px; }
   main { padding: 8px 16px 40px; }
   .app-card { flex-wrap: wrap; }
+  .pillar .hanja { font-size: 1.3rem; }
 }

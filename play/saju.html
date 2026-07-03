@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>사주 보기 — goblub</title>
+  <meta name="description" content="만세력 정밀 절입시각으로 계산하는 나의 사주팔자" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+  <div id="site-header"></div>
+
+  <main>
+    <section class="hero">
+      <h1>🔮 나의 사주팔자</h1>
+      <p>생년월일시로 보는 사주 — 절기 경계까지 분 단위로 정확하게</p>
+    </section>
+
+    <section class="panel" id="input-panel">
+      <h2>언제 태어났나요?</h2>
+      <div class="field-row">
+        <select id="in-year"></select>
+        <select id="in-month"></select>
+        <select id="in-day"></select>
+      </div>
+      <div class="field-row">
+        <select id="in-hour">
+          <option value="">태어난 시 몰라요</option>
+        </select>
+        <label for="in-min">분</label>
+        <input type="number" id="in-min" min="0" max="59" value="0" style="width:70px" />
+      </div>
+      <button class="btn-primary" id="btn-go">사주 보기</button>
+      <p class="error-msg" id="err"></p>
+    </section>
+
+    <section class="panel" id="result-panel" style="display:none">
+      <h2 id="r-title"></h2>
+      <div class="pillar-grid" id="r-pillars"></div>
+      <div class="oheng-bars" id="r-oheng"></div>
+      <p id="r-ilgan" style="line-height:1.7"></p>
+      <p id="r-oheng-txt" style="line-height:1.7; margin-top:10px; color:var(--ink-soft)"></p>
+      <div class="result-actions">
+        <button class="btn-ghost" onclick="document.getElementById('result-panel').style.display='none'; document.getElementById('input-panel').scrollIntoView();">다시 보기</button>
+      </div>
+    </section>
+
+    <p class="fine-print">사주는 재미로 봐주세요 🙂 절입시각 데이터: 만세력(KASI 검증) 기반</p>
+  </main>
+
+  <div id="site-footer"></div>
+  <script src="../js/common.js" data-root=".."></script>
+  <script src="js/saju.js"></script>
+  <script>
+    (function () {
+      var $ = function (id) { return document.getElementById(id); };
+      var data = null;
+
+      fetch("data/saju-terms.json")
+        .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+        .then(function (d) { data = d; })
+        .catch(function () { showErr("데이터를 불러오지 못했어요. 새로고침 해주세요."); });
+
+      // 셀렉트 채우기
+      var y = $("in-year"), m = $("in-month"), d = $("in-day"), h = $("in-hour");
+      for (var i = 2100; i >= 1900; i--) y.add(new Option(i + "년", i));
+      y.value = 1995;
+      for (i = 1; i <= 12; i++) m.add(new Option(i + "월", i));
+      for (i = 1; i <= 31; i++) d.add(new Option(i + "일", i));
+      for (i = 0; i <= 23; i++) h.add(new Option(i + "시", i));
+
+      function showErr(msg) { var e = $("err"); e.textContent = msg; e.style.display = "block"; }
+
+      $("btn-go").onclick = function () {
+        $("err").style.display = "none";
+        if (!data) { showErr("데이터를 불러오지 못했어요. 새로고침 해주세요."); return; }
+        var yy = +y.value, mm = +m.value, dd = +d.value;
+        var date = new Date(yy, mm - 1, dd);
+        if (date.getFullYear() !== yy || date.getMonth() !== mm - 1 || date.getDate() !== dd) {
+          showErr("없는 날짜예요. 다시 확인해주세요!"); return;
+        }
+        var hour = h.value === "" ? null : +h.value;
+        var min = Math.min(59, Math.max(0, +($("in-min").value || 0)));
+        var r = Saju.compute(data, { y: yy, m: mm, d: dd, hour: hour, min: min });
+        render(r);
+        $("result-panel").style.display = "block";
+        $("result-panel").scrollIntoView({ behavior: "smooth" });
+      };
+
+      function render(r) {
+        $("r-title").textContent = zodiacEmoji(r.zodiac) + " " + r.zodiac + "띠의 사주";
+        var roles = [["시주", r.pillars.hour], ["일주", r.pillars.day], ["월주", r.pillars.month], ["년주", r.pillars.year]];
+        var html = "";
+        roles.forEach(function (pair) {
+          if (!pair[1]) {
+            html += '<div class="pillar"><span class="role">' + pair[0] + '</span><span class="hanja">?</span><span class="hangul">몰라요</span></div>';
+            return;
+          }
+          var t = Saju.pillarText(pair[1]);
+          html += '<div class="pillar"><span class="role">' + pair[0] + '</span><span class="hanja">' + t.hanja + '</span><span class="hangul">' + t.hangul + "</span></div>";
+        });
+        $("r-pillars").innerHTML = html;
+
+        var total = 0;
+        ["목", "화", "토", "금", "수"].forEach(function (k) { total += r.oheng[k]; });
+        var bars = "";
+        ["목", "화", "토", "금", "수"].forEach(function (k) {
+          var n = r.oheng[k];
+          bars += '<div class="oheng-row"><span class="name">' + k + '</span><div class="bar oheng-' + k + '" style="width:' + (n / total * 100) + '%"></div><span class="cnt">' + n + "</span></div>";
+        });
+        $("r-oheng").innerHTML = bars;
+
+        $("r-ilgan").textContent = "🌱 나의 일간은 「" + Saju.GAN[r.ilgan] + "」 — " + SajuText.ilgan[r.ilgan];
+
+        var most = "목", none = [];
+        ["목", "화", "토", "금", "수"].forEach(function (k) {
+          if (r.oheng[k] > r.oheng[most]) most = k;
+          if (r.oheng[k] === 0) none.push(k);
+        });
+        var txt = SajuText.ohengMost[most];
+        if (none.length) txt += " " + SajuText.ohengNone[none[0]];
+        $("r-oheng-txt").textContent = txt;
+      }
+
+      function zodiacEmoji(z) {
+        return { 쥐: "🐭", 소: "🐮", 호랑이: "🐯", 토끼: "🐰", 용: "🐲", 뱀: "🐍", 말: "🐴", 양: "🐑", 원숭이: "🐵", 닭: "🐔", 개: "🐶", 돼지: "🐷" }[z] || "🔮";
+      }
+    })();
+  </script>
+</body>
+</html>
