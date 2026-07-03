@@ -1,0 +1,5 @@
+{
+  "functions": {
+    "api/saju-reading.js": { "maxDuration": 300 }
+  }
+}
