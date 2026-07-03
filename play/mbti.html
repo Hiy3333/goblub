@@ -3,118 +3,304 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>초스피드 MBTI — goblub</title>
-  <meta name="description" content="20문항으로 알아보는 나의 MBTI (재미용)" />
+  <title>엽기 상황극 MBTI — goblub</title>
+  <meta name="description" content="당신이 만약 미니 식빵이 된다면? 12가지 대환장 상황으로 보는 찐 본능 MBTI" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    .portal { width: 150px; height: 150px; border-radius: 50%; margin: 0 auto 18px;
+      background: conic-gradient(var(--coral), var(--yellow), var(--mint), var(--sky), var(--purple), var(--coral));
+      animation: spin 6s linear infinite; filter: blur(1px); }
+    .portal:hover { animation-duration: 1.2s; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .visual-card { font-size: 3.4rem; text-align: center; padding: 26px 10px; border-radius: 18px; margin-bottom: 16px; letter-spacing: 6px; }
+    .choice-btn:hover { animation: wiggle 0.3s ease; border-color: var(--sky); }
+    @keyframes wiggle { 25% { transform: rotate(-1.2deg); } 75% { transform: rotate(1.2deg); } }
+    .copy-q { background: none; border: none; color: var(--ink-soft); font-family: inherit; font-size: 0.85rem; cursor: pointer; margin-top: 4px; }
+    .meme-title { text-align: center; font-size: 1.15rem; color: var(--ink-soft); margin-bottom: 6px; }
+  </style>
 </head>
 <body>
   <div id="site-header"></div>
   <main>
     <section class="hero">
-      <h1>🎭 초스피드 MBTI</h1>
-      <p>20문항으로 알아보는 나의 MBTI</p>
+      <h1>🍞 엽기 상황극 MBTI</h1>
+      <p>뻔한 질문은 가라. 우주적 대위기 12연속, 당신의 찐 본능은?</p>
     </section>
-    <section class="panel" id="quiz"></section>
-    <p class="fine-print">정식 검사가 아닌 재미용이에요 🙂</p>
+
+    <section class="panel">
+      <div id="st-intro">
+        <div class="portal"></div>
+        <h2 style="text-align:center">당신이 만약 미니 식빵이 된다면? 🍞</h2>
+        <p class="result-desc" style="text-align:center; margin:12px 0 20px">
+          착한 척 설문지는 우주 저편으로. 초극단 상황 12개에서 튀어나오는 동물적 본능으로 당신의 MBTI를 판별해 드립니다.
+        </p>
+        <div class="result-actions"><button class="btn-primary" id="btn-start">🌀 포탈 입장하기</button></div>
+      </div>
+
+      <div id="st-quiz" style="display:none">
+        <div class="progress-track"><div class="progress-fill" id="q-fill" style="width:0%"></div></div>
+        <div class="visual-card" id="q-visual"></div>
+        <p class="quiz-q" id="q-text"></p>
+        <button class="choice-btn" id="q-a"></button>
+        <button class="choice-btn" id="q-b"></button>
+        <div style="text-align:center"><button class="copy-q" id="q-copy">📋 이 질문 단톡방에 기습 복사</button></div>
+      </div>
+
+      <div id="st-result" style="display:none">
+        <span class="result-emoji" id="r-emoji"></span>
+        <p class="meme-title" id="r-meme"></p>
+        <p class="result-name" id="r-name"></p>
+        <p class="result-desc" id="r-roast" style="margin-bottom:12px"></p>
+        <p class="result-desc" id="r-fate"></p>
+        <div class="result-actions">
+          <button class="btn-primary" id="r-save">🖼 짤 저장</button>
+          <button class="btn-ghost" id="r-link">🔗 결과 링크 복사</button>
+          <button class="btn-ghost" id="r-retry">다시하기</button>
+        </div>
+      </div>
+    </section>
+
+    <p class="fine-print">재미로 봐주세요 🙂 정식 MBTI 검사가 아니에요</p>
   </main>
   <div id="site-footer"></div>
   <script src="../js/common.js" data-root=".."></script>
-  <script src="js/quiz.js"></script>
   <script>
-    Quiz.init(document.getElementById("quiz"), {
-      emoji: "🎭",
-      title: "초스피드 MBTI (20문항)",
-      intro: "정식 검사는 아니지만 꽤 잘 맞는 20문항 재미용 MBTI! 너무 고민하지 말고 끌리는 쪽을 고르세요.",
-      questions: [
-        { q: "금요일 저녁, 에너지가 차오르는 쪽은?", choices: [
-          { text: "사람들 만나서 놀기! 약속이 곧 휴식", scores: { E: 1 } },
-          { text: "집에서 혼자만의 시간. 이게 진짜 휴식", scores: { I: 1 } } ] },
-        { q: "모임에서 나는 주로?", choices: [
-          { text: "대화 주제를 던지고 분위기를 끌어감", scores: { E: 1 } },
-          { text: "듣다가 마음 맞는 한두 명과 깊은 얘기", scores: { I: 1 } } ] },
-        { q: "고민이 생기면?", choices: [
-          { text: "말하면서 정리됨. 일단 누구든 붙잡고 얘기", scores: { E: 1 } },
-          { text: "혼자 충분히 생각한 뒤에야 꺼냄", scores: { I: 1 } } ] },
-        { q: "낯선 사람이 많은 자리에서 나는?", choices: [
-          { text: "먼저 말 걸며 금방 친해짐", scores: { E: 1 } },
-          { text: "누가 말 걸어주길 기다리는 편", scores: { I: 1 } } ] },
-        { q: "전화 vs 문자?", choices: [
-          { text: "전화가 빠르지! 바로 걸어버림", scores: { E: 1 } },
-          { text: "문자로 정리해서 보내는 게 편함", scores: { I: 1 } } ] },
-        { q: "새 가전제품을 사면?", choices: [
-          { text: "설명서 보고 순서대로 설정", scores: { S: 1 } },
-          { text: "일단 눌러보면서 감으로 파악", scores: { N: 1 } } ] },
-        { q: "영화를 보고 나서 주로 하는 얘기는?", choices: [
-          { text: "장면·배우·연출 등 실제 본 것들", scores: { S: 1 } },
-          { text: "숨은 의미, 뒷이야기 상상, \"만약에…\"", scores: { N: 1 } } ] },
-        { q: "길을 설명할 때 나는?", choices: [
-          { text: "\"편의점에서 좌회전, 300m 직진\"", scores: { S: 1 } },
-          { text: "\"그… 분위기 있는 골목 지나서 대충 그쪽\"", scores: { N: 1 } } ] },
-        { q: "일할 때 더 자신 있는 것은?", choices: [
-          { text: "정해진 절차를 꼼꼼하게 해내기", scores: { S: 1 } },
-          { text: "새로운 방식을 떠올리고 판 새로 짜기", scores: { N: 1 } } ] },
-        { q: "멍 때릴 때 나의 머릿속은?", choices: [
-          { text: "오늘 있었던 일, 해야 할 일", scores: { S: 1 } },
-          { text: "우주, 미래, 갑자기 10년 뒤 상상", scores: { N: 1 } } ] },
-        { q: "친구가 \"나 오늘 회사에서 혼났어\"라고 하면?", choices: [
-          { text: "\"왜? 뭐 때문에? 어떻게 된 건데?\"", scores: { T: 1 } },
-          { text: "\"헐 속상했겠다… 괜찮아?\"", scores: { F: 1 } } ] },
-        { q: "결정을 내릴 때 더 중요한 것은?", choices: [
-          { text: "논리적으로 맞는가", scores: { T: 1 } },
-          { text: "관련된 사람들의 마음", scores: { F: 1 } } ] },
-        { q: "피드백을 줄 때 나는?", choices: [
-          { text: "개선점을 정확하게 짚어주는 게 도움", scores: { T: 1 } },
-          { text: "좋은 점부터, 상처받지 않게 돌려서", scores: { F: 1 } } ] },
-        { q: "드라마 볼 때 나는?", choices: [
-          { text: "\"아니 저게 말이 돼? 개연성이…\"", scores: { T: 1 } },
-          { text: "주인공 따라 웃고 울고 감정이입", scores: { F: 1 } } ] },
-        { q: "갈등 상황에서 나는?", choices: [
-          { text: "사실관계부터 정리하자", scores: { T: 1 } },
-          { text: "일단 서로 기분부터 풀자", scores: { F: 1 } } ] },
-        { q: "여행 스타일은?", choices: [
-          { text: "시간표급 일정표. 예약은 미리미리", scores: { J: 1 } },
-          { text: "숙소만 잡고 나머지는 현지에서 즉흥", scores: { P: 1 } } ] },
-        { q: "과제나 일 처리 스타일은?", choices: [
-          { text: "미리 조금씩 끝내둬야 마음이 편함", scores: { J: 1 } },
-          { text: "마감 직전 초인적인 집중력 발동", scores: { P: 1 } } ] },
-        { q: "책상 상태는?", choices: [
-          { text: "물건마다 자리가 있다. 각 잡힌 정리", scores: { J: 1 } },
-          { text: "어지러워 보여도 나만의 질서가 있음", scores: { P: 1 } } ] },
-        { q: "갑자기 약속이 바뀌면?", choices: [
-          { text: "당황+살짝 불편. 계획이 흔들리잖아", scores: { J: 1 } },
-          { text: "오히려 좋아. 새로운 전개 환영", scores: { P: 1 } } ] },
-        { q: "쇼핑할 때 나는?", choices: [
-          { text: "살 것 정하고 가서 그것만 사 옴", scores: { J: 1 } },
-          { text: "구경하다 보면 계획에 없던 걸 사 옴", scores: { P: 1 } } ] }
-      ],
-      results: {
-        ISTJ: { emoji: "📘", name: "ISTJ — 원칙의 수호자", desc: "말보다 행동, 약속은 반드시 지키는 신뢰의 아이콘. 당신이 있어서 세상이 굴러갑니다." },
-        ISFJ: { emoji: "🧸", name: "ISFJ — 따뜻한 수호천사", desc: "조용히 챙겨주는 디테일 장인. 당신의 다정함은 티가 안 나지만 모두가 알고 있어요." },
-        INFJ: { emoji: "🔮", name: "INFJ — 통찰의 조언자", desc: "사람 마음을 꿰뚫어 보는 희귀 유형. 겉은 잔잔, 속은 우주급 깊이." },
-        INTJ: { emoji: "♟️", name: "INTJ — 전략의 설계자", desc: "머릿속에 늘 큰 그림이 있는 전략가. 계획대로 되는 순간의 짜릿함으로 삽니다." },
-        ISTP: { emoji: "🔧", name: "ISTP — 만능 해결사", desc: "말수는 적어도 손은 빠른 실전형. 위기 상황에서 제일 침착한 사람이 바로 당신." },
-        ISFP: { emoji: "🎨", name: "ISFP — 조용한 예술가", desc: "감성과 취향이 확실한 유형. 무해해 보이지만 자기 세계는 확고합니다." },
-        INFP: { emoji: "🌙", name: "INFP — 낭만적 이상주의자", desc: "겉은 조용, 속은 감정의 대서사시. 세상을 더 따뜻하게 만드는 상상력의 소유자." },
-        INTP: { emoji: "🧪", name: "INTP — 호기심 과학자", desc: "\"왜?\"가 인생 기본값. 관심 분야가 걸리면 밤새 파고드는 지적 탐험가." },
-        ESTP: { emoji: "🏄", name: "ESTP — 행동파 모험가", desc: "고민할 시간에 일단 해보는 타입. 순발력과 현실 감각이 최강입니다." },
-        ESFP: { emoji: "🎉", name: "ESFP — 무대 위의 스타", desc: "있는 곳이 곧 파티장. 흥과 정이 넘쳐 사람들을 즐겁게 만드는 재주꾼." },
-        ENFP: { emoji: "🌈", name: "ENFP — 열정의 스파크", desc: "아이디어와 설렘이 마르지 않는 유형. 시작은 100개, 마무리는… 그래도 미워할 수 없죠." },
-        ENTP: { emoji: "⚡", name: "ENTP — 토론의 발명가", desc: "\"근데 반대로 생각해보면?\"이 입버릇. 두뇌 회전으로 세상을 뒤집는 아이디어 뱅크." },
-        ESTJ: { emoji: "📋", name: "ESTJ — 타고난 관리자", desc: "체계와 효율의 화신. 당신이 팀장이면 프로젝트는 무조건 굴러갑니다." },
-        ESFJ: { emoji: "🍀", name: "ESFJ — 모두의 분위기 메이커", desc: "사람 챙기기가 본능인 유형. 당신 덕분에 모임이 모임답게 됩니다." },
-        ENFJ: { emoji: "🌻", name: "ENFJ — 카리스마 멘토", desc: "사람의 가능성을 알아보고 끌어올리는 리더. 진심 어린 오지랖은 당신의 초능력." },
-        ENTJ: { emoji: "👑", name: "ENTJ — 대담한 통솔자", desc: "목표가 생기면 길을 만드는 타입. 추진력 하나로 세상을 밀고 나갑니다." }
-      },
-      resolve: function (t) {
-        return ((t.E || 0) >= (t.I || 0) ? "E" : "I") +
-          ((t.S || 0) >= (t.N || 0) ? "S" : "N") +
-          ((t.T || 0) >= (t.F || 0) ? "T" : "F") +
-          ((t.J || 0) >= (t.P || 0) ? "J" : "P");
+    (function () {
+      var $ = function (id) { return document.getElementById(id); };
+
+      var QUESTIONS = [
+        { id: 1, visual: "🛸📻", tint: "tint-purple",
+          q: "외딴 우주 기지에 당신 홀로 버려졌습니다. 통신기를 복구하려는데, 무전기 너머로 정체불명의 외계인이 흘려보내는 '우주 대환장 인싸 댄스곡'이 울려 퍼집니다. 당신은?",
+          a: { text: "외계인의 드롭 더 비트에 맞춰 혼자 우주 춤을 신나게 춘 뒤, 텐션을 풀충전해 무전기 수리에 들어간다.", score: { E: 2 } },
+          b: { text: "시끄러워서 귀가 아프니 즉각 볼륨을 0으로 줄이고, 기지 매뉴얼 가이드북을 찾아 조용히 정독하며 수리한다.", score: { I: 2 } } },
+        { id: 2, visual: "🍞🔥", tint: "tint-coral",
+          q: "눈을 떴는데 당신의 몸이 가로 10cm, 세로 10cm의 미니 식빵으로 변해 토스터기 안에 갇혀 있습니다. 30초 뒤 식빵이 구워집니다. 당신의 행동은?",
+          a: { text: "내 몸의 식빵 밀도와 토스터기 열판 간의 거리를 계산한 후, 고무 패킹 지렛대를 이용해 즉각 물리적 탈출을 꾀한다.", score: { S: 2 } },
+          b: { text: "기왕 식빵이 된 거 역사에 남을 골든 브라운 토스트가 되겠다며 눈을 감고 버터와 잼의 완벽한 풍미를 상상한다.", score: { N: 2 } } },
+        { id: 3, visual: "🚀😭", tint: "tint-sky",
+          q: "산소가 단 5분 남은 인류 최후의 구명 우주선. 옆자리 동료가 당신의 어깨에 기대어 눈물을 질질 짜며 마지막 유언을 하려 합니다. 이때 당신의 대처는?",
+          a: { text: "울면 산소 소비율이 1.5배 빨라져서 생존 시간이 단축되니 조용히 하고 내 생명 유지 장치 수치나 같이 쳐다보자고 다독인다.", score: { T: 2 } },
+          b: { text: "동료의 젖은 손을 꽉 쥐고 '우리는 결국 우주의 먼지가 되어 영원히 공존할 거야'라며 같이 오열하다 산소를 3분 만에 탕진한다.", score: { F: 2 } } },
+        { id: 4, visual: "☄️🌍", tint: "tint-yellow",
+          q: "오늘 밤 11시 59분에 거대 혜성이 충돌해 지구가 완전히 멸망합니다. 당신에게 남은 반나절의 일정은?",
+          a: { text: "마지막 순간의 경건함을 지키기 위해 매 시각 타임라인을 짠다. (18:00 유언장 정리, 20:00 방 청소, 23:50 옥상 대기)", score: { J: 2 } },
+          b: { text: "일단 낮 12시 넘어서까지 낮잠을 자고 일어난 뒤, 소파에 누워 유튜브 멸망 실시간 중계 쇼츠를 보다가 맞이한다.", score: { P: 2 } } },
+        { id: 5, visual: "🛗👯", tint: "tint-mint",
+          q: "정전으로 갇힌 엘리베이터. 어둠 속에서 마주 본 옆 사람이 나와 완벽하게 똑같이 생긴 도플갱어입니다. 심지어 날 쳐다보며 '안녕? 나 너야'라고 속삭입니다.",
+          a: { text: "'대박! 실물 쩌는데? 야 너 주말에 뭐 해? 나 대신 출근할래?'라며 다짜고짜 하이파이브와 어깨동무를 시도한다.", score: { E: 2 } },
+          b: { text: "절대 눈을 마주치지 않고 어색하게 주머니의 폰을 꺼내 인터넷에 '도플갱어 퇴치법', '정전 대처법'을 필사적으로 타이핑한다.", score: { I: 2 } } },
+        { id: 6, visual: "🥤👻", tint: "tint-purple",
+          q: "길을 가다가 신비한 자판기를 발견했습니다. 동전 구멍에 '영혼 0.1g을 투입하면 세상에서 가장 맛있는 음료가 나옵니다'라고 적혀 있습니다.",
+          a: { text: "'요즘 신종 사기 수법인가?' 하고 혀를 끌끌 차며, 편의점 브랜드 원플러스원 캔커피를 안전하게 사 마시러 간다.", score: { S: 2 } },
+          b: { text: "'내 영혼 0.1g 떼어 주면 무슨 맛이 날까? 영혼의 맛은 스파클링인가?' 하며 침을 꼴깍 삼키고 멍하니 자판기를 분석한다.", score: { N: 2 } } },
+        { id: 7, visual: "🌵💀", tint: "tint-mint",
+          q: "절친이 새벽에 꺼이꺼이 울면서 전화해 '내가 3년간 아끼며 이름까지 지어준 반려 선인장이 과습으로 죽었어...'라고 슬퍼합니다. 당신의 첫마디는?",
+          a: { text: "선인장은 원래 건조 기후 식물이라 한 달에 한 번만 물을 줘야 하는데 네 과한 집착이 흙을 썩게 한 거야. 다음엔 다육이 키워봐.", score: { T: 2 } },
+          b: { text: "아... 너 매일 아침 초록이한테 뽀뽀해 주던 거 기억나는데 어떡해... 초록이도 네 슬픔 다 가져가고 좋은 곳 갔을 거야... ㅠㅠ", score: { F: 2 } } },
+        { id: 8, visual: "🧟🍳", tint: "tint-coral",
+          q: "좀비 아포칼립스가 발발해 마트 안에 갇혔습니다. 당신이 당장 생존 장비를 챙기기 위해 움직인다면?",
+          a: { text: "마트 도면을 입수해 비상 탈출구 A, B, C 계획을 세우고, 전투식량의 칼로리와 유통기한을 계산해 정확히 분배해 담는다.", score: { J: 2 } },
+          b: { text: "일단 주방 용품 코너에서 단단한 테팔 프라이팬을 챙겨 들고, '가보자고!'를 외치며 닥치는 대로 부딪히며 돌파구를 만든다.", score: { P: 2 } } },
+        { id: 9, visual: "🧟🔦", tint: "tint-sky",
+          q: "좀비 소굴이 된 비밀 지하 연구소에 은밀히 침투해야 합니다. 생존을 위해 딱 한 명의 파트너를 영입할 수 있다면 당신의 선택은?",
+          a: { text: "말 많고 텐션이 극도로 높아 위급할 때 온갖 개그로 좀비의 어그로를 완벽하게 끌어주는 소란스러운 분위기 메이커 파트너.", score: { E: 2 } },
+          b: { text: "임무 내내 단 한마디도 나누지 않지만, 그림자처럼 뒤를 든든하게 받치며 소리 없이 좀비의 목을 베는 과묵한 고수 파트너.", score: { I: 2 } } },
+        { id: 10, visual: "📱💀", tint: "tint-yellow",
+          q: "아침에 눈을 뜨고 폰을 켰는데, 잠금 화면에 '당신은 오늘 밤 12시에 소멸합니다'라는 기괴한 푸시 알림이 고정되어 절대 지워지지 않습니다.",
+          a: { text: "악성코드나 기괴한 스팸 광고 피싱 앱이 깔린 게 분명하다고 판단하고, 즉시 백신 어플을 돌리거나 폰을 공장 초기화한다.", score: { S: 2 } },
+          b: { text: "'전생의 업보가 결국 도달한 것인가...'라며 심오한 철학적 상상에 빠지고, 마지막 유언으로 쓸 힙한 유언장 한 구절을 구상한다.", score: { N: 2 } } },
+        { id: 11, visual: "📑💢", tint: "tint-coral",
+          q: "직장에서 밤새 혼을 갈아 넣어 힙한 신규 웹 기획서 프로토타입을 완성해 올렸는데, 상사가 보지도 않고 '디자인이 너무 어두침침해서 탈락'이라며 까버렸습니다.",
+          a: { text: "'디자인은 요청하신 가이드를 그대로 따른 겁니다. 어두침침하다는 게 정확히 어느 부분인지, 감 말고 근거로 피드백 주시죠'라며 조목조목 따진다.", score: { T: 2 } },
+          b: { text: "(가슴에 대못이 박힘) 내 영혼의 산물을 로직조차 안 보고 짓밟다니 하며, 속으로 이 상사의 이름 뒤에 분노의 데스노트를 묵묵히 써 내려간다.", score: { F: 2 } } },
+        { id: 12, visual: "✈️🌧️", tint: "tint-sky",
+          q: "오랫동안 고대해 왔던 친구들과의 휴가 여행 당일 아침, 공항철도 안에서 '기상 악화로 비행기 전면 결항'이라는 충격적인 문자를 받았습니다.",
+          a: { text: "정신이 혼미하지만, 즉시 대체 가능한 플랜B(KTX 기차표 즉시 예매, 유명한 근교 풀빌라 공실 조회 등) 리스트를 10분 만에 뽑아 단톡방에 공지한다.", score: { J: 2 } },
+          b: { text: "'오히려 개이득? 운명이 우릴 막아서는 구만!'이라 외치며, 캐리어를 끈 채 즉흥적으로 영종도 조개구이 맛집 투어로 일정을 전면 전환한다.", score: { P: 2 } } }
+      ];
+
+      var RESULTS = {
+        INFP: { emoji: "🌫️💭", title: "우주 먼지 몽상가", memeTitle: "토스터기에서 불탄 재가 된 우주 먼지 몽상가",
+          roast: "자존감은 지구 핵 내핵에 처박혀 있는데 상상력은 안드로메다 우주 정거장급. 우주 멸망 소식이 들리면 생존 도구를 챙기는 대신 \"마지막 날을 장식할 감성 일기장\"을 사러 가며, 정작 대처법은 침대 이불 밑에서 베개 안고 고민함.",
+          fate: "토스터기 안에서 아름답게 구워지는 완벽한 버터 식빵이 되는 몽상만 가득 품다가, 탈출 시도조차 안 한 채 결국 석탄처럼 새까맣게 불타 흩어지는 먼지가 됨." },
+        INFJ: { emoji: "🔮🕯️", title: "파멸의 심연 예언자", memeTitle: "외계인과 텔레파시 시도하다 지구가 멸망한 은둔 교주",
+          roast: "도통 속을 알 수 없는 기괴한 인류애와 은밀한 파괴욕의 기묘한 하이브리드. 혼자 머릿속으로 지구를 세 번 구하고 다섯 번 멸망시키는 어둠의 시나리오를 집필함.",
+          fate: "우주선 산소가 부족할 때 울고 짜는 동료를 우수에 찬 눈빛으로 쳐다보며 \"이것도 기나긴 우주의 정화 섭리야...\" 하고 혼자 해탈해서 동료 몰래 산소 밸브를 아주 차분히 줄여버림." },
+        INTP: { emoji: "🤖📝", title: "분석 광기 인공지능", memeTitle: "멸망 1초 전까지 혜성 궤도 계산하다 타 죽은 무감정 키보드 워리어",
+          roast: "행동력은 우주 나무늘보 수준인데, 잘난 척하고 싶은 지적 호기심은 무한대. 남들 울고 짜며 좀비에 물어뜯길 때 혼자 구석에서 \"좀비의 타액 내 바이러스 전파 원리\"를 메모하며 눈을 빛냄. 귀찮아서 그냥 좀비가 다가와도 목을 대줌.",
+          fate: "미니 식빵이 되었을 때 탈출할 생각은 안 하고, 식빵 밀가루 성분이 열을 받아 탄화되는 9단계 화학 과정을 머릿속으로 논문 작성하다 타버림." },
+        INTJ: { emoji: "🏰🗝️", title: "어둠의 우주 정복자", memeTitle: "지구 멸망 대비 방공호 짓다 좀비에게 열쇠 뺏긴 유리몸 설계자",
+          roast: "머릿속으로는 플랜 Z까지 세워두어 이미 지구를 3번 정복했으나, 정작 실제 방문을 여는 데 필요한 악력과 물리적 근력이 부족함. 고집불통 독고다이의 대명사.",
+          fate: "좀비 아포칼립스 생존 매뉴얼을 5년간 완벽하게 컴퓨터에 짜놓았지만, 좀비 습격 첫날 대형 마트 카트의 고장 난 바퀴에 발가락이 끼어 무릎을 꿇은 채 끔살당함." },
+        ISFP: { emoji: "🛏️📱", title: "누워 있는 우주 나무늘보", memeTitle: "좀비가 현관문 부숴도 침대가 편해 이불 덮고 잠든 눕방 빌런",
+          roast: "예술적 감수성을 수줍게 품고 태어났으나, 이를 표현하기엔 누워 있는 게 훨씬 편함. 남 비위 다 맞춰주다가 혼자 밤마다 이불 발차기하며 \"아까 그 말 했어야 했는데...\" 하고 속으로 응어리만 한 트럭 쌓는 고독한 고구마.",
+          fate: "지구 멸망 당일 \"어차피 우주 터지는데 일어나서 뭐 하나\" 하며 누워 유튜브 쇼츠로 '식빵 굽는 고양이 모음'을 보다가 침대째로 소멸함." },
+        ISFJ: { emoji: "😇🧷", title: "영혼 탈탈 배려 좀비", memeTitle: "우주선 산소 1% 남았는데 동료 눈물 닦아주다 가장 먼저 질식사한 배려 과잉 빌런",
+          roast: "세상 온갖 사람들의 걱정과 소소한 감정을 도맡아 수호하려 하지만, 정작 자신의 멘탈은 이미 부스러기만 남은 유통기한 지난 쿠키 상태. 겉으로는 생글생글 웃으며 상사의 잔인한 말폭격을 받아내지만 뒤로는 묵묵히 저주 인형을 삼.",
+          fate: "산소 게이지가 1%로 깜빡이는 구명 우주선에서 '먼저 쉬어, 난 괜찮아'라며 제 산소 호스를 동료 콧구멍에 꽂아주고, 정작 본인은 미소를 유지한 채 가장 먼저 조용히 기절함." },
+        ISTP: { emoji: "🍳🔧", title: "무표정 뚝딱이 암살자", memeTitle: "좀비 머리를 프라이팬으로 패며 '스윙 각도가 아쉽군' 되뇌는 도구 중독 맹수",
+          roast: "감정은 냉동고 깊숙이 처박아 두고, 사람을 기계나 도구 대하듯 차갑게 다룸. 말수는 0인데 대가리 깨는 타격감은 은하계 1등. 남의 연애사는 내 알 바 아니며 기계를 고칠 때만 눈에 불이 켜짐.",
+          fate: "도플갱어가 \"안녕? 나 너야\"라고 속삭이며 엘리베이터 정전 상황을 덮치자마자 1초의 망설임도 없이 천장 비상구를 기계 부품으로 뜯어내고 홀연히 기어 올라감." },
+        ISTJ: { emoji: "📊📏", title: "규칙 중독 행정 알파고", memeTitle: "지구 멸망 10분 전인데 엑셀 수식 안 맞는다며 야근하는 규칙 광인",
+          roast: "세상에서 가장 융통성이 없으며 매뉴얼에 지배당함. 창의성 0%의 무시무시한 규칙 기계. 친구가 선인장 죽었다고 울부짖으면 위로 대신 \"과습이 주 원인\"이라는 팩트 리포트를 제출해 인간관계를 파탄 냄.",
+          fate: "미니 식빵으로 변하자마자 '식빵 탈출 수칙 제3조 2항'을 허공에 낭독하며 정자세로 가만히 누워 고른 색상으로 구워지길 기다림." },
+        ENFP: { emoji: "🪩🔥", title: "도파민 폭주 탬버린", memeTitle: "지구 멸망 소식 듣고 해변 파티 열자며 탬버린 치다 파도에 쓸려간 광기의 불나방",
+          roast: "추진력은 워프 드라이브 수준인데 마무리는 단 한 개도 없음. 우주에 벌려놓은 기획과 생각만 안드로메다 은하수 규모. 뜬금없는 아이디어로 조용히 살고 싶어 하는 내향인들의 뇌수를 매일 쥐어짜 괴롭히는 도파민 좀비.",
+          fate: "우주선 기지 통신 복구 도중 외계인 댄스곡이 흘러나오자마자, 들고 있던 수리 공구를 드럼스틱 삼아 춤을 추다 전원선을 쇼트 내며 기지 통째로 폭파해버림." },
+        ENFJ: { emoji: "📢🤝", title: "계몽주의 우주 교주", memeTitle: "비밀 지하 연구소에 침투해 좀비들에게 '대화와 협상' 제안하다 뜯겨먹힌 사회운동가",
+          roast: "뇌 속에 과도한 오지랖과 영웅심리가 영원히 공존함. 주변의 모든 사소한 고민을 다 개조하고 교화하려 하지만, 사실 상대방은 조용히 집에 가고 싶어 한다는 점을 죽어도 깨닫지 못함.",
+          fate: "우주선 산소 게이지가 깜빡거릴 때 \"우린 결국 마음으로 하나가 될 수 있어!\"를 전파하며 사람들을 강제로 일렬로 세워 손을 잡게 하다가 대규모 산소 과호흡을 유발함." },
+        ENTP: { emoji: "🗯️⚡", title: "말싸움 불도저 어그로", memeTitle: "도플갱어 만나 '누가 찐이고 짭인가' 밤새 토론 배틀 뜨다 엘리베이터에서 굶어 죽은 아가리 파이터",
+          roast: "세상의 당연한 법규와 규칙에 무조건 딴지를 걸어야 피가 도는 어그로 자판기. 온 세상이 오른쪽이라 하면 왼쪽이라 우기고, 왼쪽이라 하면 오른쪽이라 우기는 피곤함의 결정체.",
+          fate: "영혼 투입 자판기 앞에 서서 \"영혼을 착취하는 자판기 메커니즘의 반인륜적 구조\"에 대한 즉석 1인 연설을 5시간 동안 떠들다 목말라 죽음." },
+        ENTJ: { emoji: "👑🧊", title: "야망 광기 독재 지배자", memeTitle: "좀비 군단을 조직해 대장 좀비 자리를 기획하다 뒤통수 물린 효율성 중독자",
+          roast: "눈물이란 자원은 뇌 속에 존재하지 않는 무자비한 성과 추구 행정관. 상사가 내 웹 기획서 어둡다고 대충 까면, 상사의 기획 안목이 왜 썩었는지 분석한 50페이지 분량의 저격 슬라이드를 전사 메일로 쏘고 짤림.",
+          fate: "우주 구명정 산소가 부족하다고 짜는 F형 동료들을 향해 \"인류 문명 재건에 하등 도움 안 되는 비효율적 낭비 요소\"라며 에어록을 열어 조용히 우주 밖으로 추방함." },
+        ESFP: { emoji: "🤳✨", title: "우주 관종 슈팅스타", memeTitle: "비행기 전면 결항되자 공항 카트 타고 셔플댄스 챌린지 찍어 올린 무지성 야외 관종",
+          roast: "우주에 홀로 버려지더라도 카메라가 켜져 있으면 생글거릴 도파민과 주목 중독자. 조용한 침묵은 뇌의 사멸을 뜻하며, 진지한 심오 대화가 들어오면 침을 흘리며 졸기 시작함. 무조건 놀고 떠들어야 삶의 의미를 느낌.",
+          fate: "좀비로 뒤덮인 마트에서 탈출하는 긴박한 와중에 \"프라이팬으로 좀비 뒷머리 찰지게 후려치기 챌린지\"를 틱톡 라이브로 켜고 중계하다 뒤에서 덮친 좀비에 뒷목을 물림." },
+        ESFJ: { emoji: "💬🕵️", title: "평판 광기 참견 헌터", memeTitle: "지구 멸망 10분 전인데 3대 단톡방에 작별 인사 안 남겼다고 친구 차단한 소외감 빌런",
+          roast: "모든 친목 모임의 인맥 왕이자 완벽한 평판 주의자. 남들의 가십과 뒷담화를 온 은하계에서 가장 빠르고 세련되게 전달하며, 겉으로는 누구보다 세상에 친절한 마더 테레사를 완벽하게 연기함.",
+          fate: "엘리베이터 정전 속에서 나와 완벽하게 똑같이 생긴 도플갱어를 만나자마자 \"어머 자기 피부 너무 좋다! 톤업 크림 어디 거 써?\" 하며 수다를 떨다 포탈 탈출 시간을 전면 오버함." },
+        ESTP: { emoji: "🏍️💥", title: "우주 파괴 폭주 오토바이", memeTitle: "영혼 자판기 부수고 음료 몽땅 털어 훔쳐 달아난 사기 충동의 액션 빌런",
+          roast: "뇌를 거치지 않는 직발성 주먹과 입방정. 일단 들이받고 수습은 평행우주 저 너머의 다음 차례 내가 하게 둠. 성격이 불도저 같아서 오히려 지가 당해놓고 뻔뻔하게 배를 내미는 무시무시한 야생동물.",
+          fate: "비행기 폭우 결항 사태에 활주로 철조망을 뜯고 들어가 \"오히려 좋아! 오늘 밤은 비행기 날개 위에서 조개구이 구우며 차박이다!\"를 외치며 난동 부리다 공항 특수 진압 부대에 제압당함." },
+        ESTJ: { emoji: "🖍️📋", title: "우주 꼰대 잔소리 폭격기", memeTitle: "지구 멸망 충돌 3초 전인데 유언장에 맞춤법 틀렸다며 친구 따귀 때린 빨간 펜 지휘관",
+          roast: "타인의 슬픔이나 아픔에 대한 공감 능력은 진공 상태인데, 잔소리와 지배욕은 은하 규모. 내 말이 무조건 정답이며, 내 맘에 안 들면 세상의 모든 기획서와 사람의 성격을 쓰레기 취합하듯 난장판을 침.",
+          fate: "상사의 개소리 피드백으로 내 기획서가 까인 날, 사직서 대신 그 상사가 사내 클라우드에 몰래 올린 맞춤법 틀린 엉망진창 공금 영수증 청구서 엑셀 파일을 해킹해서 전사 단톡방에 박제해 복수함." }
+      };
+
+      var idx = 0;
+      var scores = {};
+
+      function show(state) {
+        $("st-intro").style.display = state === "intro" ? "block" : "none";
+        $("st-quiz").style.display = state === "quiz" ? "block" : "none";
+        $("st-result").style.display = state === "result" ? "block" : "none";
       }
-    });
+
+      function calculateMBTI(s) {
+        var m = "";
+        m += (s.E || 0) >= (s.I || 0) ? "E" : "I";
+        m += (s.S || 0) >= (s.N || 0) ? "S" : "N";
+        m += (s.T || 0) >= (s.F || 0) ? "T" : "F";
+        m += (s.J || 0) >= (s.P || 0) ? "J" : "P";
+        return m;
+      }
+
+      function copyText(text, btn, okLabel) {
+        var prev = btn.textContent;
+        (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject())
+          .then(function () { btn.textContent = okLabel; setTimeout(function () { btn.textContent = prev; }, 1500); })
+          .catch(function () { prompt("복사해 주세요:", text); });
+      }
+
+      function renderQ() {
+        var q = QUESTIONS[idx];
+        $("q-fill").style.width = Math.round(idx / QUESTIONS.length * 100) + "%";
+        var v = $("q-visual");
+        v.textContent = q.visual;
+        v.className = "visual-card card " + q.tint;
+        v.style.boxShadow = "none";
+        $("q-text").textContent = "Q" + (idx + 1) + ". " + q.q;
+        $("q-a").textContent = "A. " + q.a.text;
+        $("q-b").textContent = "B. " + q.b.text;
+      }
+
+      function pick(choice) {
+        var sc = QUESTIONS[idx][choice].score;
+        for (var k in sc) scores[k] = (scores[k] || 0) + sc[k];
+        idx++;
+        if (idx < QUESTIONS.length) renderQ();
+        else renderResult(calculateMBTI(scores), true);
+      }
+
+      function renderResult(type, setHash) {
+        var r = RESULTS[type];
+        $("r-emoji").textContent = r.emoji;
+        $("r-meme").textContent = "「" + r.memeTitle + "」";
+        $("r-name").textContent = type + " · " + r.title;
+        $("r-roast").textContent = "💥 성격 팩폭: " + r.roast;
+        $("r-fate").textContent = "🌌 우주적 운명: " + r.fate;
+        if (setHash) history.replaceState(null, "", "#" + type);
+        show("result");
+        window.__resultType = type;
+      }
+
+      $("btn-start").onclick = function () { idx = 0; scores = {}; renderQ(); show("quiz"); };
+      $("q-a").onclick = function () { pick("a"); };
+      $("q-b").onclick = function () { pick("b"); };
+
+      $("q-copy").onclick = function () {
+        var q = QUESTIONS[idx];
+        var url = location.origin + location.pathname;
+        copyText("Q. " + q.q + "\nA. " + q.a.text + "\nB. " + q.b.text + "\n👉 나도 하기: " + url, $("q-copy"), "복사됨! 단톡방에 투척하세요 🍞");
+      };
+
+      $("r-link").onclick = function () {
+        copyText(location.origin + location.pathname + "#" + window.__resultType, $("r-link"), "복사됨!");
+      };
+
+      $("r-retry").onclick = function () {
+        history.replaceState(null, "", location.pathname);
+        show("intro");
+      };
+
+      $("r-save").onclick = function () {
+        var type = window.__resultType;
+        var r = RESULTS[type];
+        var c = document.createElement("canvas");
+        c.width = 720; c.height = 900;
+        var g = c.getContext("2d");
+        g.fillStyle = "#fff9ec"; g.fillRect(0, 0, 720, 900);
+        var colors = ["#ff6b6b", "#ffd93d", "#6bcb77", "#4d96ff", "#b983ff"];
+        for (var i = 0; i < 5; i++) { g.fillStyle = colors[i]; g.fillRect(i * 144, 0, 144, 16); }
+        g.textAlign = "center"; g.fillStyle = "#38352f";
+        g.font = "130px 'Segoe UI Emoji', sans-serif";
+        g.fillText(r.emoji, 360, 260);
+        g.font = "64px 'Jua', 'Malgun Gothic', sans-serif";
+        g.fillText(type, 360, 380);
+        g.font = "34px 'Jua', 'Malgun Gothic', sans-serif";
+        g.fillText(r.title, 360, 435);
+        g.font = "26px 'Jua', 'Malgun Gothic', sans-serif";
+        g.fillStyle = "#7a766d";
+        // 밈 타이틀 줄바꿈
+        var words = r.memeTitle.split(" ");
+        var lines = [], line = "";
+        words.forEach(function (w) {
+          var t = line ? line + " " + w : w;
+          if (g.measureText("「" + t + "」").width > 620) { lines.push(line); line = w; }
+          else line = t;
+        });
+        if (line) lines.push(line);
+        lines.forEach(function (l, i2) {
+          var txt = (i2 === 0 ? "「" : "") + l + (i2 === lines.length - 1 ? "」" : "");
+          g.fillText(txt, 360, 530 + i2 * 40);
+        });
+        g.font = "28px 'Jua', 'Malgun Gothic', sans-serif";
+        g.fillStyle = "#38352f";
+        g.fillText("🍞 엽기 상황극 MBTI", 360, 790);
+        g.fillStyle = "#7a766d";
+        g.font = "24px 'Jua', 'Malgun Gothic', sans-serif";
+        g.fillText("goblub.vercel.app", 360, 830);
+        c.toBlob(function (blob) {
+          if (!blob) { window.open(c.toDataURL("image/png")); return; }
+          var a = document.createElement("a");
+          a.href = URL.createObjectURL(blob);
+          a.download = "goblub-mbti-" + type + ".png";
+          document.body.appendChild(a); a.click(); a.remove();
+          setTimeout(function () { URL.revokeObjectURL(a.href); }, 5000);
+        }, "image/png");
+      };
+
+      // 해시 진입
+      var h = (location.hash || "").replace("#", "").toUpperCase();
+      if (/^[EI][SN][TF][JP]$/.test(h) && RESULTS[h]) renderResult(h, false);
+      else show("intro");
+    })();
   </script>
 </body>
 </html>
