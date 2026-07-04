@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>타로 — goblub</title>
+  <meta name="description" content="오늘의 타로 한 장, 그리고 과거·현재·미래 3장 스프레드" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    .tcard { width: 130px; height: 200px; perspective: 800px; cursor: pointer; margin: 0 auto; }
+    .tcard .inner { position: relative; width: 100%; height: 100%; transition: transform 0.7s; transform-style: preserve-3d; }
+    .tcard.flip .inner { transform: rotateY(180deg); }
+    .tface { position: absolute; inset: 0; backface-visibility: hidden; border-radius: 14px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+      box-shadow: var(--shadow); padding: 10px; text-align: center; }
+    .tback { background: linear-gradient(135deg, var(--purple), var(--sky));
+      color: #fff; font-size: 2.4rem; }
+    .tback::after { content: "✦ ✧ ✦"; font-size: 0.9rem; opacity: 0.8; }
+    .tfront { background: #fff; transform: rotateY(180deg); border: 2px solid var(--purple); }
+    .tfront .te { font-size: 3rem; }
+    .tfront .tn { font-size: 0.95rem; }
+    .tfront .ten { font-size: 0.7rem; color: var(--ink-soft); }
+    .tfront.rev .te { transform: rotate(180deg); }
+    .rev-badge { font-size: 0.7rem; color: var(--coral); }
+    .spread-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin: 16px 0; }
+    .spread-slot { text-align: center; }
+    .slot-label { color: var(--ink-soft); font-size: 0.88rem; margin-bottom: 8px; }
+    .tmeaning { line-height: 1.75; margin-top: 10px; }
+    .q-input { width: 100%; font-family: inherit; font-size: 0.95rem; padding: 10px 12px;
+      border: 2px solid #e8e2d4; border-radius: 12px; color: var(--ink); margin-bottom: 12px; }
+  </style>
+</head>
+<body>
+  <div id="site-header"></div>
+  <main>
+    <section class="hero">
+      <h1>🃏 타로</h1>
+      <p>카드를 뒤집어 보세요 — 오늘의 한 장, 그리고 세 장의 이야기</p>
+    </section>
+
+    <section class="panel">
+      <h2>🌞 오늘의 타로</h2>
+      <p class="result-desc" style="margin:8px 0 16px">하루에 한 장 — 오늘 다시 와도 같은 카드가 기다립니다.</p>
+      <div class="tcard" id="day-card"><div class="inner">
+        <div class="tface tback">🃏</div>
+        <div class="tface tfront" id="day-front"></div>
+      </div></div>
+      <p class="tmeaning result-desc" id="day-meaning" style="display:none"></p>
+    </section>
+
+    <section class="panel">
+      <h2>🔮 세 장의 이야기 — 과거 · 현재 · 미래</h2>
+      <input type="text" class="q-input" id="sp-q" maxlength="100" placeholder="궁금한 것을 마음속으로, 또는 여기에 적어보세요 (선택)" />
+      <div class="result-actions" style="margin-bottom:4px">
+        <button class="btn-primary" id="btn-shuffle">🌀 셔플하고 세 장 뽑기</button>
+      </div>
+      <div class="spread-row" id="spread" style="display:none"></div>
+      <div id="spread-meanings"></div>
+      <p class="fine-print" id="sp-hint" style="display:none">카드를 눌러 한 장씩 공개하세요</p>
+    </section>
+
+    <p class="fine-print">타로는 재미로 봐주세요 🙂 답은 언제나 당신 안에</p>
+  </main>
+  <div id="site-footer"></div>
+  <script src="../js/common.js" data-root=".."></script>
+  <script src="js/feed.js"></script>
+  <script>
+    (function () {
+      var $ = function (id) { return document.getElementById(id); };
+
+      var CARDS = [
+        { n: "바보", en: "The Fool", e: "🤸", up: "겁 없이 내딛는 첫걸음. 계획은 없지만 그래서 자유로워요 — 오늘의 무모함이 내일의 이야깃거리가 됩니다.", rev: "설레는 마음은 좋지만 신발끈은 묶고 뛰어요. 준비물 하나만 챙기면 완벽한 출발." },
+        { n: "마법사", en: "The Magician", e: "🎩", up: "필요한 재료는 이미 손안에 다 있어요. 미루던 그 일, 지금 시작하면 마법처럼 풀립니다.", rev: "재능을 서랍에 넣어두고 계시네요. 보여주기 전엔 아무도 모릅니다 — 꺼내세요." },
+        { n: "여사제", en: "The High Priestess", e: "🌙", up: "머리보다 촉이 정확한 날. 설명할 수 없는 그 느낌, 믿어도 됩니다.", rev: "생각이 너무 많아 직감이 파묻혔어요. 잠시 조용한 곳에서 마음의 소리 볼륨을 키워보세요." },
+        { n: "여황제", en: "The Empress", e: "🌾", up: "풍요가 자라나는 중. 돌봐온 것들이 열매를 맺기 시작해요 — 자신에게도 물을 주세요.", rev: "남 챙기다 내 화분이 말랐어요. 오늘은 나부터 돌보는 날." },
+        { n: "황제", en: "The Emperor", e: "🏛️", up: "기준을 세우면 흔들리지 않아요. 오늘은 규칙과 구조가 당신 편입니다.", rev: "고집이 성벽이 되면 아무도 못 들어와요. 문 하나쯤은 열어두기." },
+        { n: "교황", en: "The Hierophant", e: "📿", up: "선배·스승·검증된 길이 힘이 되는 날. 조언을 구하면 예상보다 큰 것을 얻어요.", rev: "남들 하는 대로가 답답하다면, 그게 신호예요. 당신만의 방식을 실험해도 좋습니다." },
+        { n: "연인", en: "The Lovers", e: "💞", up: "마음이 가는 쪽이 정답인 날. 관계에도, 선택에도 진심이 통합니다.", rev: "이러지도 저러지도 못하는 중이군요. 둘 다 갖는 선택지는 없다는 걸 인정하면 편해져요." },
+        { n: "전차", en: "The Chariot", e: "🏇", up: "액셀 밟아도 되는 날! 추진력이 승리를 만듭니다. 망설이던 일에 시동을 거세요.", rev: "속도보다 방향. 핸들 놓친 채 달리는 중은 아닌지 잠깐 확인." },
+        { n: "힘", en: "Strength", e: "🦁", up: "부드러움이 사자도 이기는 날. 화내지 않고도 원하는 걸 얻을 수 있어요.", rev: "스스로를 의심하는 목소리가 커졌네요. 지금까지 버텨온 게 이미 증거입니다." },
+        { n: "은둔자", en: "The Hermit", e: "🏮", up: "혼자만의 시간이 보약인 날. 잠깐 꺼두셔도 좋습니다 — 답은 조용한 곳에 있어요.", rev: "동굴 생활이 길어지고 있어요. 등불 들고 슬슬 나올 시간." },
+        { n: "운명의 수레바퀴", en: "Wheel of Fortune", e: "🎡", up: "흐름이 바뀌는 전환점! 우연처럼 오는 기회를 잡을 준비만 하면 됩니다.", rev: "바퀴가 잠시 역회전 중. 억지로 돌리지 말고 다음 회전을 기다리는 것도 실력이에요." },
+        { n: "정의", en: "Justice", e: "⚖️", up: "뿌린 대로 거두는 날 — 좋은 의미로요. 공정하게 판단하면 저울이 당신 쪽으로 기울어요.", rev: "나에게만 관대하거나 나에게만 가혹하지 않았는지. 저울 영점 조절이 필요해요." },
+        { n: "매달린 사람", en: "The Hanged Man", e: "🙃", up: "거꾸로 보면 보이는 게 있어요. 멈춰 있는 지금이 사실은 가장 많이 배우는 중.", rev: "기다림이 미룸이 되어가고 있진 않나요? 내려올 타이밍은 스스로 정하는 겁니다." },
+        { n: "죽음", en: "Death", e: "🦋", up: "무서운 카드가 아니에요 — 끝나야 시작됩니다. 낡은 것을 보내주면 새것이 들어올 자리가 생겨요.", rev: "지나간 것을 꼭 쥔 손, 슬슬 아프죠? 놓는 순간 가벼워집니다." },
+        { n: "절제", en: "Temperance", e: "🫗", up: "섞고 조율하는 감각이 빛나는 날. 무리하지 않는 페이스가 최고 기록을 만듭니다.", rev: "어느 한쪽에 다 부어버렸네요. 균형은 소진되기 전에 챙기는 거예요." },
+        { n: "악마", en: "The Devil", e: "⛓️", up: "달콤한 유혹의 정체를 아는 것만으로 반은 이긴 거예요. 즐기되, 사슬은 차지 마세요.", rev: "묶여 있던 것에서 풀려나는 중! 그 결심, 오늘이 실행 적기입니다." },
+        { n: "탑", en: "The Tower", e: "🌩️", up: "흔들림은 무너지라고 오는 게 아니라 다시 짓라고 오는 거예요. 변화를 두려워하지 마세요.", rev: "피하고 있는 그 문제, 미룰수록 이자가 붙어요. 작게라도 지금 손대는 게 이득." },
+        { n: "별", en: "The Star", e: "⭐", up: "희망이 별처럼 또렷해지는 날. 회복과 치유의 기운 — 소원을 빌기 좋은 타이밍입니다.", rev: "별이 안 보이는 건 흐린 날씨 때문이지, 별이 사라진 게 아니에요. 구름은 지나갑니다." },
+        { n: "달", en: "The Moon", e: "🌕", up: "모호함 속을 걷는 날. 서두르지 말고 달빛만큼만 보고 한 걸음씩 — 그거면 충분해요.", rev: "안개가 걷히기 시작했어요. 어제 무서웠던 게 오늘은 그림자였음을 알게 됩니다." },
+        { n: "태양", en: "The Sun", e: "☀️", up: "쨍한 성공운! 숨기지 말고 드러내세요. 오늘의 당신은 조명이 필요 없는 주인공.", rev: "잘되고 있는데도 뭔가 부족해 보인다면, 구름 낀 건 하늘이 아니라 마음이에요." },
+        { n: "심판", en: "Judgement", e: "📯", up: "다시 일어설 나팔이 울렸어요. 미뤄둔 결단, 오늘 내리면 후회 없습니다.", rev: "지난 일을 너무 오래 재판 중이네요. 판결은 '무죄' — 이제 앞으로 갑시다." },
+        { n: "세계", en: "The World", e: "🌍", up: "한 챕터의 완성! 축하받아 마땅한 성취의 기운입니다. 마침표를 찍고 새 페이지로.", rev: "마지막 한 조각이 안 맞춰지는 느낌. 완벽보다 완료 — 90%면 세상은 이미 돌아갑니다." }
+      ];
+
+      function drawOne(rng) {
+        return { idx: Math.floor(rng() * 22), reversed: rng() < 0.3 };
+      }
+
+      function cardFrontHTML(c, reversed) {
+        return '<span class="te">' + c.e + "</span>" +
+          '<span class="tn">' + c.n + (reversed ? ' <span class="rev-badge">역방향</span>' : "") + "</span>" +
+          '<span class="ten">' + c.en + "</span>";
+      }
+
+      // ---- 오늘의 타로 (하루 1장 고정) ----
+      var dk = (function () {
+        var d = new Date();
+        return "goblub_tarot_" + d.getFullYear() + ("0" + (d.getMonth() + 1)).slice(-2) + ("0" + d.getDate()).slice(-2);
+      })();
+      var daily = null;
+      try { daily = JSON.parse(localStorage.getItem(dk)); } catch (e) {}
+      if (!daily || typeof daily.idx !== "number") {
+        daily = drawOne(Math.random);
+        try { localStorage.setItem(dk, JSON.stringify(daily)); } catch (e) {}
+      }
+      var dc = CARDS[daily.idx];
+      var front = $("day-front");
+      front.innerHTML = cardFrontHTML(dc, daily.reversed);
+      if (daily.reversed) front.classList.add("rev");
+
+      $("day-card").onclick = function () {
+        var el = $("day-card");
+        if (el.classList.contains("flip")) return;
+        el.classList.add("flip");
+        setTimeout(function () {
+          var mean = $("day-meaning");
+          mean.textContent = "🃏 " + dc.n + (daily.reversed ? "(역방향)" : "") + " — " + (daily.reversed ? dc.rev : dc.up);
+          mean.style.display = "block";
+          if (window.GoblubFeed) GoblubFeed.grant("tarot");
+        }, 500);
+      };
+
+      // ---- 3장 스프레드 ----
+      var POS = ["과거", "현재", "미래"];
+      $("btn-shuffle").onclick = function () {
+        var used = {};
+        var picks = [];
+        while (picks.length < 3) {
+          var p = drawOne(Math.random);
+          if (used[p.idx]) continue;
+          used[p.idx] = 1;
+          picks.push(p);
+        }
+        var row = $("spread");
+        row.innerHTML = "";
+        $("spread-meanings").innerHTML = "";
+        $("sp-hint").style.display = "block";
+        picks.forEach(function (p, i) {
+          var c = CARDS[p.idx];
+          var slot = document.createElement("div");
+          slot.className = "spread-slot";
+          slot.innerHTML = '<p class="slot-label">' + POS[i] + "</p>" +
+            '<div class="tcard"><div class="inner"><div class="tface tback">🃏</div>' +
+            '<div class="tface tfront' + (p.reversed ? " rev" : "") + '">' + cardFrontHTML(c, p.reversed) + "</div></div></div>";
+          var cardEl = slot.querySelector(".tcard");
+          cardEl.onclick = function () {
+            if (cardEl.classList.contains("flip")) return;
+            cardEl.classList.add("flip");
+            setTimeout(function () {
+              var pm = document.createElement("p");
+              pm.className = "tmeaning result-desc";
+              pm.textContent = "「" + POS[i] + "」 " + c.n + (p.reversed ? "(역방향)" : "") + " — " + (p.reversed ? c.rev : c.up);
+              $("spread-meanings").appendChild(pm);
+              if ($("spread-meanings").children.length === 3) $("sp-hint").style.display = "none";
+            }, 500);
+          };
+          row.appendChild(slot);
+        });
+        row.style.display = "flex";
+      };
+    })();
+  </script>
+</body>
+</html>

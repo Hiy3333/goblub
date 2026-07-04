@@ -21,6 +21,7 @@
     love: { label: "💘 연애 테스트", url: "love-test.html" },
     stress: { label: "🔥 스트레스 테스트", url: "stress-test.html" },
     decide: { label: "⚡ 결정의 신", url: "decide.html" },
+    tarot: { label: "🃏 오늘의 타로", url: "tarot.html" },
     pastlife: { label: "🔮 전생 파티", url: "pastlife.html" },
     balance: { label: "⚖️ 밸런스 게임", url: "balance.html" }
   };

@@ -69,6 +69,7 @@
   <script src="../js/common.js" data-root=".."></script>
   <script src="js/saju.js"></script>
   <script src="js/dosa.js"></script>
+  <script src="js/profile.js"></script>
   <script src="js/feed.js"></script>
   <script>
     (function () {
@@ -88,6 +89,17 @@
       for (i = 1; i <= 31; i++) d.add(new Option(i + "일", i));
       for (i = 0; i <= 23; i++) h.add(new Option(i + "시", i));
 
+      // 공유 프로필 프리필
+      (function () {
+        var p = window.GoblubProfile && GoblubProfile.get();
+        if (!p) return;
+        y.value = p.y; m.value = p.m; d.value = p.d;
+        h.value = p.hour == null ? "" : p.hour;
+        if (p.min) $("in-min").value = p.min;
+        var g = document.querySelector('input[name="gender"][value="' + (p.gender || "") + '"]');
+        if (g) g.checked = true;
+      })();
+
       function showErr(msg) { var e = $("err"); e.textContent = msg; e.style.display = "block"; }
 
       $("btn-go").onclick = function () {
@@ -105,6 +117,7 @@
         var r = Saju.compute(data, { y: yy, m: mm, d: dd, hour: hour, min: min },
           { trueSolar: trueSolar, gender: gender });
         lastCtx = { r: r, birth: { y: yy, m: mm, d: dd, hour: hour, min: min }, gender: gender, trueSolar: trueSolar };
+        if (window.GoblubProfile) GoblubProfile.set({ y: yy, m: mm, d: dd, hour: hour, min: min, gender: gender || "" });
         $("dosa-text").style.display = "none";
         $("dosa-text").textContent = "";
         $("dosa-status").style.display = "none";

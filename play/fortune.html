@@ -3,32 +3,58 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>오늘의 운세 — goblub</title>
-  <meta name="description" content="내 사주 기반 오늘의 총운·연애운·재물운·이번 달 운세" />
+  <title>운세 — goblub</title>
+  <meta name="description" content="내 사주 하나로 전부 — 오늘의 운세·연애운·재물운·궁합·타로·전생까지" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    .profile-badge { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+    .profile-badge .who { font-size: 1.15rem; }
+    .profile-badge .sub { color: var(--ink-soft); font-size: 0.9rem; }
+    .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+    .menu-grid a { display: block; background: var(--cream); border-radius: 14px; padding: 16px 14px; text-align: center; }
+    .menu-grid a:hover { background: #f4edda; }
+    .menu-grid .mi { font-size: 1.8rem; display: block; margin-bottom: 6px; }
+    .menu-grid .mt { font-size: 0.98rem; }
+  </style>
 </head>
 <body>
   <div id="site-header"></div>
   <main>
     <section class="hero">
-      <h1>🌞 오늘의 운세</h1>
-      <p id="today-label">내 사주로 보는 진짜 운세 — 매일 달라져요</p>
+      <h1>🔮 운세</h1>
+      <p>사주 프로필 한 번이면 — 오늘의 운세부터 궁합·타로·전생까지</p>
     </section>
 
     <section class="panel" id="input-panel">
-      <h2>생일을 알려주세요 (한 번만!)</h2>
+      <h2>내 사주 프로필 (한 번만!)</h2>
       <div class="field-row">
         <select id="in-year"></select>
         <select id="in-month"></select>
         <select id="in-day"></select>
         <select id="in-hour"><option value="">태어난 시 몰라요</option></select>
       </div>
-      <button class="btn-primary" id="btn-go">운세 보기</button>
+      <div class="opt-row">
+        <label><input type="radio" name="gender" value="" checked />성별 안 함</label>
+        <label><input type="radio" name="gender" value="M" />남</label>
+        <label><input type="radio" name="gender" value="F" />여</label>
+        <span style="font-size:0.85rem">(성별은 대운·궁합 풀이에만 쓰여요)</span>
+      </div>
+      <button class="btn-primary" id="btn-go">프로필 저장하고 운세 보기</button>
       <p class="error-msg" id="err"></p>
-      <p class="fine-print" style="text-align:left">생일은 이 브라우저에만 저장돼요. 서버로 전송되지 않아요.</p>
+      <p class="fine-print" style="text-align:left">프로필은 이 브라우저에만 저장돼요. 서버로 전송되지 않아요.</p>
+    </section>
+
+    <section class="panel" id="profile-panel" style="display:none">
+      <div class="profile-badge">
+        <div>
+          <p class="who" id="p-who"></p>
+          <p class="sub" id="p-sub"></p>
+        </div>
+        <button class="btn-ghost" id="btn-edit">수정</button>
+      </div>
     </section>
 
     <div id="result-area" style="display:none">
@@ -41,11 +67,19 @@
       <section class="panel"><h2>💘 오늘의 연애운 <span class="stars" id="s-love"></span></h2><p class="result-desc" id="t-love"></p></section>
       <section class="panel"><h2>💰 오늘의 재물운 <span class="stars" id="s-money"></span></h2><p class="result-desc" id="t-money"></p></section>
       <section class="panel"><h2>📆 이번 달의 운세 <span class="stars" id="s-month"></span></h2><p class="result-desc" id="t-month"></p></section>
-      <div class="result-actions">
-        <button class="btn-ghost" id="btn-reset">생일 바꾸기</button>
-        <a class="btn-primary" href="saju.html">내 사주 전체 보기</a>
-      </div>
     </div>
+
+    <section class="panel">
+      <h2>🎪 더 깊이 보기</h2>
+      <p class="result-desc" style="margin:8px 0 14px">프로필이 저장돼 있으면 어디서든 자동으로 채워져요.</p>
+      <div class="menu-grid">
+        <a href="saju.html"><span class="mi">🔮</span><span class="mt">사주팔자 심층</span></a>
+        <a href="gunghap.html"><span class="mi">💑</span><span class="mt">우리 궁합</span></a>
+        <a href="tarot.html"><span class="mi">🃏</span><span class="mt">타로</span></a>
+        <a href="today.html"><span class="mi">📅</span><span class="mt">오늘의 사주</span></a>
+        <a href="pastlife.html"><span class="mi">🌀</span><span class="mt">전생 대환장 파티</span></a>
+      </div>
+    </section>
 
     <p class="fine-print">운세는 재미로 봐주세요 🙂</p>
   </main>
@@ -53,11 +87,11 @@
   <script src="../js/common.js" data-root=".."></script>
   <script src="js/saju.js"></script>
   <script src="js/fortune.js"></script>
+  <script src="js/profile.js"></script>
   <script src="js/feed.js"></script>
   <script>
     (function () {
       var $ = function (id) { return document.getElementById(id); };
-      var KEY = "goblub_birth";
       var data = null;
 
       var y = $("in-year"), m = $("in-month"), d = $("in-day"), h = $("in-hour");
@@ -69,18 +103,26 @@
 
       function showErr(msg) { var e = $("err"); e.textContent = msg; e.style.display = "block"; }
 
-      function savedBirth() {
-        try {
-          var b = JSON.parse(localStorage.getItem(KEY));
-          if (b && b.y >= 1900 && b.y <= 2100 && b.m >= 1 && b.m <= 12 && b.d >= 1 && b.d <= 31) return b;
-        } catch (e) {}
-        return null;
+      function fillForm(p) {
+        y.value = p.y; m.value = p.m; d.value = p.d;
+        h.value = p.hour == null ? "" : p.hour;
+        var g = document.querySelector('input[name="gender"][value="' + (p.gender || "") + '"]');
+        if (g) g.checked = true;
       }
 
       function show(birth) {
         var f = Fortune.get(data, birth, new Date());
         var tt = Saju.pillarText(f.today.pillars.day);
+        var meT = Saju.pillarText(f.me.pillars.day);
         var now = new Date();
+
+        // 프로필 요약 배지
+        $("p-who").textContent = meT.hanja + " " + meT.hangul + "일주 · " + f.me.zodiac + "띠";
+        $("p-sub").textContent = birth.y + "년 " + birth.m + "월 " + birth.d + "일" +
+          (birth.hour != null ? " " + birth.hour + "시" : "") +
+          (birth.gender === "M" ? " · 남" : birth.gender === "F" ? " · 여" : "") +
+          " · " + f.me.strength.label;
+
         $("r-head").textContent = (now.getMonth() + 1) + "월 " + now.getDate() + "일, " +
           birth.y + "년생 " + f.me.zodiac + "띠님의 운세";
         $("r-iljin").textContent = "오늘의 일진: " + tt.hanja + " (" + tt.hangul + ")";
@@ -91,7 +133,9 @@
         $("s-love").textContent = stars(f.love.score); $("t-love").textContent = f.love.text;
         $("s-money").textContent = stars(f.money.score); $("t-money").textContent = f.money.text;
         $("s-month").textContent = stars(f.month.score); $("t-month").textContent = f.month.text;
+
         $("input-panel").style.display = "none";
+        $("profile-panel").style.display = "block";
         $("result-area").style.display = "block";
         if (window.GoblubFeed) GoblubFeed.grant("fortune");
       }
@@ -100,8 +144,8 @@
         .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
         .then(function (dd) {
           data = dd;
-          var b = savedBirth();
-          if (b) show(b);
+          var p = GoblubProfile.get();
+          if (p) { fillForm(p); show(p); }
         })
         .catch(function () { showErr("데이터를 불러오지 못했어요. 새로고침 해주세요."); });
 
@@ -113,14 +157,15 @@
         if (date.getFullYear() !== yy || date.getMonth() !== mm - 1 || date.getDate() !== dd2) {
           showErr("없는 날짜예요. 다시 확인해주세요!"); return;
         }
-        var birth = { y: yy, m: mm, d: dd2, hour: h.value === "" ? null : +h.value, min: 0 };
-        try { localStorage.setItem(KEY, JSON.stringify(birth)); } catch (e) {}
+        var gender = document.querySelector('input[name="gender"]:checked').value;
+        var birth = { y: yy, m: mm, d: dd2, hour: h.value === "" ? null : +h.value, min: 0, gender: gender };
+        GoblubProfile.set(birth);
         show(birth);
       };
 
-      $("btn-reset").onclick = function () {
-        try { localStorage.removeItem(KEY); } catch (e) {}
+      $("btn-edit").onclick = function () {
         $("result-area").style.display = "none";
+        $("profile-panel").style.display = "none";
         $("input-panel").style.display = "block";
       };
     })();
