@@ -105,5 +105,10 @@
     fetchStream("/api/gunghap-reading", { gunghap: payload }, "goblub_gh_", cb);
   }
 
-  window.Dosa = { buildPayload: buildPayload, fetchReading: fetchReading, fetchGunghap: fetchGunghap };
+  window.Dosa = {
+    buildPayload: buildPayload,
+    fetchReading: fetchReading,
+    fetchGunghap: fetchGunghap,
+    fetchAI: fetchStream // (path, body, cacheKeyPrefix, cb)
+  };
 })();

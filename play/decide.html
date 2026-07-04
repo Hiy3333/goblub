@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>결정의 신 — goblub</title>
+  <meta name="description" content="짜장 vs 짬뽕부터 인생 고민까지, 결정의 신이 단호하게 판결해드립니다" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    .vs-row { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; }
+    .vs-row input[type="text"] { flex: 1; font-family: inherit; font-size: 1rem; padding: 12px;
+      border: 2px solid #e8e2d4; border-radius: 12px; color: var(--ink); min-width: 0; }
+    .vs-badge { font-size: 1.2rem; color: var(--coral); flex-shrink: 0; }
+    .ctx-input { width: 100%; font-family: inherit; font-size: 0.95rem; padding: 10px 12px;
+      border: 2px solid #e8e2d4; border-radius: 12px; color: var(--ink); margin-bottom: 14px; }
+    .thunder { text-align: center; font-size: 3rem; animation: pulse 1.2s ease infinite; display: none; }
+    @keyframes pulse { 50% { transform: scale(1.25); filter: brightness(1.3); } }
+  </style>
+</head>
+<body>
+  <div id="site-header"></div>
+  <main>
+    <section class="hero">
+      <h1>⚡ 결정의 신</h1>
+      <p>짜장 vs 짬뽕부터 인생 갈림길까지 — 신께서 단호하게 정해주십니다</p>
+    </section>
+
+    <section class="panel">
+      <div id="st-ask">
+        <h2>무엇이 그대를 망설이게 하는가</h2>
+        <div class="vs-row" style="margin-top:12px">
+          <input type="text" id="in-a" maxlength="200" placeholder="선택지 A (예: 짜장면)" />
+          <span class="vs-badge">VS</span>
+          <input type="text" id="in-b" maxlength="200" placeholder="선택지 B (예: 짬뽕)" />
+        </div>
+        <input type="text" class="ctx-input" id="in-ctx" maxlength="200" placeholder="상황 한 줄 (선택 — 예: 어제 술 마심)" />
+        <div class="result-actions" style="margin-top:4px">
+          <button class="btn-primary" id="btn-go">⚡ 신탁 요청</button>
+        </div>
+        <p class="error-msg" id="err"></p>
+      </div>
+
+      <p class="thunder" id="thunder">⚡</p>
+      <p id="d-status" class="fine-print" style="display:none"></p>
+      <div id="d-text" style="display:none; white-space:pre-wrap; line-height:1.85; margin-top:12px; background:var(--cream); border-radius:14px; padding:18px"></div>
+      <div class="result-actions" id="d-actions" style="display:none">
+        <button class="btn-primary" id="btn-again">다른 고민 묻기</button>
+        <a class="btn-ghost" href="../index.html">🎡 다른 즐길거리 보기</a>
+      </div>
+    </section>
+
+    <p class="fine-print">신탁은 재미로 받아주세요 🙂 중요한 결정은 그대의 몫!</p>
+  </main>
+  <div id="site-footer"></div>
+  <script src="../js/common.js" data-root=".."></script>
+  <script src="js/dosa.js"></script>
+  <script src="js/feed.js"></script>
+  <script>
+    (function () {
+      var $ = function (id) { return document.getElementById(id); };
+
+      function setBusy(b) {
+        $("thunder").style.display = b ? "block" : "none";
+        $("btn-go").disabled = b;
+      }
+
+      $("btn-go").onclick = function () {
+        var a = $("in-a").value.trim(), b = $("in-b").value.trim(), ctx = $("in-ctx").value.trim();
+        var err = $("err");
+        err.style.display = "none";
+        if (!a || !b) { err.textContent = "A와 B를 모두 채워주세요!"; err.style.display = "block"; return; }
+        var txt = $("d-text"), st = $("d-status");
+        setBusy(true);
+        st.style.display = "block";
+        st.textContent = "⚡ 신께서 우주의 저울을 기울이는 중…";
+        txt.style.display = "block"; txt.textContent = "";
+        $("d-actions").style.display = "none";
+        Dosa.fetchAI("/api/decide", { decide: { a: a, b: b, context: ctx } }, "goblub_dc_", {
+          onChunk: function (t) { txt.textContent += t; },
+          onDone: function (fromCache) {
+            setBusy(false);
+            st.textContent = fromCache ? "⚡ (같은 고민엔 같은 신탁이 내려온다)" : "⚡ 신탁이 내려왔다.";
+            $("d-actions").style.display = "flex";
+            if (window.GoblubFeed) GoblubFeed.grant("decide");
+          },
+          onError: function (code, sec) {
+            setBusy(false);
+            txt.style.display = "none";
+            st.textContent =
+              code === "not_configured" ? "신께서 아직 강림 전이에요. 곧 찾아옵니다!" :
+              code === "cooldown" ? "신께서 숨 고르는 중… " + sec + "초 후에 다시!" :
+              "신전에 참배객이 너무 많아요. 잠시 후 다시!";
+          }
+        });
+      };
+
+      $("btn-again").onclick = function () {
+        $("d-text").style.display = "none"; $("d-text").textContent = "";
+        $("d-status").style.display = "none";
+        $("d-actions").style.display = "none";
+        $("in-a").value = ""; $("in-b").value = ""; $("in-ctx").value = "";
+        $("in-a").focus();
+      };
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>전생 대환장 파티 — goblub</title>
+  <meta name="description" content="사주 기운으로 발굴하는 나의 전생 5연속 대환장 연대기 + 전생 그림 한 장" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    .life-card { background: #fff; border: 2px solid #efe9db; border-radius: 16px; padding: 16px 18px; margin-bottom: 14px; }
+    .life-era { display: inline-block; background: var(--cream); border-radius: 999px; padding: 4px 12px; font-size: 0.82rem; color: var(--ink-soft); margin-bottom: 8px; }
+    .life-title { font-size: 1.12rem; margin-bottom: 6px; }
+    .life-body { color: var(--ink-soft); line-height: 1.7; white-space: pre-wrap; }
+    .life-card.bad { border-color: #f2b8b8; }
+    .summon { background: var(--purple); color: #fff; border: none; border-radius: 999px; padding: 8px 16px;
+      font-family: inherit; font-size: 0.9rem; cursor: pointer; margin-top: 10px; }
+    .muncher { display: inline-block; font-size: 1.3rem; }
+    .chew { animation: chew 0.18s ease infinite; }
+    @keyframes chew { 50% { transform: rotate(14deg) scale(1.25); } }
+    .svg-box { border: 2px dashed #e8e2d4; border-radius: 16px; padding: 10px; margin-top: 8px; }
+    .svg-box svg { width: 100%; height: auto; display: block; border-radius: 10px; }
+    .digging { text-align: center; font-size: 2.6rem; }
+    .digging .shovel { display: inline-block; animation: dig 0.7s ease infinite; }
+    @keyframes dig { 50% { transform: rotate(-24deg) translateY(4px); } }
+  </style>
+</head>
+<body>
+  <div id="site-header"></div>
+  <main>
+    <section class="hero">
+      <h1>🔮 전생 대환장 파티</h1>
+      <p>사주의 기운으로 발굴하는 당신의 전생 5연속 — 그림 한 장은 덤</p>
+    </section>
+
+    <section class="panel" id="input-panel">
+      <h2>언제 태어났나요?</h2>
+      <div class="field-row">
+        <select id="in-year"></select><select id="in-month"></select><select id="in-day"></select>
+        <select id="in-hour"><option value="">시 몰라요</option></select>
+      </div>
+      <button class="btn-primary" id="btn-go">⛏️ 전생 발굴 시작</button>
+      <p class="error-msg" id="err"></p>
+    </section>
+
+    <section class="panel" id="dig-panel" style="display:none">
+      <p class="digging"><span class="shovel">⛏️</span>👾</p>
+      <p class="fine-print" id="dig-status">도사님이 전생 지층을 파내려가는 중…</p>
+    </section>
+
+    <div id="result-area" style="display:none">
+      <div id="lives"></div>
+      <section class="panel" id="finale-box" style="display:none">
+        <h2>🧵 그래서 지금의 당신은</h2>
+        <p class="result-desc" id="finale-text" style="line-height:1.8"></p>
+      </section>
+      <section class="panel" id="svg-panel" style="display:none">
+        <h2>🖼 대표 전생 한 장면</h2>
+        <div class="svg-box" id="svg-box"></div>
+        <div class="result-actions">
+          <button class="btn-primary" id="btn-svg-save">🖼 그림 저장</button>
+          <button class="btn-ghost" id="btn-retry">다시 발굴</button>
+          <a class="btn-ghost" href="../index.html">🎡 다른 즐길거리 보기</a>
+        </div>
+      </section>
+    </div>
+
+    <p class="fine-print">전생은 재미로 봐주세요 🙂 업보는 셀프</p>
+  </main>
+  <div id="site-footer"></div>
+  <script src="../js/common.js" data-root=".."></script>
+  <script src="js/saju.js"></script>
+  <script src="js/dosa.js"></script>
+  <script src="js/feed.js"></script>
+  <script>
+    (function () {
+      var $ = function (id) { return document.getElementById(id); };
+      var data = null;
+
+      var y = $("in-year"), m = $("in-month"), d = $("in-day"), h = $("in-hour");
+      for (var i = 2100; i >= 1900; i--) y.add(new Option(i + "년", i));
+      y.value = 1995;
+      for (i = 1; i <= 12; i++) m.add(new Option(i + "월", i));
+      for (i = 1; i <= 31; i++) d.add(new Option(i + "일", i));
+      for (i = 0; i <= 23; i++) h.add(new Option(i + "시", i));
+      try {
+        var mine = JSON.parse(localStorage.getItem("goblub_birth"));
+        if (mine && mine.y) {
+          y.value = mine.y; m.value = mine.m; d.value = mine.d;
+          if (mine.hour != null) h.value = mine.hour;
+        }
+      } catch (e) {}
+
+      function showErr(msg) { var e = $("err"); e.textContent = msg; e.style.display = "block"; }
+
+      fetch("data/saju-terms.json")
+        .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+        .then(function (dd) { data = dd; })
+        .catch(function () { showErr("데이터를 불러오지 못했어요. 새로고침 해주세요."); });
+
+      // ---- 응답 파서: @@LIFE / @@FIX / @@FINALE / @@SVG ----
+      function parseReading(text) {
+        var svgIdx = text.indexOf("@@SVG");
+        var svg = null;
+        if (svgIdx > -1) {
+          var raw = text.slice(svgIdx + 5);
+          var s = raw.indexOf("<svg"), e = raw.lastIndexOf("</svg>");
+          if (s > -1 && e > -1) svg = raw.slice(s, e + 6);
+          text = text.slice(0, svgIdx);
+        }
+        var finale = null;
+        var fIdx = text.indexOf("@@FINALE");
+        if (fIdx > -1) { finale = text.slice(fIdx + 8).trim(); text = text.slice(0, fIdx); }
+        var lives = [];
+        text.split("@@LIFE").forEach(function (chunk) {
+          chunk = chunk.trim();
+          if (!chunk) return;
+          var nl = chunk.indexOf("\n");
+          if (nl < 0) return;
+          var head = chunk.slice(0, nl).replace(/^\|/, "").split("|");
+          var body = chunk.slice(nl + 1).trim();
+          var fix = null;
+          var fx = body.indexOf("@@FIX");
+          if (fx > -1) { fix = body.slice(fx + 5).trim(); body = body.slice(0, fx).trim(); }
+          lives.push({ era: (head[0] || "").trim(), emoji: (head[1] || "🌀").trim(),
+            title: (head[2] || "이름 모를 전생").trim(), body: body, fix: fix });
+        });
+        return { lives: lives, finale: finale, svg: svg };
+      }
+
+      function sanitizeSvg(svgText) {
+        try {
+          var doc = new DOMParser().parseFromString(svgText, "image/svg+xml");
+          if (doc.querySelector("parsererror")) return null;
+          var root = doc.documentElement;
+          Array.prototype.slice.call(doc.querySelectorAll("script, foreignObject, image, use")).forEach(function (n) { n.remove(); });
+          Array.prototype.slice.call(doc.querySelectorAll("*")).forEach(function (el) {
+            Array.prototype.slice.call(el.attributes).forEach(function (at) {
+              if (/^on/i.test(at.name) || /(javascript:|http)/i.test(at.value)) el.removeAttribute(at.name);
+            });
+          });
+          return root;
+        } catch (e) { return null; }
+      }
+
+      // ---- 고블럽 씹어먹기 모션 ----
+      function summonGoblub(card, bodyEl, fixText, btn) {
+        btn.disabled = true;
+        var muncher = document.createElement("span");
+        muncher.className = "muncher chew";
+        muncher.textContent = "👾";
+        btn.replaceWith(muncher);
+        var text = bodyEl.textContent;
+        var i = text.length;
+        var eat = setInterval(function () {
+          i = Math.max(0, i - 3);
+          bodyEl.textContent = text.slice(0, i);
+          if (i <= 0) {
+            clearInterval(eat);
+            muncher.classList.remove("chew");
+            muncher.textContent = "👾💨";
+            setTimeout(function () {
+              muncher.textContent = "👾✨";
+              var j = 0;
+              var typeIn = setInterval(function () {
+                j += 2;
+                bodyEl.textContent = fixText.slice(0, j);
+                if (j >= fixText.length) {
+                  clearInterval(typeIn);
+                  card.classList.remove("bad");
+                  card.style.borderColor = "#cdeccd";
+                }
+              }, 28);
+            }, 500);
+          }
+        }, 30);
+      }
+
+      function render(parsed) {
+        var box = $("lives");
+        box.innerHTML = "";
+        parsed.lives.forEach(function (life, n) {
+          var card = document.createElement("section");
+          card.className = "life-card" + (life.fix ? " bad" : "");
+          card.innerHTML =
+            '<span class="life-era">' + (n + 1) + "번째 전생 · " + life.era + "</span>" +
+            '<p class="life-title">' + life.emoji + " " + life.title + "</p>" +
+            '<p class="life-body"></p>';
+          card.querySelector(".life-body").textContent = life.body;
+          if (life.fix) {
+            var btn = document.createElement("button");
+            btn.className = "summon";
+            btn.textContent = "👾 고블럽 소환 — 이 업보 씹어먹기";
+            btn.onclick = function () { summonGoblub(card, card.querySelector(".life-body"), life.fix, btn); };
+            card.appendChild(btn);
+          }
+          box.appendChild(card);
+        });
+        if (parsed.finale) { $("finale-text").textContent = parsed.finale; $("finale-box").style.display = "block"; }
+        var svgRoot = parsed.svg ? sanitizeSvg(parsed.svg) : null;
+        if (svgRoot) {
+          $("svg-box").innerHTML = "";
+          $("svg-box").appendChild(svgRoot);
+          $("svg-panel").style.display = "block";
+        }
+        $("result-area").style.display = "block";
+        if (window.GoblubFeed) GoblubFeed.grant("pastlife");
+      }
+
+      $("btn-go").onclick = function () {
+        $("err").style.display = "none";
+        if (!data) { showErr("데이터를 불러오지 못했어요. 새로고침 해주세요."); return; }
+        var yy = +y.value, mm = +m.value, dd = +d.value;
+        var date = new Date(yy, mm - 1, dd);
+        if (date.getFullYear() !== yy || date.getMonth() !== mm - 1 || date.getDate() !== dd) {
+          showErr("없는 날짜예요. 다시 확인해주세요!"); return;
+        }
+        var birth = { y: yy, m: mm, d: dd, hour: h.value === "" ? null : +h.value, min: 0 };
+        var r = Saju.compute(data, birth, {});
+        var payload = Dosa.buildPayload(r, birth, null, false);
+        delete payload.daeun;
+        $("input-panel").style.display = "none";
+        $("dig-panel").style.display = "block";
+        $("result-area").style.display = "none";
+        var buffer = "";
+        Dosa.fetchAI("/api/pastlife", { saju: payload }, "goblub_pl_", {
+          onChunk: function (t) {
+            buffer += t;
+            var n = (buffer.match(/@@LIFE/g) || []).length;
+            $("dig-status").textContent = n === 0 ? "도사님이 전생 지층을 파내려가는 중…" :
+              n + "번째 전생 발굴! 계속 파는 중… ⛏️";
+          },
+          onDone: function () {
+            $("dig-panel").style.display = "none";
+            var parsed = parseReading(buffer);
+            if (!parsed.lives.length) {
+              $("input-panel").style.display = "block";
+              showErr("전생 기록이 손상됐어요. 다시 발굴해 주세요!");
+              return;
+            }
+            render(parsed);
+          },
+          onError: function (code, sec) {
+            $("dig-panel").style.display = "none";
+            $("input-panel").style.display = "block";
+            showErr(
+              code === "not_configured" ? "도사님이 아직 수련 중이에요. 곧 찾아옵니다!" :
+              code === "cooldown" ? "도사님이 숨 고르는 중… " + sec + "초 후에 다시!" :
+              "지층이 단단하네요. 잠시 후 다시 발굴해 주세요!");
+          }
+        });
+      };
+
+      $("btn-retry").onclick = function () {
+        $("result-area").style.display = "none";
+        $("input-panel").style.display = "block";
+      };
+
+      $("btn-svg-save").onclick = function () {
+        var svg = $("svg-box").querySelector("svg");
+        if (!svg) return;
+        var xml = new XMLSerializer().serializeToString(svg);
+        var img = new Image();
+        img.onload = function () {
+          var c = document.createElement("canvas");
+          c.width = 1200; c.height = 800;
+          var g = c.getContext("2d");
+          g.fillStyle = "#fff9ec"; g.fillRect(0, 0, 1200, 800);
+          g.drawImage(img, 0, 0, 1200, 800);
+          c.toBlob(function (blob) {
+            if (!blob) { window.open(c.toDataURL("image/png")); return; }
+            var a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = "goblub-pastlife.png";
+            document.body.appendChild(a); a.click(); a.remove();
+            setTimeout(function () { URL.revokeObjectURL(a.href); }, 5000);
+          }, "image/png");
+        };
+        img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(xml);
+      };
+    })();
+  </script>
+</body>
+</html>

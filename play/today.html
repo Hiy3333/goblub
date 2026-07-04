@@ -41,6 +41,7 @@
   <script src="../js/common.js" data-root=".."></script>
   <script src="js/saju.js"></script>
   <script src="js/fortune.js"></script>
+  <script src="js/feed.js"></script>
   <script>
     (function () {
       var $ = function (id) { return document.getElementById(id); };
@@ -63,6 +64,7 @@
           $("t-ji").textContent = dt.ji;
           $("t-good").innerHTML = dt.dos.good.map(function (g) { return "<li>" + g + "</li>"; }).join("");
           $("t-care").innerHTML = dt.dos.care.map(function (c) { return "<li>" + c + "</li>"; }).join("");
+          if (window.GoblubFeed) GoblubFeed.grant("today");
         })
         .catch(function () { $("t-err").textContent = "데이터를 불러오지 못했어요. 새로고침 해주세요."; });
     })();

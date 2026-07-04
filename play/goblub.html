@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>고블럽 키우기 — goblub</title>
+  <meta name="description" content="사이트를 즐길수록 자라는 나의 고블럽 — 먹이 주고 레벨업!" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    .pet { text-align: center; margin: 6px 0 2px; transition: transform 0.25s; }
+    .pet.nom { animation: nom 0.5s ease; }
+    @keyframes nom { 30% { transform: scale(1.18) rotate(-6deg); } 65% { transform: scale(1.12) rotate(6deg); } }
+    .pet-name { text-align: center; font-size: 1.3rem; margin-bottom: 2px; }
+    .pet-level { text-align: center; color: var(--ink-soft); margin-bottom: 12px; }
+    .xp-track { background: #efe9db; border-radius: 999px; height: 14px; overflow: hidden; }
+    .xp-fill { background: linear-gradient(90deg, var(--mint), var(--purple)); height: 14px; border-radius: 999px; transition: width 0.4s; }
+    .xp-label { text-align: center; color: var(--ink-soft); font-size: 0.85rem; margin: 6px 0 14px; }
+    .snack { font-size: 1.4rem; letter-spacing: 4px; text-align: center; min-height: 1.8em; }
+    .earn-list { list-style: none; }
+    .earn-list li { margin-bottom: 8px; }
+    .earn-list a { display: block; background: var(--cream); border-radius: 12px; padding: 12px 14px; }
+    .earn-list a:hover { background: #f4edda; }
+    .levelup { text-align: center; font-size: 1.2rem; color: var(--coral); display: none; margin-top: 10px; }
+    .name-edit { display: flex; gap: 8px; justify-content: center; margin-bottom: 10px; }
+    .name-edit input { font-family: inherit; font-size: 0.95rem; padding: 8px 12px; border: 2px solid #e8e2d4; border-radius: 10px; width: 160px; }
+  </style>
+</head>
+<body>
+  <div id="site-header"></div>
+  <main>
+    <section class="hero">
+      <h1>👾 고블럽 키우기</h1>
+      <p>goblub을 즐길수록 먹이가 생겨요 — 하루 최대 10개!</p>
+    </section>
+
+    <section class="panel">
+      <p class="pet" id="pet">🥚</p>
+      <p class="pet-name" id="pet-name"></p>
+      <div class="name-edit">
+        <input type="text" id="in-name" maxlength="12" placeholder="이름 지어주기" />
+        <button class="btn-ghost" id="btn-name" style="padding:8px 16px">저장</button>
+      </div>
+      <p class="pet-level" id="pet-level"></p>
+      <div class="xp-track"><div class="xp-fill" id="xp-fill" style="width:0%"></div></div>
+      <p class="xp-label" id="xp-label"></p>
+      <p class="snack" id="snack"></p>
+      <div class="result-actions">
+        <button class="btn-primary" id="btn-feed">🍬 먹이 주기</button>
+      </div>
+      <p class="levelup" id="levelup">🎉 레벨 업! 고블럽이 자랐어요!</p>
+    </section>
+
+    <section class="panel">
+      <h2>🧺 오늘 먹이가 남아 있는 곳</h2>
+      <p class="result-desc" style="margin:8px 0 12px">아래 콘텐츠를 즐기면 먹이를 1개씩 얻어요. (콘텐츠당 하루 1개)</p>
+      <ul class="earn-list" id="earn-list"></ul>
+    </section>
+
+    <p class="fine-print">고블럽은 이 브라우저에서 자라요 — 브라우저를 바꾸면 새 알을 만나게 됩니다 🥚</p>
+  </main>
+  <div id="site-footer"></div>
+  <script src="../js/common.js" data-root=".."></script>
+  <script src="js/feed.js"></script>
+  <script>
+    (function () {
+      var $ = function (id) { return document.getElementById(id); };
+
+      function refresh() {
+        var s = GoblubFeed.state();
+        var pet = $("pet");
+        pet.textContent = s.levelInfo.emoji;
+        pet.style.fontSize = s.levelInfo.size + "rem";
+        $("pet-name").textContent = s.name;
+        $("pet-level").textContent = "Lv." + (s.level + 1) + " " + s.levelInfo.name + " · 경험치 " + s.xp;
+        if (s.maxLevel) {
+          $("xp-fill").style.width = "100%";
+          $("xp-label").textContent = "최고 레벨! 이제 전설입니다 🌟";
+        } else {
+          var prev = GoblubFeed.LEVELS[s.level].need;
+          var span = s.nextNeed - prev;
+          $("xp-fill").style.width = Math.round((s.xp - prev) / span * 100) + "%";
+          $("xp-label").textContent = "다음 진화까지 " + (s.nextNeed - s.xp) + "개";
+        }
+        $("snack").textContent = s.pending > 0 ? Array(Math.min(s.pending, 10) + 1).join("🍬") + " × " + s.pending : "보유한 먹이가 없어요";
+        $("btn-feed").disabled = s.pending <= 0;
+
+        var list = $("earn-list");
+        var remain = GoblubFeed.todayRemaining();
+        list.innerHTML = remain.length
+          ? remain.map(function (r) { return '<li><a href="' + r.url + '">' + r.label + " → 먹이 +1</a></li>"; }).join("")
+          : '<li style="color:var(--ink-soft)">오늘 먹이는 전부 획득! 내일 또 만나요 👾</li>';
+      }
+
+      $("btn-feed").onclick = function () {
+        var r = GoblubFeed.feedOne();
+        if (!r.fed) return;
+        var pet = $("pet");
+        pet.classList.remove("nom");
+        void pet.offsetWidth;
+        pet.classList.add("nom");
+        if (r.levelUp) {
+          var lu = $("levelup");
+          lu.style.display = "block";
+          setTimeout(function () { lu.style.display = "none"; }, 2600);
+        }
+        setTimeout(refresh, 260);
+      };
+
+      $("btn-name").onclick = function () {
+        var v = $("in-name").value;
+        if (v.trim()) { GoblubFeed.setName(v); $("in-name").value = ""; refresh(); }
+      };
+
+      refresh();
+    })();
+  </script>
+</body>
+</html>

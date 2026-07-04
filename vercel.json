@@ -1,6 +1,8 @@
 {
   "functions": {
     "api/saju-reading.js": { "maxDuration": 300 },
-    "api/gunghap-reading.js": { "maxDuration": 300 }
+    "api/gunghap-reading.js": { "maxDuration": 300 },
+    "api/decide.js": { "maxDuration": 300 },
+    "api/pastlife.js": { "maxDuration": 300 }
   }
 }

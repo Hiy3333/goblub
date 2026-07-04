@@ -53,6 +53,7 @@
   <script src="../js/common.js" data-root=".."></script>
   <script src="js/saju.js"></script>
   <script src="js/fortune.js"></script>
+  <script src="js/feed.js"></script>
   <script>
     (function () {
       var $ = function (id) { return document.getElementById(id); };
@@ -92,6 +93,7 @@
         $("s-month").textContent = stars(f.month.score); $("t-month").textContent = f.month.text;
         $("input-panel").style.display = "none";
         $("result-area").style.display = "block";
+        if (window.GoblubFeed) GoblubFeed.grant("fortune");
       }
 
       fetch("data/saju-terms.json")

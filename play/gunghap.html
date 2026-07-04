@@ -79,6 +79,7 @@
   <script src="js/saju.js"></script>
   <script src="js/gunghap.js"></script>
   <script src="js/dosa.js"></script>
+  <script src="js/feed.js"></script>
   <script>
     (function () {
       var $ = function (id) { return document.getElementById(id); };
@@ -136,6 +137,7 @@
         $("gh-status").style.display = "none"; $("btn-ghdosa").disabled = false;
         $("input-panel").style.display = "none";
         $("result-panel").style.display = "block";
+        if (window.GoblubFeed) GoblubFeed.grant("gunghap");
       };
 
       function pillarBox(label, r) {

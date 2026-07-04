@@ -49,6 +49,7 @@
     function renderResult() {
       var key = config.resolve(totals);
       var r = config.results[key];
+      if (window.GoblubFeed && window.__feedSrc) GoblubFeed.grant(window.__feedSrc);
       el.innerHTML =
         '<span class="result-emoji">' + r.emoji + "</span>" +
         '<p class="result-name">' + r.name + "</p>" +

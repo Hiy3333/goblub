@@ -69,6 +69,7 @@
   <script src="../js/common.js" data-root=".."></script>
   <script src="js/saju.js"></script>
   <script src="js/dosa.js"></script>
+  <script src="js/feed.js"></script>
   <script>
     (function () {
       var $ = function (id) { return document.getElementById(id); };
@@ -111,6 +112,7 @@
         render(r);
         $("result-panel").style.display = "block";
         $("result-panel").scrollIntoView({ behavior: "smooth" });
+        if (window.GoblubFeed) GoblubFeed.grant("saju");
       };
 
       function render(r) {

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>대환장 밸런스 게임 — goblub</title>
+  <meta name="description" content="극한의 양자택일 12연속 — 전국 사람들은 뭘 골랐을까?" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    .bal-btn { display: block; width: 100%; text-align: center; border: 2px solid transparent;
+      border-radius: 16px; padding: 22px 16px; margin-bottom: 12px; font-family: inherit;
+      font-size: 1.05rem; color: var(--ink); cursor: pointer; }
+    .bal-a { background: #ffe3e3; } .bal-a:hover { border-color: var(--coral); }
+    .bal-b { background: #dfeaff; } .bal-b:hover { border-color: var(--sky); }
+    .stat-bar { display: flex; height: 30px; border-radius: 999px; overflow: hidden; margin: 14px 0 6px; font-size: 0.85rem; color: #fff; }
+    .stat-bar .sa { background: var(--coral); display: flex; align-items: center; justify-content: center; min-width: 2.5em; transition: width 0.5s; }
+    .stat-bar .sb { background: var(--sky); display: flex; align-items: center; justify-content: center; min-width: 2.5em; transition: width 0.5s; }
+    .verdict { text-align: center; line-height: 1.7; margin-top: 8px; }
+    .offline-badge { text-align: center; color: var(--ink-soft); font-size: 0.85rem; margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <div id="site-header"></div>
+  <main>
+    <section class="hero">
+      <h1>⚖️ 대환장 밸런스 게임</h1>
+      <p>극한의 양자택일 12연속 — 전국 사람들의 선택과 비교해보세요</p>
+    </section>
+
+    <section class="panel">
+      <div id="st-intro">
+        <h2 style="text-align:center">둘 중 하나만 고를 수 있다면?</h2>
+        <p class="result-desc" style="text-align:center; margin:12px 0 20px">
+          고르면 곧바로 전국 통계가 공개됩니다. 당신은 다수파일까, 청개구리일까?
+        </p>
+        <div class="result-actions"><button class="btn-primary" id="btn-start">시작하기</button></div>
+      </div>
+
+      <div id="st-play" style="display:none">
+        <div class="progress-track"><div class="progress-fill" id="q-fill" style="width:0%"></div></div>
+        <p class="quiz-q" id="q-text"></p>
+        <button class="bal-btn bal-a" id="q-a"></button>
+        <p style="text-align:center; color:var(--ink-soft); margin-bottom:12px">VS</p>
+        <button class="bal-btn bal-b" id="q-b"></button>
+        <div id="q-stat" style="display:none">
+          <div class="stat-bar"><div class="sa" id="s-a"></div><div class="sb" id="s-b"></div></div>
+          <p class="verdict" id="q-verdict"></p>
+          <p class="offline-badge" id="q-offline" style="display:none">🛰 전국 통계는 준비 중 — 일단 내 선택만 기록했어요</p>
+          <div class="result-actions"><button class="btn-primary" id="btn-next">다음 문제</button></div>
+        </div>
+      </div>
+
+      <div id="st-done" style="display:none">
+        <span class="result-emoji" id="d-emoji"></span>
+        <p class="result-name" id="d-name"></p>
+        <p class="result-desc" id="d-desc" style="text-align:center"></p>
+        <div class="result-actions">
+          <button class="btn-primary" id="btn-copy">📋 결과 복사</button>
+          <button class="btn-ghost" id="btn-redo">다시하기</button>
+          <a class="btn-ghost" href="../index.html">🎡 다른 즐길거리 보기</a>
+        </div>
+      </div>
+    </section>
+  </main>
+  <div id="site-footer"></div>
+  <script src="../js/common.js" data-root=".."></script>
+  <script src="js/feed.js"></script>
+  <script>
+    (function () {
+      var $ = function (id) { return document.getElementById(id); };
+      var API = "https://goblub.vercel.app/api/balance-vote";
+
+      var QUESTIONS = [
+        { id: 1, a: "평생 라면 금지 🍜🚫", b: "평생 치킨 금지 🍗🚫" },
+        { id: 2, a: "말할 때마다 랩으로 말하기 🎤", b: "걸을 때마다 문워크로 걷기 🕴️" },
+        { id: 3, a: "과거로 가서 흑역사 수정 ⏪", b: "미래 10년 미리보기 ⏩" },
+        { id: 4, a: "월 500 받고 평생 집콕 🏠", b: "월 200 받고 자유롭게 🌍" },
+        { id: 5, a: "내 검색기록 전체공개 🔍", b: "내 통장내역 전체공개 💳" },
+        { id: 6, a: "한여름에 롱패딩 🧥☀️", b: "한겨울에 반팔 반바지 🩳❄️" },
+        { id: 7, a: "평생 찬물 샤워 🚿🧊", b: "평생 미지근한 밥 🍚😐" },
+        { id: 8, a: "고백 먼저 하기 100번 💌", b: "고백 받고 차이기 10번 💔" },
+        { id: 9, a: "모든 음식 맛 2배, 가격도 2배 😋💸", b: "모든 음식 맛 절반, 전부 공짜 😑🆓" },
+        { id: 10, a: "3시간만 자도 쌩쌩 ⚡", b: "12시간 자야 하지만 항상 개운 😴" },
+        { id: 11, a: "남의 속마음 들리기(끄기 불가) 🔊", b: "내 속마음 들키기(끄기 불가) 📢" },
+        { id: 12, a: "기억 갖고 10년 전으로 ⏰", b: "지금 이대로 10억 받기 💰" }
+      ];
+
+      var idx = 0, minority = 0, answered = 0, statsOn = true;
+
+      function show(s) {
+        $("st-intro").style.display = s === "intro" ? "block" : "none";
+        $("st-play").style.display = s === "play" ? "block" : "none";
+        $("st-done").style.display = s === "done" ? "block" : "none";
+      }
+
+      function renderQ() {
+        var q = QUESTIONS[idx];
+        $("q-fill").style.width = Math.round(idx / QUESTIONS.length * 100) + "%";
+        $("q-text").textContent = "Q" + (idx + 1) + ". 둘 중 하나!";
+        $("q-a").textContent = q.a;
+        $("q-b").textContent = q.b;
+        $("q-a").disabled = false; $("q-b").disabled = false;
+        $("q-stat").style.display = "none";
+      }
+
+      function showStat(pick, counts) {
+        var q = QUESTIONS[idx];
+        var total = counts.a + counts.b;
+        var pa = total > 0 ? Math.round(counts.a / total * 100) : 50;
+        var pb = 100 - pa;
+        $("s-a").style.width = Math.max(8, pa) + "%"; $("s-a").textContent = pa + "%";
+        $("s-b").style.width = Math.max(8, pb) + "%"; $("s-b").textContent = pb + "%";
+        var myPct = pick === "a" ? pa : pb;
+        var isMinority = myPct < 50;
+        if (isMinority) minority++;
+        $("q-verdict").textContent = total > 1
+          ? (isMinority ? "🐸 당신은 소수파! 전국의 " + myPct + "%만 이쪽을 골랐어요." :
+             myPct === 50 ? "⚖️ 정확히 반반! 우주의 균형이 당신 손에." :
+             "🙌 다수파! 전국의 " + myPct + "%가 같은 편이에요.")
+          : "🥇 이 문제의 첫 투표자! 전국 통계를 개척하셨습니다.";
+        $("q-stat").style.display = "block";
+      }
+
+      function vote(pick) {
+        var q = QUESTIONS[idx];
+        $("q-a").disabled = true; $("q-b").disabled = true;
+        answered++;
+        var localKey = "goblub_bal_" + q.id;
+        var already = false;
+        try { already = !!localStorage.getItem(localKey); localStorage.setItem(localKey, pick); } catch (e) {}
+        if (!statsOn) { offlineStat(pick); return; }
+        fetch(API, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: q.id, pick: already ? null : pick })
+        }).then(function (r) {
+          if (r.status === 501) { statsOn = false; offlineStat(pick); return null; }
+          if (!r.ok) throw new Error(r.status);
+          return r.json();
+        }).then(function (counts) {
+          if (counts) showStat(pick, counts);
+        }).catch(function () { statsOn = false; offlineStat(pick); });
+      }
+
+      function offlineStat(pick) {
+        $("s-a").style.width = pick === "a" ? "92%" : "8%"; $("s-a").textContent = pick === "a" ? "나" : "";
+        $("s-b").style.width = pick === "b" ? "92%" : "8%"; $("s-b").textContent = pick === "b" ? "나" : "";
+        $("q-verdict").textContent = "선택 완료!";
+        $("q-offline").style.display = "block";
+        $("q-stat").style.display = "block";
+      }
+
+      $("btn-start").onclick = function () { idx = 0; minority = 0; answered = 0; renderQ(); show("play"); };
+      $("q-a").onclick = function () { vote("a"); };
+      $("q-b").onclick = function () { vote("b"); };
+      $("btn-next").onclick = function () {
+        idx++;
+        if (idx < QUESTIONS.length) renderQ();
+        else finish();
+      };
+
+      function finish() {
+        var r = minority >= 8 ? { e: "👽", n: "완전 별종", d: "12판 중 " + minority + "판 소수파. 지구인 맞으신가요? (칭찬)" } :
+                minority >= 5 ? { e: "🐸", n: "청개구리 유형", d: "12판 중 " + minority + "판 소수파. 남들과 다른 길이 편한 타입!" } :
+                minority >= 2 ? { e: "🦉", n: "균형 잡힌 반골", d: "12판 중 " + minority + "판 소수파. 대세도 알고 내 취향도 있는 밸런스형." } :
+                { e: "🐑", n: "국민 표준", d: "12판 중 소수파 " + minority + "판. 당신의 취향이 곧 대한민국 평균입니다." };
+        $("d-emoji").textContent = r.e;
+        $("d-name").textContent = r.n;
+        $("d-desc").textContent = r.d + (statsOn ? "" : " (전국 통계는 준비 중이라 이번 판은 내 기록 기준!)");
+        show("done");
+        if (window.GoblubFeed) GoblubFeed.grant("balance");
+        window.__balResult = r.n + " — " + r.d;
+      }
+
+      $("btn-copy").onclick = function () {
+        var text = "⚖️ 대환장 밸런스 게임 결과: " + (window.__balResult || "") + "\n👉 나도 하기: " + location.origin + location.pathname;
+        var btn = $("btn-copy");
+        (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject())
+          .then(function () { btn.textContent = "복사됨!"; setTimeout(function () { btn.textContent = "📋 결과 복사"; }, 1500); })
+          .catch(function () { prompt("복사해 주세요:", text); });
+      };
+      $("btn-redo").onclick = function () { show("intro"); };
+
+      show("intro");
+    })();
+  </script>
+</body>
+</html>
