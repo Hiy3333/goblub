@@ -36,6 +36,7 @@
         <div class="field-row">
           <select id="a-year"></select><select id="a-month"></select><select id="a-day"></select>
           <select id="a-hour"><option value="">시 몰라요</option></select>
+          <input type="number" id="a-min" min="0" max="59" value="0" aria-label="분" title="분(0~59)" style="width:58px" />
         </div>
       </div>
       <div class="person-box">
@@ -43,6 +44,7 @@
         <div class="field-row">
           <select id="b-year"></select><select id="b-month"></select><select id="b-day"></select>
           <select id="b-hour"><option value="">시 몰라요</option></select>
+          <input type="number" id="b-min" min="0" max="59" value="0" aria-label="분" title="분(0~59)" style="width:58px" />
         </div>
       </div>
       <button class="btn-primary" id="btn-go">궁합 보기</button>
@@ -101,6 +103,7 @@
         if (mine && mine.y) {
           $("a-year").value = mine.y; $("a-month").value = mine.m; $("a-day").value = mine.d;
           if (mine.hour != null) $("a-hour").value = mine.hour;
+          if (mine.min) $("a-min").value = mine.min;
         }
       } catch (e) {}
 
@@ -111,7 +114,8 @@
         var date = new Date(yy, mm - 1, dd);
         if (date.getFullYear() !== yy || date.getMonth() !== mm - 1 || date.getDate() !== dd) return null;
         var hv = $(prefix + "-hour").value;
-        return { y: yy, m: mm, d: dd, hour: hv === "" ? null : +hv, min: 0 };
+        var mv = hv === "" ? 0 : Math.min(59, Math.max(0, +($(prefix + "-min").value || 0)));
+        return { y: yy, m: mm, d: dd, hour: hv === "" ? null : +hv, min: mv };
       }
 
       fetch("data/saju-terms.json")
@@ -124,8 +128,8 @@
         if (!data) { showErr("데이터를 불러오지 못했어요. 새로고침 해주세요."); return; }
         var ba = readBirth("a"), bb = readBirth("b");
         if (!ba || !bb) { showErr("없는 날짜가 있어요. 다시 확인해주세요!"); return; }
-        var rA = Saju.compute(data, ba, {});
-        var rB = Saju.compute(data, bb, {});
+        var rA = Saju.compute(data, ba, { trueSolar: true });
+        var rB = Saju.compute(data, bb, { trueSolar: true });
         var s = Gunghap.score(rA, rB);
         var now = new Date();
         var rT = Saju.compute(data, { y: now.getFullYear(), m: now.getMonth() + 1, d: now.getDate(), hour: 12, min: 0 }, {});

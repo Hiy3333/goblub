@@ -40,6 +40,7 @@
       <div class="field-row">
         <select id="in-year"></select><select id="in-month"></select><select id="in-day"></select>
         <select id="in-hour"><option value="">시 몰라요</option></select>
+        <input type="number" id="in-min" min="0" max="59" value="0" aria-label="분" title="분(0~59)" style="width:58px" />
       </div>
       <button class="btn-primary" id="btn-go">⛏️ 전생 발굴 시작</button>
       <p class="error-msg" id="err"></p>
@@ -91,6 +92,7 @@
         if (mine && mine.y) {
           y.value = mine.y; m.value = mine.m; d.value = mine.d;
           if (mine.hour != null) h.value = mine.hour;
+          if (mine.min) $("in-min").value = mine.min;
         }
       } catch (e) {}
 
@@ -219,8 +221,9 @@
         if (date.getFullYear() !== yy || date.getMonth() !== mm - 1 || date.getDate() !== dd) {
           showErr("없는 날짜예요. 다시 확인해주세요!"); return;
         }
-        var birth = { y: yy, m: mm, d: dd, hour: h.value === "" ? null : +h.value, min: 0 };
-        var r = Saju.compute(data, birth, {});
+        var min = h.value === "" ? 0 : Math.min(59, Math.max(0, +($("in-min").value || 0)));
+        var birth = { y: yy, m: mm, d: dd, hour: h.value === "" ? null : +h.value, min: min };
+        var r = Saju.compute(data, birth, { trueSolar: true });
         var payload = Dosa.buildPayload(r, birth, null, false);
         delete payload.daeun;
         $("input-panel").style.display = "none";
