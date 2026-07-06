@@ -1,20 +1,14 @@
-// goblub 공용 퀴즈 엔진.
-// 사용: Quiz.init(document.getElementById("quiz"), config)
+// goblub 공용 퀴즈 엔진 — 흐름+채점. 결과는 config.renderResult 로 위임.
 // config = {
-//   emoji, title, intro,                       // 시작 화면
-//   questions: [{ q, choices: [{ text, scores: {키:점수} }] }],
-//   results: { 키: { emoji, name, desc } },
-//   resolve: function(totals) -> 결과키,
-//   extraResultHTML: (선택) 결과 카드 하단에 붙일 HTML 문자열
+//   emoji, title, intro,                        // 시작 화면
+//   feedSrc,                                     // (선택) 결과 도달 시 GoblubFeed.grant(feedSrc)
+//   questions: [{ q, choices: [{ text, scores:{키:점수} }] }],
+//   renderResult: function(totals, el, api)      // 테스트별 커스텀 결과. api={restart, shareLink}
 // }
 (function () {
   function init(el, config) {
-    var idx = 0;
-    var totals = {};
-
-    function addScores(scores) {
-      for (var k in scores) totals[k] = (totals[k] || 0) + scores[k];
-    }
+    var idx = 0, totals = {};
+    function addScores(s) { for (var k in s) totals[k] = (totals[k] || 0) + s[k]; }
 
     function renderStart() {
       idx = 0; totals = {};
@@ -41,35 +35,31 @@
           addScores(q.choices[+btn.dataset.i].scores);
           idx++;
           if (idx < config.questions.length) renderQ();
-          else renderResult();
+          else finish();
         };
       });
     }
 
-    function renderResult() {
-      var key = config.resolve(totals);
-      var r = config.results[key];
-      if (window.GoblubFeed && window.__feedSrc) GoblubFeed.grant(window.__feedSrc);
-      el.innerHTML =
-        '<span class="result-emoji">' + r.emoji + "</span>" +
-        '<p class="result-name">' + r.name + "</p>" +
-        '<p class="result-desc">' + r.desc + "</p>" +
-        (config.extraResultHTML || "") +
-        '<div class="result-actions">' +
-        '<button class="btn-primary" id="qz-retry">다시하기</button>' +
-        '<button class="btn-ghost" id="qz-share">링크 복사</button>' +
-        "</div>";
-      el.querySelector("#qz-retry").onclick = renderStart;
-      el.querySelector("#qz-share").onclick = function () {
-        var btn = el.querySelector("#qz-share");
-        (navigator.clipboard ? navigator.clipboard.writeText(location.href) : Promise.reject())
-          .then(function () { btn.textContent = "복사됨!"; })
-          .catch(function () { btn.textContent = location.href; });
-      };
+    function finish() {
+      if (window.GoblubFeed && config.feedSrc) GoblubFeed.grant(config.feedSrc);
+      config.renderResult(totals, el, { restart: renderStart, shareLink: shareLink });
+    }
+
+    function shareLink(btn) {
+      (navigator.clipboard ? navigator.clipboard.writeText(location.href) : Promise.reject())
+        .then(function () { btn.textContent = "복사됨!"; })
+        .catch(function () { btn.textContent = location.href; });
     }
 
     renderStart();
   }
 
-  window.Quiz = { init: init };
+  // 이산 결과 최고점 키(동점이면 order 앞선 키 우선). 순수 함수.
+  function top(totals, order) {
+    var best = order[0], bestV = -Infinity;
+    order.forEach(function (k) { var v = totals[k] || 0; if (v > bestV) { bestV = v; best = k; } });
+    return best;
+  }
+
+  window.Quiz = { init: init, top: top };
 })();
