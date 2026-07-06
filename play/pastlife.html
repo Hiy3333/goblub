@@ -230,7 +230,7 @@
         $("dig-panel").style.display = "block";
         $("result-area").style.display = "none";
         var buffer = "";
-        Dosa.fetchAI("/api/pastlife", { saju: payload }, "goblub_pl_", {
+        Dosa.fetchAI("/api/pastlife", { saju: payload }, "goblub_pl2_", {
           onChunk: function (t) {
             buffer += t;
             var n = (buffer.match(/@@LIFE/g) || []).length;
