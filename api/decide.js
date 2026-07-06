@@ -1,5 +1,5 @@
 // 결정의 신 — A vs B 고민을 단호하게 판결해주는 AI 프록시.
-import Anthropic from "@anthropic-ai/sdk";
+import { streamGemini, geminiConfigured } from "../lib/gemini.js";
 
 const ALLOWED_ORIGINS = [
   "https://goblub.vercel.app",
@@ -37,7 +37,7 @@ export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
   if (req.method === "OPTIONS") return res.status(204).end();
   if (req.method !== "POST") return res.status(405).json({ error: "method_not_allowed" });
-  if (!process.env.ANTHROPIC_API_KEY) return res.status(501).json({ error: "not_configured" });
+  if (!geminiConfigured()) return res.status(501).json({ error: "not_configured" });
 
   const d = req.body && req.body.decide;
   const ok = (s, min) => typeof s === "string" && s.trim().length >= (min ?? 1) && s.length <= 200;
@@ -45,30 +45,18 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "bad_payload" });
   }
 
-  const client = new Anthropic();
   try {
-    const stream = client.messages.stream({
-      model: "claude-opus-4-8",
-      max_tokens: 800,
-      system: [{ type: "text", text: SYSTEM, cache_control: { type: "ephemeral" } }],
-      messages: [
-        {
-          role: "user",
-          content:
-            "고민 A: " + d.a.trim() +
-            "\n고민 B: " + d.b.trim() +
-            (d.context && d.context.trim() ? "\n상황: " + d.context.trim() : "") +
-            "\n\n판결을 내려주소서.",
-        },
-      ],
+    const wrote = await streamGemini(res, {
+      system: SYSTEM,
+      user:
+        "고민 A: " + d.a.trim() +
+        "\n고민 B: " + d.b.trim() +
+        (d.context && d.context.trim() ? "\n상황: " + d.context.trim() : "") +
+        "\n\n판결을 내려주소서.",
+      maxTokens: 800,
+      temperature: 1.0,
     });
-    res.setHeader("Content-Type", "text/plain; charset=utf-8");
-    res.setHeader("Cache-Control", "no-store");
-    stream.on("text", (t) => res.write(t));
-    const final = await stream.finalMessage();
-    if (final.stop_reason === "refusal") {
-      res.write("\n[신께서 이 고민에는 침묵하시네요. 다른 고민을 가져와 보세요.]");
-    }
+    if (!wrote) res.write("\n[신께서 이 고민에는 침묵하시네요. 다른 고민을 가져와 보세요.]");
     return res.end();
   } catch (err) {
     if (!res.headersSent) return res.status(502).json({ error: "busy" });

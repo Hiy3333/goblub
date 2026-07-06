@@ -1,5 +1,5 @@
 // 전생 대환장 파티 — 사주 시드 기반 다중 전생 연대기 + 대표 전생 SVG 생성 프록시.
-import Anthropic from "@anthropic-ai/sdk";
+import { streamGemini, geminiConfigured } from "../lib/gemini.js";
 
 const ALLOWED_ORIGINS = [
   "https://goblub.vercel.app",
@@ -66,33 +66,21 @@ export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
   if (req.method === "OPTIONS") return res.status(204).end();
   if (req.method !== "POST") return res.status(405).json({ error: "method_not_allowed" });
-  if (!process.env.ANTHROPIC_API_KEY) return res.status(501).json({ error: "not_configured" });
+  if (!geminiConfigured()) return res.status(501).json({ error: "not_configured" });
 
   const saju = req.body && req.body.saju;
   if (!validate(saju)) return res.status(400).json({ error: "bad_payload" });
 
-  const client = new Anthropic();
   try {
-    const stream = client.messages.stream({
-      model: "claude-opus-4-8",
-      max_tokens: 4000,
-      system: [{ type: "text", text: SYSTEM, cache_control: { type: "ephemeral" } }],
-      messages: [
-        {
-          role: "user",
-          content:
-            "다음은 만세력 엔진이 계산한 이 사람의 사주입니다. 전생 5개를 발굴해 주세요.\n" +
-            JSON.stringify(saju),
-        },
-      ],
+    const wrote = await streamGemini(res, {
+      system: SYSTEM,
+      user:
+        "다음은 만세력 엔진이 계산한 이 사람의 사주입니다. 전생 5개를 발굴해 주세요.\n" +
+        JSON.stringify(saju),
+      maxTokens: 4000,
+      temperature: 1.0,
     });
-    res.setHeader("Content-Type", "text/plain; charset=utf-8");
-    res.setHeader("Cache-Control", "no-store");
-    stream.on("text", (t) => res.write(t));
-    const final = await stream.finalMessage();
-    if (final.stop_reason === "refusal") {
-      res.write("\n@@FINALE\n도사님이 이 전생 기록에는 말을 아끼시네요. 다시 시도해 주세요.");
-    }
+    if (!wrote) res.write("\n@@FINALE\n도사님이 이 전생 기록에는 말을 아끼시네요. 다시 시도해 주세요.");
     return res.end();
   } catch (err) {
     if (!res.headersSent) return res.status(502).json({ error: "busy" });
