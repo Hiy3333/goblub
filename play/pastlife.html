@@ -46,7 +46,7 @@
     </section>
 
     <section class="panel" id="dig-panel" style="display:none">
-      <p class="digging"><span class="shovel">⛏️</span>👾</p>
+      <p class="digging"><span class="shovel">⛏️</span><span class="dig-gob" data-goblub="40" style="display:inline-block;vertical-align:middle"></span></p>
       <p class="fine-print" id="dig-status">도사님이 전생 지층을 파내려가는 중…</p>
     </section>
 
@@ -74,6 +74,7 @@
   <script src="js/saju.js"></script>
   <script src="js/dosa.js"></script>
   <script src="js/feed.js"></script>
+  <script src="js/goblub-art.js"></script>
   <script>
     (function () {
       var $ = function (id) { return document.getElementById(id); };
@@ -150,7 +151,8 @@
         btn.disabled = true;
         var muncher = document.createElement("span");
         muncher.className = "muncher chew";
-        muncher.textContent = "👾";
+        var gobImg = (window.GoblubArt ? GoblubArt.svg(30) : "👾");
+        muncher.innerHTML = gobImg;
         btn.replaceWith(muncher);
         var text = bodyEl.textContent;
         var i = text.length;
@@ -160,9 +162,9 @@
           if (i <= 0) {
             clearInterval(eat);
             muncher.classList.remove("chew");
-            muncher.textContent = "👾💨";
+            muncher.innerHTML = gobImg + '<span style="font-size:1.2rem;vertical-align:top">💨</span>';
             setTimeout(function () {
-              muncher.textContent = "👾✨";
+              muncher.innerHTML = gobImg + '<span style="font-size:1.2rem;vertical-align:top">✨</span>';
               var j = 0;
               var typeIn = setInterval(function () {
                 j += 2;
@@ -192,7 +194,7 @@
           if (life.fix) {
             var btn = document.createElement("button");
             btn.className = "summon";
-            btn.textContent = "👾 고블럽 소환 — 이 업보 씹어먹기";
+            btn.textContent = "🌀 고블럽 소환 — 이 업보 씹어먹기";
             btn.onclick = function () { summonGoblub(card, card.querySelector(".life-body"), life.fix, btn); };
             card.appendChild(btn);
           }

@@ -105,6 +105,7 @@
   <div id="site-footer"></div>
   <script src="../js/common.js" data-root=".."></script>
   <script src="js/feed.js"></script>
+  <script src="js/goblub-art.js"></script>
   <script>
     (function () {
       var $ = function (id) { return document.getElementById(id); };
@@ -210,7 +211,7 @@
         var p = $("play-panel");
         p.innerHTML =
           '<div class="deliver-stage" id="stage">' +
-          '<div class="goblub-char" id="gob">👾</div>' +
+          '<div class="goblub-char" id="gob">' + (window.GoblubArt ? GoblubArt.svg(88) : "👾") + "</div>" +
           '<div class="puff" id="puff">💨</div>' +
           '<div class="envelope" id="env">💌</div>' +
           '</div>' +
@@ -227,7 +228,7 @@
         // ---- 편지 배달 애니메이션 시퀀스 ----
         var gob = $("gob"), env = $("env"), puff = $("puff"), cap = $("cap");
         function caption(txt) { cap.style.opacity = "0"; setTimeout(function () { cap.textContent = txt; cap.style.opacity = "1"; }, 200); }
-        caption("👾 고블럽이 " + t.label + " 편지를 물고 오는 중...");
+        caption("고블럽이 " + t.label + " 편지를 물고 오는 중...");
         // 1) 고블럽 등장(0.8s) → 2) 씹기(0.9s) 시작하며 편지 뱉기
         setTimeout(function () {
           gob.classList.add("chew");

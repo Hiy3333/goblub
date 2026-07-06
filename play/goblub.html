@@ -10,9 +10,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../css/style.css" />
   <style>
-    .pet { text-align: center; margin: 6px 0 2px; transition: transform 0.25s; }
+    .pet { position: relative; text-align: center; margin: 6px 0 2px; transition: transform 0.25s; }
     .pet.nom { animation: nom 0.5s ease; }
     @keyframes nom { 30% { transform: scale(1.18) rotate(-6deg); } 65% { transform: scale(1.12) rotate(6deg); } }
+    .pet .goblub-svg { display: inline-block; }
+    .pet .pet-deco { position: absolute; top: -4px; left: 50%; transform: translateX(-50%); font-size: 1.9rem; pointer-events: none; }
     .pet-name { text-align: center; font-size: 1.3rem; margin-bottom: 2px; }
     .pet-level { text-align: center; color: var(--ink-soft); margin-bottom: 12px; }
     .xp-track { background: #efe9db; border-radius: 999px; height: 14px; overflow: hidden; }
@@ -32,7 +34,7 @@
   <div id="site-header"></div>
   <main>
     <section class="hero">
-      <h1>👾 고블럽 키우기</h1>
+      <h1><span data-goblub="30" style="display:inline-block;vertical-align:-8px"></span> 고블럽 키우기</h1>
       <p>goblub을 즐길수록 먹이가 생겨요 — 하루 최대 10개!</p>
     </section>
 
@@ -64,6 +66,7 @@
   <div id="site-footer"></div>
   <script src="../js/common.js" data-root=".."></script>
   <script src="js/feed.js"></script>
+  <script src="js/goblub-art.js"></script>
   <script>
     (function () {
       var $ = function (id) { return document.getElementById(id); };
@@ -71,8 +74,16 @@
       function refresh() {
         var s = GoblubFeed.state();
         var pet = $("pet");
-        pet.textContent = s.levelInfo.emoji;
-        pet.style.fontSize = s.levelInfo.size + "rem";
+        var li = s.levelInfo;
+        if (li.art && window.GoblubArt) {
+          pet.style.fontSize = "";
+          pet.innerHTML = GoblubArt.svg(Math.round(li.size * 16)) +
+            (li.deco ? '<span class="pet-deco">' + li.deco + "</span>" : "");
+        } else {
+          pet.innerHTML = "";
+          pet.textContent = li.emoji;
+          pet.style.fontSize = li.size + "rem";
+        }
         $("pet-name").textContent = s.name;
         $("pet-level").textContent = "Lv." + (s.level + 1) + " " + s.levelInfo.name + " · 경험치 " + s.xp;
         if (s.maxLevel) {
@@ -91,7 +102,7 @@
         var remain = GoblubFeed.todayRemaining();
         list.innerHTML = remain.length
           ? remain.map(function (r) { return '<li><a href="' + r.url + '">' + r.label + " → 먹이 +1</a></li>"; }).join("")
-          : '<li style="color:var(--ink-soft)">오늘 먹이는 전부 획득! 내일 또 만나요 👾</li>';
+          : '<li style="color:var(--ink-soft)">오늘 먹이는 전부 획득! 내일 또 만나요 🍬</li>';
       }
 
       $("btn-feed").onclick = function () {

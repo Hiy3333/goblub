@@ -4,12 +4,12 @@
   var KEY = "goblub_pet";
 
   var LEVELS = [
-    { need: 0, name: "알", emoji: "🥚", size: 4.2 },
-    { need: 3, name: "아기 고블럽", emoji: "👾", size: 4.6 },
-    { need: 8, name: "청소년 고블럽", emoji: "👾✨", size: 5.2 },
-    { need: 15, name: "어른 고블럽", emoji: "👾🎩", size: 5.8 },
-    { need: 25, name: "대왕 고블럽", emoji: "👾👑", size: 6.6 },
-    { need: 40, name: "전설의 고블럽", emoji: "🌟👾🌟", size: 7.4 }
+    { need: 0, name: "알", emoji: "🥚", size: 4.2, art: false, deco: "" },
+    { need: 3, name: "아기 고블럽", emoji: "👾", size: 4.6, art: true, deco: "" },
+    { need: 8, name: "청소년 고블럽", emoji: "👾", size: 5.2, art: true, deco: "✨" },
+    { need: 15, name: "어른 고블럽", emoji: "👾", size: 5.8, art: true, deco: "🎩" },
+    { need: 25, name: "대왕 고블럽", emoji: "👾", size: 6.6, art: true, deco: "👑" },
+    { need: 40, name: "전설의 고블럽", emoji: "👾", size: 7.4, art: true, deco: "🌟" }
   ];
 
   var SOURCES = {
@@ -69,7 +69,7 @@
     p.log[key] = 1;
     p.pending = (p.pending || 0) + 1;
     save(p);
-    toast("👾 고블럽 먹이 +1! (" + SOURCES[src].label + ") — 고블럽 키우기에서 먹여주세요");
+    toast("🍬 고블럽 먹이 +1! (" + SOURCES[src].label + ") — 고블럽 키우기에서 먹여주세요");
     return true;
   }
 
