@@ -61,7 +61,6 @@ export default async function handler(req, res) {
         "\n\n판결을 내려주소서.",
       maxTokens: 800,
       temperature: 1.0,
-      model: "gemini-2.5-pro",
     });
     if (!wrote) res.write("\n[신께서 이 고민에는 침묵하시네요. 다른 고민을 가져와 보세요.]");
     return res.end();
