@@ -19,10 +19,47 @@
       border: 2px solid #e8e2d4; border-radius: 12px; color: var(--ink); margin-bottom: 12px; }
     .link-box { word-break: break-all; background: var(--cream); border-radius: 12px; padding: 12px;
       font-size: 0.85rem; color: var(--ink-soft); margin: 12px 0; display: none; }
-    .type-line { font-family: "Malgun Gothic", monospace; color: var(--ink-soft); line-height: 1.9; white-space: pre-wrap; min-height: 6.5em; }
-    .ask { font-size: clamp(20px,5vw,26px); color: var(--ink); font-weight: 700; margin: 14px 0; opacity: 0; transition: opacity .4s; }
+    /* ===== 편지 배달 애니메이션 ===== */
+    .deliver-stage { position: relative; height: 200px; margin: 6px 0 4px; overflow: hidden; }
+    .goblub-char { position: absolute; left: 50%; bottom: 8px; transform: translateX(-50%) translateY(140px);
+      font-size: 84px; line-height: 1; animation: gob-in .7s cubic-bezier(.34,1.56,.64,1) .1s forwards; }
+    .goblub-char.chew { animation: gob-chew .5s ease 2; }
+    @keyframes gob-in { to { transform: translateX(-50%) translateY(0); } }
+    @keyframes gob-chew {
+      0%,100% { transform: translateX(-50%) translateY(0) scale(1,1); }
+      35% { transform: translateX(-50%) translateY(4px) scale(1.14,.86); }
+      70% { transform: translateX(-50%) translateY(-6px) scale(.9,1.12); }
+    }
+    .envelope { position: absolute; left: 50%; top: 44%; font-size: 20px; opacity: 0;
+      transform: translate(-50%,-50%) scale(.2); }
+    .envelope.fly { animation: env-fly 1s cubic-bezier(.22,.9,.3,1) forwards; }
+    @keyframes env-fly {
+      0% { opacity: 0; top: 70%; transform: translate(-50%,-50%) scale(.2) rotate(-20deg); }
+      25% { opacity: 1; }
+      60% { top: 30%; transform: translate(-50%,-50%) scale(1.4) rotate(12deg); }
+      80% { top: 40%; transform: translate(-50%,-50%) scale(2.4) rotate(-6deg); }
+      100% { opacity: 1; top: 40%; font-size: 74px; transform: translate(-50%,-50%) scale(1) rotate(0deg); }
+    }
+    /* 펼친 편지: opacity·크기는 static으로 고정(애니메이션 종료 후에도 유지), 팝은 transform만 */
+    .envelope.open { opacity: 1; font-size: 74px; }
+    .envelope.pop { animation: env-pop .5s ease forwards; }
+    @keyframes env-pop {
+      0% { transform: translate(-50%,-50%) scale(1); }
+      45% { transform: translate(-50%,-52%) scale(1.22) rotate(-5deg); }
+      100% { transform: translate(-50%,-50%) scale(1) rotate(0); }
+    }
+    .puff { position: absolute; left: 50%; bottom: 70px; font-size: 30px; opacity: 0; transform: translateX(-50%); }
+    .puff.show { animation: puff .5s ease forwards; }
+    @keyframes puff { 0% { opacity: 0; transform: translateX(-50%) scale(.4); } 40% { opacity: .9; } 100% { opacity: 0; transform: translateX(-50%) translateY(-24px) scale(1.3); } }
+    .deliver-caption { text-align: center; color: var(--ink-soft); min-height: 1.6em; font-size: 0.98rem; transition: opacity .3s; }
+    .msg-tag { text-align: center; margin: 2px 0 4px; }
+    .msg-tag span { display: inline-block; background: #ffe3e3; color: var(--coral); border-radius: 999px; padding: 5px 14px; font-size: 0.95rem; max-width: 90%; word-break: break-word; }
+    @media (prefers-reduced-motion: reduce) {
+      .goblub-char, .goblub-char.chew, .envelope.fly, .envelope.pop, .puff.show { animation-duration: .01s !important; }
+    }
+    .ask { font-size: clamp(20px,5vw,26px); color: var(--ink); font-weight: 700; margin: 14px 0; opacity: 0; }
     .ask.show { opacity: 1; }
-    .yn { position: relative; height: 72px; display: flex; align-items: center; justify-content: center; gap: 16px; opacity: 0; transition: opacity .4s; }
+    .yn { position: relative; height: 72px; display: flex; align-items: center; justify-content: center; gap: 16px; opacity: 0; }
     .yn.show { opacity: 1; }
     #no { position: relative; transition: left .22s cubic-bezier(.22,.61,.36,1), top .22s cubic-bezier(.22,.61,.36,1); }
     .choice-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
@@ -172,7 +209,13 @@
         var t = TYPES[d.t] || TYPES.date;
         var p = $("play-panel");
         p.innerHTML =
-          '<div class="type-line" id="tl"></div>' +
+          '<div class="deliver-stage" id="stage">' +
+          '<div class="goblub-char" id="gob">👾</div>' +
+          '<div class="puff" id="puff">💨</div>' +
+          '<div class="envelope" id="env">💌</div>' +
+          '</div>' +
+          '<div class="deliver-caption" id="cap"></div>' +
+          '<div class="msg-tag" id="msgtag"></div>' +
           '<div class="ask" id="ask"></div>' +
           '<div class="yn" id="yn"><button class="btn-primary" id="yes"></button>' +
           '<button class="btn-ghost" id="no"></button></div>' +
@@ -181,26 +224,36 @@
         $("yes").textContent = t.yes;
         $("no").textContent = t.no;
 
-        var lines = [
-          "👾 고블럽이 " + t.label + " 편지를 배달하는 중",
-          "📦 포장을 뜯는 중...",
-          (d.m ? "💬 \"" + d.m + "\"" : "✨ 마음을 담는 중..."),
-          "💌 " + d.n + "님에게 도착!"
-        ];
-        var tl = $("tl"), i = 0;
-        (function typeLine() {
-          if (i >= lines.length) {
-            $("ask").textContent = t.q;
-            $("ask").classList.add("show");
-            $("yn").classList.add("show");
-            return;
-          }
-          tl.textContent += (i ? "\n" : "") + lines[i];
-          i++;
-          setTimeout(typeLine, 520);
-        })();
+        // ---- 편지 배달 애니메이션 시퀀스 ----
+        var gob = $("gob"), env = $("env"), puff = $("puff"), cap = $("cap");
+        function caption(txt) { cap.style.opacity = "0"; setTimeout(function () { cap.textContent = txt; cap.style.opacity = "1"; }, 200); }
+        caption("👾 고블럽이 " + t.label + " 편지를 물고 오는 중...");
+        // 1) 고블럽 등장(0.8s) → 2) 씹기(0.9s) 시작하며 편지 뱉기
+        setTimeout(function () {
+          gob.classList.add("chew");
+          puff.classList.add("show");
+          env.classList.add("fly");
+          caption("😤 우웩— 편지를 뱉는 중!");
+        }, 850);
+        // 3) 편지 도착 + 메시지 태그
+        setTimeout(function () {
+          caption("💌 " + d.n + "님에게 편지 도착!");
+          if (d.m) $("msgtag").innerHTML = '<span>💬 "' + d.m + '"</span>';
+        }, 1950);
+        // 4) 편지 펼치기 → 질문 등장
+        setTimeout(function () {
+          env.classList.remove("fly");
+          env.classList.add("open"); env.classList.add("pop");
+          caption("");
+          $("ask").textContent = t.q;
+          $("ask").classList.add("show");
+          $("yn").classList.add("show");
+        }, 2750);
 
         $("yes").onclick = function () {
+          $("stage").style.display = "none";
+          $("cap").style.display = "none";
+          $("msgtag").style.display = "none";
           $("ask").style.display = "none";
           $("yn").style.display = "none";
           runSteps(t);
