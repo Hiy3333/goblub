@@ -109,7 +109,7 @@
       function showStat(pick, counts) {
         var q = QUESTIONS[idx];
         var total = counts.a + counts.b;
-        var pa = total > 0 ? Math.round(counts.a / total * 100) : 50;
+        var pa = total > 0 ? Math.round(counts.a / total * 100) : (pick === "a" ? 100 : 0);
         var pb = 100 - pa;
         $("s-a").style.width = Math.max(8, pa) + "%"; $("s-a").textContent = pa + "%";
         $("s-b").style.width = Math.max(8, pb) + "%"; $("s-b").textContent = pb + "%";
@@ -128,9 +128,9 @@
         var q = QUESTIONS[idx];
         $("q-a").disabled = true; $("q-b").disabled = true;
         answered++;
-        var localKey = "goblub_bal_" + q.id;
+        var localKey = "goblub_bal2_" + q.id;
         var already = false;
-        try { already = !!localStorage.getItem(localKey); localStorage.setItem(localKey, pick); } catch (e) {}
+        try { already = !!localStorage.getItem(localKey); } catch (e) {}
         if (!statsOn) { offlineStat(pick); return; }
         fetch(API, {
           method: "POST",
@@ -141,7 +141,7 @@
           if (!r.ok) throw new Error(r.status);
           return r.json();
         }).then(function (counts) {
-          if (counts) showStat(pick, counts);
+          if (counts) { try { localStorage.setItem(localKey, pick); } catch (e) {} showStat(pick, counts); }
         }).catch(function () { statsOn = false; offlineStat(pick); });
       }
 
