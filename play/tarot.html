@@ -25,6 +25,15 @@
     .tfront .ten { font-size: 0.7rem; color: var(--ink-soft); }
     .tfront.rev .te { transform: rotate(180deg); }
     .rev-badge { font-size: 0.7rem; color: var(--coral); }
+    .tarot-fan { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 6px 0 12px; }
+    .tarot-fan .tcard { width: 74px; height: 114px; margin: 0; }
+    .tarot-fan .tback { font-size: 1.5rem; }
+    .tarot-fan .tfront .te { font-size: 1.8rem; }
+    .tarot-fan .tfront .tn { font-size: 0.62rem; line-height: 1.15; }
+    .tarot-fan .tfront .ten { font-size: 0.5rem; }
+    .tarot-fan .tcard { transition: transform 0.15s; }
+    .tarot-fan:not(.locked) .tcard:hover { transform: translateY(-6px); }
+    .tarot-fan.locked .tcard:not(.chosen) { opacity: 0.4; pointer-events: none; }
     .spread-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 16px auto; max-width: 440px; }
     .spread-slot { text-align: center; }
     .spread-slot .tcard { width: 100%; height: auto; aspect-ratio: 13 / 20; }
@@ -48,11 +57,8 @@
 
     <section class="panel">
       <h2>🌞 오늘의 타로</h2>
-      <p class="result-desc" style="margin:8px 0 16px">하루에 한 장 — 오늘 다시 와도 같은 카드가 기다립니다.</p>
-      <div class="tcard" id="day-card"><div class="inner">
-        <div class="tface tback">🃏</div>
-        <div class="tface tfront" id="day-front"></div>
-      </div></div>
+      <p class="result-desc" id="day-hint" style="margin:8px 0 14px">마음이 가는 카드 한 장을 고르세요 — 오늘 다시 와도 같은 카드가 기다립니다.</p>
+      <div class="tarot-fan" id="day-fan"></div>
       <p class="tmeaning result-desc" id="day-meaning" style="display:none"></p>
     </section>
 
@@ -111,33 +117,61 @@
           '<span class="ten">' + c.en + "</span>";
       }
 
-      // ---- 오늘의 타로 (하루 1장 고정) ----
+      // ---- 오늘의 타로 (7장 중 한 장 선택 · 하루 고정) ----
+      var NPICK = 7;
       var dk = (function () {
         var d = new Date();
         return "goblub_tarot_" + d.getFullYear() + ("0" + (d.getMonth() + 1)).slice(-2) + ("0" + d.getDate()).slice(-2);
       })();
       var daily = null;
       try { daily = JSON.parse(localStorage.getItem(dk)); } catch (e) {}
-      if (!daily || typeof daily.idx !== "number") {
-        daily = drawOne(Math.random);
-        try { localStorage.setItem(dk, JSON.stringify(daily)); } catch (e) {}
-      }
-      var dc = CARDS[daily.idx];
-      var front = $("day-front");
-      front.innerHTML = cardFrontHTML(dc, daily.reversed);
-      if (daily.reversed) front.classList.add("rev");
+      if (daily && typeof daily.idx !== "number") daily = null;
 
-      $("day-card").onclick = function () {
-        var el = $("day-card");
-        if (el.classList.contains("flip")) return;
-        el.classList.add("flip");
-        setTimeout(function () {
-          var mean = $("day-meaning");
-          mean.textContent = "🃏 " + dc.n + (daily.reversed ? "(역방향)" : "") + " — " + (daily.reversed ? dc.rev : dc.up);
-          mean.style.display = "block";
-          if (window.GoblubFeed) GoblubFeed.grant("tarot");
-        }, 500);
-      };
+      function revealDaily(pick) {
+        var c = CARDS[pick.idx];
+        var mean = $("day-meaning");
+        mean.textContent = "🃏 " + c.n + (pick.reversed ? "(역방향)" : "") + " — " + (pick.reversed ? c.rev : c.up);
+        mean.style.display = "block";
+      }
+
+      function fillCardFront(cardEl, pick) {
+        var c = CARDS[pick.idx];
+        var fr = cardEl.querySelector(".tfront");
+        fr.innerHTML = cardFrontHTML(c, pick.reversed);
+        if (pick.reversed) fr.classList.add("rev");
+        cardEl.classList.add("flip", "chosen");
+      }
+
+      (function renderFan() {
+        var fan = $("day-fan");
+        fan.innerHTML = "";
+        var savedPos = daily ? (daily.pos == null ? 0 : daily.pos) : -1;
+        for (var i = 0; i < NPICK; i++) {
+          (function (i) {
+            var card = document.createElement("div");
+            card.className = "tcard";
+            card.innerHTML = '<div class="inner"><div class="tface tback">🃏</div><div class="tface tfront"></div></div>';
+            if (daily && savedPos === i) fillCardFront(card, daily);
+            card.onclick = function () {
+              if (daily) return;
+              var pick = drawOne(Math.random);
+              pick.pos = i;
+              fillCardFront(card, pick);
+              daily = pick;
+              try { localStorage.setItem(dk, JSON.stringify(daily)); } catch (e) {}
+              fan.classList.add("locked");
+              $("day-hint").textContent = "오늘의 카드를 골랐어요 ✨ 내일 또 한 장!";
+              setTimeout(function () { revealDaily(daily); if (window.GoblubFeed) GoblubFeed.grant("tarot"); }, 500);
+            };
+            fan.appendChild(card);
+          })(i);
+        }
+        if (daily) {
+          fan.classList.add("locked");
+          $("day-hint").textContent = "오늘 뽑은 카드예요 ✨ 내일 또 한 장!";
+          revealDaily(daily);
+        }
+      })();
 
       // ---- 3장 스프레드 ----
       var POS = ["과거", "현재", "미래"];
