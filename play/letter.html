@@ -158,6 +158,7 @@
           '<h2>누구에게, 어떤 마음을 보낼까요?</h2>' +
           '<div class="type-grid" id="type-grid"></div>' +
           '<input class="txt-input" id="in-name" maxlength="20" placeholder="받는 사람 이름 (필수)" />' +
+          '<input class="txt-input" id="in-from" maxlength="20" placeholder="보내는 사람 이름 (선택)" />' +
           '<input class="txt-input" id="in-msg" maxlength="60" placeholder="한 줄 메시지 (선택 — 비워도 돼요)" />' +
           '<button class="btn-primary" id="btn-make">🔗 공유 링크 만들기</button>' +
           '<p class="error-msg" id="mk-err"></p>' +
@@ -181,11 +182,13 @@
         var madeUrl = "";
         $("btn-make").onclick = function () {
           var name = $("in-name").value.trim();
+          var from = $("in-from").value.trim();
           var msg = $("in-msg").value.trim();
           var err = $("mk-err");
           if (!name) { err.textContent = "받는 사람 이름을 적어주세요!"; err.style.display = "block"; return; }
           err.style.display = "none";
           var d = { t: chosen, n: name.slice(0, 20) };
+          if (from) d.f = from.slice(0, 20);
           if (msg) d.m = msg.slice(0, 60);
           madeUrl = location.origin + location.pathname + "#d=" + enc(d);
           var lb = $("link-box");
@@ -401,7 +404,8 @@
           (r.menu ? '🍴 메뉴: ' + r.menu + '<br>' : '') +
           '📅 날짜: ' + r.day + ' (' + wd + ')<br>' +
           '⏰ 시간: ' + r.time +
-          (d.m ? '<br>💬 "' + d.m + '"' : '');
+          (d.m ? '<br>💬 "' + d.m + '"' : '') +
+          (d.f ? '<br>✍️ From. <b>' + d.f + '</b>' : '');
         show("result");
         if (doRain) rain(d.t);
         if (window.GoblubFeed) GoblubFeed.grant("letter");
@@ -448,6 +452,7 @@
         g.fillText("📅 " + r.day + " (" + wd + ")", 360, y); y += 52;
         g.fillText("⏰ " + r.time, 360, y); y += 52;
         if (d.m) { g.fillStyle = "#b06a5a"; g.fillText("“" + d.m + "”", 360, y + 6); }
+        if (d.f) { g.fillStyle = "#7a766d"; g.font = "30px 'Jua', 'Malgun Gothic', sans-serif"; g.fillText("✍️ From. " + d.f, 360, 800); }
         g.fillStyle = "#38352f"; g.font = "26px 'Jua', 'Malgun Gothic', sans-serif";
         g.fillText("💌 goblub.vercel.app", 360, 850);
         c.toBlob(function (blob) {
