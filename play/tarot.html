@@ -25,8 +25,13 @@
     .tfront .ten { font-size: 0.7rem; color: var(--ink-soft); }
     .tfront.rev .te { transform: rotate(180deg); }
     .rev-badge { font-size: 0.7rem; color: var(--coral); }
-    .spread-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin: 16px 0; }
+    .spread-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 16px auto; max-width: 440px; }
     .spread-slot { text-align: center; }
+    .spread-slot .tcard { width: 100%; height: auto; aspect-ratio: 13 / 20; }
+    .spread-slot .tback { font-size: 1.8rem; }
+    .spread-slot .tfront .te { font-size: 2rem; }
+    .spread-slot .tfront .tn { font-size: 0.78rem; }
+    .spread-slot .tfront .ten { font-size: 0.58rem; }
     .slot-label { color: var(--ink-soft); font-size: 0.88rem; margin-bottom: 8px; }
     .tmeaning { line-height: 1.75; margin-top: 10px; }
     .q-input { width: 100%; font-family: inherit; font-size: 0.95rem; padding: 10px 12px;
@@ -170,7 +175,7 @@
           };
           row.appendChild(slot);
         });
-        row.style.display = "flex";
+        row.style.display = "grid";
       };
     })();
   </script>
