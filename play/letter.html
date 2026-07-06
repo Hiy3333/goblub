@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>마음 배달 — goblub</title>
+  <meta name="description" content="고백·사과를 링크로 보내고, 답장은 이미지로 받는 마음 배달" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    .type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+    .type-tile { background: var(--cream); border: 2px solid transparent; border-radius: 16px;
+      padding: 20px 10px; text-align: center; cursor: pointer; font-family: inherit; font-size: 1.05rem; color: var(--ink); }
+    .type-tile .em { font-size: 2.4rem; display: block; margin-bottom: 6px; }
+    .type-tile.sel { border-color: var(--coral); background: #ffe3e3; }
+    .txt-input { width: 100%; font-family: inherit; font-size: 1rem; padding: 12px;
+      border: 2px solid #e8e2d4; border-radius: 12px; color: var(--ink); margin-bottom: 12px; }
+    .link-box { word-break: break-all; background: var(--cream); border-radius: 12px; padding: 12px;
+      font-size: 0.85rem; color: var(--ink-soft); margin: 12px 0; display: none; }
+    .type-line { font-family: "Malgun Gothic", monospace; color: var(--ink-soft); line-height: 1.9; white-space: pre-wrap; min-height: 6.5em; }
+    .ask { font-size: clamp(20px,5vw,26px); color: var(--ink); font-weight: 700; margin: 14px 0; opacity: 0; transition: opacity .4s; }
+    .ask.show { opacity: 1; }
+    .yn { position: relative; height: 72px; display: flex; align-items: center; justify-content: center; gap: 16px; opacity: 0; transition: opacity .4s; }
+    .yn.show { opacity: 1; }
+    #no { position: relative; transition: left .22s cubic-bezier(.22,.61,.36,1), top .22s cubic-bezier(.22,.61,.36,1); }
+    .choice-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+    .choice { background: var(--cream); border: 2px solid transparent; border-radius: 14px; padding: 16px 8px;
+      cursor: pointer; font-family: inherit; font-size: 0.98rem; color: var(--ink); display: flex; flex-direction: column; align-items: center; gap: 6px; }
+    .choice .em { font-size: 1.8rem; }
+    .choice:hover { border-color: var(--sky); }
+    .cal-head, .cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 5px; }
+    .cal-head span { text-align: center; font-size: 0.8rem; color: var(--ink-soft); padding: 4px 0; }
+    .cal-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .cal-nav button { background: var(--cream); border: none; border-radius: 8px; padding: 6px 12px; font-family: inherit; cursor: pointer; }
+    .cal-grid .day { aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center;
+      background: var(--cream); border: 2px solid transparent; border-radius: 10px; cursor: pointer; font-family: inherit; font-size: 0.95rem; }
+    .cal-grid .day.blank { background: transparent; cursor: default; }
+    .cal-grid .day.past { color: #ccc; cursor: not-allowed; background: #f3f0e8; }
+    .cal-grid .day:not(.blank):not(.past):hover { border-color: var(--mint); }
+    .cal-grid .day.sel { background: var(--mint); color: #fff; font-weight: 700; }
+    .time-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin-top: 8px; }
+    .time-grid .slot { background: var(--cream); border: 2px solid transparent; border-radius: 10px; padding: 10px 0; text-align: center; cursor: pointer; font-family: inherit; }
+    .time-grid .slot:hover { border-color: var(--mint); }
+    .time-grid .slot.sel { background: var(--mint); color: #fff; font-weight: 700; }
+    .step-q { font-size: 1.1rem; color: var(--ink); font-weight: 700; margin: 8px 0 14px; }
+    .step-q.mt { margin-top: 22px; }
+    .heart { position: fixed; top: -40px; font-size: 26px; pointer-events: none; animation: fall linear forwards; z-index: 50; }
+    @keyframes fall { to { transform: translateY(110vh) rotate(360deg); opacity: .2; } }
+    .out-card { background: var(--cream); border-radius: 14px; padding: 18px; line-height: 2; margin: 12px 0; }
+  </style>
+</head>
+<body>
+  <div id="site-header"></div>
+  <main>
+    <section class="hero">
+      <h1>💌 마음 배달</h1>
+      <p id="hero-sub">고백·사과를 링크로 보내고, 답장은 이미지로 받아요</p>
+    </section>
+
+    <section class="panel" id="make-panel" style="display:none"></section>
+    <section class="panel" id="play-panel" style="display:none"></section>
+    <section class="panel" id="result-panel" style="display:none"></section>
+
+    <p class="fine-print">재미로 즐겨주세요 🙂</p>
+  </main>
+  <div id="site-footer"></div>
+  <script src="../js/common.js" data-root=".."></script>
+  <script src="js/feed.js"></script>
+  <script>
+    (function () {
+      var $ = function (id) { return document.getElementById(id); };
+
+      // ---- base64url(JSON) 인코딩 ----
+      function enc(obj) {
+        return btoa(encodeURIComponent(JSON.stringify(obj)))
+          .replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+      }
+      function dec(s) {
+        try {
+          var b = s.replace(/-/g, "+").replace(/_/g, "/");
+          return JSON.parse(decodeURIComponent(atob(b)));
+        } catch (e) { return null; }
+      }
+      function parseHash() {
+        var h = (location.hash || "").replace(/^#/, "");
+        var out = { d: null, r: null };
+        h.split("&").forEach(function (kv) {
+          var i = kv.indexOf("=");
+          if (i < 0) return;
+          var k = kv.slice(0, i), v = kv.slice(i + 1);
+          if (k === "d") out.d = dec(v);
+          if (k === "r") out.r = dec(v);
+        });
+        return out;
+      }
+
+      var TYPES = {
+        date: { emoji: "💚", label: "데이트 신청", q: "나랑 데이트 갈래?",
+          yes: "응! 좋아 💚", no: "싫어", success: "데이트 성사! 🎉", steps: ["menu", "date", "time"] },
+        apology: { emoji: "🍎", label: "사과하기", q: "내 사과 받아줄래?",
+          yes: "사과 받을게 🍎", no: "안 받아", success: "사과 수락! 🍎", steps: ["date", "time"] }
+      };
+      var MENUS = [["🍚","한식"],["🥢","중식"],["🍣","일식"],["🍝","양식"],["🍜","분식"],["☕","카페"]];
+      var TIMES = ["11:00","12:00","13:00","14:00","17:00","18:00","19:00","20:00"];
+
+      window.LETTER = { enc: enc, dec: dec, parseHash: parseHash, TYPES: TYPES, MENUS: MENUS, TIMES: TIMES, $: $ };
+
+      function show(which) {
+        $("make-panel").style.display = which === "make" ? "block" : "none";
+        $("play-panel").style.display = which === "play" ? "block" : "none";
+        $("result-panel").style.display = which === "result" ? "block" : "none";
+      }
+
+      // ================= 만들기 모드 =================
+      function renderMake() {
+        var p = $("make-panel");
+        p.innerHTML =
+          '<h2>누구에게, 어떤 마음을 보낼까요?</h2>' +
+          '<div class="type-grid" id="type-grid"></div>' +
+          '<input class="txt-input" id="in-name" maxlength="20" placeholder="받는 사람 이름 (필수)" />' +
+          '<input class="txt-input" id="in-msg" maxlength="60" placeholder="한 줄 메시지 (선택 — 비워도 돼요)" />' +
+          '<button class="btn-primary" id="btn-make">🔗 공유 링크 만들기</button>' +
+          '<p class="error-msg" id="mk-err"></p>' +
+          '<div class="link-box" id="link-box"></div>' +
+          '<div class="result-actions" id="mk-actions" style="display:none">' +
+          '<button class="btn-ghost" id="btn-preview">👀 미리보기</button></div>';
+        var tg = $("type-grid");
+        var chosen = "date";
+        Object.keys(TYPES).forEach(function (k) {
+          var t = TYPES[k];
+          var b = document.createElement("button");
+          b.className = "type-tile" + (k === chosen ? " sel" : "");
+          b.innerHTML = '<span class="em">' + t.emoji + "</span>" + t.label;
+          b.onclick = function () {
+            chosen = k;
+            tg.querySelectorAll(".type-tile").forEach(function (x) { x.classList.remove("sel"); });
+            b.classList.add("sel");
+          };
+          tg.appendChild(b);
+        });
+        var madeUrl = "";
+        $("btn-make").onclick = function () {
+          var name = $("in-name").value.trim();
+          var msg = $("in-msg").value.trim();
+          var err = $("mk-err");
+          if (!name) { err.textContent = "받는 사람 이름을 적어주세요!"; err.style.display = "block"; return; }
+          err.style.display = "none";
+          var d = { t: chosen, n: name.slice(0, 20) };
+          if (msg) d.m = msg.slice(0, 60);
+          madeUrl = location.origin + location.pathname + "#d=" + enc(d);
+          var lb = $("link-box");
+          lb.textContent = madeUrl;
+          lb.style.display = "block";
+          $("mk-actions").style.display = "flex";
+          var btn = $("btn-make");
+          (navigator.clipboard ? navigator.clipboard.writeText(madeUrl) : Promise.reject())
+            .then(function () { btn.textContent = "✅ 링크 복사됨! 상대에게 보내세요"; })
+            .catch(function () { btn.textContent = "아래 링크를 복사해 보내세요"; });
+        };
+        $("btn-preview").onclick = function () { if (madeUrl) window.open(madeUrl, "_blank"); };
+        show("make");
+      }
+
+      // ================= 플레이 모드 =================
+      var choice = { menu: null, day: null, time: null };
+      var playData = null;
+
+      function renderPlay(d) {
+        playData = d;
+        var t = TYPES[d.t] || TYPES.date;
+        var p = $("play-panel");
+        p.innerHTML =
+          '<div class="type-line" id="tl"></div>' +
+          '<div class="ask" id="ask"></div>' +
+          '<div class="yn" id="yn"><button class="btn-primary" id="yes"></button>' +
+          '<button class="btn-ghost" id="no"></button></div>' +
+          '<div id="steps"></div>';
+        show("play");
+        $("yes").textContent = t.yes;
+        $("no").textContent = t.no;
+
+        var lines = [
+          "👾 고블럽이 " + t.label + " 편지를 배달하는 중",
+          "📦 포장을 뜯는 중...",
+          (d.m ? "💬 \"" + d.m + "\"" : "✨ 마음을 담는 중..."),
+          "💌 " + d.n + "님에게 도착!"
+        ];
+        var tl = $("tl"), i = 0;
+        (function typeLine() {
+          if (i >= lines.length) {
+            $("ask").textContent = t.q;
+            $("ask").classList.add("show");
+            $("yn").classList.add("show");
+            return;
+          }
+          tl.textContent += (i ? "\n" : "") + lines[i];
+          i++;
+          setTimeout(typeLine, 520);
+        })();
+
+        $("yes").onclick = function () {
+          $("ask").style.display = "none";
+          $("yn").style.display = "none";
+          runSteps(t);
+        };
+        setupRunaway();
+      }
+
+      function setupRunaway() {
+        var no = $("no"), yn = $("yn");
+        var TRIGGER = 140, SAFE = 120, fixed = false;
+        function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+        function ensureFixed() {
+          if (fixed) return;
+          var nr = no.getBoundingClientRect();
+          no.style.position = "fixed"; no.style.margin = "0"; no.style.zIndex = "60";
+          no.style.left = nr.left + "px"; no.style.top = nr.top + "px";
+          fixed = true;
+        }
+        function glide(px, py) {
+          if (no.style.display === "none" || !yn.classList.contains("show")) return;
+          var nb = no.getBoundingClientRect();
+          var cx = nb.left + nb.width / 2, cy = nb.top + nb.height / 2;
+          var dx = cx - px, dy = cy - py, dist = Math.hypot(dx, dy);
+          if (dist > TRIGGER) return;
+          ensureFixed();
+          if (dist < 0.001) { dx = 1; dy = 0; dist = 1; }
+          var m = 12, maxL = window.innerWidth - nb.width - m, maxT = window.innerHeight - nb.height - m;
+          var ux = dx / dist, uy = dy / dist;
+          var left = px + ux * SAFE - nb.width / 2, top = py + uy * SAFE - nb.height / 2;
+          var cl = clamp(left, m, maxL), ct = clamp(top, m, maxT);
+          if (cl !== left || ct !== top) {
+            var tcx = window.innerWidth / 2 - px, tcy = window.innerHeight / 2 - py;
+            var tl2 = Math.hypot(tcx, tcy) || 1;
+            left = px + (tcx / tl2) * SAFE - nb.width / 2; top = py + (tcy / tl2) * SAFE - nb.height / 2;
+            cl = clamp(left, m, maxL); ct = clamp(top, m, maxT);
+          }
+          no.style.left = cl + "px"; no.style.top = ct + "px";
+        }
+        document.addEventListener("mousemove", function (e) { glide(e.clientX, e.clientY); });
+        no.addEventListener("mouseover", function (e) { glide(e.clientX, e.clientY); });
+        no.addEventListener("click", function (e) { e.preventDefault(); glide(e.clientX, e.clientY); });
+        no.addEventListener("touchstart", function (e) { e.preventDefault(); var tt = e.touches[0]; glide(tt.clientX, tt.clientY); }, { passive: false });
+        no.addEventListener("pointerdown", function (e) { if (e.pointerType !== "mouse") { e.preventDefault(); glide(e.clientX, e.clientY); } });
+      }
+
+      function runSteps(t) {
+        var steps = t.steps.slice();
+        var box = $("steps");
+        function nextStep() {
+          if (!steps.length) { finishPlay(t); return; }
+          var s = steps.shift();
+          if (s === "menu") stepMenu(nextStep);
+          else if (s === "date") stepDate(nextStep);
+          else if (s === "time") stepTime(nextStep);
+        }
+        function stepMenu(done) {
+          box.innerHTML = '<div class="step-q">🍴 뭐 먹으러 갈까?</div><div class="choice-grid" id="mg"></div>';
+          MENUS.forEach(function (m) {
+            var b = document.createElement("button");
+            b.className = "choice"; b.innerHTML = '<span class="em">' + m[0] + "</span>" + m[1];
+            b.onclick = function () { choice.menu = m[0] + " " + m[1]; done(); };
+            $("mg").appendChild(b);
+          });
+        }
+        function stepDate(done) {
+          box.innerHTML =
+            '<div class="step-q">📅 언제 만날까?</div>' +
+            '<div class="cal-nav"><button id="cal-prev">◀</button><span id="cal-title"></span><button id="cal-next">▶</button></div>' +
+            '<div class="cal-head"><span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span></div>' +
+            '<div class="cal-grid" id="cg"></div>';
+          var now = new Date();
+          var view = { y: now.getFullYear(), m: now.getMonth() };
+          var minY = now.getFullYear(), minM = now.getMonth();
+          function draw() {
+            $("cal-title").textContent = view.y + "년 " + (view.m + 1) + "월";
+            $("cal-prev").disabled = (view.y === minY && view.m === minM);
+            $("cal-prev").style.opacity = $("cal-prev").disabled ? ".3" : "1";
+            var g = $("cg"); g.innerHTML = "";
+            var first = new Date(view.y, view.m, 1).getDay();
+            var dim = new Date(view.y, view.m + 1, 0).getDate();
+            var todayD = (view.y === now.getFullYear() && view.m === now.getMonth()) ? now.getDate() : 0;
+            for (var b = 0; b < first; b++) { var e = document.createElement("div"); e.className = "day blank"; g.appendChild(e); }
+            for (var dd = 1; dd <= dim; dd++) {
+              (function (dd) {
+                var el = document.createElement("div"); el.className = "day"; el.textContent = dd;
+                if (todayD && dd < todayD) el.classList.add("past");
+                else el.onclick = function () {
+                  g.querySelectorAll(".day.sel").forEach(function (x) { x.classList.remove("sel"); });
+                  el.classList.add("sel");
+                  choice.day = view.y + "-" + ("0" + (view.m + 1)).slice(-2) + "-" + ("0" + dd).slice(-2);
+                  setTimeout(done, 250);
+                };
+                g.appendChild(el);
+              })(dd);
+            }
+          }
+          $("cal-prev").onclick = function () { if (view.y === minY && view.m === minM) return; view.m--; if (view.m < 0) { view.m = 11; view.y--; } draw(); };
+          $("cal-next").onclick = function () { view.m++; if (view.m > 11) { view.m = 0; view.y++; } draw(); };
+          draw();
+        }
+        function stepTime(done) {
+          box.innerHTML = '<div class="step-q">⏰ 몇 시에 볼까?</div><div class="time-grid" id="tg2"></div>';
+          TIMES.forEach(function (tm) {
+            var b = document.createElement("div"); b.className = "slot"; b.textContent = tm;
+            b.onclick = function () { choice.time = tm; done(); };
+            $("tg2").appendChild(b);
+          });
+        }
+        nextStep();
+      }
+
+      // ================= 결과 모드 =================
+      function finishPlay(t) {
+        $("steps").innerHTML = "";
+        var r = { day: choice.day, time: choice.time };
+        if (choice.menu) r.menu = choice.menu;
+        renderResult(playData, r, true);
+      }
+
+      function weekday(ymd) {
+        var p = ymd.split("-");
+        return ["일","월","화","수","목","금","토"][new Date(+p[0], +p[1] - 1, +p[2]).getDay()];
+      }
+
+      function renderResult(d, r, doRain) {
+        var t = TYPES[d.t] || TYPES.date;
+        var wd = r.day ? weekday(r.day) : "";
+        var p = $("result-panel");
+        p.innerHTML =
+          '<div style="text-align:center"><span class="result-emoji">' + t.emoji + '</span>' +
+          '<p class="result-name">' + t.success + '</p></div>' +
+          '<div class="out-card" id="out"></div>' +
+          '<div class="result-actions">' +
+          '<button class="btn-primary" id="btn-img">🖼 이미지 저장</button>' +
+          '<button class="btn-ghost" id="btn-reply">🔗 되답 링크 복사</button>' +
+          '<a class="btn-ghost" href="../index.html">🎡 다른 즐길거리</a></div>';
+        $("out").innerHTML =
+          '💌 To. <b>' + d.n + '</b><br>' +
+          (r.menu ? '🍴 메뉴: ' + r.menu + '<br>' : '') +
+          '📅 날짜: ' + r.day + ' (' + wd + ')<br>' +
+          '⏰ 시간: ' + r.time +
+          (d.m ? '<br>💬 "' + d.m + '"' : '');
+        show("result");
+        if (doRain) rain(d.t);
+        if (window.GoblubFeed) GoblubFeed.grant("letter");
+
+        $("btn-reply").onclick = function () {
+          var url = location.origin + location.pathname + "#d=" + enc(d) + "&r=" + enc(r);
+          var b = $("btn-reply");
+          (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject())
+            .then(function () { b.textContent = "복사됨! 보낸 사람에게 전하세요"; })
+            .catch(function () { prompt("이 링크를 보내세요:", url); });
+        };
+        $("btn-img").onclick = function () { saveImage(d, r, wd); };
+      }
+
+      function rain(type) {
+        var em = type === "apology" ? ["🍎","🍏","🤝","💚","✨"] : ["💚","💖","💗","✨","🎉"];
+        var n = 0, iv = setInterval(function () {
+          var h = document.createElement("div"); h.className = "heart";
+          h.textContent = em[Math.floor(Math.random() * em.length)];
+          h.style.left = Math.random() * 100 + "vw";
+          h.style.fontSize = (18 + Math.random() * 20) + "px";
+          h.style.animationDuration = (2.4 + Math.random() * 2) + "s";
+          document.body.appendChild(h);
+          setTimeout(function () { h.remove(); }, 4600);
+          if (++n > 50) clearInterval(iv);
+        }, 130);
+      }
+
+      function saveImage(d, r, wd) {
+        var t = TYPES[d.t] || TYPES.date;
+        var c = document.createElement("canvas"); c.width = 720; c.height = 900;
+        var g = c.getContext("2d");
+        g.fillStyle = "#fff9ec"; g.fillRect(0, 0, 720, 900);
+        var cols = ["#ff6b6b","#ffd93d","#6bcb77","#4d96ff","#b983ff"];
+        for (var i = 0; i < 5; i++) { g.fillStyle = cols[i]; g.fillRect(i * 144, 0, 144, 16); }
+        g.textAlign = "center"; g.fillStyle = "#38352f";
+        g.font = "150px 'Segoe UI Emoji', sans-serif"; g.fillText(t.emoji, 360, 260);
+        g.font = "52px 'Jua', 'Malgun Gothic', sans-serif"; g.fillText(t.success, 360, 360);
+        g.font = "34px 'Jua', 'Malgun Gothic', sans-serif";
+        g.fillText("To. " + d.n, 360, 440);
+        g.fillStyle = "#7a766d"; g.font = "30px 'Jua', 'Malgun Gothic', sans-serif";
+        var y = 520;
+        if (r.menu) { g.fillText("🍴 " + r.menu, 360, y); y += 52; }
+        g.fillText("📅 " + r.day + " (" + wd + ")", 360, y); y += 52;
+        g.fillText("⏰ " + r.time, 360, y); y += 52;
+        if (d.m) { g.fillStyle = "#b06a5a"; g.fillText("“" + d.m + "”", 360, y + 6); }
+        g.fillStyle = "#38352f"; g.font = "26px 'Jua', 'Malgun Gothic', sans-serif";
+        g.fillText("💌 goblub.vercel.app", 360, 850);
+        c.toBlob(function (blob) {
+          if (!blob) { window.open(c.toDataURL("image/png")); return; }
+          var a = document.createElement("a");
+          a.href = URL.createObjectURL(blob);
+          a.download = "goblub-letter-" + d.t + ".png";
+          document.body.appendChild(a); a.click(); a.remove();
+          setTimeout(function () { URL.revokeObjectURL(a.href); }, 5000);
+        }, "image/png");
+      }
+
+      // ================= 라우팅 =================
+      var st = parseHash();
+      var route = (st.d && st.r) ? "result" : (st.d ? "play" : "make");
+      if (route === "make") renderMake();
+      else if (route === "play") renderPlay(st.d);
+      else renderResult(st.d, st.r, false);
+      window.__st = st; window.__route = route;
+    })();
+  </script>
+</body>
+</html>
