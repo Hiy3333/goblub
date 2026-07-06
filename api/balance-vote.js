@@ -11,9 +11,20 @@ const ALLOWED_ORIGINS = [
 const MAX_QID = 30;
 
 function redisEnv() {
-  const url = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
-  const token = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
-  return url && token ? { url, token } : null;
+  const e = process.env;
+  // 1) 표준 이름 우선
+  const pairs = [
+    ["KV_REST_API_URL", "KV_REST_API_TOKEN"],
+    ["UPSTASH_REDIS_REST_URL", "UPSTASH_REDIS_REST_TOKEN"],
+  ];
+  for (const [u, t] of pairs) if (e[u] && e[t]) return { url: e[u], token: e[t] };
+  // 2) 커스텀 접두사 대응: *REST_API_URL 과 짝이 되는 *REST_API_TOKEN(읽기전용 제외) 탐색
+  const urlKey = Object.keys(e).find((k) => /REST_API_URL$/.test(k) && e[k]);
+  if (urlKey) {
+    const tokenKey = urlKey.replace(/REST_API_URL$/, "REST_API_TOKEN");
+    if (e[tokenKey]) return { url: e[urlKey], token: e[tokenKey] };
+  }
+  return null;
 }
 
 async function redis(cmd) {
