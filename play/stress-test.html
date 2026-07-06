@@ -3,97 +3,141 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>스트레스 유형 테스트 — goblub</title>
-  <meta name="description" content="스트레스 받을 때 나는 어떤 모습일까? 10문항으로 확인" />
+  <title>스트레스 몬스터 변신 — goblub</title>
+  <meta name="description" content="스트레스 받으면 튀어나오는 내 안의 몬스터 — 고블럽이 냠 먹어드립니다" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    .mon-stage { text-align:center; min-height:120px; margin:10px 0; }
+    .mon-emoji { font-size:4.5rem; display:inline-block; }
+    .mon-emoji.eaten { animation: mon-shrink .5s ease forwards; }
+    @keyframes mon-shrink { to { transform: scale(0); opacity:0; } }
+    .gob-muncher { display:inline-block; }
+    .gob-muncher.chew { animation: gob-chew .45s ease 3; }
+    @keyframes gob-chew { 30% { transform: scale(1.15) rotate(-5deg);} 65%{ transform: scale(1.1) rotate(5deg);} }
+    .cure-line { color: var(--mint-deep, #3f9b52); font-size:1.05rem; margin-top:8px; }
+  </style>
 </head>
 <body>
   <div id="site-header"></div>
   <main>
-    <section class="hero">
-      <h1>🔥 스트레스 유형 테스트</h1>
-      <p>스트레스 받을 때 나는 어떤 모습일까? 10문항으로 확인!</p>
-    </section>
-    <section class="panel" id="quiz"></section>
-    <p class="fine-print">재미로 봐주세요 🙂</p>
+    <section class="panel"><div id="quiz"></div></section>
+    <p class="fine-print" style="margin-top:20px">재미로 봐주세요 🙂</p>
   </main>
   <div id="site-footer"></div>
   <script src="../js/common.js" data-root=".."></script>
-  <script src="js/quiz.js"></script>
   <script src="js/feed.js"></script>
+  <script src="js/quiz.js"></script>
+  <script src="js/sharecard.js"></script>
+  <script src="js/goblub-art.js"></script>
   <script>
-    window.__feedSrc = "stress";
+    var MONS = {
+      pokbal:{emoji:"🌋",name:"폭발몬",desc:"참을 인 세 번은커녕 한 번도 못 참고 그대로 터지는 타입. 화끈하게 분출하고 나면 뒤끝은 없지만, 터지는 순간 옆 사람이 파편에 맞을 수 있어요. 화산도 분화구가 필요하듯, 터지기 전에 미리 빼는 안전밸브 하나쯤은 마련해두세요.",cure:"고블럽이 화를 냠— 이제 심호흡 세 번, 물 한 잔."},
+      jamsu:{emoji:"🌊",name:"잠수몬",desc:"힘들면 일단 연락부터 끊고 물속으로 숨어버리는 타입. 혼자만의 시간이 회복에 도움되는 건 맞지만, 너무 오래 잠수 타면 걱정하던 사람들도 지쳐서 물 밖으로 안 나오게 됩니다. 가끔은 숨만 쉬러라도 수면 위로 올라와 주세요.",cure:"고블럽이 잠수를 냠— 한 사람에게만 '나 힘들어' 한마디."},
+      nunmul:{emoji:"💧",name:"눈물몬",desc:"감정이 차오르면 말보다 눈물이 먼저 나오는 타입. 참는 것보다 훨씬 건강한 배출법이지만, 정작 왜 우는지는 본인도 정리가 안 될 때가 많아요. 실컷 울고 난 뒤엔 꼭 원인 한 줄 정리해보는 습관을 들여보세요.",cure:"고블럽이 눈물을 냠— 실컷 울었으면 따뜻한 거 먹기."},
+      meokbo:{emoji:"🍔",name:"먹보몬",desc:"스트레스는 입으로 푸는 게 국룰인 타입. 먹는 순간엔 세상 행복하지만 배부름이 가시면 스트레스는 고스란히 그대로 남아있는 경우가 많죠. 먹는 즐거움은 지키되, 배달앱 켜기 전에 노래 한 곡만 먼저 틀어보길.",cure:"고블럽이 폭식을 냠— 대신 좋아하는 노래 한 곡."},
+      yemin:{emoji:"🌵",name:"예민몬",desc:"스트레스 받으면 온몸에 가시부터 돋는 타입. 별거 아닌 말에도 발끈하고, 정작 본인도 왜 이렇게 날카로운지 몰라 당황하죠. 가시가 돋았다는 건 위험 신호니, 사람 만나기 전에 혼자 쿨다운할 시간을 꼭 확보하세요.",cure:"고블럽이 가시를 냠— 30분만 알림 끄고 혼자."},
+      eoreum:{emoji:"🧊",name:"얼음몬",desc:"버거워지면 그대로 얼어붙어 아무것도 못 하는 타입. 게으른 게 아니라 뇌가 잠시 정지 버튼을 누른 것뿐인데, 자책까지 더해지면 얼음이 더 두꺼워져요. 완벽하게 녹이려 하지 말고 딱 손톱만큼만 움직여보세요.",cure:"고블럽이 무기력을 냠— 딱 5분, 제일 작은 일 하나만."}
+    };
+    var MORDER = ["pokbal","jamsu","nunmul","meokbo","yemin","eoreum"];
+
+    var QUESTIONS = [
+      { q:"팀플 조원이 또 잠수를 탔다. 마감은 내일. 지금 나는?", choices:[
+        { text:"단톡방에 대문자로 '지금 어디임?!'", scores:{ pokbal:2 } },
+        { text:"조용히 나 혼자 다 해버림", scores:{ eoreum:1, jamsu:2 } },
+        { text:"화장실에서 몰래 눈물 찔끔", scores:{ nunmul:2 } },
+        { text:"배달앱부터 켠다", scores:{ meokbo:2 } } ] },
+      { q:"상사가 다 보는 앞에서 나만 지적한다. 심장이 쿵!", choices:[
+        { text:"얼굴이 화끈, 그 자리에서 바로 따지고 싶다", scores:{ pokbal:2 } },
+        { text:"눈물이 왈칵. 억울해서 참기 힘들다", scores:{ nunmul:2 } },
+        { text:"머릿속이 하얘지고 아무 말도 안 나온다", scores:{ eoreum:2 } },
+        { text:"괜히 사소한 걸로 옆 사람한테 짜증 남", scores:{ yemin:2 } } ] },
+      { q:"주말 약속이 갑자기 취소됐다. 혼자가 된 오후, 나는?", choices:[
+        { text:"연락 다 끊고 이불 속으로 잠수", scores:{ jamsu:2 } },
+        { text:"배달 음식 3인분 시켜서 혼자 다 먹음", scores:{ meokbo:2 } },
+        { text:"괜히 서러워서 혼자 훌쩍임", scores:{ nunmul:1, jamsu:1 } },
+        { text:"아무것도 하기 싫어 그냥 누워만 있음", scores:{ eoreum:2 } } ] },
+      { q:"단톡방에서 나를 저격하는 듯한 메시지를 봤다.", choices:[
+        { text:"바로 캡처해서 '이거 나 얘기임?' 전송", scores:{ pokbal:2 } },
+        { text:"메시지를 스무 번쯤 다시 읽으며 예민해짐", scores:{ yemin:2 } },
+        { text:"조용히 방 나가기 버튼을 누른다", scores:{ jamsu:2 } },
+        { text:"머리가 멍해져서 폰만 붙잡고 굳어버림", scores:{ eoreum:1, nunmul:1 } } ] },
+      { q:"중요한 발표 전날 밤, 스트레스 몬스터가 슬슬 등장한다.", choices:[
+        { text:"별거 아닌 일에도 예민하게 날 세움", scores:{ yemin:2 } },
+        { text:"긴장 풀겠다며 야식 폭풍 흡입", scores:{ meokbo:2 } },
+        { text:"연습은 안 하고 방 청소하며 현실도피", scores:{ jamsu:1, eoreum:1 } },
+        { text:"이불킥하며 혼자 분노 게이지 상승", scores:{ pokbal:2 } } ] },
+      { q:"친구가 별생각 없이 던진 농담이 마음에 콱 박혔다.", choices:[
+        { text:"그날 밤 이불 속에서 서럽게 운다", scores:{ nunmul:2 } },
+        { text:"괜히 다른 일에 날카롭게 반응함", scores:{ yemin:2 } },
+        { text:"그 친구 연락을 며칠간 은근슬쩍 피함", scores:{ jamsu:2 } },
+        { text:"당장 전화해서 '그거 무슨 뜻이야?' 따짐", scores:{ pokbal:1, yemin:1 } } ] },
+      { q:"할 일이 산더미인데 손도 대기 싫은 날. 몸은 이미 몬스터.", choices:[
+        { text:"책상 앞에 앉아만 있고 멍— 아무것도 못함", scores:{ eoreum:2 } },
+        { text:"과자 한 봉지 다 비우고서야 정신 차림", scores:{ meokbo:2 } },
+        { text:"괜히 물건 던지듯 짜증 내며 시작함", scores:{ pokbal:1, yemin:1 } },
+        { text:"폰 무음으로 돌려놓고 다 회피", scores:{ jamsu:2 } } ] },
+      { q:"연인과 다툰 다음 날 아침. 스트레스 몬스터 컨디션은?", choices:[
+        { text:"먼저 연락 안 하고 며칠 잠수", scores:{ jamsu:2 } },
+        { text:"베개에 얼굴 묻고 펑펑 운다", scores:{ nunmul:2 } },
+        { text:"사소한 일에도 계속 예민하게 반응", scores:{ yemin:2 } },
+        { text:"아침 댓바람부터 폭발해서 전화로 따짐", scores:{ pokbal:2 } } ] },
+      { q:"번아웃 직전, 몸이 먼저 신호를 보낸다.", choices:[
+        { text:"'다 그만둘래!' 소리부터 지르고 봄", scores:{ pokbal:2 } },
+        { text:"손가락 하나 까딱하기 싫어 침대와 한몸", scores:{ eoreum:2 } },
+        { text:"이유 없이 계속 뭔가를 우물거리며 먹음", scores:{ meokbo:2 } },
+        { text:"괜히 눈물부터 핑 돈다", scores:{ nunmul:1, eoreum:1 } } ] },
+      { q:"오랜만에 친구들이 '너 스트레스 받으면 어떤 사람이야?' 라고 묻는다.", choices:[
+        { text:"'터지기 전엔 멀쩡, 터지면 화산이야'", scores:{ pokbal:2 } },
+        { text:"'연락 안 되면 그냥 충전 중인 거야'", scores:{ jamsu:2 } },
+        { text:"'울면서 스트레스 배출하는 스타일'", scores:{ nunmul:2 } },
+        { text:"'예민 지수 폭발, 건드리면 위험'", scores:{ yemin:2 } } ] }
+    ];
+
+    function renderResult(totals, el, api){
+      var key = Quiz.top(totals, MORDER), r = MONS[key];
+      el.innerHTML =
+        '<span class="result-emoji">'+r.emoji+'</span>'+
+        '<p class="result-name">스트레스 받으면… '+r.name+' 변신!</p>'+
+        '<p class="result-desc">'+r.desc+'</p>'+
+        '<div class="mon-stage"><span class="mon-emoji" id="mon">'+r.emoji+'</span></div>'+
+        '<div class="result-actions"><button class="btn-primary" id="summon">🌀 고블럽 소환 — 이 몬스터 먹어치우기</button></div>'+
+        '<div id="after" style="display:none">'+
+          '<p class="cure-line" id="cure"></p>'+
+          '<div id="card-slot"></div>'+
+          '<div class="result-actions">'+
+          '<button class="btn-primary" id="qz-retry">다시하기</button>'+
+          '<button class="btn-ghost" id="qz-share">링크 복사</button></div>'+
+        '</div>';
+
+      el.querySelector("#summon").onclick = function(){
+        var btn=this; btn.disabled=true;
+        var stage=el.querySelector(".mon-stage");
+        var gob=document.createElement("span");
+        gob.className="gob-muncher chew";
+        gob.innerHTML = (window.GoblubArt ? GoblubArt.svg(74) : "👾");
+        stage.insertBefore(gob, stage.firstChild);
+        setTimeout(function(){ el.querySelector("#mon").classList.add("eaten"); }, 500);
+        setTimeout(function(){
+          gob.classList.remove("chew");
+          el.querySelector("#cure").textContent = "🌟 "+r.cure;
+          el.querySelector("#after").style.display="block";
+          el.querySelector("#card-slot").appendChild(ShareCard.render({
+            palette:"yellow", emoji:r.emoji, badge:"나의 스트레스 몬스터", title:r.name,
+            lines:[r.desc, r.cure]
+          }));
+          el.querySelector("#qz-retry").onclick=api.restart;
+          el.querySelector("#qz-share").onclick=function(){ api.shareLink(el.querySelector("#qz-share")); };
+        }, 1400);
+      };
+    }
+
     Quiz.init(document.getElementById("quiz"), {
-      emoji: "🔥",
-      title: "스트레스 유형 테스트",
-      intro: "스트레스 상황에서 내가 보이는 진짜 반응 패턴을 알려드려요.",
-      questions: [
-        { q: "월요일 아침, 눈 뜨자마자 드는 생각은?", choices: [
-          { text: "아 진짜! (이불을 발로 참)", scores: { volcano: 1 } },
-          { text: "휴… 가야지 뭐 (조용히 한숨)", scores: { sponge: 1 } },
-          { text: "5분만 더… 10분만 더… (현실 도피)", scores: { runner: 1 } },
-          { text: "오늘 할 일부터 머릿속으로 정리", scores: { solver: 1 } } ] },
-        { q: "일이 몰려서 터질 것 같을 때 나는?", choices: [
-          { text: "\"이걸 왜 다 나한테!\" 짜증부터 남", scores: { volcano: 1 } },
-          { text: "말없이 다 떠안고 밤새 함", scores: { sponge: 1 } },
-          { text: "일단 유튜브 켬. 나중의 내가 하겠지", scores: { runner: 1 } },
-          { text: "우선순위 정하고 급한 것부터 처리", scores: { solver: 1 } } ] },
-        { q: "친구가 약속을 당일 취소했다!", choices: [
-          { text: "서운함을 바로 표현한다", scores: { volcano: 1 } },
-          { text: "\"괜찮아~\" 하고 혼자 곱씹는다", scores: { sponge: 1 } },
-          { text: "잘됐다, 집에서 쉬자! 금방 잊는다", scores: { runner: 1 } },
-          { text: "다음 약속을 바로 다시 잡는다", scores: { solver: 1 } } ] },
-        { q: "스트레스가 극에 달했을 때 몸의 신호는?", choices: [
-          { text: "심장이 빨리 뛰고 얼굴이 뜨거워짐", scores: { volcano: 1 } },
-          { text: "어깨·목이 뭉치고 소화가 안 됨", scores: { sponge: 1 } },
-          { text: "무기력. 눕고 싶고 아무것도 하기 싫음", scores: { runner: 1 } },
-          { text: "머리가 오히려 차가워지고 말이 빨라짐", scores: { solver: 1 } } ] },
-        { q: "나의 스트레스 해소법에 가장 가까운 것은?", choices: [
-          { text: "운동이나 노래방에서 폭발적으로 발산", scores: { volcano: 1 } },
-          { text: "친한 사람에게 털어놓기 (근데 잘 못함)", scores: { sponge: 1 } },
-          { text: "잠, 넷플릭스, 게임 — 일단 꺼두기", scores: { runner: 1 } },
-          { text: "원인을 적어보고 해결책 리스트 만들기", scores: { solver: 1 } } ] },
-        { q: "단톡방에서 나를 저격하는 듯한 말을 봤다", choices: [
-          { text: "바로 물어본다. \"그거 나 얘기야?\"", scores: { volcano: 1 } },
-          { text: "밤새 그 메시지를 다시 읽는다", scores: { sponge: 1 } },
-          { text: "알림 끄고 못 본 척한다", scores: { runner: 1 } },
-          { text: "따로 개인톡으로 차분히 확인한다", scores: { solver: 1 } } ] },
-        { q: "중요한 발표 전날 밤, 나는?", choices: [
-          { text: "긴장돼서 예민 폭발. 건드리면 위험", scores: { volcano: 1 } },
-          { text: "잘해야 한다는 부담을 혼자 삭힘", scores: { sponge: 1 } },
-          { text: "준비는 미뤄뒀고… 갑자기 방 청소 시작", scores: { runner: 1 } },
-          { text: "리허설 한 번 더 하고 일찍 잔다", scores: { solver: 1 } } ] },
-        { q: "화가 났던 일, 얼마나 오래 가나요?", choices: [
-          { text: "그 자리에서 폭발하고 금방 풀림", scores: { volcano: 1 } },
-          { text: "겉으론 괜찮은데 몇 주씩 남아 있음", scores: { sponge: 1 } },
-          { text: "생각 안 하려고 해서 잘 모르겠음", scores: { runner: 1 } },
-          { text: "원인이 해결되면 딱 끝남", scores: { solver: 1 } } ] },
-        { q: "번아웃이 온 것 같을 때 나는?", choices: [
-          { text: "\"다 그만둘래!\" 선언부터 하고 봄", scores: { volcano: 1 } },
-          { text: "그래도 해야지… 하며 계속 버팀", scores: { sponge: 1 } },
-          { text: "연락 두절, 잠수 모드 돌입", scores: { runner: 1 } },
-          { text: "휴가를 내고 회복 계획을 짠다", scores: { solver: 1 } } ] },
-        { q: "주변 사람들이 말하는 나는?", choices: [
-          { text: "\"화끈해. 뒤끝은 없어\"", scores: { volcano: 1 } },
-          { text: "\"착한데… 좀 참는 것 같아\"", scores: { sponge: 1 } },
-          { text: "\"연락 안 되면 충전 중인 거야\"", scores: { runner: 1 } },
-          { text: "\"어른스러워. 기댈 수 있어\"", scores: { solver: 1 } } ] }
-      ],
-      results: {
-        volcano: { emoji: "🌋", name: "화산 폭발형", desc: "스트레스가 쌓이면 바로바로 분출하는 타입! 뒤끝 없이 시원한 게 장점이지만, 폭발 순간의 파편이 주변에 튈 수 있어요. 터지기 전에 운동·노래방 같은 안전한 분화구를 미리 만들어두면 최고예요." },
-        sponge: { emoji: "🧽", name: "스펀지 흡수형", desc: "싫은 소리 못 하고 다 빨아들이는 타입. 배려심 만렙이지만 스펀지도 다 차면 무거워져요. 참는 게 미덕이 아니라는 것, 짜서 비워내는 시간(수다, 일기, 눈물 뭐든!)이 꼭 필요해요." },
-        runner: { emoji: "🏃", name: "일단 도망형", desc: "스트레스 원인에서 일단 거리를 두는 타입. 회피처럼 보여도 사실 재충전 본능이에요! 다만 도망간 곳에서 눕기만 하면 원인이 그대로 기다리고 있으니, 충전 후 한 가지만 처리하고 다시 쉬어보세요." },
-        solver: { emoji: "🛠️", name: "해결사 직면형", desc: "스트레스를 문제로 정의하고 풀어버리는 타입. 멋있지만, 세상엔 해결 안 되는 일도 있다는 게 함정. 가끔은 해결 말고 그냥 '느끼는' 것도 회복이에요. 오늘은 리스트 접고 푹 쉬어도 돼요." }
-      },
-      resolve: function (t) {
-        var best = "volcano";
-        ["volcano", "sponge", "runner", "solver"].forEach(function (k) { if ((t[k] || 0) > (t[best] || 0)) best = k; });
-        return best;
-      },
-      extraResultHTML: '<p class="result-desc" style="margin-top:14px">🩺 힘든 순간이 계속된다면 — 즉시 도움을 연결해주는 앱 <a href="../apps.html" style="text-decoration:underline">Golden time</a>도 준비 중이에요.</p>'
+      emoji: "🌋", title: "스트레스 몬스터 변신",
+      intro: "스트레스 받으면 내 안에서 튀어나오는 몬스터가 있다. 10문항으로 정체를 밝히고, 고블럽이 냠 먹어드립니다.",
+      feedSrc: "stress", questions: QUESTIONS, renderResult: renderResult
     });
   </script>
 </body>
