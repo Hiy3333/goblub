@@ -52,13 +52,19 @@ export default async function handler(req, res) {
   }
 
   try {
+    const userMsg =
+      "고민 A: " + d.a.trim() +
+      "\n고민 B: " + d.b.trim() +
+      (d.context && d.context.trim() ? "\n상황: " + d.context.trim() : "") +
+      "\n\n판결을 내려주소서.";
+    if (req.query && req.query.debug === "1") {
+      res.setHeader("Content-Type", "text/plain; charset=utf-8");
+      res.setHeader("Cache-Control", "no-store");
+      return res.end("[DEBUG userMsg the server sends]\n" + userMsg);
+    }
     const wrote = await streamGemini(res, {
       system: SYSTEM,
-      user:
-        "고민 A: " + d.a.trim() +
-        "\n고민 B: " + d.b.trim() +
-        (d.context && d.context.trim() ? "\n상황: " + d.context.trim() : "") +
-        "\n\n판결을 내려주소서.",
+      user: userMsg,
       maxTokens: 400,
       temperature: 0.85,
     });
