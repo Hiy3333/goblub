@@ -209,11 +209,16 @@
       }
 
       function setupRunaway() {
-        var no = $("no"), yn = $("yn");
+        var no = $("no"), yes = $("yes"), yn = $("yn");
         var TRIGGER = 140, SAFE = 120, fixed = false;
         function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
         function ensureFixed() {
           if (fixed) return;
+          // 도망 직전, YES를 지금 자리에 고정 → NO가 빠져도 YES가 중앙으로 튀지 않음
+          var yr = yes.getBoundingClientRect();
+          yes.style.position = "fixed"; yes.style.margin = "0";
+          yes.style.width = yr.width + "px";
+          yes.style.left = yr.left + "px"; yes.style.top = yr.top + "px";
           var nr = no.getBoundingClientRect();
           no.style.position = "fixed"; no.style.margin = "0"; no.style.zIndex = "60";
           no.style.left = nr.left + "px"; no.style.top = nr.top + "px";
