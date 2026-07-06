@@ -15,13 +15,16 @@
       '<stop offset="100%" stop-color="#8fbfe8"/></radialGradient></defs>' +
       '<ellipse cx="106" cy="176" rx="8" ry="11" fill="#8877ad"/>' +
       '<ellipse cx="134" cy="176" rx="8" ry="11" fill="#8877ad"/>' +
+      '<path d="M86 154 Q52 172 40 164" fill="none" stroke="#8877ad" stroke-width="8" stroke-linecap="round"/>' +
+      '<circle cx="35" cy="164" r="13" fill="url(#' + id + ')"/>' +
+      '<circle cx="35" cy="164" r="13" fill="none" stroke="#bcdcf5" stroke-width="1" opacity=".6"/>' +
       '<path d="M120 20 C168 20 182 62 183 104 C184 148 158 172 120 172 C82 172 56 148 57 104 C58 62 72 20 120 20 Z" fill="#9a8ac2"/>' +
       '<ellipse cx="102" cy="90" rx="24" ry="34" fill="#ab9dd4" opacity=".45"/>' +
       '<ellipse cx="120" cy="158" rx="44" ry="15" fill="#8877ad" opacity=".4"/>' +
-      '<path d="M82 126 Q54 134 50 148" fill="none" stroke="#8877ad" stroke-width="6" stroke-linecap="round"/>' +
-      '<circle cx="48" cy="150" r="12" fill="url(#' + id + ')"/>' +
-      '<circle cx="48" cy="150" r="12" fill="none" stroke="#bcdcf5" stroke-width="1" opacity=".6"/>' +
-      '<path d="M162 126 Q186 133 189 146" fill="none" stroke="#8877ad" stroke-width="5.5" stroke-linecap="round"/>' +
+      '<path d="M60 104 Q45 110 41 120" fill="none" stroke="#8877ad" stroke-width="6" stroke-linecap="round"/>' +
+      '<circle cx="40" cy="122" r="6" fill="#8877ad"/>' +
+      '<path d="M180 104 Q195 110 199 120" fill="none" stroke="#8877ad" stroke-width="6" stroke-linecap="round"/>' +
+      '<circle cx="200" cy="122" r="6" fill="#8877ad"/>' +
       '<g fill="#aec13d">' +
       '<circle cx="74" cy="52" r="2.6"/><circle cx="64" cy="80" r="2.4"/><circle cx="72" cy="104" r="2.2"/>' +
       '<circle cx="166" cy="52" r="2.6"/><circle cx="176" cy="80" r="2.4"/><circle cx="168" cy="104" r="2.2"/>' +
