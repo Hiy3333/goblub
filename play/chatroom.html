@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>단톡방 캐릭터 테스트 — goblub</title>
+  <meta name="description" content="10가지 상황으로 보는 나의 단톡방 캐릭터 — 도배왕·잠수함·드립러·눈팅유령·공지봇·이모티콘 장인" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    .type-bars { margin: 18px 0 6px; }
+    .type-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 0.95rem; }
+    .type-row .nm { width: 96px; flex: none; }
+    .type-row .track { flex: 1; background: #efe9db; border-radius: 999px; height: 14px; overflow: hidden; }
+    .type-row .fill { height: 14px; border-radius: 999px; background: linear-gradient(90deg, var(--sky), var(--purple)); }
+    .type-row .pct { width: 42px; flex: none; text-align: right; color: var(--ink-soft); }
+  </style>
+</head>
+<body>
+  <div id="site-header"></div>
+  <main>
+    <section class="panel"><div id="quiz"></div></section>
+    <p class="fine-print" style="margin-top:20px">재미로 봐주세요 🙂</p>
+  </main>
+  <div id="site-footer"></div>
+  <script src="../js/common.js" data-root=".."></script>
+  <script src="js/feed.js"></script>
+  <script src="js/quiz.js"></script>
+  <script src="js/sharecard.js"></script>
+  <script>
+    var TYPES = {
+      dobae:  { emoji:"🌊", name:"새벽 감성 도배왕",     short:"도배왕",    desc:"자정 넘으면 갑자기 텐션이 폭발해서 메시지를 폭풍처럼 쏟아내는 타입. 다음 날 아침 대화창 스크롤 압박에 스스로도 놀라지만, 방이 조용하면 못 견디는 그 활력 덕분에 단톡방이 안 죽고 살아있는 겁니다." },
+      jamsu:  { emoji:"🤿", name:"읽씹 잠수함",         short:"잠수함",    desc:"읽음 표시는 뜨는데 답장은 안 오는 미스터리 그 자체. 사실 안 읽은 게 아니라 할 말을 고르다 타이밍을 놓친 것뿐이지만, 갑자기 3일 뒤에 '아까 그거'로 대화를 이어붙이는 능력만큼은 인정해야 합니다." },
+      drip:   { emoji:"🎤", name:"드립 폭격기",         short:"드립러",    desc:"누가 무슨 말을 하든 3초 안에 드립으로 받아치는 반사신경의 소유자. 방 분위기를 살리는 일등 공신이지만, 가끔은 진지한 얘기 좀 하려는데 개그로 새버려서 다들 할 말을 잃게 만들기도 합니다." },
+      ghost:  { emoji:"👻", name:"눈팅만 하는 유령",     short:"눈팅유령",  desc:"알림은 다 오는데 존재감은 제로, 며칠에 한 번 이모티콘 하나로 생존 신고하는 스타일. 정작 중요한 순간엔 조용히 다 보고 있다가 핵심만 콕 집어 한마디 던지는 은근한 존재감이 있습니다." },
+      notice: { emoji:"📢", name:"단톡방 총무 공지봇",   short:"공지봇",    desc:"약속 날짜·장소·회비까지 정리해서 공지하는 이 방의 실질적 운영자. 다들 대충 넘어가려 할 때 혼자 디테일을 챙기는 책임감은 최고지만, 정작 본인 스케줄은 방장 노릇 하느라 못 챙기기 일쑤입니다." },
+      emoti:  { emoji:"🐥", name:"이모티콘 장인",       short:"이모티콘",  desc:"할 말이 없어도 이모티콘 하나로 완벽하게 리액션을 완성하는 능력자. 텍스트보다 짤과 이모티콘이 먼저 나가는 통에 정작 진지한 대화가 필요할 땐 말문이 좀 막히기도 합니다." }
+    };
+    var ORDER = ["dobae","jamsu","drip","ghost","notice","emoti"];
+
+    var QUESTIONS = [
+      { q: "새 단톡방에 초대됐다. 첫 반응은?", choices: [
+        { text: "바로 자기소개 겸 드립부터 한 방", scores: { drip: 2, dobae: 1 } },
+        { text: "이모티콘으로 인사만 살짝", scores: { emoti: 2 } },
+        { text: "일단 조용히 대화 흐름부터 파악", scores: { ghost: 2 } },
+        { text: "방 목적·규칙부터 정리해서 공지", scores: { notice: 2 } } ] },
+      { q: "밤 12시, 알림이 미친 듯이 울린다. 범인은 나?", choices: [
+        { text: "맞다, 감성 터져서 혼자 10개 연속 전송 중", scores: { dobae: 2 } },
+        { text: "아니, 난 이미 자는 척 무음 처리", scores: { jamsu: 2 } },
+        { text: "다들 자는데 혼자 드립 치고 있음", scores: { drip: 1, dobae: 1 } },
+        { text: "읽고 이모티콘 하나만 던지고 다시 잠수", scores: { emoti: 1, ghost: 1 } } ] },
+      { q: "약속을 잡아야 하는데 다들 대답이 없다. 나는?", choices: [
+        { text: "날짜·시간·장소 후보까지 정리해서 올림", scores: { notice: 2 } },
+        { text: "'좋아요' 이모티콘만 얼른 붙임", scores: { emoti: 2 } },
+        { text: "누가 정하겠지 하고 조용히 지켜봄", scores: { ghost: 2 } },
+        { text: "일단 텐션 올려서 분위기부터 띄움", scores: { dobae: 1, drip: 1 } } ] },
+      { q: "누가 재밌는 짤을 올렸다. 내 반응은?", choices: [
+        { text: "바로 그거보다 더 웃긴 드립으로 받아침", scores: { drip: 2 } },
+        { text: "웃참 이모티콘 하나로 리액션 끝", scores: { emoti: 2 } },
+        { text: "속으로 빵 터졌지만 티는 안 냄", scores: { ghost: 1, jamsu: 1 } },
+        { text: "이 흐름 타서 나도 짤 폭탄 투척", scores: { dobae: 2 } } ] },
+      { q: "누가 나한테 직접 질문을 했다. 답장 타이밍은?", choices: [
+        { text: "읽자마자 바로 답장", scores: { drip: 1, notice: 1 } },
+        { text: "읽음 뜨고 한참 뒤에야 슬그머니 답장", scores: { jamsu: 2 } },
+        { text: "이모티콘으로 일단 리액션만", scores: { emoti: 2 } },
+        { text: "아예 못 본 척 넘어감(사실 다 봄)", scores: { ghost: 2 } } ] },
+      { q: "단톡방에서 논쟁이 시작됐다. 나의 역할은?", choices: [
+        { text: "농담으로 분위기 풀어서 싸움 중재", scores: { drip: 2 } },
+        { text: "논점 정리해서 중립적으로 요약 공지", scores: { notice: 2 } },
+        { text: "조용히 스크롤만 올리며 관전", scores: { ghost: 2 } },
+        { text: "감정 이입해서 새벽까지 장문 토로", scores: { dobae: 2 } } ] },
+      { q: "며칠째 방이 조용하다. 참을 수 없는 나는?", choices: [
+        { text: "밑도 끝도 없는 근황 폭탄 투척", scores: { dobae: 2 } },
+        { text: "다들 뭐하나 안부 공지 올림", scores: { notice: 2 } },
+        { text: "굳이 안 깨움, 조용한 게 편함", scores: { ghost: 1, jamsu: 1 } },
+        { text: "드립 하나 던져서 반응 유도", scores: { drip: 2 } } ] },
+      { q: "톡방 인원이 내 생일을 축하해준다. 반응은?", choices: [
+        { text: "이모티콘 폭죽으로 도배하듯 답함", scores: { emoti: 2, dobae: 1 } },
+        { text: "고맙다고 짧게 답한 뒤 또 잠수", scores: { jamsu: 2 } },
+        { text: "감동 멘트 길게 써서 감성 폭발", scores: { dobae: 1, notice: 1 } },
+        { text: "고마움을 드립으로 승화시켜 웃김", scores: { drip: 2 } } ] },
+      { q: "단톡방 규칙(약속 시간·회비 등)이 애매해졌다. 나는?", choices: [
+        { text: "표까지 만들어서 깔끔하게 정리 공지", scores: { notice: 2 } },
+        { text: "누가 정리하겠지, 나서지 않음", scores: { ghost: 2 } },
+        { text: "'모르겠고 일단 ㄱㄱ' 이모티콘만 남김", scores: { emoti: 2 } },
+        { text: "괜히 진지해지기 싫어서 농담으로 넘김", scores: { drip: 1, jamsu: 1 } } ] },
+      { q: "친구가 '너 단톡방에서 어떤 애야?'라고 묻는다면?", choices: [
+        { text: "'나만 보면 방이 시끄러워져'", scores: { dobae: 2 } },
+        { text: "'있는 듯 없는 듯, 근데 다 봄'", scores: { ghost: 2 } },
+        { text: "'답장은 늦어도 마음은 있어'", scores: { jamsu: 2 } },
+        { text: "'그 방 실질적 총무가 나임'", scores: { notice: 1, emoti: 1 } } ] }
+    ];
+
+    function renderResult(totals, el, api) {
+      var key = Quiz.top(totals, ORDER);
+      var r = TYPES[key];
+      var sum = 0; ORDER.forEach(function (k) { sum += (totals[k] || 0); });
+      sum = sum || 1;
+      var rows = ORDER.map(function (k) { return { k: k, v: totals[k] || 0 }; })
+        .sort(function (a, b) { return b.v - a.v; }).slice(0, 4);
+      var barsHtml = '<div class="type-bars">' + rows.map(function (row) {
+        var pct = Math.round(row.v / sum * 100);
+        return '<div class="type-row"><span class="nm">' + TYPES[row.k].emoji + " " + TYPES[row.k].short +
+          '</span><span class="track"><span class="fill" style="width:' + pct + '%"></span></span>' +
+          '<span class="pct">' + pct + '%</span></div>';
+      }).join("") + "</div>";
+      el.innerHTML =
+        '<span class="result-emoji">' + r.emoji + "</span>" +
+        '<p class="result-name">' + r.name + "</p>" +
+        '<p class="result-desc">' + r.desc + "</p>" + barsHtml +
+        '<div id="card-slot"></div>' +
+        '<div class="result-actions">' +
+        '<button class="btn-primary" id="qz-retry">다시하기</button>' +
+        '<button class="btn-ghost" id="qz-share">링크 복사</button></div>';
+      el.querySelector("#card-slot").appendChild(ShareCard.render({
+        palette: "sky", emoji: r.emoji, badge: "단톡방 캐릭터", title: r.name, lines: [r.desc]
+      }));
+      el.querySelector("#qz-retry").onclick = api.restart;
+      el.querySelector("#qz-share").onclick = function () { api.shareLink(el.querySelector("#qz-share")); };
+    }
+
+    Quiz.init(document.getElementById("quiz"), {
+      emoji: "💬", title: "단톡방 캐릭터 테스트",
+      intro: "새 단톡방에 초대됐다. 알림이 울리기 시작한다. 이 방에서 나는 어떤 캐릭터일까?",
+      feedSrc: "chatroom", questions: QUESTIONS, renderResult: renderResult
+    });
+  </script>
+</body>
+</html>

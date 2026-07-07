@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>좀비 아포칼립스 생존 유형 — goblub</title>
+  <meta name="description" content="10가지 상황으로 보는 나의 좀비 아포칼립스 생존 유형 — 리더·전투·살림꾼·은둔·배신·첫날사망" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    .type-bars { margin: 18px 0 6px; }
+    .type-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 0.95rem; }
+    .type-row .nm { width: 96px; flex: none; }
+    .type-row .track { flex: 1; background: #efe9db; border-radius: 999px; height: 14px; overflow: hidden; }
+    .type-row .fill { height: 14px; border-radius: 999px; background: linear-gradient(90deg, var(--mint), var(--sky)); }
+    .type-row .pct { width: 42px; flex: none; text-align: right; color: var(--ink-soft); }
+  </style>
+</head>
+<body>
+  <div id="site-header"></div>
+  <main>
+    <section class="panel"><div id="quiz"></div></section>
+    <p class="fine-print" style="margin-top:20px">재미로 봐주세요 🙂</p>
+  </main>
+  <div id="site-footer"></div>
+  <script src="../js/common.js" data-root=".."></script>
+  <script src="js/feed.js"></script>
+  <script src="js/quiz.js"></script>
+  <script src="js/sharecard.js"></script>
+  <script>
+    var TYPES = {
+      leader:   { emoji:"🛡️", name:"무리를 이끄는 리더형",     short:"리더",    desc:"패닉에 빠진 사람들 사이에서 혼자 침착하게 상황을 정리하고 있죠. 다들 당신만 보고 움직이는데, 정작 본인 체력은 하나도 안 챙기는 게 함정입니다." },
+      fighter:  { emoji:"🪓", name:"좀비 때려잡는 전투형",     short:"전투",    desc:"위협이 나타나면 일단 몸이 먼저 나가는 타입. 무리의 방패 역할을 자처하지만, 가끔은 무기보다 머리를 먼저 쓰는 연습도 필요합니다." },
+      supplier: { emoji:"🎒", name:"팀의 생명줄 살림꾼형",     short:"살림꾼",  desc:"물, 식량, 배터리까지 야무지게 챙기는 진짜 생존 실세. 다들 당신 가방만 믿고 따라다니는데, 정작 본인 몫은 늘 제일 적게 챙깁니다." },
+      hermit:   { emoji:"🏚️", name:"혼자 살아남는 은둔형",     short:"은둔",    desc:"무리보다는 나 혼자가 편한 스타일. 아무도 못 찾는 안전가옥을 귀신같이 찾아내지만, 정작 마지막에 문 두드릴 사람이 없어서 조금 외롭습니다." },
+      traitor:  { emoji:"🔪", name:"살기 위해선 뭐든 배신자형", short:"배신",    desc:"위기의 순간 계산이 제일 빠른 사람. 생존율은 확실히 높지만, 사태가 끝나고 나면 같이 살아남은 사람들 얼굴 보기가 좀 민망할 겁니다." },
+      firstday: { emoji:"💀", name:"호기심이 부른 첫날 사망형", short:"첫날사망", desc:"사이렌 울리자마자 창문 열고 밖부터 구경하는 스타일. 궁금한 건 못 참는 성격이 이번만큼은 수명을 크게 단축시킬 것 같습니다." }
+    };
+    var ORDER = ["leader","fighter","supplier","hermit","traitor","firstday"];
+
+    var QUESTIONS = [
+      { q: "새벽, 창밖에서 비명 소리와 사이렌이 울린다. 가장 먼저 하는 행동은?", choices: [
+        { text: "커튼 젖히고 창문 열어서 무슨 일인지 구경", scores: { firstday: 2 } },
+        { text: "가족·룸메이트부터 깨워서 상황 설명하고 지시 내림", scores: { leader: 2, supplier: 1 } },
+        { text: "야구방망이부터 챙겨 들고 문 앞을 지킴", scores: { fighter: 2 } },
+        { text: "불부터 끄고 조용히 숨어서 상황 파악", scores: { hermit: 2 } } ] },
+
+      { q: "TV·SNS로 '정체불명의 감염 확산' 속보가 뜬다. 당신의 다음 스텝은?", choices: [
+        { text: "물, 통조림, 상비약부터 정리해서 챙기기 시작", scores: { supplier: 2 } },
+        { text: "옆집·이웃한테 알려주러 뛰어나감", scores: { leader: 2 } },
+        { text: "'설마 진짜겠어' 하고 확인하러 밖에 나가봄", scores: { firstday: 2 } },
+        { text: "혼자 조용히 짐 싸서 아무도 모르게 빠져나갈 준비", scores: { hermit: 2, traitor: 1 } } ] },
+
+      { q: "피난 행렬에 합류했다. 무리 안에서 당신의 포지션은?", choices: [
+        { text: "맨 앞에서 길을 정하고 대열을 통솔", scores: { leader: 2 } },
+        { text: "맨 뒤에서 좀비 접근을 경계하며 후위를 맡음", scores: { fighter: 2 } },
+        { text: "누가 뭘 들고 있는지 파악하며 물자를 분배", scores: { supplier: 2 } },
+        { text: "무리랑 슬쩍 거리 두고 혼자 움직일 타이밍 봄", scores: { hermit: 2, traitor: 1 } } ] },
+
+      { q: "폐건물에서 좀비 한 마리와 딱 마주쳤다! 반응은?", choices: [
+        { text: "망설임 없이 무기 들고 정면으로 처치", scores: { fighter: 2 } },
+        { text: "일행에게 신호 보내며 침착하게 후퇴 경로 지시", scores: { leader: 2 } },
+        { text: "재빨리 좀비가 안 보는 틈을 타 혼자 빠져나감", scores: { hermit: 2, traitor: 1 } },
+        { text: "너무 신기해서 잠깐 관찰하다가 늦게 반응", scores: { firstday: 2 } } ] },
+
+      { q: "은신처에서 며칠 버틸 물자를 발견했다. 양은 4인분인데 일행은 6명. 당신은?", choices: [
+        { text: "다 같이 조금씩 나눠서 최대한 오래 버티자고 제안", scores: { supplier: 2, leader: 1 } },
+        { text: "체력 약한 사람들 먼저 챙기고 내 몫은 나중에", scores: { supplier: 2 } },
+        { text: "몰래 내 몫부터 확보해두고 티 안 냄", scores: { traitor: 2 } },
+        { text: "귀찮은 논쟁 피해서 혼자 다른 곳으로 이동", scores: { hermit: 2 } } ] },
+
+      { q: "무리 중 한 명이 물린 것 같다는 의심이 든다. 당신의 선택은?", choices: [
+        { text: "직접 확인하고 사실이면 모두를 위해 냉정하게 조치", scores: { leader: 2, traitor: 1 } },
+        { text: "밤에 조용히 다른 텐트로 몰래 도망침", scores: { traitor: 2 } },
+        { text: "일단 무기 들고 만약을 대비해 지켜봄", scores: { fighter: 2 } },
+        { text: "진짜 물렸는지 너무 궁금해서 가까이 가서 확인함", scores: { firstday: 2 } } ] },
+
+      { q: "폐허가 된 마트에서 물자를 뒤지는 중, 좀비 무리 소리가 가까워진다. 당신은?", choices: [
+        { text: "일행에게 빨리 튀라고 소리치고 방어선부터 침", scores: { fighter: 2, leader: 1 } },
+        { text: "챙길 수 있는 물자만 최대한 빠르게 쓸어 담음", scores: { supplier: 2 } },
+        { text: "혼자 빠져나갈 뒷문부터 확인해둠", scores: { hermit: 2 } },
+        { text: "소리가 어디서 나는지 궁금해서 살짝 다가가봄", scores: { firstday: 2 } } ] },
+
+      { q: "안전해 보이는 폐가를 발견했다. 근데 이미 누가 살고 있는 흔적이 있다. 당신은?", choices: [
+        { text: "그 사람들과 협상해서 같이 지내는 쪽으로 이끔", scores: { leader: 2 } },
+        { text: "혹시 모르니 몰래 물자만 슬쩍 챙겨서 빠져나감", scores: { traitor: 2 } },
+        { text: "누가 있든 상관없이 조용히 내 자리만 찾아 눕는다", scores: { hermit: 2 } },
+        { text: "누가 사는지 궁금해서 집 안까지 둘러봄", scores: { firstday: 2, fighter: 1 } } ] },
+
+      { q: "마지막 총알 혹은 마지막 무기 하나가 남았다. 누가 가져야 할까?", choices: [
+        { text: "전투 경험 많은 나나 전투원이 들어야 함", scores: { fighter: 2 } },
+        { text: "무리 전체를 지킬 사람, 즉 리더가 들어야 함", scores: { leader: 2 } },
+        { text: "물자 관리하는 나한테 우선 맡겨서 상황 보고 배분", scores: { supplier: 2 } },
+        { text: "그냥 나 혼자 챙겨서 조용히 빠질 궁리부터 함", scores: { traitor: 2, hermit: 1 } } ] },
+
+      { q: "몇 달째 생존 중, 무리에 위기가 닥쳤다. 당신의 최종 선택은?", choices: [
+        { text: "다 같이 살 방법을 끝까지 찾아보자고 사람들 설득", scores: { leader: 2 } },
+        { text: "몸으로 부딪혀서라도 무리를 지키고 버팀", scores: { fighter: 2 } },
+        { text: "위험하지만 나 혼자라면 살 수 있는 길을 택함", scores: { traitor: 2, hermit: 1 } },
+        { text: "애초에 무리에 낄 걸 그랬나 후회하며 혼자 헤맴", scores: { hermit: 2 } } ] }
+    ];
+
+    function renderResult(totals, el, api) {
+      var key = Quiz.top(totals, ORDER);
+      var r = TYPES[key];
+      var sum = 0; ORDER.forEach(function (k) { sum += (totals[k] || 0); });
+      sum = sum || 1;
+      var rows = ORDER.map(function (k) { return { k: k, v: totals[k] || 0 }; })
+        .sort(function (a, b) { return b.v - a.v; }).slice(0, 4);
+      var barsHtml = '<div class="type-bars">' + rows.map(function (row) {
+        var pct = Math.round(row.v / sum * 100);
+        return '<div class="type-row"><span class="nm">' + TYPES[row.k].emoji + " " + TYPES[row.k].short +
+          '</span><span class="track"><span class="fill" style="width:' + pct + '%"></span></span>' +
+          '<span class="pct">' + pct + '%</span></div>';
+      }).join("") + "</div>";
+      el.innerHTML =
+        '<span class="result-emoji">' + r.emoji + "</span>" +
+        '<p class="result-name">' + r.name + "</p>" +
+        '<p class="result-desc">' + r.desc + "</p>" + barsHtml +
+        '<div id="card-slot"></div>' +
+        '<div class="result-actions">' +
+        '<button class="btn-primary" id="qz-retry">다시하기</button>' +
+        '<button class="btn-ghost" id="qz-share">링크 복사</button></div>';
+      el.querySelector("#card-slot").appendChild(ShareCard.render({
+        palette: "mint", emoji: r.emoji, badge: "좀비 생존 유형", title: r.name, lines: [r.desc]
+      }));
+      el.querySelector("#qz-retry").onclick = api.restart;
+      el.querySelector("#qz-share").onclick = function () { api.shareLink(el.querySelector("#qz-share")); };
+    }
+
+    Quiz.init(document.getElementById("quiz"), {
+      emoji: "🧟", title: "좀비 아포칼립스 생존 유형",
+      intro: "좀비 사태가 터졌다. 사이렌이 울리고 세상이 뒤집혔다. 이 아수라장에서 너는 어떤 인간이 될까?",
+      feedSrc: "zombie", questions: QUESTIONS, renderResult: renderResult
+    });
+  </script>
+</body>
+</html>
