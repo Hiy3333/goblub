@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>내 안의 연애세포 회의 — goblub</title>
-  <meta name="description" content="내 안의 연애세포들이 회의를 연다 — 우세 세포로 보는 나의 연애 본능" />
+  <title>연애세포 테스트 — goblub</title>
+  <meta name="description" content="10가지 상황으로 보는 나의 연애 세포 — 밀당·직진·집착·모솔·츤데레·헌신" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
@@ -42,7 +42,7 @@
     var ORDER = ["mildang","jikjin","jipchak","mosol","tsundere","heonsin"];
 
     var QUESTIONS = [
-      { q: "썸남에게 카톡이 왔다. 회의실이 술렁인다. 내 손가락은?", choices: [
+      { q: "썸 타는 상대에게 카톡이 왔다. 내 손가락은?", choices: [
         { text: "일부러 30분 뒤에 답장", scores: { mildang: 2 } },
         { text: "1초 컷 '나도 방금 생각했어!'", scores: { jikjin: 2, heonsin: 1 } },
         { text: "답장 열 번 썼다 지웠다", scores: { mosol: 2 } },
@@ -52,7 +52,7 @@
         { text: "쿨하게 내 할 일 함(속은 탐)", scores: { mildang: 1, tsundere: 2 } },
         { text: "'바쁜가 보다' 하고 진짜 잊음", scores: { mosol: 2 } },
         { text: "먼저 재밌는 짤 하나 더 보냄", scores: { jikjin: 2, heonsin: 1 } } ] },
-      { q: "짝사랑 상대와 우연히 엘리베이터 단둘이. 회의 소집!", choices: [
+      { q: "짝사랑 상대와 우연히 엘리베이터에 단둘이. 나는?", choices: [
         { text: "심장 터질 것 같아 층수 버튼만 응시", scores: { mosol: 2 } },
         { text: "괜히 무심한 척 딴 데 봄", scores: { tsundere: 2 } },
         { text: "'저희 어디서 뵀죠?' 먼저 말 걺", scores: { jikjin: 2 } },
@@ -67,27 +67,27 @@
         { text: "몇 시에 끝나는지, 누구랑 있는지 확인 또 확인", scores: { jipchak: 2 } },
         { text: "야식 사다 놓고 기다리는 편", scores: { heonsin: 2 } },
         { text: "나도 내 할 일 하며 신경 안 씀", scores: { mosol: 1, mildang: 1 } } ] },
-      { q: "고백 타이밍, 회의실 분위기가 팽팽하다. 결론은?", choices: [
+      { q: "드디어 고백 타이밍이 왔다. 내 선택은?", choices: [
         { text: "오늘 무조건 끝장 본다", scores: { jikjin: 2 } },
         { text: "분위기 봐서 은근슬쩍 떠보기", scores: { mildang: 2 } },
         { text: "상대가 먼저 고백하게 만들 작전 짬", scores: { tsundere: 2 } },
         { text: "고백 문구만 100번째 수정 중", scores: { mosol: 2 } } ] },
-      { q: "연인의 생일. 회의실 예산 담당 세포가 나선다.", choices: [
+      { q: "연인의 생일이 다가온다. 선물은?", choices: [
         { text: "한 달 월급 갈아 넣어 서프라이즈", scores: { heonsin: 2 } },
         { text: "위시리스트 스크린샷 저장해둔 지 오래", scores: { jipchak: 2 } },
         { text: "적당히 센스 있게, 무리는 안 함", scores: { mildang: 1, jikjin: 1 } },
         { text: "뭘 좋아할지 몰라서 계속 눈치만 봄", scores: { mosol: 2 } } ] },
-      { q: "다툰 다음 날. 화해 담당 세포 투표 결과는?", choices: [
+      { q: "연인과 다툰 다음 날. 나는?", choices: [
         { text: "먼저 전화해서 '미안해' 바로 인정", scores: { jikjin: 2, heonsin: 1 } },
         { text: "속으로는 화해하고 싶은데 입은 '흥'", scores: { tsundere: 2 } },
         { text: "상대 기분 풀릴 때까지 무한 대기", scores: { jipchak: 1, mosol: 1 } },
         { text: "일단 시간을 좀 두고 지켜봄", scores: { mildang: 2 } } ] },
-      { q: "친구가 '너 연애할 때 어떤 스타일이야?'라고 묻는다. 세포들이 답 준비.", choices: [
+      { q: "친구가 '너 연애할 때 어떤 스타일이야?'라고 묻는다. 내 대답은?", choices: [
         { text: "'다 퍼줘야 직성이 풀려'", scores: { heonsin: 2 } },
         { text: "'좋아해도 절대 먼저 표현 안 해'", scores: { tsundere: 2, mildang: 1 } },
         { text: "'꽂히면 그날부터 올인이지'", scores: { jipchak: 2 } },
         { text: "'그게... 나도 잘 몰라. 경험이 없어서'", scores: { mosol: 2 } } ] },
-      { q: "마지막 회의 안건: 이상형이 나타났다. 최우선 행동은?", choices: [
+      { q: "눈앞에 이상형이 나타났다! 최우선 행동은?", choices: [
         { text: "바로 연락처 물어보고 대시", scores: { jikjin: 2 } },
         { text: "일단 친해지고 서서히 다가감", scores: { mildang: 1, heonsin: 1 } },
         { text: "머릿속으로 연애 시나리오만 100개 완성", scores: { mosol: 2 } },
@@ -121,7 +121,7 @@
         '<button class="btn-ghost" id="qz-share">링크 복사</button></div>';
 
       el.querySelector("#card-slot").appendChild(ShareCard.render({
-        palette: "coral", emoji: r.emoji, badge: "연애세포 회의 결과", title: r.name,
+        palette: "coral", emoji: r.emoji, badge: "연애세포 테스트 결과", title: r.name,
         lines: [r.desc, "짝꿍세포: " + CELLS[r.match].name.replace(" 우세형", "")]
       }));
       el.querySelector("#qz-retry").onclick = api.restart;
@@ -129,8 +129,8 @@
     }
 
     Quiz.init(document.getElementById("quiz"), {
-      emoji: "💘", title: "내 안의 연애세포 회의",
-      intro: "당신의 연애를 좌우하는 6개의 세포. 지금부터 회의를 시작합니다. 어떤 세포가 마이크를 잡을까요?",
+      emoji: "💘", title: "연애세포 테스트",
+      intro: "당신의 연애를 좌우하는 6가지 세포. 10가지 상황 속 선택으로 내 안의 우세 세포를 찾아봐요!",
       feedSrc: "love", questions: QUESTIONS, renderResult: renderResult
     });
   </script>

@@ -18,7 +18,7 @@
     today: { label: "📅 오늘의 사주", url: "today.html" },
     gunghap: { label: "💑 우리 궁합", url: "gunghap.html" },
     mbti: { label: "🍞 대환장 MBTI", url: "mbti.html" },
-    love: { label: "💘 연애세포 회의", url: "love-test.html" },
+    love: { label: "💘 연애세포 테스트", url: "love-test.html" },
     stress: { label: "🌋 스트레스 몬스터", url: "stress-test.html" },
     decide: { label: "⚡ 결정의 신", url: "decide.html" },
     tarot: { label: "🃏 오늘의 타로", url: "tarot.html" },
