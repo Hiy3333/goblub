@@ -10,15 +10,26 @@
   <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../css/style.css" />
   <style>
-    .gob-stage { text-align: center; min-height: 96px; }
+    .gob-stage { position: relative; text-align: center; min-height: 96px; }
     .gob-stage .goblub-svg { display: inline-block; }
-    .gob-stage .gb.spit { animation: gb-spit 0.4s ease; }
-    @keyframes gb-spit { 30% { transform: scale(1.12, .9) translateY(3px); } 60% { transform: scale(.92, 1.1) translateY(-4px); } }
+    .gob-stage .gb { display: inline-block; }
+    .gob-stage .gb.spit { animation: gb-spit 0.42s ease; }
+    @keyframes gb-spit { 22% { transform: scale(1.17, .83) translateY(5px); } 55% { transform: scale(.83, 1.19) translateY(-8px); } 100% { transform: scale(1); } }
+    .ppyong { position: absolute; left: 50%; top: 36%; font-size: 1.45rem; font-weight: bold; color: var(--coral);
+      pointer-events: none; opacity: 0; z-index: 4; text-shadow: 0 1px 2px rgba(0,0,0,.15); }
+    .ppyong.go { animation: ppyong 0.7s ease forwards; }
+    @keyframes ppyong { 0% { opacity: 0; transform: translate(-50%,4px) scale(.4) rotate(-10deg); } 30% { opacity: 1; }
+      100% { opacity: 0; transform: translate(-50%,-42px) scale(1.35) rotate(8deg); } }
     .balls { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; align-items: center; margin: 16px 0 6px; min-height: 56px; }
     .ball { width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
       font-size: 1.35rem; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.25); box-shadow: inset -3px -5px 7px rgba(0,0,0,.18), 0 2px 4px rgba(0,0,0,.12); }
-    .ball.pop { animation: ballpop 0.42s cubic-bezier(.2,1.4,.4,1); }
-    @keyframes ballpop { 0% { transform: scale(0) rotate(-40deg); } 100% { transform: scale(1) rotate(0); } }
+    .ball.pop { animation: pop-out 0.5s cubic-bezier(.2,1.7,.35,1); }
+    @keyframes pop-out {
+      0% { transform: translateY(-60px) scale(.2) rotate(-25deg); opacity: 0; }
+      40% { opacity: 1; }
+      62% { transform: translateY(8px) scale(1.3) rotate(10deg); }
+      82% { transform: translateY(-3px) scale(.93) rotate(-5deg); }
+      100% { transform: translateY(0) scale(1) rotate(0); opacity: 1; } }
     .plus { color: var(--ink-soft); font-size: 1.3rem; }
     .bonus-label { display: block; font-size: 0.72rem; color: var(--ink-soft); text-align: center; margin-bottom: 2px; }
     .lines { margin-top: 8px; }
@@ -78,8 +89,7 @@
         for (i = 1; i <= 45; i++) pool.push(i);
         for (i = pool.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = pool[i]; pool[i] = pool[j]; pool[j] = t; }
         var nums = pool.slice(0, 6).sort(function (a, b) { return a - b; });
-        var bonus = pool[6];
-        return { nums: nums, bonus: bonus };
+        return { nums: nums };
       }
       function ballEl(n, cls) {
         var b = document.createElement("span");
@@ -88,7 +98,15 @@
         b.textContent = n;
         return b;
       }
-      function gobSpit() { var g = $("gob"); g.classList.remove("spit"); void g.offsetWidth; g.classList.add("spit"); }
+      function ppyong() {
+        var stage = document.querySelector(".gob-stage");
+        var p = document.createElement("span"); p.className = "ppyong";
+        p.textContent = ["뿅!", "뿅~", "팡!", "뾰옹~"][Math.floor(Math.random() * 4)];
+        p.style.left = (43 + Math.random() * 14) + "%";
+        stage.appendChild(p); void p.offsetWidth; p.classList.add("go");
+        setTimeout(function () { p.remove(); }, 720);
+      }
+      function gobSpit() { var g = $("gob"); g.classList.remove("spit"); void g.offsetWidth; g.classList.add("spit"); ppyong(); }
 
       var busy = false;
       function spitOneByOne() {
@@ -106,17 +124,10 @@
             i++;
             setTimeout(next, 620);
           } else {
-            // 보너스
-            var plus = document.createElement("span"); plus.className = "plus"; plus.textContent = "+"; balls.appendChild(plus);
-            var wrap = document.createElement("span"); wrap.style.textAlign = "center";
-            var bl = document.createElement("span"); bl.className = "bonus-label"; bl.textContent = "보너스";
-            var bcol = document.createElement("span"); bcol.style.display = "inline-flex"; bcol.style.flexDirection = "column"; bcol.style.alignItems = "center";
-            bcol.appendChild(bl); bcol.appendChild(ballEl(g.bonus));
-            gobSpit(); balls.appendChild(bcol);
             $("status").textContent = "🍀 오늘의 행운 번호! (재미로 봐주세요)";
             $("card-slot").appendChild(ShareCard.render({
               palette: "sky", emoji: "🎱", badge: "고블럽 로또 번호",
-              title: g.nums.join("  "), lines: ["보너스 " + g.bonus, "🍀 재미로 뽑은 랜덤 번호예요"]
+              title: g.nums.join("  "), lines: ["🍀 재미로 뽑은 랜덤 번호예요"]
             }));
             if (window.GoblubFeed) GoblubFeed.grant("lotto");
             $("btn-spit").disabled = false; $("btn-auto").disabled = false; busy = false;
