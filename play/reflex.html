@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>고블럽 반응속도 — goblub</title>
+  <meta name="description" content="초록불이 뜨면 최대한 빨리 탭! 페이크·부정출발 함정까지 — 5라운드 평균 기록 도전" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    .rf-hud { display: flex; justify-content: space-around; margin: 6px 0 12px; font-size: 1.05rem; }
+    .rf-hud b { color: var(--coral); font-size: 1.3rem; }
+    .pad { border-radius: 20px; min-height: 260px; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; text-align: center; cursor: pointer; user-select: none;
+      color: #fff; transition: background 0.05s; padding: 20px; }
+    .pad .em { font-size: 4rem; line-height: 1; }
+    .pad .msg { font-size: 1.5rem; margin-top: 10px; font-weight: bold; }
+    .pad .sub { font-size: 0.95rem; margin-top: 6px; opacity: 0.9; }
+    .pad.idle { background: linear-gradient(135deg, var(--purple), var(--sky)); }
+    .pad.wait { background: #e05a5a; }
+    .pad.fake { background: #4d96ff; }
+    .pad.go { background: #4caf50; }
+    .pad.false { background: #38352f; }
+    .pad.result { background: linear-gradient(135deg, #ff9a6b, var(--coral)); }
+    .rounds { display: flex; gap: 6px; justify-content: center; margin: 12px 0 2px; flex-wrap: wrap; }
+    .rd { font-size: 0.8rem; color: var(--ink-soft); background: var(--cream); border-radius: 999px; padding: 3px 9px; }
+    .grade { font-size: 1.5rem; color: var(--coral); }
+  </style>
+</head>
+<body>
+  <div id="site-header"></div>
+  <main>
+    <section class="hero">
+      <h1>⚡ 고블럽 반응속도</h1>
+      <p>🟢 초록불이 뜨면 0.001초라도 빨리 탭! 근데… 함정이 있어요 😈</p>
+    </section>
+
+    <section class="panel">
+      <div class="rf-hud">
+        <span>라운드 <b id="round">0</b>/5</span>
+        <span>이번 <b id="last">-</b></span>
+        <span>최고 평균 <b id="best">-</b></span>
+      </div>
+      <div class="pad idle" id="pad">
+        <span class="em" id="em">⚡</span>
+        <span class="msg" id="msg">탭하면 시작!</span>
+        <span class="sub" id="sub">초록불에만 탭. 파란불·빨간불에 누르면 부정출발!</span>
+      </div>
+      <div class="rounds" id="rounds"></div>
+      <div id="card-slot" style="text-align:center"></div>
+      <p class="fine-print" style="margin-top:12px">🟢만 진짜 신호 · 🔵는 페이크 함정 · 미리 누르면 그 라운드 다시!</p>
+    </section>
+  </main>
+  <div id="site-footer"></div>
+  <script src="../js/common.js" data-root=".."></script>
+  <script src="js/feed.js"></script>
+  <script src="js/sharecard.js"></script>
+  <script>
+    (function () {
+      var $ = function (id) { return document.getElementById(id); };
+      var pad = $("pad");
+      var ROUNDS = 5, BEST_KEY = "goblub_reflex_best";
+      var state = "idle", round = 0, t0 = 0, results = [], timers = [], goTimer = null;
+
+      function best() { try { return +localStorage.getItem(BEST_KEY) || 0; } catch (e) { return 0; } }
+      $("best").textContent = best() ? best() + "ms" : "-";
+
+      function set(s, em, msg, sub) {
+        state = s; pad.className = "pad " + s;
+        if (em != null) $("em").textContent = em;
+        if (msg != null) $("msg").textContent = msg;
+        $("sub").textContent = sub || "";
+      }
+
+      function clearTimers() { timers.forEach(clearTimeout); timers = []; clearTimeout(goTimer); }
+
+      function renderRounds() {
+        $("rounds").innerHTML = results.map(function (m, i) { return '<span class="rd">R' + (i + 1) + " · " + m + "ms</span>"; }).join("");
+      }
+
+      function startGame() {
+        results = []; round = 0; renderRounds(); $("last").textContent = "-";
+        $("card-slot").innerHTML = "";
+        if (window.GoblubFeed) GoblubFeed.grant("reflex");
+        nextRound();
+      }
+
+      function nextRound() {
+        round++; $("round").textContent = round;
+        if (round > ROUNDS) { finish(); return; }
+        armRound();
+      }
+
+      function armRound() {
+        set("wait", "😤", "기다려…", "초록불에만!");
+        clearTimers();
+        var delay = 1100 + Math.random() * 2600;
+        var fakes = Math.random() < 0.65 ? (Math.random() < 0.4 ? 2 : 1) : 0;
+        for (var i = 0; i < fakes; i++) {
+          var ft = 400 + Math.random() * (delay - 750);
+          timers.push(setTimeout(function () { if (state === "wait") { set("fake", "😮", "아직!", ""); timers.push(setTimeout(function () { if (state === "fake") set("wait", "😤", "기다려…", ""); }, 240)); } }, ft));
+        }
+        goTimer = setTimeout(function () { set("go", "😆", "지금!! 탭!", ""); t0 = performance.now(); }, delay);
+      }
+
+      function falseStart() {
+        clearTimers();
+        set("false", "🚫", "부정출발!", "초록불일 때만 눌러요 — 이 라운드 다시!");
+        timers.push(setTimeout(armRound, 950));
+      }
+
+      function hit() {
+        var ms = Math.round(performance.now() - t0);
+        results.push(ms); $("last").textContent = ms + "ms"; renderRounds();
+        set("result", ms < 220 ? "⚡" : ms < 320 ? "😎" : "🐢", ms + "ms!", "");
+        timers.push(setTimeout(nextRound, 950));
+      }
+
+      function gradeOf(avg) {
+        if (avg < 190) return { e: "⚡", n: "신의 반사신경" };
+        if (avg < 230) return { e: "🎮", n: "프로게이머급" };
+        if (avg < 270) return { e: "🔥", n: "상위 1% 순발력" };
+        if (avg < 320) return { e: "😎", n: "제법 빠른 손" };
+        if (avg < 400) return { e: "🙂", n: "평범한 인간계" };
+        return { e: "🐢", n: "느긋한 고블럽" };
+      }
+
+      function finish() {
+        var sum = results.reduce(function (a, b) { return a + b; }, 0);
+        var avg = Math.round(sum / results.length);
+        var b = best(), isBest = !b || avg < b;
+        if (isBest) { try { localStorage.setItem(BEST_KEY, avg); } catch (e) {} $("best").textContent = avg + "ms"; }
+        var g = gradeOf(avg);
+        set("result", g.e, "평균 " + avg + "ms", g.n + (isBest ? " · 🏆 신기록!" : ""));
+        $("round").textContent = "0";
+        state = "idle";
+        $("card-slot").appendChild(ShareCard.render({
+          palette: "purple", emoji: g.e, badge: "고블럽 반응속도", title: "평균 " + avg + "ms",
+          lines: [g.n, "5라운드 " + results.join(" / ") + "ms"]
+        }));
+      }
+
+      pad.addEventListener("pointerdown", function () {
+        if (state === "idle") { startGame(); return; }
+        if (state === "wait" || state === "fake") { falseStart(); return; }
+        if (state === "go") { hit(); return; }
+        // result/false 상태에선 무시(자동 진행)
+      });
+    })();
+  </script>
+</body>
+</html>

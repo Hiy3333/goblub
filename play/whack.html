@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>감정 몬스터 팡팡 — goblub</title>
+  <meta name="description" content="구멍에서 튀어나오는 감정 몬스터를 팡팡! 30초 극악 난이도 점수전 — 고블럽이 냠냠" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    .hud { display: flex; justify-content: space-around; align-items: center; margin: 6px 0 12px; font-size: 1.05rem; }
+    .hud b { font-size: 1.4rem; color: var(--coral); }
+    .hud .combo { color: var(--purple); }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; max-width: 380px; margin: 0 auto; }
+    .hole { position: relative; aspect-ratio: 1/1; background: #efe6d3; border-radius: 18px; overflow: hidden;
+      box-shadow: inset 0 6px 10px rgba(120,100,60,.25); cursor: pointer; user-select: none; }
+    .hole .mon { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+      font-size: 3rem; transform: translateY(105%); transition: transform 0.12s ease; }
+    .hole.up .mon { transform: translateY(0); }
+    .hole.hit { animation: hitflash 0.25s ease; }
+    .hole.bad { animation: badflash 0.3s ease; }
+    @keyframes hitflash { 0% { background: #b6e3b6; } 100% { background: #efe6d3; } }
+    @keyframes badflash { 0%,60% { background: #ffb3b3; } 100% { background: #efe6d3; } }
+    .fx { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; pointer-events: none; opacity: 0; }
+    .fx.go { animation: fx 0.5s ease forwards; }
+    @keyframes fx { 0% { opacity: 1; transform: scale(.6) translateY(0); } 100% { opacity: 0; transform: scale(1.3) translateY(-18px); } }
+    .center { text-align: center; }
+    .big-emoji { font-size: 3.4rem; }
+    .grade { font-size: 1.5rem; color: var(--coral); margin: 6px 0; }
+    .best { color: var(--ink-soft); }
+    #board { position: relative; }
+    #overlay { position: absolute; inset: 0; background: rgba(255,249,236,.94); border-radius: 16px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; z-index: 5; }
+  </style>
+</head>
+<body>
+  <div id="site-header"></div>
+  <main>
+    <section class="hero">
+      <h1>🕳️ 감정 몬스터 팡팡</h1>
+      <p>튀어나오는 몬스터를 탭! 폭탄 💣은 절대 건들지 마 — 30초 극악 점수전</p>
+    </section>
+
+    <section class="panel">
+      <div class="hud">
+        <span>점수 <b id="score">0</b></span>
+        <span>시간 <b id="time">30</b></span>
+        <span class="combo">콤보 <b id="combo" style="color:var(--purple)">0</b></span>
+      </div>
+      <div id="board">
+        <div class="grid" id="grid"></div>
+        <div id="overlay">
+          <span class="big-emoji" id="ov-emoji">🕳️</span>
+          <p class="result-name" id="ov-title">감정 몬스터 팡팡</p>
+          <p class="result-desc" id="ov-desc" style="margin:8px 0 16px">몬스터는 탭, 폭탄 💣은 피하기!<br>속도는 점점 빨라져요. 콤보를 이어가면 점수 폭발 💥</p>
+          <div id="ov-extra"></div>
+          <button class="btn-primary" id="ov-btn">시작!</button>
+        </div>
+      </div>
+      <div id="card-slot" class="center"></div>
+      <p class="fine-print" style="margin-top:14px">몬스터 = 스트레스 · 폭탄 💣 = 감점 · 놓치면 콤보 끊김!</p>
+    </section>
+  </main>
+  <div id="site-footer"></div>
+  <script src="../js/common.js" data-root=".."></script>
+  <script src="js/feed.js"></script>
+  <script src="js/sharecard.js"></script>
+  <script>
+    (function () {
+      var $ = function (id) { return document.getElementById(id); };
+      var MONS = ["🌋", "🌊", "💧", "🍔", "🌵", "🧊", "😡", "😱", "😭", "🤬"];
+      var HOLES = 9, GAME_MS = 30000;
+      var BEST_KEY = "goblub_whack_best";
+
+      var grid = $("grid"), cells = [];
+      for (var i = 0; i < HOLES; i++) {
+        var h = document.createElement("div");
+        h.className = "hole";
+        h.innerHTML = '<span class="mon"></span><span class="fx"></span>';
+        (function (h, idx) { h.addEventListener("pointerdown", function () { whack(idx); }); })(h, i);
+        grid.appendChild(h);
+        cells.push({ el: h, mon: h.querySelector(".mon"), fx: h.querySelector(".fx"), active: false, bomb: false, timer: null });
+      }
+
+      var score = 0, combo = 0, maxCombo = 0, running = false, endAt = 0, spawnTimer = null, tickTimer = null;
+
+      function best() { try { return +localStorage.getItem(BEST_KEY) || 0; } catch (e) { return 0; } }
+
+      function reset() {
+        score = 0; combo = 0; maxCombo = 0;
+        $("score").textContent = "0"; $("combo").textContent = "0"; $("time").textContent = "30";
+        cells.forEach(hide);
+      }
+
+      function hide(c) {
+        c.active = false; c.bomb = false; c.el.classList.remove("up");
+        clearTimeout(c.timer); c.timer = null;
+      }
+
+      function elapsedFrac() { return Math.min(1, (Date.now() - (endAt - GAME_MS)) / GAME_MS); }
+
+      function spawn() {
+        if (!running) return;
+        var f = elapsedFrac();
+        var free = cells.filter(function (c) { return !c.active; });
+        if (free.length) {
+          var c = free[Math.floor(Math.random() * free.length)];
+          var bombChance = 0.14 + f * 0.22;           // 14% → 36%
+          c.bomb = Math.random() < bombChance;
+          c.mon.textContent = c.bomb ? "💣" : MONS[Math.floor(Math.random() * MONS.length)];
+          c.active = true; c.el.classList.add("up");
+          var dur = 820 - f * 500 + Math.random() * 120; // 빠르게 짧아짐 ~320ms
+          c.timer = setTimeout(function () {
+            if (c.active && !c.bomb) { combo = 0; $("combo").textContent = "0"; } // 몬스터 놓침 → 콤보 끊김
+            hide(c);
+          }, dur);
+        }
+        var interval = 640 - f * 340 + Math.random() * 120; // 640ms → 300ms, 후반 동시다발
+        spawnTimer = setTimeout(spawn, interval);
+      }
+
+      function whack(idx) {
+        if (!running) return;
+        var c = cells[idx];
+        if (!c.active) return;
+        if (c.bomb) {
+          score = Math.max(0, score - 40); combo = 0;
+          $("score").textContent = score; $("combo").textContent = "0";
+          c.el.classList.remove("bad"); void c.el.offsetWidth; c.el.classList.add("bad");
+          fx(c, "💥"); hide(c);
+        } else {
+          combo++; if (combo > maxCombo) maxCombo = combo;
+          var gain = 10 + Math.min(combo, 15) * 2;      // 콤보 보너스
+          score += gain;
+          $("score").textContent = score; $("combo").textContent = combo;
+          c.el.classList.remove("hit"); void c.el.offsetWidth; c.el.classList.add("hit");
+          fx(c, combo >= 5 ? "🔥" : "😋"); hide(c);
+        }
+      }
+
+      function fx(c, em) { c.fx.textContent = em; c.fx.classList.remove("go"); void c.fx.offsetWidth; c.fx.classList.add("go"); }
+
+      function gradeOf(s) {
+        if (s >= 1300) return { e: "👑", n: "전설의 대식가 고블럽" };
+        if (s >= 950) return { e: "🔥", n: "고블럽 마스터" };
+        if (s >= 650) return { e: "💪", n: "프로 감정 사냥꾼" };
+        if (s >= 400) return { e: "😎", n: "제법인데? 견습 사냥꾼" };
+        if (s >= 200) return { e: "🌱", n: "새내기 고블럽" };
+        return { e: "🍼", n: "아직 배고픈 아기 고블럽" };
+      }
+
+      function start() {
+        reset();
+        running = true; endAt = Date.now() + GAME_MS;
+        $("overlay").style.display = "none";
+        $("card-slot").innerHTML = "";
+        if (window.GoblubFeed) GoblubFeed.grant("whack");
+        spawn();
+        tickTimer = setInterval(function () {
+          var left = Math.max(0, Math.ceil((endAt - Date.now()) / 1000));
+          $("time").textContent = left;
+          if (Date.now() >= endAt) end();
+        }, 200);
+      }
+
+      function end() {
+        running = false;
+        clearTimeout(spawnTimer); clearInterval(tickTimer);
+        cells.forEach(hide);
+        var b = best(), isBest = score > b;
+        if (isBest) { try { localStorage.setItem(BEST_KEY, score); } catch (e) {} }
+        var g = gradeOf(score);
+        var ov = $("overlay");
+        $("ov-emoji").textContent = g.e;
+        $("ov-title").textContent = "최종 " + score + "점!";
+        $("ov-desc").innerHTML = '<span class="grade">' + g.n + "</span><br>" +
+          "최고 콤보 " + maxCombo + " · 최고 기록 " + (isBest ? score + " 🏆 신기록!" : Math.max(b, score)) + "점";
+        $("ov-btn").textContent = "다시 도전!";
+        $("ov-extra").innerHTML = "";
+        ov.style.display = "flex";
+        $("card-slot").appendChild(ShareCard.render({
+          palette: "coral", emoji: g.e, badge: "감정 몬스터 팡팡", title: score + "점 · " + g.n,
+          lines: ["최고 콤보 " + maxCombo + "연타!", "너의 기록에 도전해봐 🔥"]
+        }));
+      }
+
+      $("ov-btn").onclick = start;
+    })();
+  </script>
+</body>
+</html>
