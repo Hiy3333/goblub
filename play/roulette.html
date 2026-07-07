@@ -4,18 +4,23 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>복불복 룰렛 — goblub</title>
-  <meta name="description" content="벌칙, 점심 메뉴, 청소 당번까지 — 뭐든 룰렛으로 정해버리자" />
+  <meta name="description" content="벌칙, 점심 메뉴, 청소 당번까지 — 빙글빙글 룰렛으로 정해버리자" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../css/style.css" />
   <style>
-    .roul-list { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin:16px 0; }
-    .roul-item { background:var(--cream); border:2px solid transparent; border-radius:12px; padding:10px 16px; font-size:1rem; }
-    .roul-item.hot { background:var(--yellow); border-color:var(--coral); transform:scale(1.08); font-weight:bold; transition:transform .05s; }
-    #items { width:100%; min-height:120px; font-family:inherit; font-size:0.95rem; padding:12px; border:2px solid #e8e2d4; border-radius:12px; resize:vertical; }
+    #items { width:100%; min-height:110px; font-family:inherit; font-size:0.95rem; padding:12px; border:2px solid #e8e2d4; border-radius:12px; resize:vertical; }
     .preset-row { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-bottom:10px; }
     .err-msg { text-align:center; color:var(--coral); font-weight:bold; margin:8px 0; }
+    .wheel-wrap { position:relative; width:320px; max-width:84vw; aspect-ratio:1/1; margin:18px auto 8px; }
+    .wheel-spin { width:100%; height:100%; transition: transform 4.2s cubic-bezier(.15,.86,.28,1); transform-origin:50% 50%; }
+    .wheel-spin svg { width:100%; height:100%; display:block; }
+    .wheel-pointer { position:absolute; top:-4px; left:50%; transform:translateX(-50%); font-size:2rem; z-index:3;
+      color:#38352f; filter:drop-shadow(0 2px 2px rgba(0,0,0,.25)); line-height:1; }
+    .wheel-hub { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:48px; height:48px; border-radius:50%;
+      background:#fff; box-shadow:0 2px 8px rgba(0,0,0,.25); display:flex; align-items:center; justify-content:center; font-size:1.5rem; z-index:2; }
+    .wheel-empty { text-align:center; color:var(--ink-soft); padding:40px 0; }
   </style>
 </head>
 <body>
@@ -23,29 +28,30 @@
   <main>
     <section class="hero">
       <h1>🎡 복불복 룰렛</h1>
-      <p>벌칙, 점심 메뉴, 청소 당번까지 — 뭐든 룰렛으로 정해버리자</p>
+      <p>벌칙, 점심 메뉴, 청소 당번까지 — 빙글빙글 돌려서 정해버리자</p>
     </section>
 
     <section class="panel">
       <h2 style="text-align:center">항목을 정하고 돌려보세요</h2>
-
       <div class="preset-row">
         <button class="btn-ghost" id="preset-1">🍗 벌칙</button>
         <button class="btn-ghost" id="preset-2">🍽 점심 메뉴</button>
         <button class="btn-ghost" id="preset-3">🧹 청소 당번</button>
       </div>
-
       <textarea id="items" placeholder="한 줄에 하나씩 입력하세요 (2~12개)&#10;예)&#10;꿀밤 한 대&#10;애교 부리기&#10;다음 판 사기"></textarea>
-
       <p class="err-msg" id="err" style="display:none"></p>
 
-      <div class="result-actions">
-        <button class="btn-primary" id="btn-spin">🎡 돌리기</button>
+      <div class="wheel-wrap" id="wheel-wrap">
+        <span class="wheel-pointer">▼</span>
+        <div class="wheel-spin" id="wheel-spin"><div class="wheel-empty" id="wheel-empty">항목을 넣고 돌려보세요 🎡</div></div>
+        <span class="wheel-hub">🎯</span>
       </div>
 
-      <div class="roul-list" id="roul-list"></div>
+      <div class="result-actions">
+        <button class="btn-primary" id="btn-spin">🎡 돌리기!</button>
+      </div>
 
-      <div id="result-box" style="display:none; text-align:center; margin-top:12px">
+      <div id="result-box" style="display:none; text-align:center; margin-top:14px">
         <span class="result-emoji">🎯</span>
         <p class="result-name" id="result-name"></p>
         <p class="fine-print" id="result-line"></p>
@@ -58,63 +64,65 @@
   <script>
     (function () {
       var $ = function (id) { return document.getElementById(id); };
+      var SVGNS = "http://www.w3.org/2000/svg";
+      var COLS = ["#ffb3b3", "#ffe79a", "#a9e3af", "#a8c8ff", "#dcbcff", "#ffcaa3",
+        "#9fe0e0", "#f7bcda", "#cfe08f", "#f2a8a8", "#bcd2f2", "#efc9a0"];
 
       var PRESETS = {
-        1: ["꿀밤 한 대", "애교 부리기", "다음 판 사기", "아무 노래 부르기", "물 원샷", "벌칙 면제!", "옆 사람 칭찬하기", "셀카 찍어 단톡방에"],
+        1: ["꿀밤 한 대", "애교 부리기", "다음 판 사기", "아무 노래 부르기", "물 원샷", "벌칙 면제!", "칭찬하기", "셀카 인증"],
         2: ["김밥", "라면", "국밥", "돈까스", "마라탕", "햄버거", "파스타", "아무거나"],
         3: ["설거지", "분리수거", "화장실", "바닥 쓸기", "오늘은 쉼", "걸레질"]
       };
-
-      $("preset-1").onclick = function () { $("items").value = PRESETS[1].join("\n"); };
-      $("preset-2").onclick = function () { $("items").value = PRESETS[2].join("\n"); };
-      $("preset-3").onclick = function () { $("items").value = PRESETS[3].join("\n"); };
+      $("preset-1").onclick = function () { $("items").value = PRESETS[1].join("\n"); build(); };
+      $("preset-2").onclick = function () { $("items").value = PRESETS[2].join("\n"); build(); };
+      $("preset-3").onclick = function () { $("items").value = PRESETS[3].join("\n"); build(); };
+      $("items").addEventListener("input", build);
 
       function readItems() {
-        return $("items").value
-          .split(/\n/)
-          .map(function (s) { return s.trim(); })
-          .filter(function (s) { return s.length > 0; })
-          .slice(0, 12);
+        return $("items").value.split(/\n/).map(function (s) { return s.trim(); })
+          .filter(function (s) { return s.length > 0; }).slice(0, 12);
+      }
+      function showErr(m) { var e = $("err"); e.textContent = m; e.style.display = "block"; }
+      function hideErr() { $("err").style.display = "none"; }
+
+      var cx = 100, cy = 100, r = 96, rotation = 0;
+      function P(a, rad) { var t = a * Math.PI / 180; return [cx + rad * Math.sin(t), cy - rad * Math.cos(t)]; }
+
+      function build() {
+        var items = readItems();
+        var wrap = $("wheel-spin");
+        if (items.length < 2) { wrap.innerHTML = '<div class="wheel-empty" id="wheel-empty">항목을 2개 이상 넣어보세요 🎡</div>'; return null; }
+        var n = items.length, seg = 360 / n;
+        var fs = n > 9 ? 7 : n > 6 ? 8.5 : 10;
+        var svg = document.createElementNS(SVGNS, "svg");
+        svg.setAttribute("viewBox", "0 0 200 200");
+        for (var i = 0; i < n; i++) {
+          var a1 = i * seg, a2 = (i + 1) * seg, p1 = P(a1, r), p2 = P(a2, r);
+          var large = seg > 180 ? 1 : 0;
+          var path = document.createElementNS(SVGNS, "path");
+          path.setAttribute("d", "M" + cx + " " + cy + " L" + p1[0].toFixed(2) + " " + p1[1].toFixed(2) +
+            " A" + r + " " + r + " 0 " + large + " 1 " + p2[0].toFixed(2) + " " + p2[1].toFixed(2) + " Z");
+          path.setAttribute("fill", COLS[i % COLS.length]);
+          path.setAttribute("stroke", "#fff9ec"); path.setAttribute("stroke-width", "1.5");
+          svg.appendChild(path);
+          var am = a1 + seg / 2, lp = P(am, r * 0.62);
+          var label = items[i].length > (n > 8 ? 5 : 8) ? items[i].slice(0, n > 8 ? 5 : 8) + "…" : items[i];
+          var t = document.createElementNS(SVGNS, "text");
+          t.setAttribute("x", lp[0].toFixed(2)); t.setAttribute("y", lp[1].toFixed(2));
+          t.setAttribute("font-size", fs); t.setAttribute("font-family", "Jua, sans-serif");
+          t.setAttribute("fill", "#38352f"); t.setAttribute("text-anchor", "middle");
+          t.setAttribute("dominant-baseline", "middle");
+          var rot = (am > 90 && am < 270) ? am + 180 : am;
+          t.setAttribute("transform", "rotate(" + rot.toFixed(1) + " " + lp[0].toFixed(2) + " " + lp[1].toFixed(2) + ")");
+          t.textContent = label;
+          svg.appendChild(t);
+        }
+        wrap.innerHTML = ""; wrap.appendChild(svg);
+        wrap.style.transform = "rotate(" + rotation + "deg)";
+        return items;
       }
 
-      function showErr(msg) {
-        var e = $("err");
-        e.textContent = msg;
-        e.style.display = "block";
-      }
-
-      function hideErr() {
-        $("err").style.display = "none";
-      }
-
-      function renderList(items) {
-        var list = $("roul-list");
-        list.innerHTML = "";
-        items.forEach(function (text) {
-          var el = document.createElement("div");
-          el.className = "roul-item";
-          el.textContent = text;
-          list.appendChild(el);
-        });
-      }
-
-      function setHot(i) {
-        var nodes = document.querySelectorAll(".roul-item");
-        for (var n = 0; n < nodes.length; n++) nodes[n].classList.remove("hot");
-        if (nodes[i]) nodes[i].classList.add("hot");
-      }
-
-      function hideResult() {
-        $("result-box").style.display = "none";
-      }
-
-      var LINES = [
-        "고블럽의 선택은…!",
-        "운명은 이미 정해졌습니다.",
-        "이의 제기는 받지 않습니다!",
-        "고블럽이 대신 골라줬어요."
-      ];
-
+      var LINES = ["고블럽의 선택은…!", "운명은 이미 정해졌습니다.", "이의 제기는 받지 않습니다!", "짜잔, 이걸로 결정!"];
       function showResult(text) {
         $("result-name").textContent = "🎯 " + text;
         $("result-line").textContent = LINES[Math.floor(Math.random() * LINES.length)];
@@ -122,28 +130,23 @@
       }
 
       function spin() {
-        hideErr();
-        var items = readItems();
-        if (items.length < 2) { showErr("항목을 2개 이상 적어주세요!"); return; }
-        renderList(items);
-        var btn = document.getElementById("btn-spin"); btn.disabled = true;
-        hideResult();
+        hideErr(); $("result-box").style.display = "none";
+        var items = build();
+        if (!items) { showErr("항목을 2개 이상 적어주세요!"); return; }
+        var btn = $("btn-spin"); btn.disabled = true;
         if (window.GoblubFeed) GoblubFeed.grant("roulette");
-        var winner = Math.floor(Math.random() * items.length);
-        var totalSteps = items.length * 4 + winner;
-        var step = 0;
-        function tick() {
-          setHot(step % items.length);
-          step++;
-          if (step > totalSteps) { showResult(items[winner]); btn.disabled = false; return; }
-          var progress = step / totalSteps;
-          var delay = 50 + Math.pow(progress, 3) * 380;
-          setTimeout(tick, delay);
-        }
-        tick();
+        var n = items.length, seg = 360 / n, winner = Math.floor(Math.random() * n);
+        var want = (360 - (winner + 0.5) * seg) % 360;
+        var jitter = (Math.random() - 0.5) * seg * 0.55;   // 살짝 비껴 멈추게(같은 칸 안)
+        var cur = ((rotation % 360) + 360) % 360;
+        var delta = (((want - cur + jitter) % 360) + 360) % 360;
+        rotation += 360 * 6 + delta;                        // 6바퀴+
+        $("wheel-spin").style.transform = "rotate(" + rotation + "deg)";
+        setTimeout(function () { showResult(items[winner]); btn.disabled = false; }, 4300);
       }
 
       $("btn-spin").onclick = spin;
+      build();
     })();
   </script>
 </body>
