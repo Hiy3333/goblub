@@ -27,69 +27,69 @@
   <script src="js/quiz.js"></script>
   <script src="js/sharecard.js"></script>
   <script>
-    var QN = 12; // 문항 수(아래 QUESTIONS와 일치)
+    var QN = 10; // 문항 수(아래 QUESTIONS와 일치). 선택지 s:0~4 = 이성쪽 ~ 동성쪽
 
     var QUESTIONS = [
-      { q:"영화 속 로맨스, 나도 모르게 몰입되는 커플은?", choices:[
-        { text:"A와 B", scores:{ s:0 } },
-        { text:"어느 쪽이든 케미가 좋으면", scores:{ s:2 } },
-        { text:"C와 D", scores:{ s:4 } },
-        { text:"솔직히 로맨스보다 스토리", scores:{ s:2 } } ] },
-      { q:"길을 걷다 나도 모르게 시선이 한 번 더 가는 쪽은?", choices:[
-        { text:"딱 정해진 한쪽", scores:{ s:0 } },
-        { text:"그쪽에 좀 더 기우는 편", scores:{ s:1 } },
-        { text:"반반, 그때그때 달라", scores:{ s:2 } },
-        { text:"반대쪽에 더 기우는 편", scores:{ s:3 } } ] },
-      { q:"친구가 소개팅을 주선해준다면, 가장 먼저 묻고 싶은 건?", choices:[
-        { text:"성격이나 취향 (성별은 이미 정해둔 쪽)", scores:{ s:0 } },
-        { text:"일단 사진부터, 마음이 가면 성별은 안 봄", scores:{ s:2 } },
-        { text:"성격이나 취향 (반대쪽으로)", scores:{ s:4 } },
-        { text:"그냥 재밌는 사람이면 다 좋음", scores:{ s:2 } } ] },
-      { q:"심쿵했던 순간을 떠올려보면, 그 기억 속 상대는?", choices:[
-        { text:"늘 같은 쪽이었던 것 같다", scores:{ s:0 } },
-        { text:"대체로 한쪽이지만 예외도 있었다", scores:{ s:1 } },
-        { text:"양쪽 다 있었다", scores:{ s:2 } },
-        { text:"돌아보니 반대쪽이 더 많았다", scores:{ s:3 } } ] },
-      { q:"연예인 이상형 월드컵, 결승까지 남는 얼굴들은 주로?", choices:[
-        { text:"한 방향으로 쭉 취향이 통일", scores:{ s:0 } },
-        { text:"가끔 낯선 조합이 올라오기도", scores:{ s:1 } },
-        { text:"의외로 폭이 넓어서 나도 놀람", scores:{ s:2 } },
-        { text:"예상 밖의 방향이 자꾸 올라옴", scores:{ s:4 } } ] },
-      { q:"'이 사람과 사귀면 어떨까' 진지하게 그려본 상대는?", choices:[
-        { text:"늘 같은 쪽으로만 그려진다", scores:{ s:0 } },
-        { text:"주로 그쪽이지만 상상은 자유롭게", scores:{ s:1 } },
-        { text:"양쪽 다 자연스럽게 그려진다", scores:{ s:2 } },
-        { text:"요즘은 반대쪽이 더 자주 그려진다", scores:{ s:3 } } ] },
-      { q:"설렘의 스위치가 켜지는 포인트는 주로?", choices:[
-        { text:"정해진 이상형 조건이 뚜렷함", scores:{ s:0 } },
-        { text:"조건보다는 분위기나 케미", scores:{ s:2 } },
-        { text:"사람 자체, 성별은 크게 안 따짐", scores:{ s:2 } },
-        { text:"예상 못한 쪽에서 설렐 때가 많음", scores:{ s:4 } } ] },
-      { q:"단체 사진을 보면 나도 모르게 눈이 먼저 가는 사람은?", choices:[
-        { text:"거의 항상 같은 쪽", scores:{ s:0 } },
-        { text:"대체로 같은 쪽, 가끔 딴 데도", scores:{ s:1 } },
-        { text:"딱히 정해져 있지 않다", scores:{ s:2 } },
-        { text:"오히려 반대쪽에 시선이 자주 감", scores:{ s:3 } } ] },
-      { q:"'만약 그 사람이 반대쪽 성별이었다면?' 하는 상상, 해본 적 있다면?", choices:[
-        { text:"딱히 상상해본 적 없다", scores:{ s:0 } },
-        { text:"장난삼아 한두 번 정도", scores:{ s:1 } },
-        { text:"의외로 자연스럽게 그려진다", scores:{ s:2 } },
-        { text:"오히려 그쪽이 더 편하게 그려진다", scores:{ s:3 } } ] },
-      { q:"연애 상상 속 미래의 짝, 가장 먼저 그려지는 모습은?", choices:[
-        { text:"성별부터 뚜렷하게 정해져 있다", scores:{ s:0 } },
-        { text:"성격이 먼저 그려지고 성별은 나중", scores:{ s:2 } },
-        { text:"딱히 성별을 그려본 적이 없다", scores:{ s:2 } },
-        { text:"오히려 낯선 쪽이 먼저 그려진다", scores:{ s:4 } } ] },
-      { q:"'너는 이런 사람 좋아할 것 같아'라는 친구의 말에 나는?", choices:[
-        { text:"대체로 정확하게 맞힌다", scores:{ s:0 } },
-        { text:"반은 맞고 반은 틀린다", scores:{ s:2 } },
-        { text:"의외로 자주 틀린다, 나도 나를 잘 모름", scores:{ s:2 } },
-        { text:"정반대로 예상해야 오히려 맞는다", scores:{ s:4 } } ] },
-      { q:"오늘 하루, 마음이 자꾸 향하는 방향을 한마디로 표현하면?", choices:[
-        { text:"늘 그렇듯 한쪽으로 또렷하게", scores:{ s:0 } },
-        { text:"한쪽에 가깝지만 마음은 열려 있게", scores:{ s:1 } },
-        { text:"양쪽 다 넓게 열려 있는 기분으로", scores:{ s:2 } },
-        { text:"오늘따라 반대쪽으로 마음이 향하게", scores:{ s:3 } } ] }
+      { q:"지금까지 설레거나 반했던 상대를 떠올리면, 주로 누구였나요?", choices:[
+        { text:"거의 다 이성(다른 성별)이었어요", scores:{ s:0 } },
+        { text:"대부분 이성, 가끔 동성도 있었어요", scores:{ s:1 } },
+        { text:"이성·동성 둘 다 비슷했어요", scores:{ s:2 } },
+        { text:"대부분 동성, 가끔 이성도 있었어요", scores:{ s:3 } },
+        { text:"거의 다 동성(같은 성별)이었어요", scores:{ s:4 } } ] },
+      { q:"길이나 모임에서 '매력 있다' 하고 눈이 한 번 더 가는 사람은?", choices:[
+        { text:"주로 이성", scores:{ s:0 } },
+        { text:"이성이 더 많지만 동성도 가끔", scores:{ s:1 } },
+        { text:"성별과 상관없이, 끌리면 끌려요", scores:{ s:2 } },
+        { text:"동성이 더 많지만 이성도 가끔", scores:{ s:3 } },
+        { text:"주로 동성", scores:{ s:4 } } ] },
+      { q:"데이트나 연애를 상상하면, 옆에 있는 상대는?", choices:[
+        { text:"대부분 이성", scores:{ s:0 } },
+        { text:"주로 이성, 가끔 동성", scores:{ s:1 } },
+        { text:"이성일 때도, 동성일 때도 있어요", scores:{ s:2 } },
+        { text:"주로 동성, 가끔 이성", scores:{ s:3 } },
+        { text:"대부분 동성", scores:{ s:4 } } ] },
+      { q:"로맨스 영화·드라마에서 더 두근거리며 몰입되는 관계는?", choices:[
+        { text:"이성 주인공들의 로맨스", scores:{ s:0 } },
+        { text:"주로 이성 로맨스, 가끔 동성 케미도", scores:{ s:1 } },
+        { text:"이성이든 동성이든 케미만 좋으면 다", scores:{ s:2 } },
+        { text:"주로 동성 케미, 가끔 이성 로맨스도", scores:{ s:3 } },
+        { text:"동성 주인공들의 로맨스", scores:{ s:4 } } ] },
+      { q:"'이 사람 좋다'는 마음이 들 때, 상대의 성별은 주로?", choices:[
+        { text:"늘 이성이에요", scores:{ s:0 } },
+        { text:"보통 이성, 드물게 동성", scores:{ s:1 } },
+        { text:"성별은 별로 중요하지 않아요", scores:{ s:2 } },
+        { text:"보통 동성, 드물게 이성", scores:{ s:3 } },
+        { text:"늘 동성이에요", scores:{ s:4 } } ] },
+      { q:"친구에게 내 이상형을 설명한다면?", choices:[
+        { text:"\"난 이성 중에 이런 사람이 좋아\"", scores:{ s:0 } },
+        { text:"\"주로 이성인데 예외도 있어\"", scores:{ s:1 } },
+        { text:"\"성별보다 사람 자체가 중요해\"", scores:{ s:2 } },
+        { text:"\"주로 동성인데 예외도 있어\"", scores:{ s:3 } },
+        { text:"\"난 동성 중에 이런 사람이 좋아\"", scores:{ s:4 } } ] },
+      { q:"손을 잡거나 가까이 있고 싶은 상대를 떠올리면?", choices:[
+        { text:"주로 이성", scores:{ s:0 } },
+        { text:"이성 쪽이 더 편해요, 가끔 동성도", scores:{ s:1 } },
+        { text:"성별과 상관없이 마음이 통하면", scores:{ s:2 } },
+        { text:"동성 쪽이 더 편해요, 가끔 이성도", scores:{ s:3 } },
+        { text:"주로 동성", scores:{ s:4 } } ] },
+      { q:"'진짜 멋지다/예쁘다, 좋아' 싶은 연예인은 주로?", choices:[
+        { text:"거의 이성", scores:{ s:0 } },
+        { text:"이성이 많지만 동성도", scores:{ s:1 } },
+        { text:"이성·동성 골고루", scores:{ s:2 } },
+        { text:"동성이 많지만 이성도", scores:{ s:3 } },
+        { text:"거의 동성", scores:{ s:4 } } ] },
+      { q:"먼 미래, 평생을 함께할 짝을 그려보면?", choices:[
+        { text:"자연스럽게 이성이 그려져요", scores:{ s:0 } },
+        { text:"주로 이성이지만 마음은 열려 있어요", scores:{ s:1 } },
+        { text:"성별은 따로 정해두지 않았어요", scores:{ s:2 } },
+        { text:"주로 동성이지만 마음은 열려 있어요", scores:{ s:3 } },
+        { text:"자연스럽게 동성이 그려져요", scores:{ s:4 } } ] },
+      { q:"지금 이 순간, 솔직하게 내 마음이 향하는 쪽은?", choices:[
+        { text:"이성 쪽으로 또렷하게", scores:{ s:0 } },
+        { text:"이성 쪽에 가깝게", scores:{ s:1 } },
+        { text:"어느 쪽으로도 열려 있게", scores:{ s:2 } },
+        { text:"동성 쪽에 가깝게", scores:{ s:3 } },
+        { text:"동성 쪽으로 또렷하게", scores:{ s:4 } } ] }
     ];
 
     function spectrumPos(totals){
@@ -129,7 +129,7 @@
 
     Quiz.init(document.getElementById("quiz"), {
       emoji: "🌈", title: "나의 무지개 좌표",
-      intro: "정답도 등급도 없어요. 끌림의 스펙트럼 위, 오늘의 나는 어디쯤일까 — 조용히 나를 비추는 거울이에요.",
+      intro: "누구에게 끌리고 설레는지는 사람마다 무지개처럼 달라요. 정답도, 더 좋고 나쁨도 없어요. 10가지 질문에 편하게 답하면 오늘의 내가 무지개의 어디쯤인지 살짝 비춰드려요.",
       questions: QUESTIONS, renderResult: renderResult
     });
   </script>
