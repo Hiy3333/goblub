@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>고블럽 로또 번호 뱉기 — goblub</title>
+  <meta name="description" content="고블럽이 행운의 로또 번호를 하나씩 뱉어드려요 — 재미로 뽑는 랜덤 번호(당첨 보장 X)" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    .gob-stage { text-align: center; min-height: 96px; }
+    .gob-stage .goblub-svg { display: inline-block; }
+    .gob-stage .gb.spit { animation: gb-spit 0.4s ease; }
+    @keyframes gb-spit { 30% { transform: scale(1.12, .9) translateY(3px); } 60% { transform: scale(.92, 1.1) translateY(-4px); } }
+    .balls { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; align-items: center; margin: 16px 0 6px; min-height: 56px; }
+    .ball { width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-size: 1.35rem; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.25); box-shadow: inset -3px -5px 7px rgba(0,0,0,.18), 0 2px 4px rgba(0,0,0,.12); }
+    .ball.pop { animation: ballpop 0.42s cubic-bezier(.2,1.4,.4,1); }
+    @keyframes ballpop { 0% { transform: scale(0) rotate(-40deg); } 100% { transform: scale(1) rotate(0); } }
+    .plus { color: var(--ink-soft); font-size: 1.3rem; }
+    .bonus-label { display: block; font-size: 0.72rem; color: var(--ink-soft); text-align: center; margin-bottom: 2px; }
+    .lines { margin-top: 8px; }
+    .line-row { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; align-items: center; margin: 8px 0; }
+    .line-row .tag { width: 26px; color: var(--ink-soft); font-size: 0.9rem; }
+    .line-row .ball { width: 40px; height: 40px; font-size: 1.05rem; }
+    .disclaimer { background: var(--cream); border-radius: 12px; padding: 12px 14px; margin-top: 16px;
+      color: var(--ink-soft); font-size: 0.85rem; line-height: 1.6; }
+  </style>
+</head>
+<body>
+  <div id="site-header"></div>
+  <main>
+    <section class="hero">
+      <h1>🎱 고블럽 로또 번호 뱉기</h1>
+      <p>고블럽이 오늘의 행운 번호를 하나씩 뱉어드려요 — 재미로!</p>
+    </section>
+
+    <section class="panel">
+      <div class="gob-stage"><span class="gb" id="gob"></span></div>
+      <div class="balls" id="balls"></div>
+      <p class="fine-print" id="status" style="text-align:center; min-height:1.2em"></p>
+
+      <div class="result-actions">
+        <button class="btn-primary" id="btn-spit">🎱 번호 뱉어줘!</button>
+        <button class="btn-ghost" id="btn-auto">🎰 자동 5줄</button>
+      </div>
+
+      <div id="card-slot" style="text-align:center; margin-top:12px"></div>
+      <div class="lines" id="lines"></div>
+
+      <div class="disclaimer">
+        🎲 재미로 뽑는 <b>랜덤 번호</b>예요. 당첨을 보장하거나 예측하지 않아요.<br>
+        복권 구매는 만 19세 이상 · 과도한 구매는 삼가세요. (공식 복권사와 무관한 재미 콘텐츠)
+      </div>
+    </section>
+  </main>
+  <div id="site-footer"></div>
+  <script src="../js/common.js" data-root=".."></script>
+  <script src="js/goblub-art.js"></script>
+  <script src="js/feed.js"></script>
+  <script src="js/sharecard.js"></script>
+  <script>
+    (function () {
+      var $ = function (id) { return document.getElementById(id); };
+      $("gob").innerHTML = (window.GoblubArt ? GoblubArt.svg(78) : "👾");
+
+      function ballColor(n) {
+        if (n <= 10) return "#fbc400";
+        if (n <= 20) return "#69c8f2";
+        if (n <= 30) return "#ff7272";
+        if (n <= 40) return "#9fa8b0";
+        return "#b0d840";
+      }
+      function pick6() {
+        var pool = [], i;
+        for (i = 1; i <= 45; i++) pool.push(i);
+        for (i = pool.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = pool[i]; pool[i] = pool[j]; pool[j] = t; }
+        var nums = pool.slice(0, 6).sort(function (a, b) { return a - b; });
+        var bonus = pool[6];
+        return { nums: nums, bonus: bonus };
+      }
+      function ballEl(n, cls) {
+        var b = document.createElement("span");
+        b.className = "ball pop" + (cls || "");
+        b.style.background = ballColor(n);
+        b.textContent = n;
+        return b;
+      }
+      function gobSpit() { var g = $("gob"); g.classList.remove("spit"); void g.offsetWidth; g.classList.add("spit"); }
+
+      var busy = false;
+      function spitOneByOne() {
+        if (busy) return; busy = true;
+        $("lines").innerHTML = ""; $("card-slot").innerHTML = "";
+        var balls = $("balls"); balls.innerHTML = "";
+        $("btn-spit").disabled = true; $("btn-auto").disabled = true;
+        $("status").textContent = "고블럽이 우물우물… 🥁";
+        var g = pick6();
+        var i = 0;
+        function next() {
+          if (i < 6) {
+            gobSpit();
+            balls.appendChild(ballEl(g.nums[i]));
+            i++;
+            setTimeout(next, 620);
+          } else {
+            // 보너스
+            var plus = document.createElement("span"); plus.className = "plus"; plus.textContent = "+"; balls.appendChild(plus);
+            var wrap = document.createElement("span"); wrap.style.textAlign = "center";
+            var bl = document.createElement("span"); bl.className = "bonus-label"; bl.textContent = "보너스";
+            var bcol = document.createElement("span"); bcol.style.display = "inline-flex"; bcol.style.flexDirection = "column"; bcol.style.alignItems = "center";
+            bcol.appendChild(bl); bcol.appendChild(ballEl(g.bonus));
+            gobSpit(); balls.appendChild(bcol);
+            $("status").textContent = "🍀 오늘의 행운 번호! (재미로 봐주세요)";
+            $("card-slot").appendChild(ShareCard.render({
+              palette: "sky", emoji: "🎱", badge: "고블럽 로또 번호",
+              title: g.nums.join("  "), lines: ["보너스 " + g.bonus, "🍀 재미로 뽑은 랜덤 번호예요"]
+            }));
+            if (window.GoblubFeed) GoblubFeed.grant("lotto");
+            $("btn-spit").disabled = false; $("btn-auto").disabled = false; busy = false;
+          }
+        }
+        next();
+      }
+
+      function auto5() {
+        if (busy) return;
+        $("balls").innerHTML = ""; $("card-slot").innerHTML = ""; $("status").textContent = "🎰 고블럽이 5줄 몰아서 뱉었어요!";
+        gobSpit();
+        var lines = $("lines"); lines.innerHTML = "";
+        var tags = ["A", "B", "C", "D", "E"];
+        for (var r = 0; r < 5; r++) {
+          var g = pick6();
+          var row = document.createElement("div"); row.className = "line-row";
+          var tag = document.createElement("span"); tag.className = "tag"; tag.textContent = tags[r]; row.appendChild(tag);
+          g.nums.forEach(function (n) { row.appendChild(ballEl(n)); });
+          lines.appendChild(row);
+        }
+        if (window.GoblubFeed) GoblubFeed.grant("lotto");
+      }
+
+      $("btn-spit").onclick = spitOneByOne;
+      $("btn-auto").onclick = auto5;
+    })();
+  </script>
+</body>
+</html>

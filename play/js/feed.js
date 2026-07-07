@@ -33,7 +33,8 @@
     questions: { label: "🎴 질문 카드", url: "questions.html" },
     naming: { label: "📛 네이밍 생성기", url: "naming.html" },
     whack: { label: "🕳️ 감정 몬스터 팡팡", url: "whack.html" },
-    reflex: { label: "⚡ 고블럽 반응속도", url: "reflex.html" }
+    reflex: { label: "⚡ 고블럽 반응속도", url: "reflex.html" },
+    lotto: { label: "🎱 고블럽 로또 번호", url: "lotto.html" }
   };
 
   function load() {
