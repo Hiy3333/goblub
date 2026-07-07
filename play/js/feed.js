@@ -25,6 +25,7 @@
     foodtype: { label: "🍜 음식형 인간", url: "foodtype.html" },
     decide: { label: "⚡ 결정의 신", url: "decide.html" },
     tarot: { label: "🃏 오늘의 타로", url: "tarot.html" },
+    cookie: { label: "🥠 오늘의 포춘쿠키", url: "cookie.html" },
     letter: { label: "💌 마음 배달", url: "letter.html" },
     pastlife: { label: "🔮 전생 파티", url: "pastlife.html" },
     balance: { label: "⚖️ 밸런스 게임", url: "balance.html" }

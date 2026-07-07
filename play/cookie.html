@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>오늘의 고블럽 포춘쿠키 — goblub</title>
+  <meta name="description" content="하루 한 번, 쿠키를 톡 깨서 받는 고블럽의 응원 한 줄과 오늘의 럭키" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    .cookie-stage { text-align: center; padding: 10px 0 4px; }
+    .cookie { font-size: 6.4rem; line-height: 1.1; cursor: pointer; display: inline-block; transition: transform 0.18s; }
+    .cookie:hover { transform: scale(1.08) rotate(-4deg); }
+    .cookie.crack { animation: cookie-crack 0.6s ease forwards; pointer-events: none; }
+    @keyframes cookie-crack {
+      0% { transform: rotate(0); } 18% { transform: rotate(-9deg) scale(1.04); }
+      38% { transform: rotate(9deg) scale(1.12); } 58% { transform: rotate(-7deg) scale(1.08); }
+      100% { transform: scale(0.2) rotate(6deg); opacity: 0; } }
+    .crack-hint { color: var(--ink-soft); margin-top: 8px; }
+    .crumb { position: absolute; font-size: 1.2rem; opacity: 0; pointer-events: none; }
+    .crumb.go { animation: crumb 0.7s ease forwards; }
+    @keyframes crumb { 0% { opacity: 1; transform: translate(0,0) scale(1); } 100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(0.4); } }
+    .slip { max-width: 440px; margin: 6px auto 0; background: #fffdf6; border: 2px dashed #e0d6bf; border-radius: 16px; padding: 24px 22px; opacity: 0; }
+    .slip.show { opacity: 1; animation: slip-in 0.5s ease; }
+    @keyframes slip-in { from { transform: translateY(14px) scale(0.96); } to { transform: none; } }
+    .fortune { font-size: 1.2rem; line-height: 1.7; color: var(--ink); }
+    .lucky { margin-top: 14px; color: var(--ink-soft); font-size: 0.95rem; line-height: 1.7; }
+    @media (prefers-reduced-motion: reduce) { .cookie.crack, .slip.show, .crumb.go { animation-duration: 0.01s !important; } }
+  </style>
+</head>
+<body>
+  <div id="site-header"></div>
+  <main>
+    <section class="hero">
+      <h1>🥠 오늘의 고블럽 포춘쿠키</h1>
+      <p>하루 한 번, 쿠키를 톡 깨서 오늘의 한 줄을 받아가세요</p>
+    </section>
+
+    <section class="panel">
+      <div class="cookie-stage" id="stage">
+        <span class="cookie" id="cookie" role="button" tabindex="0" aria-label="포춘쿠키 깨기">🥠</span>
+        <p class="crack-hint" id="hint">쿠키를 톡! 눌러 깨보세요</p>
+      </div>
+      <div class="slip" id="slip">
+        <p class="fortune" id="fortune"></p>
+        <p class="lucky" id="lucky"></p>
+      </div>
+      <div id="card-slot"></div>
+      <div class="result-actions" id="actions" style="display:none">
+        <a class="btn-ghost" href="fortune.html">🔮 운세 더 보기</a>
+        <a class="btn-ghost" href="../index.html">🎡 다른 즐길거리</a>
+      </div>
+      <p class="fine-print" id="again" style="display:none; margin-top:14px">쿠키는 하루에 하나 — 내일 또 만나요 🍪</p>
+    </section>
+  </main>
+  <div id="site-footer"></div>
+  <script src="../js/common.js" data-root=".."></script>
+  <script src="js/feed.js"></script>
+  <script src="js/sharecard.js"></script>
+  <script>
+    (function () {
+      var $ = function (id) { return document.getElementById(id); };
+
+      var FORTUNES = [
+        "오늘 당신에게 좋은 일이 슬금슬금 다가오고 있어요. 뒤돌아보지 말고 그냥 받으세요.",
+        "참았던 한숨은 나한테 주고, 대신 이 말 가져가요 — 당신 생각보다 훨씬 잘하고 있어.",
+        "오늘의 실수는 내일의 안주거리. 크게 웃고 넘겨버려요.",
+        "미뤄둔 그거, 딱 5분만 손대보세요. 시작이 반이고 나머지 반은 고블럽이 응원할게요.",
+        "지나가던 행운이 당신 어깨를 톡 쳤어요. 오늘은 용기 내도 되는 날.",
+        "별거 아닌 하루 같아도, 당신이 버텨줘서 세상이 굴러가요. 진짜로.",
+        "오늘 만나는 사람 중 한 명이 당신을 웃게 할 거예요. 안테나 세워두기!",
+        "냠— 방금 당신의 걱정 한 입 먹었어요. 조금 가벼워졌죠?",
+        "하고 싶은 말이 있다면 오늘 하세요. 타이밍의 신이 당신 편이에요.",
+        "커피 한 잔의 여유가 오늘의 슈퍼파워. 꼭 챙겨 마셔요.",
+        "완벽하지 않아도 괜찮아요. 90%면 세상은 이미 잘 돌아가요.",
+        "오늘 당신의 미소가 누군가의 하루를 구합니다. 아끼지 말고 팍팍 쓰세요.",
+        "작은 결정 하나가 큰 흐름을 바꿔요. 오늘은 마음 가는 대로 골라봐요.",
+        "지금 힘든 건 당신이 약해서가 아니라 큰 걸 들고 있어서예요. 잠깐 내려놔도 돼요.",
+        "오늘 예상치 못한 곳에서 반가운 소식이 올 수도. 알림 잘 확인해봐요.",
+        "하늘 한 번 올려다보세요. 그거 하나로 기분 3도 상승 보장.",
+        "준비한 만큼 딱 그만큼 티가 나는 하루. 자신감 장착!",
+        "오늘의 귀찮음을 내일의 나에게 미루지 마세요. 미래의 당신이 고마워할 거예요.",
+        "좋아하는 노래 한 곡이 오늘의 부적. 이어폰 챙기기.",
+        "누군가 당신을 몰래 응원하고 있어요. (사실 그거 나 고블럽임)",
+        "안 될 것 같던 일이 슬쩍 풀리는 날. 한 번 더 시도해봐요.",
+        "배고프면 판단력 떨어져요. 일단 뭐라도 드세요. 그게 오늘의 운세.",
+        "당신의 다정함은 낭비가 아니에요. 언젠가 다 돌아옵니다.",
+        "오늘 딱 하나만 정리해보세요. 책상이든 마음이든. 개운함이 따라와요.",
+        "지금 이 순간을 견디는 당신, 이미 절반은 이긴 거예요.",
+        "웃긴 짤 하나 저장하면 하루가 든든해집니다. 밈은 힘이에요.",
+        "망설이던 그 연락, 상대도 기다리고 있을지 몰라요. 톡 하나 보내볼까요?",
+        "오늘의 나는 어제의 나보다 확실히 성장했어요. 눈에 안 보여도 진짜예요.",
+        "계획대로 안 돼도 괜찮아요. 즉흥이 더 좋은 이야기를 만들기도 하니까.",
+        "물 한 잔 마시고 심호흡 세 번. 그게 오늘 당신을 지키는 마법 주문.",
+        "필요한 건 더 많은 노력이 아니라 조금의 쉼일지도 몰라요.",
+        "지나간 일에 미련 두지 마요. 냠— 그 후회도 내가 먹어줄게요.",
+        "오늘 만나는 초록불처럼, 당신 앞길에도 신호가 잘 맞을 거예요.",
+        "자책은 그만. 당신은 최선을 다했고, 그거면 충분해요.",
+        "오늘 건넨 따뜻한 말 한마디가 부메랑처럼 돌아옵니다.",
+        "큰 그림은 나중에. 오늘은 눈앞의 작은 일부터 하나씩.",
+        "당신의 취향은 이상한 게 아니라 특별한 거예요. 당당하게!",
+        "오늘 살짝 게을러도 돼요. 배터리 충전도 실력이에요.",
+        "예상 밖의 칭찬을 듣게 될지도. 겸손 떨지 말고 감사히 받아요.",
+        "오늘 하루도 무사히. 그거면 이미 대성공이에요. 수고했어요, 진짜로."
+      ];
+      var COLORS = ["코랄 핑크", "민트", "레몬 옐로우", "하늘색", "라벤더", "크림", "올리브 그린", "피치", "체리 레드", "인디고"];
+      var ITEMS = ["따뜻한 아메리카노", "이어폰", "작은 초콜릿", "포스트잇", "좋아하는 짤", "텀블러", "반짝이 스티커", "10분 산책", "달콤한 젤리", "귀여운 볼펜"];
+
+      function hash(s) { var h = 5381; for (var i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0; return h >>> 0; }
+      var d = new Date();
+      var dstr = "" + d.getFullYear() + ("0" + (d.getMonth() + 1)).slice(-2) + ("0" + d.getDate()).slice(-2);
+      var dk = "goblub_cookie_" + dstr;
+      var seed = hash(dstr);
+      var fortune = FORTUNES[seed % FORTUNES.length];
+      var color = COLORS[Math.floor(seed / 7) % COLORS.length];
+      var item = ITEMS[Math.floor(seed / 13) % ITEMS.length];
+      var num = (seed % 45) + 1;
+
+      function crumbs() {
+        var stage = $("stage");
+        for (var i = 0; i < 7; i++) {
+          var c = document.createElement("span");
+          c.className = "crumb"; c.textContent = "🍪";
+          c.style.left = (46 + Math.random() * 8) + "%"; c.style.top = "42px";
+          c.style.setProperty("--dx", (Math.random() * 160 - 80) + "px");
+          c.style.setProperty("--dy", (Math.random() * 90 + 20) + "px");
+          stage.appendChild(c);
+          (function (c) { setTimeout(function () { c.classList.add("go"); }, 120); setTimeout(function () { c.remove(); }, 1000); })(c);
+        }
+      }
+
+      function reveal() {
+        $("cookie").style.display = "none";
+        $("fortune").textContent = "🥠 " + fortune;
+        $("lucky").innerHTML = "🍀 오늘의 럭키 컬러 <b>" + color + "</b> · 럭키 넘버 <b>" + num + "</b> · 럭키템 <b>" + item + "</b>";
+        $("slip").classList.add("show");
+        $("actions").style.display = "flex";
+        $("again").style.display = "block";
+        if (!$("card-slot").childNodes.length) {
+          $("card-slot").appendChild(ShareCard.render({
+            palette: "yellow", emoji: "🥠", badge: "오늘의 고블럽 포춘쿠키",
+            title: "오늘의 한 줄", lines: [fortune, "🍀 " + color + " · " + num + " · " + item]
+          }));
+        }
+      }
+
+      var opened = false;
+      try { opened = !!localStorage.getItem(dk); } catch (e) {}
+
+      if (opened) {
+        $("hint").style.display = "none";
+        reveal();
+      } else {
+        function crack() {
+          if ($("cookie").classList.contains("crack")) return;
+          try { localStorage.setItem(dk, "1"); } catch (e) {}
+          if (window.GoblubFeed) GoblubFeed.grant("cookie");
+          $("hint").style.display = "none";
+          $("cookie").classList.add("crack");
+          crumbs();
+          setTimeout(reveal, 600);
+        }
+        $("cookie").onclick = crack;
+        $("cookie").onkeydown = function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); crack(); } };
+      }
+    })();
+  </script>
+</body>
+</html>
