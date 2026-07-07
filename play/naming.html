@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>고블럽 작명소 — goblub</title>
+  <meta name="description" content="게임 닉네임·펫 이름·가게 이름·태명까지 — 고블럽이 센스있게 지어드려요" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    .cat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+    .cat-tile { background: var(--cream); border: 2px solid transparent; border-radius: 14px;
+      padding: 16px 10px; text-align: center; cursor: pointer; font-family: inherit; font-size: 1rem; color: var(--ink); }
+    .cat-tile .em { font-size: 1.9rem; display: block; margin-bottom: 4px; }
+    .cat-tile.sel { border-color: var(--purple); background: #f4edff; }
+    .kw-input { width: 100%; font-family: inherit; font-size: 0.95rem; padding: 12px 14px;
+      border: 2px solid #e8e2d4; border-radius: 12px; color: var(--ink); margin-bottom: 12px; }
+    #name-out { display: none; white-space: pre-wrap; line-height: 1.9; margin-top: 14px;
+      background: var(--cream); border-radius: 14px; padding: 18px; }
+  </style>
+</head>
+<body>
+  <div id="site-header"></div>
+  <main>
+    <section class="hero">
+      <h1>📛 고블럽 작명소</h1>
+      <p>이름 짓기 어렵죠? 고블럽이 센스있게 여러 개 뽑아드려요</p>
+    </section>
+
+    <section class="panel">
+      <h2>뭐 이름을 지을까요?</h2>
+      <div class="cat-grid" id="cat-grid"></div>
+      <input type="text" class="kw-input" id="kw" maxlength="100" placeholder="키워드·분위기 (선택 — 예: 귀엽게, 고양이, 힙한, 커피)" />
+      <div class="result-actions" style="margin-top:4px">
+        <button class="btn-primary" id="btn-go">✨ 이름 지어줘</button>
+      </div>
+      <p class="fine-print" id="status" style="display:none; margin-top:10px"></p>
+      <div id="name-out"></div>
+    </section>
+
+    <p class="fine-print">이름은 참고용이에요 — 마음에 드는 걸 골라 쓰세요 🙂</p>
+  </main>
+  <div id="site-footer"></div>
+  <script src="../js/common.js" data-root=".."></script>
+  <script src="js/feed.js"></script>
+  <script src="js/dosa.js"></script>
+  <script>
+    (function () {
+      var $ = function (id) { return document.getElementById(id); };
+      var CATS = [
+        { k: "nickname", em: "🎮", t: "게임·SNS 닉네임" },
+        { k: "pet", em: "🐾", t: "반려동물 이름" },
+        { k: "shop", em: "🏪", t: "가게·브랜드" },
+        { k: "baby", em: "🍼", t: "태명" },
+        { k: "character", em: "🗡️", t: "캐릭터 이름" }
+      ];
+      var chosen = "nickname";
+      var grid = $("cat-grid");
+      CATS.forEach(function (c) {
+        var b = document.createElement("button");
+        b.className = "cat-tile" + (c.k === chosen ? " sel" : "");
+        b.innerHTML = '<span class="em">' + c.em + "</span>" + c.t;
+        b.onclick = function () {
+          chosen = c.k;
+          grid.querySelectorAll(".cat-tile").forEach(function (x) { x.classList.remove("sel"); });
+          b.classList.add("sel");
+        };
+        grid.appendChild(b);
+      });
+
+      $("btn-go").onclick = function () {
+        var btn = $("btn-go"), out = $("name-out"), st = $("status");
+        btn.disabled = true;
+        st.style.display = "block";
+        st.textContent = "🐙 고블럽이 이름을 궁리하는 중…";
+        out.style.display = "block";
+        out.textContent = "";
+        Dosa.fetchAI("/api/naming", { naming: { category: chosen, keywords: $("kw").value.trim() } }, "goblub_name_", {
+          onChunk: function (t) { out.textContent += t; },
+          onDone: function (fromCache) {
+            st.textContent = fromCache ? "🐙 (지난번에 지어준 이름이에요)" : "🐙 짜잔! 맘에 드는 게 있나요?";
+            btn.disabled = false;
+            if (!fromCache && window.GoblubFeed) GoblubFeed.grant("naming");
+          },
+          onError: function (code, sec) {
+            out.style.display = "none";
+            st.textContent =
+              code === "not_configured" ? "작명가가 아직 수련 중이에요. 곧 찾아옵니다!" :
+              code === "cooldown" ? "고블럽이 숨 고르는 중… " + sec + "초 후에 다시 눌러주세요!" :
+              "지금 손님이 많아요. 잠시 후 다시 시도해 주세요.";
+            btn.disabled = false;
+          }
+        });
+      };
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>우리 사이 질문 카드 — goblub</title>
+  <meta name="description" content="커플, 친구, 진실게임까지 — 랜덤 질문 카드로 대화를 시작해보세요" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    .cat-tabs { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 20px; }
+    .cat-tab {
+      font-family: inherit; font-size: 0.95rem; padding: 10px 16px; border-radius: 999px;
+      border: 2px solid #e8e2d4; background: var(--cream); color: var(--ink-soft); cursor: pointer;
+      transition: border-color 0.15s, color 0.15s, background 0.15s;
+    }
+    .cat-tab:hover { border-color: var(--coral); }
+    .cat-tab.active {
+      background: var(--coral); border-color: var(--coral); color: #fff; font-weight: bold;
+    }
+
+    .card-stage { perspective: 1000px; margin: 8px 0 22px; }
+    .q-card {
+      background: var(--cream); border-radius: 20px; padding: 46px 26px;
+      min-height: 180px; display: flex; align-items: center; justify-content: center;
+      text-align: center; box-shadow: 0 4px 0 rgba(56, 53, 47, 0.08);
+    }
+    .q-card p {
+      font-size: 1.35rem; line-height: 1.6; color: var(--ink); font-weight: bold; margin: 0;
+    }
+    .q-card.flip { animation: cardFlip 0.5s ease; }
+    @keyframes cardFlip {
+      0% { transform: rotateY(0deg) scale(1); opacity: 1; }
+      45% { transform: rotateY(90deg) scale(0.92); opacity: 0.3; }
+      55% { transform: rotateY(90deg) scale(0.92); opacity: 0.3; }
+      100% { transform: rotateY(0deg) scale(1); opacity: 1; }
+    }
+
+    .q-meta { text-align: center; color: var(--ink-soft); font-size: 0.85rem; margin-bottom: 14px; }
+  </style>
+</head>
+<body>
+  <div id="site-header"></div>
+  <main>
+    <section class="hero">
+      <h1>🎴 우리 사이 질문 카드</h1>
+      <p>커플, 친구, 진실게임까지 — 카드 한 장으로 대화를 열어보세요</p>
+    </section>
+
+    <section class="panel">
+      <div class="cat-tabs" id="cat-tabs">
+        <button class="cat-tab active" data-cat="couple">💑 커플</button>
+        <button class="cat-tab" data-cat="friend">🤝 친구</button>
+        <button class="cat-tab" data-cat="random">🎲 랜덤</button>
+        <button class="cat-tab" data-cat="truth">🔥 진실게임</button>
+      </div>
+
+      <p class="q-meta" id="q-meta">💑 커플 카드</p>
+
+      <div class="card-stage">
+        <div class="q-card" id="q-card">
+          <p id="q-text">버튼을 눌러 질문을 뽑아보세요!</p>
+        </div>
+      </div>
+
+      <div class="result-actions">
+        <button class="btn-primary" id="btn-draw">🎴 다음 질문</button>
+        <a class="btn-ghost" href="../index.html">🎡 다른 즐길거리 보기</a>
+      </div>
+    </section>
+
+    <p class="fine-print">답하기 싫은 질문은 패스해도 괜찮아요. 즐겁게, 편하게! 🙂</p>
+  </main>
+  <div id="site-footer"></div>
+  <script src="../js/common.js" data-root=".."></script>
+  <script src="js/feed.js"></script>
+  <script>
+    (function () {
+      var $ = function (id) { return document.getElementById(id); };
+
+      var QUESTIONS = {
+        couple: [
+          "나의 어떤 점에 처음 반했어?",
+          "우리가 처음 만난 날, 기억나는 순간은?",
+          "나랑 있을 때 제일 편안했던 순간은 언제야?",
+          "나한테 아직 못한 말이 있다면?",
+          "우리 커플만의 특별한 습관이 있다면 뭐야?",
+          "십 년 뒤 우리 모습을 상상하면 어떤 장면이 떠올라?",
+          "내가 힘들어할 때 어떻게 위로해주고 싶어?",
+          "우리가 함께 가보고 싶은 여행지는 어디야?",
+          "나랑 싸웠을 때 제일 서운했던 순간은?",
+          "내 첫인상이랑 지금 느낌이 많이 달라?",
+          "나한테 고맙다고 느꼈던 순간이 있다면?",
+          "우리 관계에서 가장 소중하게 지키고 싶은 건 뭐야?",
+          "나랑 있을 때 가장 웃겼던 순간은 언제야?",
+          "함께 이루고 싶은 목표가 있다면?",
+          "내가 어떤 행동을 할 때 제일 사랑스러워?",
+          "나에게 서운했던 점이 있다면 솔직히 말해줄래?",
+          "우리 처음 손 잡았던 순간 기억나?",
+          "나랑 사귀면서 제일 놀랐던 점은 뭐야?",
+          "이상형에 나는 몇 점 정도 부합해?",
+          "우리만 아는 비밀 하나 만들어볼까?",
+          "내가 더 잘했으면 하는 부분이 있어?",
+          "지금 이 순간 나한테 하고 싶은 말은?",
+          "우리 첫 데이트에서 제일 좋았던 기억은?",
+          "나랑 결혼한다면 어떤 모습일 것 같아?",
+          "내 이름을 부를 때 어떤 기분이 들어?",
+          "나랑 함께한 시간 중 가장 행복했던 하루는?"
+        ],
+        friend: [
+          "나 처음 봤을 때 첫인상 솔직히 어땠어?",
+          "우리가 친해지게 된 결정적인 계기는 뭐였을까?",
+          "나랑 있을 때랑 다른 사람이랑 있을 때랑 내가 달라 보여?",
+          "내가 제일 의지가 됐던 순간이 있다면?",
+          "우리 둘이 겪은 제일 웃긴 사건은 뭐야?",
+          "나한테 서운했던 적 있으면 지금 말해도 돼",
+          "나의 장점 세 가지만 꼽아본다면?",
+          "같이 여행 간다면 어디로 가고 싶어?",
+          "나랑 있으면 편한 이유가 뭐라고 생각해?",
+          "우리 우정에서 제일 소중한 순간은 언제였어?",
+          "내가 바뀌었으면 하는 습관이 있다면?",
+          "나 몰래 놀랐던 내 모습 있어?",
+          "우리 처음 만난 장소 기억나?",
+          "나랑 다시 태어나도 친구할 거야?",
+          "내가 힘들어 보일 때 어떻게 알아채?",
+          "우리끼리만 아는 별명이나 인 있는 얘기 있어?",
+          "나한테 고맙다고 느꼈던 순간이 있다면?",
+          "친구로서 내가 부족한 부분이 있다면?",
+          "같이 하고 싶은 버킷리스트 하나만 말해줘",
+          "나랑 절교할 뻔했던 순간 있었어?",
+          "내 연애 스타일 보면서 어떤 생각 들어?",
+          "우리 관계를 한 단어로 표현한다면?",
+          "나 없이 심심했던 적 있어?",
+          "나랑 있을 때 제일 편했던 순간이 언제야?",
+          "10년 후에도 이렇게 연락하고 지낼 것 같아?",
+          "지금 나한테 궁금한 거 하나 물어봐도 돼"
+        ],
+        truth: [
+          "최근에 몰래 스토킹한 인스타 계정 있어?",
+          "지금 이 자리에서 제일 눈치 보이는 사람은?",
+          "최근에 거짓말했던 일 하나만 말해줘",
+          "핸드폰 최근 검색어 하나 공개할 수 있어?",
+          "짝사랑했던 사람 중 제일 오래간 사람은?",
+          "여기 있는 사람 중 이상형에 가장 가까운 사람은?",
+          "제일 최근에 누군가한테 서운했던 순간은?",
+          "몰래 좋아했던 친구의 친구 있었어?",
+          "자다가 이불킥한 흑역사 하나만 공개해줘",
+          "최근 한 달 안에 가장 크게 후회한 선택은?",
+          "여기서 누구랑 하루 바꿔 살아보고 싶어?",
+          "짝사랑 고백했다가 차인 적 있어?",
+          "누군가를 질투했던 적, 최근에 있었어?",
+          "SNS에 올렸다가 지운 게시물 있어?",
+          "제일 오래 짝사랑한 기간은 얼마나 돼?",
+          "여기 있는 사람 중 소개팅 시켜주고 싶은 사람은?",
+          "최근에 제일 부러웠던 사람은 누구야?",
+          "몰래 팔로우 끊었다가 다시 한 계정 있어?",
+          "여기서 제일 먼저 연애할 것 같은 사람은?",
+          "핸드폰 사진첩 맨 마지막 사진은 뭐야?",
+          "가장 최근에 설렜던 순간은 언제야?",
+          "누군가한테 답장 늦게 해서 미안했던 적 있어?",
+          "여기 있는 사람 중 가장 재밌는 사람은?",
+          "최근에 홧김에 산 물건 있어?",
+          "썸 타다가 흐지부지된 적 있어?",
+          "지금 이 순간 가장 생각나는 사람은 누구야?"
+        ]
+      };
+
+      var cat = "couple";
+      var lastQ = null;
+      var granted = false;
+
+      function pool() {
+        return cat === "random"
+          ? QUESTIONS.couple.concat(QUESTIONS.friend, QUESTIONS.truth)
+          : QUESTIONS[cat];
+      }
+
+      var META = {
+        couple: "💑 커플 카드",
+        friend: "🤝 친구 카드",
+        random: "🎲 랜덤 카드",
+        truth: "🔥 진실게임 카드"
+      };
+
+      function draw() {
+        var arr = pool();
+        if (!arr.length) return;
+        var n;
+        do {
+          n = Math.floor(Math.random() * arr.length);
+        } while (arr.length > 1 && arr[n] === lastQ);
+        lastQ = arr[n];
+
+        var card = $("q-card");
+        card.classList.remove("flip");
+        // 강제 리플로우로 애니메이션 재실행
+        void card.offsetWidth;
+        card.classList.add("flip");
+        $("q-text").textContent = lastQ;
+
+        if (window.GoblubFeed && !granted) {
+          GoblubFeed.grant("questions");
+          granted = true;
+        }
+      }
+
+      $("btn-draw").onclick = draw;
+
+      var tabs = document.querySelectorAll(".cat-tab");
+      for (var i = 0; i < tabs.length; i++) {
+        tabs[i].onclick = function () {
+          for (var j = 0; j < tabs.length; j++) tabs[j].classList.remove("active");
+          this.classList.add("active");
+          cat = this.getAttribute("data-cat");
+          $("q-meta").textContent = META[cat];
+          lastQ = null;
+          draw();
+        };
+      }
+    })();
+  </script>
+</body>
+</html>

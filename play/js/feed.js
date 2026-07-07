@@ -28,7 +28,10 @@
     cookie: { label: "🥠 오늘의 포춘쿠키", url: "cookie.html" },
     letter: { label: "💌 마음 배달", url: "letter.html" },
     pastlife: { label: "🔮 전생 파티", url: "pastlife.html" },
-    balance: { label: "⚖️ 밸런스 게임", url: "balance.html" }
+    balance: { label: "⚖️ 밸런스 게임", url: "balance.html" },
+    roulette: { label: "🎡 복불복 룰렛", url: "roulette.html" },
+    questions: { label: "🎴 질문 카드", url: "questions.html" },
+    naming: { label: "📛 네이밍 생성기", url: "naming.html" }
   };
 
   function load() {

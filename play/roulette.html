@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>복불복 룰렛 — goblub</title>
+  <meta name="description" content="벌칙, 점심 메뉴, 청소 당번까지 — 뭐든 룰렛으로 정해버리자" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    .roul-list { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin:16px 0; }
+    .roul-item { background:var(--cream); border:2px solid transparent; border-radius:12px; padding:10px 16px; font-size:1rem; }
+    .roul-item.hot { background:var(--yellow); border-color:var(--coral); transform:scale(1.08); font-weight:bold; transition:transform .05s; }
+    #items { width:100%; min-height:120px; font-family:inherit; font-size:0.95rem; padding:12px; border:2px solid #e8e2d4; border-radius:12px; resize:vertical; }
+    .preset-row { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-bottom:10px; }
+    .err-msg { text-align:center; color:var(--coral); font-weight:bold; margin:8px 0; }
+  </style>
+</head>
+<body>
+  <div id="site-header"></div>
+  <main>
+    <section class="hero">
+      <h1>🎡 복불복 룰렛</h1>
+      <p>벌칙, 점심 메뉴, 청소 당번까지 — 뭐든 룰렛으로 정해버리자</p>
+    </section>
+
+    <section class="panel">
+      <h2 style="text-align:center">항목을 정하고 돌려보세요</h2>
+
+      <div class="preset-row">
+        <button class="btn-ghost" id="preset-1">🍗 벌칙</button>
+        <button class="btn-ghost" id="preset-2">🍽 점심 메뉴</button>
+        <button class="btn-ghost" id="preset-3">🧹 청소 당번</button>
+      </div>
+
+      <textarea id="items" placeholder="한 줄에 하나씩 입력하세요 (2~12개)&#10;예)&#10;꿀밤 한 대&#10;애교 부리기&#10;다음 판 사기"></textarea>
+
+      <p class="err-msg" id="err" style="display:none"></p>
+
+      <div class="result-actions">
+        <button class="btn-primary" id="btn-spin">🎡 돌리기</button>
+      </div>
+
+      <div class="roul-list" id="roul-list"></div>
+
+      <div id="result-box" style="display:none; text-align:center; margin-top:12px">
+        <span class="result-emoji">🎯</span>
+        <p class="result-name" id="result-name"></p>
+        <p class="fine-print" id="result-line"></p>
+      </div>
+    </section>
+  </main>
+  <div id="site-footer"></div>
+  <script src="../js/common.js" data-root=".."></script>
+  <script src="js/feed.js"></script>
+  <script>
+    (function () {
+      var $ = function (id) { return document.getElementById(id); };
+
+      var PRESETS = {
+        1: ["꿀밤 한 대", "애교 부리기", "다음 판 사기", "아무 노래 부르기", "물 원샷", "벌칙 면제!", "옆 사람 칭찬하기", "셀카 찍어 단톡방에"],
+        2: ["김밥", "라면", "국밥", "돈까스", "마라탕", "햄버거", "파스타", "아무거나"],
+        3: ["설거지", "분리수거", "화장실", "바닥 쓸기", "오늘은 쉼", "걸레질"]
+      };
+
+      $("preset-1").onclick = function () { $("items").value = PRESETS[1].join("\n"); };
+      $("preset-2").onclick = function () { $("items").value = PRESETS[2].join("\n"); };
+      $("preset-3").onclick = function () { $("items").value = PRESETS[3].join("\n"); };
+
+      function readItems() {
+        return $("items").value
+          .split(/\n/)
+          .map(function (s) { return s.trim(); })
+          .filter(function (s) { return s.length > 0; })
+          .slice(0, 12);
+      }
+
+      function showErr(msg) {
+        var e = $("err");
+        e.textContent = msg;
+        e.style.display = "block";
+      }
+
+      function hideErr() {
+        $("err").style.display = "none";
+      }
+
+      function renderList(items) {
+        var list = $("roul-list");
+        list.innerHTML = "";
+        items.forEach(function (text) {
+          var el = document.createElement("div");
+          el.className = "roul-item";
+          el.textContent = text;
+          list.appendChild(el);
+        });
+      }
+
+      function setHot(i) {
+        var nodes = document.querySelectorAll(".roul-item");
+        for (var n = 0; n < nodes.length; n++) nodes[n].classList.remove("hot");
+        if (nodes[i]) nodes[i].classList.add("hot");
+      }
+
+      function hideResult() {
+        $("result-box").style.display = "none";
+      }
+
+      var LINES = [
+        "고블럽의 선택은…!",
+        "운명은 이미 정해졌습니다.",
+        "이의 제기는 받지 않습니다!",
+        "고블럽이 대신 골라줬어요."
+      ];
+
+      function showResult(text) {
+        $("result-name").textContent = "🎯 " + text;
+        $("result-line").textContent = LINES[Math.floor(Math.random() * LINES.length)];
+        $("result-box").style.display = "block";
+      }
+
+      function spin() {
+        hideErr();
+        var items = readItems();
+        if (items.length < 2) { showErr("항목을 2개 이상 적어주세요!"); return; }
+        renderList(items);
+        var btn = document.getElementById("btn-spin"); btn.disabled = true;
+        hideResult();
+        if (window.GoblubFeed) GoblubFeed.grant("roulette");
+        var winner = Math.floor(Math.random() * items.length);
+        var totalSteps = items.length * 4 + winner;
+        var step = 0;
+        function tick() {
+          setHot(step % items.length);
+          step++;
+          if (step > totalSteps) { showResult(items[winner]); btn.disabled = false; return; }
+          var progress = step / totalSteps;
+          var delay = 50 + Math.pow(progress, 3) * 380;
+          setTimeout(tick, delay);
+        }
+        tick();
+      }
+
+      $("btn-spin").onclick = spin;
+    })();
+  </script>
+</body>
+</html>
