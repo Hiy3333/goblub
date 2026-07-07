@@ -10,12 +10,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../css/style.css" />
   <style>
-    .type-bars { margin: 18px 0 6px; }
-    .type-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 0.95rem; }
-    .type-row .nm { width: 96px; flex: none; }
-    .type-row .track { flex: 1; background: #efe9db; border-radius: 999px; height: 14px; overflow: hidden; }
-    .type-row .fill { height: 14px; border-radius: 999px; background: linear-gradient(90deg, var(--sky), var(--purple)); }
-    .type-row .pct { width: 42px; flex: none; text-align: right; color: var(--ink-soft); }
+    .tags { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 14px 0 4px; }
+    .tag { background: var(--cream); border: 1.5px solid #e8e2d4; border-radius: 999px; padding: 5px 12px; font-size: 0.9rem; color: var(--ink-soft); }
+    .match-line { margin-top: 12px; color: var(--ink-soft); }
   </style>
 </head>
 <body>
@@ -31,12 +28,18 @@
   <script src="js/sharecard.js"></script>
   <script>
     var TYPES = {
-      dobae:  { emoji:"🌊", name:"새벽 감성 도배왕",     short:"도배왕",    desc:"자정 넘으면 갑자기 텐션이 폭발해서 메시지를 폭풍처럼 쏟아내는 타입. 다음 날 아침 대화창 스크롤 압박에 스스로도 놀라지만, 방이 조용하면 못 견디는 그 활력 덕분에 단톡방이 안 죽고 살아있는 겁니다." },
-      jamsu:  { emoji:"🤿", name:"읽씹 잠수함",         short:"잠수함",    desc:"읽음 표시는 뜨는데 답장은 안 오는 미스터리 그 자체. 사실 안 읽은 게 아니라 할 말을 고르다 타이밍을 놓친 것뿐이지만, 갑자기 3일 뒤에 '아까 그거'로 대화를 이어붙이는 능력만큼은 인정해야 합니다." },
-      drip:   { emoji:"🎤", name:"드립 폭격기",         short:"드립러",    desc:"누가 무슨 말을 하든 3초 안에 드립으로 받아치는 반사신경의 소유자. 방 분위기를 살리는 일등 공신이지만, 가끔은 진지한 얘기 좀 하려는데 개그로 새버려서 다들 할 말을 잃게 만들기도 합니다." },
-      ghost:  { emoji:"👻", name:"눈팅만 하는 유령",     short:"눈팅유령",  desc:"알림은 다 오는데 존재감은 제로, 며칠에 한 번 이모티콘 하나로 생존 신고하는 스타일. 정작 중요한 순간엔 조용히 다 보고 있다가 핵심만 콕 집어 한마디 던지는 은근한 존재감이 있습니다." },
-      notice: { emoji:"📢", name:"단톡방 총무 공지봇",   short:"공지봇",    desc:"약속 날짜·장소·회비까지 정리해서 공지하는 이 방의 실질적 운영자. 다들 대충 넘어가려 할 때 혼자 디테일을 챙기는 책임감은 최고지만, 정작 본인 스케줄은 방장 노릇 하느라 못 챙기기 일쑤입니다." },
-      emoti:  { emoji:"🐥", name:"이모티콘 장인",       short:"이모티콘",  desc:"할 말이 없어도 이모티콘 하나로 완벽하게 리액션을 완성하는 능력자. 텍스트보다 짤과 이모티콘이 먼저 나가는 통에 정작 진지한 대화가 필요할 땐 말문이 좀 막히기도 합니다." }
+      dobae:  { emoji:"🌊", name:"새벽 감성 도배왕",     short:"도배왕",    desc:"자정 넘으면 갑자기 텐션이 폭발해서 메시지를 폭풍처럼 쏟아내는 타입. 다음 날 아침 대화창 스크롤 압박에 스스로도 놀라지만, 방이 조용하면 못 견디는 그 활력 덕분에 단톡방이 안 죽고 살아있는 겁니다.",
+        tags: ["새벽감성폭발","혼자5연속톡","의식의흐름","알림지옥제조기"], match:"drip", clash:"jamsu" },
+      jamsu:  { emoji:"🤿", name:"읽씹 잠수함",         short:"잠수함",    desc:"읽음 표시는 뜨는데 답장은 안 오는 미스터리 그 자체. 사실 안 읽은 게 아니라 할 말을 고르다 타이밍을 놓친 것뿐이지만, 갑자기 3일 뒤에 '아까 그거'로 대화를 이어붙이는 능력만큼은 인정해야 합니다.",
+        tags: ["읽씹아님바쁨","3일뒤아까그거","답장은늦어도진심","무음모드장인"], match:"ghost", clash:"dobae" },
+      drip:   { emoji:"🎤", name:"드립 폭격기",         short:"드립러",    desc:"누가 무슨 말을 하든 3초 안에 드립으로 받아치는 반사신경의 소유자. 방 분위기를 살리는 일등 공신이지만, 가끔은 진지한 얘기 좀 하려는데 개그로 새버려서 다들 할 말을 잃게 만들기도 합니다.",
+        tags: ["3초반사신경","분위기메이커","진지충전환러","드립각채굴기"], match:"dobae", clash:"notice" },
+      ghost:  { emoji:"👻", name:"눈팅만 하는 유령",     short:"눈팅유령",  desc:"알림은 다 오는데 존재감은 제로, 며칠에 한 번 이모티콘 하나로 생존 신고하는 스타일. 정작 중요한 순간엔 조용히 다 보고 있다가 핵심만 콕 집어 한마디 던지는 은근한 존재감이 있습니다.",
+        tags: ["존재감제로","생존신고전문","다보고있음","결정적순간한줄"], match:"jamsu", clash:"drip" },
+      notice: { emoji:"📢", name:"단톡방 총무 공지봇",   short:"공지봇",    desc:"약속 날짜·장소·회비까지 정리해서 공지하는 이 방의 실질적 운영자. 다들 대충 넘어가려 할 때 혼자 디테일을 챙기는 책임감은 최고지만, 정작 본인 스케줄은 방장 노릇 하느라 못 챙기기 일쑤입니다.",
+        tags: ["실질적방장","날짜장소회비정리","디테일책임감","정작본인일정은엉망"], match:"emoti", clash:"ghost" },
+      emoti:  { emoji:"🐥", name:"이모티콘 장인",       short:"이모티콘",  desc:"할 말이 없어도 이모티콘 하나로 완벽하게 리액션을 완성하는 능력자. 텍스트보다 짤과 이모티콘이 먼저 나가는 통에 정작 진지한 대화가 필요할 땐 말문이 좀 막히기도 합니다.",
+        tags: ["짤이먼저말은나중","이모티콘장인","리액션종결자","텍스트울렁증"], match:"notice", clash:"dobae" }
     };
     var ORDER = ["dobae","jamsu","drip","ghost","notice","emoti"];
 
@@ -96,26 +99,19 @@
     function renderResult(totals, el, api) {
       var key = Quiz.top(totals, ORDER);
       var r = TYPES[key];
-      var sum = 0; ORDER.forEach(function (k) { sum += (totals[k] || 0); });
-      sum = sum || 1;
-      var rows = ORDER.map(function (k) { return { k: k, v: totals[k] || 0 }; })
-        .sort(function (a, b) { return b.v - a.v; }).slice(0, 4);
-      var barsHtml = '<div class="type-bars">' + rows.map(function (row) {
-        var pct = Math.round(row.v / sum * 100);
-        return '<div class="type-row"><span class="nm">' + TYPES[row.k].emoji + " " + TYPES[row.k].short +
-          '</span><span class="track"><span class="fill" style="width:' + pct + '%"></span></span>' +
-          '<span class="pct">' + pct + '%</span></div>';
-      }).join("") + "</div>";
+      var tagsHtml = '<div class="tags">' + r.tags.map(function (t) { return '<span class="tag">#' + t + '</span>'; }).join("") + '</div>';
       el.innerHTML =
         '<span class="result-emoji">' + r.emoji + "</span>" +
         '<p class="result-name">' + r.name + "</p>" +
-        '<p class="result-desc">' + r.desc + "</p>" + barsHtml +
+        '<p class="result-desc">' + r.desc + "</p>" + tagsHtml +
+        '<p class="match-line">💛 찰떡궁합: <b>' + TYPES[r.match].short + '</b> &nbsp;·&nbsp; ⚡ 상극: <b>' + TYPES[r.clash].short + '</b></p>' +
         '<div id="card-slot"></div>' +
         '<div class="result-actions">' +
         '<button class="btn-primary" id="qz-retry">다시하기</button>' +
         '<button class="btn-ghost" id="qz-share">링크 복사</button></div>';
       el.querySelector("#card-slot").appendChild(ShareCard.render({
-        palette: "sky", emoji: r.emoji, badge: "단톡방 캐릭터", title: r.name, lines: [r.desc]
+        palette: "sky", emoji: r.emoji, badge: "단톡방 캐릭터", title: r.name,
+        lines: [r.desc, "#" + r.tags.slice(0, 3).join(" #")]
       }));
       el.querySelector("#qz-retry").onclick = api.restart;
       el.querySelector("#qz-share").onclick = function () { api.shareLink(el.querySelector("#qz-share")); };

@@ -10,12 +10,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../css/style.css" />
   <style>
-    .type-bars { margin: 18px 0 6px; }
-    .type-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 0.95rem; }
-    .type-row .nm { width: 96px; flex: none; }
-    .type-row .track { flex: 1; background: #efe9db; border-radius: 999px; height: 14px; overflow: hidden; }
-    .type-row .fill { height: 14px; border-radius: 999px; background: linear-gradient(90deg, var(--mint), var(--sky)); }
-    .type-row .pct { width: 42px; flex: none; text-align: right; color: var(--ink-soft); }
+    .tags { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 14px 0 4px; }
+    .tag { background: var(--cream); border: 1.5px solid #e8e2d4; border-radius: 999px; padding: 5px 12px; font-size: 0.9rem; color: var(--ink-soft); }
+    .match-line { margin-top: 12px; color: var(--ink-soft); }
   </style>
 </head>
 <body>
@@ -31,12 +28,18 @@
   <script src="js/sharecard.js"></script>
   <script>
     var TYPES = {
-      leader:   { emoji:"🛡️", name:"무리를 이끄는 리더형",     short:"리더",    desc:"패닉에 빠진 사람들 사이에서 혼자 침착하게 상황을 정리하고 있죠. 다들 당신만 보고 움직이는데, 정작 본인 체력은 하나도 안 챙기는 게 함정입니다." },
-      fighter:  { emoji:"🪓", name:"좀비 때려잡는 전투형",     short:"전투",    desc:"위협이 나타나면 일단 몸이 먼저 나가는 타입. 무리의 방패 역할을 자처하지만, 가끔은 무기보다 머리를 먼저 쓰는 연습도 필요합니다." },
-      supplier: { emoji:"🎒", name:"팀의 생명줄 살림꾼형",     short:"살림꾼",  desc:"물, 식량, 배터리까지 야무지게 챙기는 진짜 생존 실세. 다들 당신 가방만 믿고 따라다니는데, 정작 본인 몫은 늘 제일 적게 챙깁니다." },
-      hermit:   { emoji:"🏚️", name:"혼자 살아남는 은둔형",     short:"은둔",    desc:"무리보다는 나 혼자가 편한 스타일. 아무도 못 찾는 안전가옥을 귀신같이 찾아내지만, 정작 마지막에 문 두드릴 사람이 없어서 조금 외롭습니다." },
-      traitor:  { emoji:"🔪", name:"살기 위해선 뭐든 배신자형", short:"배신",    desc:"위기의 순간 계산이 제일 빠른 사람. 생존율은 확실히 높지만, 사태가 끝나고 나면 같이 살아남은 사람들 얼굴 보기가 좀 민망할 겁니다." },
-      firstday: { emoji:"💀", name:"호기심이 부른 첫날 사망형", short:"첫날사망", desc:"사이렌 울리자마자 창문 열고 밖부터 구경하는 스타일. 궁금한 건 못 참는 성격이 이번만큼은 수명을 크게 단축시킬 것 같습니다." }
+      leader:   { emoji:"🛡️", name:"무리를 이끄는 리더형",     short:"리더",    desc:"패닉에 빠진 사람들 사이에서 혼자 침착하게 상황을 정리하고 있죠. 다들 당신만 보고 움직이는데, 정작 본인 체력은 하나도 안 챙기는 게 함정입니다.",
+        tags:["타고난두목","위기에침착","다이끌어","책임감갑"], match:"supplier", clash:"traitor" },
+      fighter:  { emoji:"🪓", name:"좀비 때려잡는 전투형",     short:"전투",    desc:"위협이 나타나면 일단 몸이 먼저 나가는 타입. 무리의 방패 역할을 자처하지만, 가끔은 무기보다 머리를 먼저 쓰는 연습도 필요합니다.",
+        tags:["일단몸이먼저","방패자처","무기부터챙김","근손실없음"], match:"leader", clash:"hermit" },
+      supplier: { emoji:"🎒", name:"팀의 생명줄 살림꾼형",     short:"살림꾼",  desc:"물, 식량, 배터리까지 야무지게 챙기는 진짜 생존 실세. 다들 당신 가방만 믿고 따라다니는데, 정작 본인 몫은 늘 제일 적게 챙깁니다.",
+        tags:["가방이생명줄","야무진살림","내몫은늘꼴찌","진짜생존실세"], match:"leader", clash:"traitor" },
+      hermit:   { emoji:"🏚️", name:"혼자 살아남는 은둔형",     short:"은둔",    desc:"무리보다는 나 혼자가 편한 스타일. 아무도 못 찾는 안전가옥을 귀신같이 찾아내지만, 정작 마지막에 문 두드릴 사람이 없어서 조금 외롭습니다.",
+        tags:["혼자가편해","안전가옥귀신","무리는사양","은근외로움"], match:"supplier", clash:"fighter" },
+      traitor:  { emoji:"🔪", name:"살기 위해선 뭐든 배신자형", short:"배신",    desc:"위기의 순간 계산이 제일 빠른 사람. 생존율은 확실히 높지만, 사태가 끝나고 나면 같이 살아남은 사람들 얼굴 보기가 좀 민망할 겁니다.",
+        tags:["계산빠름","생존율갑","의리는패스","뒷맛은씁쓸"], match:"firstday", clash:"supplier" },
+      firstday: { emoji:"💀", name:"호기심이 부른 첫날 사망형", short:"첫날사망", desc:"사이렌 울리자마자 창문 열고 밖부터 구경하는 스타일. 궁금한 건 못 참는 성격이 이번만큼은 수명을 크게 단축시킬 것 같습니다.",
+        tags:["호기심천국","일단구경부터","못참는성격","수명단축각"], match:"traitor", clash:"leader" }
     };
     var ORDER = ["leader","fighter","supplier","hermit","traitor","firstday"];
 
@@ -105,26 +108,19 @@
     function renderResult(totals, el, api) {
       var key = Quiz.top(totals, ORDER);
       var r = TYPES[key];
-      var sum = 0; ORDER.forEach(function (k) { sum += (totals[k] || 0); });
-      sum = sum || 1;
-      var rows = ORDER.map(function (k) { return { k: k, v: totals[k] || 0 }; })
-        .sort(function (a, b) { return b.v - a.v; }).slice(0, 4);
-      var barsHtml = '<div class="type-bars">' + rows.map(function (row) {
-        var pct = Math.round(row.v / sum * 100);
-        return '<div class="type-row"><span class="nm">' + TYPES[row.k].emoji + " " + TYPES[row.k].short +
-          '</span><span class="track"><span class="fill" style="width:' + pct + '%"></span></span>' +
-          '<span class="pct">' + pct + '%</span></div>';
-      }).join("") + "</div>";
+      var tagsHtml = '<div class="tags">' + r.tags.map(function (t) { return '<span class="tag">#' + t + '</span>'; }).join("") + '</div>';
       el.innerHTML =
         '<span class="result-emoji">' + r.emoji + "</span>" +
         '<p class="result-name">' + r.name + "</p>" +
-        '<p class="result-desc">' + r.desc + "</p>" + barsHtml +
+        '<p class="result-desc">' + r.desc + "</p>" + tagsHtml +
+        '<p class="match-line">💛 찰떡궁합: <b>' + TYPES[r.match].short + '</b> &nbsp;·&nbsp; ⚡ 상극: <b>' + TYPES[r.clash].short + '</b></p>' +
         '<div id="card-slot"></div>' +
         '<div class="result-actions">' +
         '<button class="btn-primary" id="qz-retry">다시하기</button>' +
         '<button class="btn-ghost" id="qz-share">링크 복사</button></div>';
       el.querySelector("#card-slot").appendChild(ShareCard.render({
-        palette: "mint", emoji: r.emoji, badge: "좀비 생존 유형", title: r.name, lines: [r.desc]
+        palette: "mint", emoji: r.emoji, badge: "좀비 생존 유형", title: r.name,
+        lines: [r.desc, "#" + r.tags.slice(0, 3).join(" #")]
       }));
       el.querySelector("#qz-retry").onclick = api.restart;
       el.querySelector("#qz-share").onclick = function () { api.shareLink(el.querySelector("#qz-share")); };

@@ -10,12 +10,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../css/style.css" />
   <style>
-    .type-bars { margin: 18px 0 6px; }
-    .type-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 0.95rem; }
-    .type-row .nm { width: 96px; flex: none; }
-    .type-row .track { flex: 1; background: #efe9db; border-radius: 999px; height: 14px; overflow: hidden; }
-    .type-row .fill { height: 14px; border-radius: 999px; background: linear-gradient(90deg, var(--coral), var(--purple)); }
-    .type-row .pct { width: 42px; flex: none; text-align: right; color: var(--ink-soft); }
+    .tags { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 14px 0 4px; }
+    .tag { background: var(--cream); border: 1.5px solid #e8e2d4; border-radius: 999px; padding: 5px 12px; font-size: 0.9rem; color: var(--ink-soft); }
+    .match-line { margin-top: 12px; color: var(--ink-soft); }
   </style>
 </head>
 <body>
@@ -31,12 +28,18 @@
   <script src="js/sharecard.js"></script>
   <script>
     var TYPES = {
-      mala:       { emoji:"🌶️", name:"화끈 중독성 마라탕형",         short:"마라탕",  desc:"한번 빠지면 헤어나올 수 없는 강렬한 매력의 소유자. 평소엔 잔잔하다가도 꽂히면 그 열정이 주변까지 얼얼하게 만듭니다. 호불호는 갈려도 한번 맛본 사람은 꼭 다시 찾아요." },
-      naengmyeon: { emoji:"🧊", name:"시원 쿨한 물냉면형",           short:"물냉면",  desc:"어떤 상황에서도 좀처럼 동요하지 않는 쿨함의 정석. 겉으론 심심해 보여도 알고 보면 깊은 육수 같은 매력이 있어서, 알아갈수록 자꾸 생각나는 타입입니다." },
-      gukbap:     { emoji:"🍲", name:"든든 정 많은 국밥형",           short:"국밥",    desc:"언제 만나도 편하고 든든한, 정 많은 사람. 화려하진 않아도 곁에 있으면 마음이 놓이는 존재감이라 다들 은근히 자주 찾게 됩니다." },
-      mintcho:    { emoji:"🍫", name:"호불호 확실 민초형",           short:"민초",    desc:"취향이 확고하고 자기 색이 뚜렷한 타입. 누가 뭐래도 내 스타일을 밀고 나가는 소신파라, 싫어하는 사람도 있지만 좋아하는 사람은 진심으로 좋아합니다." },
-      tteokbokki: { emoji:"❤️", name:"만인의 인싸 떡볶이형",         short:"떡볶이",  desc:"누구와도 금방 친해지는 만인의 인기스타. 어디에 있어도 분위기를 화기애애하게 만드는 힘이 있어서, 모임에 꼭 있어야 할 존재로 통합니다." },
-      dosirak:    { emoji:"🍱", name:"가성비 효율 편의점 도시락형",   short:"도시락",  desc:"군더더기 없이 실속을 챙기는 효율의 아이콘. 필요한 걸 빠르고 정확하게 해결하는 타입이라, 함께 일하거나 지내면 은근히 편하고 믿음직합니다." }
+      mala:       { emoji:"🌶️", name:"화끈 중독성 마라탕형",         short:"마라탕",  desc:"한번 빠지면 헤어나올 수 없는 강렬한 매력의 소유자. 평소엔 잔잔하다가도 꽂히면 그 열정이 주변까지 얼얼하게 만듭니다. 호불호는 갈려도 한번 맛본 사람은 꼭 다시 찾아요.",
+        tags:["자극추구","화끈해","직진본능","심심한건못참아"], match:"tteokbokki", clash:"naengmyeon" },
+      naengmyeon: { emoji:"🧊", name:"시원 쿨한 물냉면형",           short:"물냉면",  desc:"어떤 상황에서도 좀처럼 동요하지 않는 쿨함의 정석. 겉으론 심심해 보여도 알고 보면 깊은 육수 같은 매력이 있어서, 알아갈수록 자꾸 생각나는 타입입니다.",
+        tags:["쿨거지","츤데레감성","은근진국","동요는없다"], match:"gukbap", clash:"mala" },
+      gukbap:     { emoji:"🍲", name:"든든 정 많은 국밥형",           short:"국밥",    desc:"언제 만나도 편하고 든든한, 정 많은 사람. 화려하진 않아도 곁에 있으면 마음이 놓이는 존재감이라 다들 은근히 자주 찾게 됩니다.",
+        tags:["정많음","든든존재감","어디서든무난","새벽에도콜"], match:"naengmyeon", clash:"mintcho" },
+      mintcho:    { emoji:"🍫", name:"호불호 확실 민초형",           short:"민초",    desc:"취향이 확고하고 자기 색이 뚜렷한 타입. 누가 뭐래도 내 스타일을 밀고 나가는 소신파라, 싫어하는 사람도 있지만 좋아하는 사람은 진심으로 좋아합니다.",
+        tags:["소신발언","호불호극혐","내길간다","논쟁각오완료"], match:"dosirak", clash:"gukbap" },
+      tteokbokki: { emoji:"❤️", name:"만인의 인싸 떡볶이형",         short:"떡볶이",  desc:"누구와도 금방 친해지는 만인의 인기스타. 어디에 있어도 분위기를 화기애애하게 만드는 힘이 있어서, 모임에 꼭 있어야 할 존재로 통합니다.",
+        tags:["인싸력만렙","분위기메이커","매콤달콤","핵인싸"], match:"mala", clash:"dosirak" },
+      dosirak:    { emoji:"🍱", name:"가성비 효율 편의점 도시락형",   short:"도시락",  desc:"군더더기 없이 실속을 챙기는 효율의 아이콘. 필요한 걸 빠르고 정확하게 해결하는 타입이라, 함께 일하거나 지내면 은근히 편하고 믿음직합니다.",
+        tags:["효율극대화","군더더기없음","계획적인생","혼밥능력자"], match:"mintcho", clash:"tteokbokki" }
     };
     var ORDER = ["mala","naengmyeon","gukbap","mintcho","tteokbokki","dosirak"];
 
@@ -96,26 +99,19 @@
     function renderResult(totals, el, api) {
       var key = Quiz.top(totals, ORDER);
       var r = TYPES[key];
-      var sum = 0; ORDER.forEach(function (k) { sum += (totals[k] || 0); });
-      sum = sum || 1;
-      var rows = ORDER.map(function (k) { return { k: k, v: totals[k] || 0 }; })
-        .sort(function (a, b) { return b.v - a.v; }).slice(0, 4);
-      var barsHtml = '<div class="type-bars">' + rows.map(function (row) {
-        var pct = Math.round(row.v / sum * 100);
-        return '<div class="type-row"><span class="nm">' + TYPES[row.k].emoji + " " + TYPES[row.k].short +
-          '</span><span class="track"><span class="fill" style="width:' + pct + '%"></span></span>' +
-          '<span class="pct">' + pct + '%</span></div>';
-      }).join("") + "</div>";
+      var tagsHtml = '<div class="tags">' + r.tags.map(function (t) { return '<span class="tag">#' + t + '</span>'; }).join("") + '</div>';
       el.innerHTML =
         '<span class="result-emoji">' + r.emoji + "</span>" +
         '<p class="result-name">' + r.name + "</p>" +
-        '<p class="result-desc">' + r.desc + "</p>" + barsHtml +
+        '<p class="result-desc">' + r.desc + "</p>" + tagsHtml +
+        '<p class="match-line">💛 찰떡궁합: <b>' + TYPES[r.match].short + '</b> &nbsp;·&nbsp; ⚡ 상극: <b>' + TYPES[r.clash].short + '</b></p>' +
         '<div id="card-slot"></div>' +
         '<div class="result-actions">' +
         '<button class="btn-primary" id="qz-retry">다시하기</button>' +
         '<button class="btn-ghost" id="qz-share">링크 복사</button></div>';
       el.querySelector("#card-slot").appendChild(ShareCard.render({
-        palette: "purple", emoji: r.emoji, badge: "음식형 인간", title: r.name, lines: [r.desc]
+        palette: "purple", emoji: r.emoji, badge: "음식형 인간", title: r.name,
+        lines: [r.desc, "#" + r.tags.slice(0, 3).join(" #")]
       }));
       el.querySelector("#qz-retry").onclick = api.restart;
       el.querySelector("#qz-share").onclick = function () { api.shareLink(el.querySelector("#qz-share")); };

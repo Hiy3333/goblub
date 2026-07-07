@@ -10,13 +10,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../css/style.css" />
   <style>
-    .cell-bars { margin: 18px 0 6px; }
-    .cell-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 0.95rem; }
-    .cell-row .nm { width: 92px; flex: none; }
-    .cell-row .track { flex: 1; background: #efe9db; border-radius: 999px; height: 14px; overflow: hidden; }
-    .cell-row .fill { height: 14px; border-radius: 999px; background: linear-gradient(90deg, var(--coral), var(--purple)); }
-    .cell-row .pct { width: 42px; flex: none; text-align: right; color: var(--ink-soft); }
-    .match-line { margin-top: 10px; color: var(--ink-soft); }
+    .tags { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 14px 0 4px; }
+    .tag { background: var(--cream); border: 1.5px solid #e8e2d4; border-radius: 999px; padding: 5px 12px; font-size: 0.9rem; color: var(--ink-soft); }
+    .match-line { margin-top: 12px; color: var(--ink-soft); }
   </style>
 </head>
 <body>
@@ -32,12 +28,12 @@
   <script src="js/sharecard.js"></script>
   <script>
     var CELLS = {
-      mildang:  { emoji:"🎭", name:"밀당세포 우세형", desc:"좋아하면서도 절대 티 안 내죠. 여유로운 미소 뒤에서 답장 타이밍을 계산하는 당신… 근데 상대도 밀당 중이면 둘 다 평생 썸만 탑니다.", match:"tsundere", clash:"jikjin" },
-      jikjin:   { emoji:"🚀", name:"직진세포 우세형", desc:"좋으면 바로 고백, 재고 따지는 시간에 이미 손 잡고 있음. 화끈해서 좋지만 상대가 아직 준비 안 됐을 땐 혼자 앞서가다 넘어지기도 합니다.", match:"mosol",    clash:"mildang" },
-      jipchak:  { emoji:"🔗", name:"집착세포 우세형", desc:"사랑하면 올인, 읽씹 3분만 넘어가도 심장이 쿵. 애정이 넘치는 건 매력이지만 가끔은 상대에게 숨 쉴 틈도 좀 줘야 오래갑니다.", match:"heonsin",  clash:"jikjin" },
-      mosol:    { emoji:"🌱", name:"모솔세포 우세형", desc:"머릿속 시뮬레이션은 이미 결혼까지 갔는데 현실은 대화 시작도 못 함. 상상력 하나는 국가대표급이니 이제 실전 배치만 하면 됩니다.", match:"jikjin",   clash:"jipchak" },
-      tsundere: { emoji:"🐱", name:"츤데레세포 우세형", desc:"좋아할수록 말이 퉁명스러워지는 신기한 회로. 본인은 '냉정한 척'이라 믿지만 주변 사람들은 이미 다 눈치챘습니다.", match:"mildang", clash:"heonsin" },
-      heonsin:  { emoji:"💝", name:"헌신세포 우세형", desc:"사랑하면 다 퍼주는 타입, 상대 기념일이 내 기념일보다 중요. 마음은 참 예쁜데, 나 자신도 좀 챙기면서 사랑해도 됩니다.", match:"jipchak",  clash:"tsundere" }
+      mildang:  { emoji:"🎭", name:"밀당세포 우세형", short:"밀당세포", tags:["밀당의고수","여유로운척","답장은계산","티안내기달인"], desc:"좋아하면서도 절대 티 안 내죠. 여유로운 미소 뒤에서 답장 타이밍을 계산하는 당신… 근데 상대도 밀당 중이면 둘 다 평생 썸만 탑니다.", match:"tsundere", clash:"jikjin" },
+      jikjin:   { emoji:"🚀", name:"직진세포 우세형", short:"직진세포", tags:["좋으면돌격","고백선빵","화끈본능","재고안따짐"], desc:"좋으면 바로 고백, 재고 따지는 시간에 이미 손 잡고 있음. 화끈해서 좋지만 상대가 아직 준비 안 됐을 땐 혼자 앞서가다 넘어지기도 합니다.", match:"mosol",    clash:"mildang" },
+      jipchak:  { emoji:"🔗", name:"집착세포 우세형", short:"집착세포", tags:["사랑하면올인","읽씹은고문","애정과다","24시간연결"], desc:"사랑하면 올인, 읽씹 3분만 넘어가도 심장이 쿵. 애정이 넘치는 건 매력이지만 가끔은 상대에게 숨 쉴 틈도 좀 줘야 오래갑니다.", match:"heonsin",  clash:"jikjin" },
+      mosol:    { emoji:"🌱", name:"모솔세포 우세형", short:"모솔세포", tags:["상상은결혼까지","실전은0","설렘만렙","표현법몰라"], desc:"머릿속 시뮬레이션은 이미 결혼까지 갔는데 현실은 대화 시작도 못 함. 상상력 하나는 국가대표급이니 이제 실전 배치만 하면 됩니다.", match:"jikjin",   clash:"jipchak" },
+      tsundere: { emoji:"🐱", name:"츤데레세포 우세형", short:"츤데레세포", tags:["좋아할수록퉁명","속마음은반대","냉정한척","다들킴"], desc:"좋아할수록 말이 퉁명스러워지는 신기한 회로. 본인은 '냉정한 척'이라 믿지만 주변 사람들은 이미 다 눈치챘습니다.", match:"mildang", clash:"heonsin" },
+      heonsin:  { emoji:"💝", name:"헌신세포 우세형", short:"헌신세포", tags:["다퍼주는사랑","상대가1순위","기념일수호신","나도좀챙겨"], desc:"사랑하면 다 퍼주는 타입, 상대 기념일이 내 기념일보다 중요. 마음은 참 예쁜데, 나 자신도 좀 챙기면서 사랑해도 됩니다.", match:"jipchak",  clash:"tsundere" }
     };
     var ORDER = ["mildang","jikjin","jipchak","mosol","tsundere","heonsin"];
 
@@ -97,24 +93,13 @@
     function renderResult(totals, el, api) {
       var key = Quiz.top(totals, ORDER);
       var r = CELLS[key];
-      var sum = 0; ORDER.forEach(function (k) { sum += (totals[k] || 0); });
-      sum = sum || 1;
-      var rows = ORDER.map(function (k) { return { k: k, v: totals[k] || 0 }; })
-        .sort(function (a, b) { return b.v - a.v; }).slice(0, 4);
-      var barsHtml = '<div class="cell-bars">' + rows.map(function (row) {
-        var pct = Math.round(row.v / sum * 100);
-        return '<div class="cell-row"><span class="nm">' + CELLS[row.k].emoji + " " +
-          CELLS[row.k].name.replace(" 우세형", "") + '</span>' +
-          '<span class="track"><span class="fill" style="width:' + pct + '%"></span></span>' +
-          '<span class="pct">' + pct + '%</span></div>';
-      }).join("") + "</div>";
+      var tagsHtml = '<div class="tags">' + r.tags.map(function (t) { return '<span class="tag">#' + t + '</span>'; }).join("") + '</div>';
 
       el.innerHTML =
         '<span class="result-emoji">' + r.emoji + "</span>" +
         '<p class="result-name">' + r.name + "</p>" +
-        '<p class="result-desc">' + r.desc + "</p>" + barsHtml +
-        '<p class="match-line">💞 환상의 짝꿍세포: <b>' + CELLS[r.match].name.replace(" 우세형", "") + "</b>" +
-        ' · ⚡ 상극세포: <b>' + CELLS[r.clash].name.replace(" 우세형", "") + "</b></p>" +
+        '<p class="result-desc">' + r.desc + "</p>" + tagsHtml +
+        '<p class="match-line">💞 환상의 짝꿍세포: <b>' + CELLS[r.match].short + "</b> &nbsp;·&nbsp; ⚡ 상극세포: <b>" + CELLS[r.clash].short + "</b></p>" +
         '<div id="card-slot"></div>' +
         '<div class="result-actions">' +
         '<button class="btn-primary" id="qz-retry">다시하기</button>' +
@@ -122,7 +107,7 @@
 
       el.querySelector("#card-slot").appendChild(ShareCard.render({
         palette: "coral", emoji: r.emoji, badge: "연애세포 테스트 결과", title: r.name,
-        lines: [r.desc, "짝꿍세포: " + CELLS[r.match].name.replace(" 우세형", "")]
+        lines: [r.desc, "#" + r.tags.slice(0, 3).join(" #")]
       }));
       el.querySelector("#qz-retry").onclick = api.restart;
       el.querySelector("#qz-share").onclick = function () { api.shareLink(el.querySelector("#qz-share")); };
