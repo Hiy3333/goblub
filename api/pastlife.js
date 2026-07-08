@@ -85,9 +85,10 @@ export default async function handler(req, res) {
       user:
         "다음은 만세력 엔진이 계산한 이 사람의 사주입니다. 전생 2개(선사시대·조선시대)를 발굴하고, 각 전생마다 공유할 만한 SVG 삽화 한 장씩 그려 주세요.\n" +
         JSON.stringify(saju),
-      maxTokens: 14000,
+      maxTokens: 16000,
       temperature: 0.95,
       model: "gemini-2.5-pro",
+      thinkingBudget: 4000, // pro thinking 상한 → 나머지(≈12000)를 두 전생 SVG 출력에 확보(삽화 누락 방지)
     });
     if (!wrote) res.write("\n@@FINALE\n도사님이 이 전생 기록에는 말을 아끼시네요. 다시 시도해 주세요.");
     return res.end();

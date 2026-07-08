@@ -23,6 +23,11 @@
     @keyframes chew { 50% { transform: rotate(14deg) scale(1.25); } }
     .svg-box { border: 2px dashed #e8e2d4; border-radius: 16px; padding: 10px; margin-top: 8px; }
     .svg-box svg { width: 100%; height: auto; display: block; border-radius: 10px; }
+    .svg-missing { border: 2px dashed #e8d9c4; border-radius: 16px; padding: 22px 14px; margin-top: 8px;
+      text-align: center; color: #a3937a; background: #fffdf7; line-height: 1.6; }
+    .svg-missing .big { font-size: 2rem; display: block; margin-bottom: 6px; }
+    .art-hint { margin: 4px 0 12px; color: var(--ink-soft); background: #fff7e8; border: 1.5px solid #f0e2c4;
+      border-radius: 12px; padding: 10px 14px; font-size: 0.92rem; }
     .digging { text-align: center; font-size: 2.6rem; }
     .digging .shovel { display: inline-block; animation: dig 0.7s ease infinite; }
     @keyframes dig { 50% { transform: rotate(-24deg) translateY(4px); } }
@@ -216,6 +221,7 @@
       function render(parsed) {
         var box = $("lives");
         box.innerHTML = "";
+        var missingArt = 0;
         parsed.lives.forEach(function (life, n) {
           var card = document.createElement("section");
           card.className = "life-card" + (life.fix ? " bad" : "");
@@ -238,6 +244,10 @@
             save.textContent = "🖼 이 장면 이미지 저장";
             (function (sv, lf, idx) { save.onclick = function () { saveLifeImage(sv, lf, idx); }; })(svgRoot, life, n);
             art.appendChild(save);
+          } else {
+            missingArt++;
+            art.innerHTML = '<div class="svg-missing"><span class="big">' + life.emoji +
+              '</span>이 전생의 삽화는 도사님이 못 그렸어요<br>아래 <b>다시 발굴</b>을 누르면 새 삽화가 나올 수 있어요!</div>';
           }
           if (life.fix) {
             var btn = document.createElement("button");
@@ -248,6 +258,12 @@
           }
           box.appendChild(card);
         });
+        if (missingArt) {
+          var hint = document.createElement("p");
+          hint.className = "art-hint";
+          hint.innerHTML = "🎨 삽화 일부가 안 나왔어요. 아래 <b>다시 발굴</b>을 누르면 새로 그려드려요!";
+          box.appendChild(hint);
+        }
         if (parsed.finale) { $("finale-text").textContent = parsed.finale; $("finale-box").style.display = "block"; }
         $("svg-panel").style.display = "block";
         $("result-area").style.display = "block";
@@ -271,7 +287,12 @@
         $("dig-panel").style.display = "block";
         $("result-area").style.display = "none";
         var buffer = "";
-        Dosa.fetchAI("/api/pastlife", { saju: payload }, "goblub_pl5_", {
+        Dosa.fetchAI("/api/pastlife", { saju: payload }, "goblub_pl6_", {
+          // 두 전생 모두 삽화가 있는 완전한 응답만 캐시(삽화 누락 결과가 고착되는 것 방지)
+          accept: function (full) {
+            var p = parseReading(full);
+            return p.lives.length > 0 && p.lives.every(function (l) { return !!l.svg; });
+          },
           onChunk: function (t) {
             buffer += t;
             var n = (buffer.match(/@@LIFE/g) || []).length;

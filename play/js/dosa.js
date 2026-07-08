@@ -82,7 +82,9 @@
           reader.read().then(function (x) {
             if (x.done) {
               if (full.trim()) {
-                try { localStorage.setItem(key, full); } catch (e) {}
+                // cb.accept(full) 가 있으면 통과한 응답만 캐시(불완전 결과가 영구 고착되는 것 방지)
+                var okToCache = !cb.accept || cb.accept(full);
+                if (okToCache) { try { localStorage.setItem(key, full); } catch (e) {} }
                 cb.onDone(false);
               } else cb.onError("busy");
               return;
