@@ -1,4 +1,4 @@
-// 공용 결과 짤 카드 — Canvas 640x800 PNG. ShareCard.render(spec) → 미리보기+저장버튼 DOM.
+// 공용 결과 짤 카드 — Canvas 720x1280(9:16, 인스타 스토리 비율) PNG. ShareCard.render(spec) → 미리보기+저장버튼 DOM.
 // spec = { palette, emoji, badge, title, lines:[...], footer }
 (function () {
   var PALETTE = { coral:"#ff6b6b", yellow:"#ffd93d", mint:"#6bcb77", sky:"#4d96ff", purple:"#b983ff", cream:"#fff9ec" };
@@ -18,18 +18,18 @@
     var c = canvas.getContext("2d"), W = canvas.width, H = canvas.height;
     var bg = PALETTE[spec.palette] || PALETTE.purple;
     c.fillStyle = "#fff9ec"; c.fillRect(0, 0, W, H);
-    c.fillStyle = bg; c.fillRect(0, 0, W, 190);
+    c.fillStyle = bg; c.fillRect(0, 0, W, 300);
     c.textAlign = "center";
-    c.fillStyle = "#ffffff"; c.font = "30px Jua, sans-serif";
-    c.fillText(spec.badge || "", W / 2, 78);
-    c.font = "130px sans-serif"; c.fillText(spec.emoji || "👾", W / 2, 340);
-    c.fillStyle = "#38352f"; c.font = "46px Jua, sans-serif";
-    c.fillText(spec.title || "", W / 2, 420);
-    c.fillStyle = "#7a766d"; c.font = "27px Jua, sans-serif";
-    var yy = 480;
-    (spec.lines || []).forEach(function (ln) { yy = wrapText(c, ln, W / 2, yy, W - 110, 40) + 46; });
-    c.fillStyle = "#b0a99a"; c.font = "22px Jua, sans-serif";
-    c.fillText(spec.footer || "goblub · 대환장 테스트", W / 2, H - 40);
+    c.fillStyle = "#ffffff"; c.font = "34px Jua, sans-serif";
+    c.fillText(spec.badge || "", W / 2, 168);
+    c.font = "160px sans-serif"; c.fillText(spec.emoji || "👾", W / 2, 560);
+    c.fillStyle = "#38352f"; c.font = "54px Jua, sans-serif";
+    c.fillText(spec.title || "", W / 2, 680);
+    c.fillStyle = "#7a766d"; c.font = "30px Jua, sans-serif";
+    var yy = 770;
+    (spec.lines || []).forEach(function (ln) { yy = wrapText(c, ln, W / 2, yy, W - 130, 46) + 56; });
+    c.fillStyle = "#b0a99a"; c.font = "24px Jua, sans-serif";
+    c.fillText(spec.footer || "goblub · 대환장 테스트", W / 2, H - 60);
   }
 
   function save(canvas, name) {
@@ -45,8 +45,8 @@
   function render(spec) {
     var wrap = document.createElement("div");
     var canvas = document.createElement("canvas");
-    canvas.width = 640; canvas.height = 800;
-    canvas.style.cssText = "width:100%; max-width:300px; border-radius:16px; display:block; margin:0 auto;";
+    canvas.width = 720; canvas.height = 1280;
+    canvas.style.cssText = "width:100%; max-width:260px; border-radius:16px; display:block; margin:0 auto;";
     function paint() { draw(canvas, spec); }
     paint();
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(paint); // Jua 로드 후 재렌더

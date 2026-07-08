@@ -129,38 +129,43 @@
       function roundRect(g, x, y, w, h, r) { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); }
       function saveImage() {
         var s = window.__cardState; if (!s) return;
-        var W = 720, H = 1080, g = document.createElement("canvas"); g.width = W; g.height = H;
+        var W = 720, H = 1280, g = document.createElement("canvas"); g.width = W; g.height = H; // 9:16 스토리 비율
         var c = g.getContext("2d");
         c.fillStyle = "#fff9ec"; c.fillRect(0, 0, W, H);
         var cols = ["#ff6b6b", "#ffd93d", "#6bcb77", "#4d96ff", "#b983ff"];
         for (var i = 0; i < 5; i++) { c.fillStyle = cols[i]; c.fillRect(i * 144, 0, 144, 16); }
         c.textAlign = "center";
-        c.fillStyle = "#38352f"; c.font = "46px 'Jua','Malgun Gothic',sans-serif";
-        c.fillText("🧑‍🚀 " + s.nm, W / 2, 92);
-        c.fillStyle = "#7a766d"; c.font = "26px 'Jua','Malgun Gothic',sans-serif";
-        c.fillText("goblub 종합 프로필 · Lv." + (s.p.level + 1) + " " + s.p.levelInfo.name, W / 2, 132);
+        c.fillStyle = "#38352f"; c.font = "48px 'Jua','Malgun Gothic',sans-serif";
+        c.fillText("🧑‍🚀 " + s.nm, W / 2, 104);
+        c.fillStyle = "#7a766d"; c.font = "27px 'Jua','Malgun Gothic',sans-serif";
+        c.fillText("goblub 종합 프로필 · Lv." + (s.p.level + 1) + " " + s.p.levelInfo.name, W / 2, 150);
         // tiles 2 cols
-        var tx = 40, ty = 168, tw = (W - 80 - 20) / 2, th = 108, gap = 20;
+        var tx = 40, ty = 196, tw = (W - 80 - 20) / 2, th = 126, gap = 22;
         s.items.forEach(function (it, n) {
           var col = n % 2, row = Math.floor(n / 2);
           var x = tx + col * (tw + gap), y = ty + row * (th + gap);
           c.fillStyle = it.done ? "#ffffff" : "#f3eee2"; roundRect(c, x, y, tw, th, 16); c.fill();
           c.lineWidth = 2; c.strokeStyle = "#e8ddc6"; c.stroke();
           c.textAlign = "left";
-          c.font = "42px 'Segoe UI Emoji',sans-serif"; c.fillStyle = "#000"; c.fillText(it.emoji, x + 18, y + 62);
-          c.font = "20px 'Jua','Malgun Gothic',sans-serif"; c.fillStyle = "#b0a99a"; c.fillText(it.label, x + 78, y + 42);
-          c.font = "24px 'Jua','Malgun Gothic',sans-serif"; c.fillStyle = it.done ? "#38352f" : "#b0a99a";
+          c.font = "44px 'Segoe UI Emoji',sans-serif"; c.fillStyle = "#000"; c.fillText(it.emoji, x + 18, y + 74);
+          c.font = "21px 'Jua','Malgun Gothic',sans-serif"; c.fillStyle = "#b0a99a"; c.fillText(it.label, x + 80, y + 50);
+          c.font = "25px 'Jua','Malgun Gothic',sans-serif"; c.fillStyle = it.done ? "#38352f" : "#b0a99a";
           var t = it.title.length > 12 ? it.title.slice(0, 12) + "…" : it.title;
-          c.fillText(t, x + 78, y + 74);
+          c.fillText(t, x + 80, y + 86);
           c.textAlign = "center";
         });
         var afterTiles = ty + Math.ceil(s.items.length / 2) * (th + gap) + 8;
         if (s.tags.length) {
-          c.fillStyle = "#7a766d"; c.font = "24px 'Jua','Malgun Gothic',sans-serif";
-          c.fillText("# " + s.tags.slice(0, 6).join("  # "), W / 2, afterTiles + 26);
+          c.fillStyle = "#7a766d"; c.font = "25px 'Jua','Malgun Gothic',sans-serif";
+          c.fillText("# " + s.tags.slice(0, 6).join("  # "), W / 2, afterTiles + 32);
         }
+        // 하단 고블럽 레벨 존
+        c.font = "110px 'Segoe UI Emoji',sans-serif"; c.fillStyle = "#000";
+        c.fillText(s.p.levelInfo.emoji + (s.p.levelInfo.deco || ""), W / 2, afterTiles + 210);
+        c.fillStyle = "#7a766d"; c.font = "28px 'Jua','Malgun Gothic',sans-serif";
+        c.fillText("Lv." + (s.p.level + 1) + " " + s.p.levelInfo.name + " 와 함께", W / 2, afterTiles + 268);
         c.fillStyle = "#b0a99a"; c.font = "24px 'Jua','Malgun Gothic',sans-serif";
-        c.fillText("🎡 goblub.vercel.app", W / 2, H - 34);
+        c.fillText("🎡 goblub.vercel.app", W / 2, H - 48);
         var dl = function (url) { var a = document.createElement("a"); a.href = url; a.download = "goblub-profile.png"; document.body.appendChild(a); a.click(); a.remove(); };
         if (g.toBlob) g.toBlob(function (b) { if (!b) { dl(g.toDataURL("image/png")); return; } var u = URL.createObjectURL(b); dl(u); setTimeout(function () { URL.revokeObjectURL(u); }, 5000); }, "image/png");
         else dl(g.toDataURL("image/png"));

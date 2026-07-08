@@ -270,18 +270,18 @@
         var type = window.__resultType;
         var r = RESULTS[type];
         var c = document.createElement("canvas");
-        c.width = 720; c.height = 900;
+        c.width = 720; c.height = 1280;
         var g = c.getContext("2d");
-        g.fillStyle = "#fff9ec"; g.fillRect(0, 0, 720, 900);
+        g.fillStyle = "#fff9ec"; g.fillRect(0, 0, 720, 1280);
         var colors = ["#ff6b6b", "#ffd93d", "#6bcb77", "#4d96ff", "#b983ff"];
         for (var i = 0; i < 5; i++) { g.fillStyle = colors[i]; g.fillRect(i * 144, 0, 144, 16); }
         g.textAlign = "center"; g.fillStyle = "#38352f";
-        g.font = "130px 'Segoe UI Emoji', sans-serif";
-        g.fillText(r.emoji, 360, 260);
-        g.font = "64px 'Jua', 'Malgun Gothic', sans-serif";
-        g.fillText(type, 360, 380);
-        g.font = "34px 'Jua', 'Malgun Gothic', sans-serif";
-        g.fillText(r.title, 360, 435);
+        g.font = "150px 'Segoe UI Emoji', sans-serif";
+        g.fillText(r.emoji, 360, 390);
+        g.font = "68px 'Jua', 'Malgun Gothic', sans-serif";
+        g.fillText(type, 360, 540);
+        g.font = "36px 'Jua', 'Malgun Gothic', sans-serif";
+        g.fillText(r.title, 360, 605);
         g.font = "26px 'Jua', 'Malgun Gothic', sans-serif";
         g.fillStyle = "#7a766d";
         // 밈 타이틀 줄바꿈
@@ -295,14 +295,14 @@
         if (line) lines.push(line);
         lines.forEach(function (l, i2) {
           var txt = (i2 === 0 ? "「" : "") + l + (i2 === lines.length - 1 ? "」" : "");
-          g.fillText(txt, 360, 530 + i2 * 40);
+          g.fillText(txt, 360, 740 + i2 * 44);
         });
         g.font = "28px 'Jua', 'Malgun Gothic', sans-serif";
         g.fillStyle = "#38352f";
-        g.fillText("🍞 대환장 상황극 MBTI", 360, 790);
+        g.fillText("🍞 대환장 상황극 MBTI", 360, 1140);
         g.fillStyle = "#7a766d";
         g.font = "24px 'Jua', 'Malgun Gothic', sans-serif";
-        g.fillText("goblub.vercel.app", 360, 830);
+        g.fillText("goblub.vercel.app", 360, 1185);
         c.toBlob(function (blob) {
           if (!blob) { window.open(c.toDataURL("image/png")); return; }
           var a = document.createElement("a");

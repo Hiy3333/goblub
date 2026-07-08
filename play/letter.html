@@ -223,7 +223,8 @@
           '<div class="ask" id="ask"></div>' +
           '<div class="yn" id="yn"><button class="btn-primary" id="yes"></button>' +
           '<button class="btn-ghost" id="no"></button></div>' +
-          '<div id="steps"></div>';
+          '<div id="steps"></div>' +
+          '<p class="fine-print" style="margin-top:22px">💜 이 편지는 <b>goblub</b>(무료 운세·테스트·미니게임 놀이터)의 마음 배달로 만들어졌어요 · 로그인·개인정보 수집 없음, 링크 속 내용은 보낸 사람만 알아요</p>';
         show("play");
         $("yes").textContent = t.yes;
         $("no").textContent = t.no;
@@ -436,25 +437,25 @@
 
       function saveImage(d, r, wd) {
         var t = TYPES[d.t] || TYPES.date;
-        var c = document.createElement("canvas"); c.width = 720; c.height = 900;
+        var c = document.createElement("canvas"); c.width = 720; c.height = 1280;
         var g = c.getContext("2d");
-        g.fillStyle = "#fff9ec"; g.fillRect(0, 0, 720, 900);
+        g.fillStyle = "#fff9ec"; g.fillRect(0, 0, 720, 1280);
         var cols = ["#ff6b6b","#ffd93d","#6bcb77","#4d96ff","#b983ff"];
         for (var i = 0; i < 5; i++) { g.fillStyle = cols[i]; g.fillRect(i * 144, 0, 144, 16); }
         g.textAlign = "center"; g.fillStyle = "#38352f";
-        g.font = "150px 'Segoe UI Emoji', sans-serif"; g.fillText(t.emoji, 360, 260);
-        g.font = "52px 'Jua', 'Malgun Gothic', sans-serif"; g.fillText(t.success, 360, 360);
-        g.font = "34px 'Jua', 'Malgun Gothic', sans-serif";
-        g.fillText("To. " + d.n, 360, 440);
-        g.fillStyle = "#7a766d"; g.font = "30px 'Jua', 'Malgun Gothic', sans-serif";
-        var y = 520;
-        if (r.menu) { g.fillText("🍴 " + r.menu, 360, y); y += 52; }
-        g.fillText("📅 " + r.day + " (" + wd + ")", 360, y); y += 52;
-        g.fillText("⏰ " + r.time, 360, y); y += 52;
-        if (d.m) { g.fillStyle = "#b06a5a"; g.fillText("“" + d.m + "”", 360, y + 6); }
-        if (d.f) { g.fillStyle = "#7a766d"; g.font = "30px 'Jua', 'Malgun Gothic', sans-serif"; g.fillText("✍️ From. " + d.f, 360, 800); }
+        g.font = "160px 'Segoe UI Emoji', sans-serif"; g.fillText(t.emoji, 360, 380);
+        g.font = "54px 'Jua', 'Malgun Gothic', sans-serif"; g.fillText(t.success, 360, 510);
+        g.font = "36px 'Jua', 'Malgun Gothic', sans-serif";
+        g.fillText("To. " + d.n, 360, 610);
+        g.fillStyle = "#7a766d"; g.font = "32px 'Jua', 'Malgun Gothic', sans-serif";
+        var y = 720;
+        if (r.menu) { g.fillText("🍴 " + r.menu, 360, y); y += 58; }
+        g.fillText("📅 " + r.day + " (" + wd + ")", 360, y); y += 58;
+        g.fillText("⏰ " + r.time, 360, y); y += 58;
+        if (d.m) { g.fillStyle = "#b06a5a"; g.fillText("“" + d.m + "”", 360, y + 10); }
+        if (d.f) { g.fillStyle = "#7a766d"; g.font = "30px 'Jua', 'Malgun Gothic', sans-serif"; g.fillText("✍️ From. " + d.f, 360, 1120); }
         g.fillStyle = "#38352f"; g.font = "26px 'Jua', 'Malgun Gothic', sans-serif";
-        g.fillText("💌 goblub.vercel.app", 360, 850);
+        g.fillText("💌 goblub.vercel.app", 360, 1190);
         c.toBlob(function (blob) {
           if (!blob) { window.open(c.toDataURL("image/png")); return; }
           var a = document.createElement("a");

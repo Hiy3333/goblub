@@ -189,7 +189,7 @@
 
       // 전생 장면 SVG를 공유용 카드(제목+삽화+브랜딩)로 저장
       function saveLifeImage(svgRoot, life, n) {
-        var W = 720, H = 900;
+        var W = 720, H = 1280; // 9:16 — 인스타 스토리 비율
         var canvas = document.createElement("canvas");
         canvas.width = W; canvas.height = H;
         var g = canvas.getContext("2d");
@@ -198,18 +198,30 @@
         for (var i = 0; i < 5; i++) { g.fillStyle = cols[i]; g.fillRect(i * 144, 0, 144, 14); }
         g.textAlign = "center";
         g.fillStyle = "#7a766d"; g.font = "28px 'Jua','Malgun Gothic',sans-serif";
-        g.fillText((n + 1) + "번째 전생 · " + life.era, W / 2, 64);
-        g.fillStyle = "#38352f"; g.font = "44px 'Jua','Malgun Gothic',sans-serif";
-        g.fillText(life.emoji + " " + life.title, W / 2, 118);
+        g.fillText((n + 1) + "번째 전생 · " + life.era, W / 2, 80);
+        g.fillStyle = "#38352f"; g.font = "46px 'Jua','Malgun Gothic',sans-serif";
+        g.fillText(life.emoji + " " + life.title, W / 2, 142);
+        function wrap(text, x, y, maxW, lh) {
+          var line = "", yy = y;
+          for (var k = 0; k < text.length; k++) {
+            var t2 = line + text[k];
+            if (g.measureText(t2).width > maxW && line) { g.fillText(line, x, yy); line = text[k]; yy += lh; }
+            else line = t2;
+          }
+          if (line) g.fillText(line, x, yy);
+          return yy;
+        }
         var clone = svgRoot.cloneNode(true);
         clone.setAttribute("width", "600"); clone.setAttribute("height", "600");
         clone.removeAttribute("style");
         var xml = new XMLSerializer().serializeToString(clone);
         var img = new Image();
         img.onload = function () {
-          g.drawImage(img, (W - 600) / 2, 150, 600, 600);
+          g.drawImage(img, (W - 600) / 2, 180, 600, 600);
+          g.fillStyle = "#7a766d"; g.font = "28px 'Jua','Malgun Gothic',sans-serif";
+          wrap(life.body, W / 2, 850, W - 120, 44);
           g.fillStyle = "#b0a99a"; g.font = "24px 'Jua','Malgun Gothic',sans-serif";
-          g.fillText("🔮 goblub · 전생 대환장 파티", W / 2, H - 34);
+          g.fillText("🔮 goblub · 전생 대환장 파티", W / 2, H - 50);
           var dl = function (url) { var a = document.createElement("a"); a.href = url; a.download = "goblub-jeonsaeng-" + (n + 1) + ".png"; document.body.appendChild(a); a.click(); a.remove(); };
           if (canvas.toBlob) canvas.toBlob(function (b) { if (!b) { dl(canvas.toDataURL("image/png")); return; } var u = URL.createObjectURL(b); dl(u); setTimeout(function () { URL.revokeObjectURL(u); }, 5000); }, "image/png");
           else dl(canvas.toDataURL("image/png"));
