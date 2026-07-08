@@ -272,37 +272,85 @@
         var c = document.createElement("canvas");
         c.width = 720; c.height = 1280;
         var g = c.getContext("2d");
-        g.fillStyle = "#fff9ec"; g.fillRect(0, 0, 720, 1280);
-        var colors = ["#ff6b6b", "#ffd93d", "#6bcb77", "#4d96ff", "#b983ff"];
-        for (var i = 0; i < 5; i++) { g.fillStyle = colors[i]; g.fillRect(i * 144, 0, 144, 16); }
-        g.textAlign = "center"; g.fillStyle = "#38352f";
+        var W = 720, H = 1280, neon = "#9d6bff";
+        function rr(x, y, w, h, rad) {
+          g.beginPath(); g.moveTo(x + rad, y);
+          g.arcTo(x + w, y, x + w, y + h, rad); g.arcTo(x + w, y + h, x, y + h, rad);
+          g.arcTo(x, y + h, x, y, rad); g.arcTo(x, y, x + w, y, rad); g.closePath();
+        }
+        // 야경 그라데이션 배경
+        var grd = g.createLinearGradient(0, 0, 0, H);
+        grd.addColorStop(0, "#0d0a2b"); grd.addColorStop(0.45, "#1c1250"); grd.addColorStop(1, "#45227a");
+        g.fillStyle = grd; g.fillRect(0, 0, W, H);
+        // 레트로 선(줄무늬 태양) — 이모지 뒤 장식
+        g.save();
+        g.beginPath(); g.arc(W / 2, 400, 170, 0, Math.PI * 2); g.clip();
+        var sun = g.createLinearGradient(0, 230, 0, 570);
+        sun.addColorStop(0, "#ffd93d"); sun.addColorStop(0.4, "#ff9a5a"); sun.addColorStop(0.75, "#ff6ec7"); sun.addColorStop(1, "#c85cff");
+        g.globalAlpha = 0.55; g.fillStyle = sun; g.fillRect(W / 2 - 170, 230, 340, 340);
+        g.globalAlpha = 1; g.fillStyle = "#151040";
+        for (var si = 0; si < 5; si++) g.fillRect(W / 2 - 170, 380 + si * 34, 340, 10 + si * 2);
+        g.restore();
+        // 시티 스카이라인
+        g.fillStyle = "#0a0620";
+        [[0, 1150, 90, 130], [110, 1120, 70, 160], [200, 1160, 80, 120], [300, 1100, 65, 180], [385, 1140, 95, 140],
+         [500, 1110, 70, 170], [590, 1155, 80, 125], [685, 1125, 60, 155]].forEach(function (b) { g.fillRect(b[0], b[1], b[2], b[3]); });
+        var win = ["#ffd93d", "#ff6ec7", "#4deeea"];
+        [[30, 1175], [135, 1150], [230, 1185], [325, 1130], [420, 1165], [525, 1140], [615, 1180], [705, 1155]].forEach(function (p, wi) {
+          g.fillStyle = win[wi % 3]; g.globalAlpha = 0.85; g.fillRect(p[0], p[1], 7, 7); g.globalAlpha = 1;
+        });
+        // 네온 프레임
+        g.save(); g.shadowColor = neon; g.shadowBlur = 24; g.strokeStyle = neon; g.lineWidth = 5;
+        rr(28, 28, W - 56, H - 56, 32); g.stroke(); g.restore();
+        g.strokeStyle = "rgba(255,255,255,0.55)"; g.lineWidth = 1.5;
+        rr(28, 28, W - 56, H - 56, 32); g.stroke();
+        // 반짝이 장식
+        g.textAlign = "center"; g.fillStyle = "#ffd93d"; g.font = "30px sans-serif";
+        g.save(); g.shadowColor = "#ffd93d"; g.shadowBlur = 14;
+        g.fillText("✦", 96, 200); g.fillText("✦", W - 90, 660); g.fillText("✧", W - 120, 160); g.fillText("✧", 110, 700);
+        g.restore();
+        // 상단 네온 pill 배지
+        var badge = "대환장 상황극 MBTI";
+        g.font = "30px 'Jua', 'Malgun Gothic', sans-serif";
+        var bw = g.measureText(badge).width + 56;
+        g.save(); g.shadowColor = neon; g.shadowBlur = 16; g.strokeStyle = neon; g.lineWidth = 3;
+        rr((W - bw) / 2, 96, bw, 62, 31); g.stroke(); g.restore();
+        g.fillStyle = "#fff";
+        g.save(); g.shadowColor = neon; g.shadowBlur = 10; g.fillText(badge, W / 2, 138); g.restore();
+        // 이모지 (레트로 선 위)
         g.font = "150px 'Segoe UI Emoji', sans-serif";
-        g.fillText(r.emoji, 360, 390);
-        g.font = "68px 'Jua', 'Malgun Gothic', sans-serif";
-        g.fillText(type, 360, 540);
-        g.font = "36px 'Jua', 'Malgun Gothic', sans-serif";
-        g.fillText(r.title, 360, 605);
-        g.font = "26px 'Jua', 'Malgun Gothic', sans-serif";
-        g.fillStyle = "#7a766d";
-        // 밈 타이틀 줄바꿈
+        g.save(); g.shadowColor = neon; g.shadowBlur = 30; g.fillText(r.emoji, W / 2, 455); g.restore();
+        // MBTI 4글자 — 초대형 시안 네온
+        g.font = "96px 'Jua', 'Malgun Gothic', sans-serif"; g.fillStyle = "#ffffff";
+        g.save(); g.shadowColor = "#4deeea"; g.shadowBlur = 30;
+        g.fillText(type, W / 2, 632); g.fillText(type, W / 2, 632);
+        g.restore();
+        // 타이틀 — 핑크 글로우
+        g.font = "42px 'Jua', 'Malgun Gothic', sans-serif"; g.fillStyle = "#ffffff";
+        g.save(); g.shadowColor = "#ff6ec7"; g.shadowBlur = 22;
+        g.fillText(r.title, W / 2, 712);
+        g.restore();
+        // 밈 타이틀 줄바꿈 — 연보라
+        g.font = "30px 'Jua', 'Malgun Gothic', sans-serif"; g.fillStyle = "#cdbdf6";
         var words = r.memeTitle.split(" ");
         var lines = [], line = "";
         words.forEach(function (w) {
           var t = line ? line + " " + w : w;
-          if (g.measureText("「" + t + "」").width > 620) { lines.push(line); line = w; }
+          if (g.measureText("「" + t + "」").width > 580) { lines.push(line); line = w; }
           else line = t;
         });
         if (line) lines.push(line);
         lines.forEach(function (l, i2) {
           var txt = (i2 === 0 ? "「" : "") + l + (i2 === lines.length - 1 ? "」" : "");
-          g.fillText(txt, 360, 740 + i2 * 44);
+          g.fillText(txt, W / 2, 800 + i2 * 48);
         });
-        g.font = "28px 'Jua', 'Malgun Gothic', sans-serif";
-        g.fillStyle = "#38352f";
-        g.fillText("🍞 대환장 상황극 MBTI", 360, 1140);
-        g.fillStyle = "#7a766d";
-        g.font = "24px 'Jua', 'Malgun Gothic', sans-serif";
-        g.fillText("goblub.vercel.app", 360, 1185);
+        // 하단 CTA
+        g.font = "26px 'Jua', 'Malgun Gothic', sans-serif"; g.fillStyle = "#b9a8e8";
+        g.fillText("🌃 goblub · 대환장 놀이터", W / 2, H - 116);
+        g.font = "28px 'Jua', 'Malgun Gothic', sans-serif"; g.fillStyle = "#4deeea";
+        g.save(); g.shadowColor = "#4deeea"; g.shadowBlur = 12;
+        g.fillText("나도 해보기 ▶ goblub.vercel.app", W / 2, H - 72);
+        g.restore();
         c.toBlob(function (blob) {
           if (!blob) { window.open(c.toDataURL("image/png")); return; }
           var a = document.createElement("a");

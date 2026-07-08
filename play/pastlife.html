@@ -187,20 +187,18 @@
         }, 30);
       }
 
-      // 전생 장면 SVG를 공유용 카드(제목+삽화+브랜딩)로 저장
+      // 전생 장면 SVG를 공유용 카드(제목+삽화+브랜딩)로 저장 — 미드나잇 시티팝 네온 룩
       function saveLifeImage(svgRoot, life, n) {
         var W = 720, H = 1280; // 9:16 — 인스타 스토리 비율
         var canvas = document.createElement("canvas");
         canvas.width = W; canvas.height = H;
         var g = canvas.getContext("2d");
-        g.fillStyle = "#fff9ec"; g.fillRect(0, 0, W, H);
-        var cols = ["#ff6b6b", "#ffd93d", "#6bcb77", "#4d96ff", "#b983ff"];
-        for (var i = 0; i < 5; i++) { g.fillStyle = cols[i]; g.fillRect(i * 144, 0, 144, 14); }
-        g.textAlign = "center";
-        g.fillStyle = "#7a766d"; g.font = "28px 'Jua','Malgun Gothic',sans-serif";
-        g.fillText((n + 1) + "번째 전생 · " + life.era, W / 2, 80);
-        g.fillStyle = "#38352f"; g.font = "46px 'Jua','Malgun Gothic',sans-serif";
-        g.fillText(life.emoji + " " + life.title, W / 2, 142);
+        var NEON = "#9d6bff";
+        function rr(x, y, w, h, r) {
+          g.beginPath(); g.moveTo(x + r, y);
+          g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r);
+          g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath();
+        }
         function wrap(text, x, y, maxW, lh) {
           var line = "", yy = y;
           for (var k = 0; k < text.length; k++) {
@@ -217,11 +215,60 @@
         var xml = new XMLSerializer().serializeToString(clone);
         var img = new Image();
         img.onload = function () {
-          g.drawImage(img, (W - 600) / 2, 180, 600, 600);
-          g.fillStyle = "#7a766d"; g.font = "28px 'Jua','Malgun Gothic',sans-serif";
-          wrap(life.body, W / 2, 850, W - 120, 44);
-          g.fillStyle = "#b0a99a"; g.font = "24px 'Jua','Malgun Gothic',sans-serif";
-          g.fillText("🔮 goblub · 전생 대환장 파티", W / 2, H - 50);
+          // 야경 그라데이션 배경
+          var grd = g.createLinearGradient(0, 0, 0, H);
+          grd.addColorStop(0, "#0d0a2b"); grd.addColorStop(0.45, "#1c1250"); grd.addColorStop(1, "#45227a");
+          g.fillStyle = grd; g.fillRect(0, 0, W, H);
+          // 시티 스카이라인 + 불빛 창문
+          g.fillStyle = "#0a0620";
+          [[0, 1150, 90, 130], [110, 1120, 70, 160], [200, 1160, 80, 120], [300, 1100, 65, 180], [385, 1140, 95, 140],
+           [500, 1110, 70, 170], [590, 1155, 80, 125], [685, 1125, 60, 155]].forEach(function (b) { g.fillRect(b[0], b[1], b[2], b[3]); });
+          var win = ["#ffd93d", "#ff6ec7", "#4deeea"];
+          [[30, 1175], [135, 1150], [230, 1185], [325, 1130], [420, 1165], [525, 1140], [615, 1180], [705, 1155],
+           [60, 1210], [160, 1190], [350, 1170], [550, 1185]].forEach(function (p, i) {
+            g.fillStyle = win[i % 3]; g.globalAlpha = 0.85; g.fillRect(p[0], p[1], 7, 7); g.globalAlpha = 1;
+          });
+          // 네온 프레임 — 퍼플
+          g.save(); g.shadowColor = NEON; g.shadowBlur = 24; g.strokeStyle = NEON; g.lineWidth = 5;
+          rr(28, 28, W - 56, H - 56, 32); g.stroke(); g.restore();
+          g.strokeStyle = "rgba(255,255,255,0.55)"; g.lineWidth = 1.5;
+          rr(28, 28, W - 56, H - 56, 32); g.stroke();
+          // 반짝이 장식
+          g.textAlign = "center";
+          g.fillStyle = "#ffd93d"; g.font = "30px sans-serif";
+          g.save(); g.shadowColor = "#ffd93d"; g.shadowBlur = 14;
+          g.fillText("✦", 96, 230); g.fillText("✧", W - 110, 190); g.fillText("✦", W - 90, 960); g.fillText("✧", 104, 930);
+          g.restore();
+          // 상단 네온 pill 배지
+          var badge = (n + 1) + "번째 전생 · " + life.era;
+          g.font = "28px 'Jua','Malgun Gothic',sans-serif";
+          var bw = g.measureText(badge).width + 56;
+          g.save(); g.shadowColor = NEON; g.shadowBlur = 16; g.strokeStyle = NEON; g.lineWidth = 3;
+          rr((W - bw) / 2, 88, bw, 58, 29); g.stroke(); g.restore();
+          g.fillStyle = "#fff";
+          g.save(); g.shadowColor = NEON; g.shadowBlur = 10; g.fillText(badge, W / 2, 127); g.restore();
+          // 타이틀 — 네온사인 글로우
+          g.font = "48px 'Jua','Malgun Gothic',sans-serif"; g.fillStyle = "#ffffff";
+          g.save(); g.shadowColor = NEON; g.shadowBlur = 26;
+          g.fillText(life.emoji + " " + life.title, W / 2, 208); g.fillText(life.emoji + " " + life.title, W / 2, 208);
+          g.restore();
+          // 흰색 폴라로이드 패널(만화 삽화는 흰 배경 필수) + 글로우 테두리
+          var px = 48, py = 248, pw = W - 96, ph = 656;
+          g.save(); g.shadowColor = NEON; g.shadowBlur = 20; g.fillStyle = "#fff";
+          rr(px, py, pw, ph, 20); g.fill(); g.restore();
+          g.strokeStyle = "rgba(255,255,255,0.7)"; g.lineWidth = 1.5;
+          rr(px, py, pw, ph, 20); g.stroke();
+          g.drawImage(img, (W - 600) / 2, py + 14, 600, 600);
+          // 본문 — 연보라
+          g.fillStyle = "#cdbdf6"; g.font = "28px 'Jua','Malgun Gothic',sans-serif";
+          wrap(life.body, W / 2, 964, W - 150, 44);
+          // 하단 CTA
+          g.font = "26px 'Jua','Malgun Gothic',sans-serif"; g.fillStyle = "#b9a8e8";
+          g.fillText("🔮 goblub · 전생 대환장 파티", W / 2, H - 116);
+          g.font = "28px 'Jua','Malgun Gothic',sans-serif"; g.fillStyle = "#4deeea";
+          g.save(); g.shadowColor = "#4deeea"; g.shadowBlur = 12;
+          g.fillText("나도 해보기 ▶ goblub.vercel.app", W / 2, H - 72);
+          g.restore();
           var dl = function (url) { var a = document.createElement("a"); a.href = url; a.download = "goblub-jeonsaeng-" + (n + 1) + ".png"; document.body.appendChild(a); a.click(); a.remove(); };
           if (canvas.toBlob) canvas.toBlob(function (b) { if (!b) { dl(canvas.toDataURL("image/png")); return; } var u = URL.createObjectURL(b); dl(u); setTimeout(function () { URL.revokeObjectURL(u); }, 5000); }, "image/png");
           else dl(canvas.toDataURL("image/png"));
