@@ -63,7 +63,8 @@
     var t = document.createElement("div");
     t.textContent = msg;
     t.style.cssText = "position:fixed; left:50%; bottom:26px; transform:translateX(-50%);" +
-      "background:#38352f; color:#fff; padding:10px 18px; border-radius:999px;" +
+      "background:#251a56; color:#f3ecff; padding:10px 18px; border-radius:999px;" +
+      "border:1.5px solid #9d6bff; box-shadow:0 0 14px rgba(157,107,255,0.5);" +
       "font-family:inherit; font-size:0.95rem; z-index:9999; opacity:0; transition:opacity 0.3s;";
     document.body.appendChild(t);
     setTimeout(function () { t.style.opacity = "1"; }, 30);

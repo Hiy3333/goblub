@@ -25,11 +25,11 @@
     "@keyframes gbd-bob{0%,100%{transform:translateY(0) rotate(-2deg);}50%{transform:translateY(-7px) rotate(2deg);}}" +
     ".gbd-body.pop{animation:gbd-pop .5s ease;}" +
     "@keyframes gbd-pop{30%{transform:scale(1.18) rotate(-6deg);}60%{transform:scale(1.1) rotate(6deg);}}" +
-    ".gbd-x{position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;border:none;background:#38352f;color:#fff;font-size:12px;line-height:20px;text-align:center;cursor:pointer;opacity:0;transition:opacity .2s;padding:0;}" +
+    ".gbd-x{position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;border:1px solid #9d6bff;background:#251a56;color:#f3ecff;font-size:12px;line-height:18px;text-align:center;cursor:pointer;opacity:0;transition:opacity .2s;padding:0;}" +
     ".gbd-body:hover .gbd-x{opacity:1;}" +
-    ".gbd-bubble{position:absolute;bottom:100%;left:50%;transform:translateX(-50%) translateY(-8px);background:#fff;border:2px solid var(--purple,#b983ff);color:#38352f;font-family:inherit;font-size:.8rem;white-space:nowrap;padding:6px 11px;border-radius:12px;box-shadow:0 4px 10px rgba(0,0,0,.14);opacity:0;pointer-events:none;transition:opacity .2s;}" +
+    ".gbd-bubble{position:absolute;bottom:100%;left:50%;transform:translateX(-50%) translateY(-8px);background:#251a56;border:2px solid var(--purple,#9d6bff);color:#f3ecff;font-family:inherit;font-size:.8rem;white-space:nowrap;padding:6px 11px;border-radius:12px;box-shadow:0 0 12px rgba(157,107,255,.4);opacity:0;pointer-events:none;transition:opacity .2s;}" +
     ".gbd-bubble.show{opacity:1;}" +
-    ".gbd-min{position:fixed;right:14px;bottom:14px;z-index:9000;width:46px;height:46px;border-radius:50%;border:none;background:#fff;box-shadow:0 4px 10px rgba(0,0,0,.2);cursor:pointer;padding:5px;display:none;}" +
+    ".gbd-min{position:fixed;right:14px;bottom:14px;z-index:9000;width:46px;height:46px;border-radius:50%;border:1.5px solid #9d6bff;background:#251a56;box-shadow:0 0 12px rgba(157,107,255,.45);cursor:pointer;padding:5px;display:none;}" +
     ".gbd-min .goblub-svg{width:100%!important;height:auto!important;display:block!important;}";
   document.head.appendChild(css);
 

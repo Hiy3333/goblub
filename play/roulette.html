@@ -8,18 +8,18 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/style.css?v=neon1" />
   <style>
-    #items { width:100%; min-height:110px; font-family:inherit; font-size:0.95rem; padding:12px; border:2px solid #e8e2d4; border-radius:12px; resize:vertical; }
+    #items { width:100%; min-height:110px; font-family:inherit; font-size:0.95rem; padding:12px; border:2px solid var(--line); border-radius:12px; resize:vertical; }
     .preset-row { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-bottom:10px; }
     .err-msg { text-align:center; color:var(--coral); font-weight:bold; margin:8px 0; }
     .wheel-wrap { position:relative; width:320px; max-width:84vw; aspect-ratio:1/1; margin:18px auto 8px; }
     .wheel-spin { width:100%; height:100%; transition: transform 4.2s cubic-bezier(.15,.86,.28,1); transform-origin:50% 50%; }
     .wheel-spin svg { width:100%; height:100%; display:block; }
     .wheel-pointer { position:absolute; top:-4px; left:50%; transform:translateX(-50%); font-size:2rem; z-index:3;
-      color:#38352f; filter:drop-shadow(0 2px 2px rgba(0,0,0,.25)); line-height:1; }
+      color:var(--ink); filter:drop-shadow(0 2px 2px rgba(0,0,0,.25)); line-height:1; }
     .wheel-hub { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:48px; height:48px; border-radius:50%;
-      background:#fff; box-shadow:0 2px 8px rgba(0,0,0,.25); display:flex; align-items:center; justify-content:center; font-size:1.5rem; z-index:2; }
+      background:var(--surface); box-shadow:0 2px 8px rgba(0,0,0,.25); display:flex; align-items:center; justify-content:center; font-size:1.5rem; z-index:2; }
     .wheel-empty { text-align:center; color:var(--ink-soft); padding:40px 0; }
   </style>
 </head>
@@ -103,7 +103,7 @@
           path.setAttribute("d", "M" + cx + " " + cy + " L" + p1[0].toFixed(2) + " " + p1[1].toFixed(2) +
             " A" + r + " " + r + " 0 " + large + " 1 " + p2[0].toFixed(2) + " " + p2[1].toFixed(2) + " Z");
           path.setAttribute("fill", COLS[i % COLS.length]);
-          path.setAttribute("stroke", "#fff9ec"); path.setAttribute("stroke-width", "1.5");
+          path.setAttribute("stroke", "#17103e"); path.setAttribute("stroke-width", "1.5");
           svg.appendChild(path);
           var am = a1 + seg / 2, lp = P(am, r * 0.62);
           var label = items[i].length > (n > 8 ? 5 : 8) ? items[i].slice(0, n > 8 ? 5 : 8) + "…" : items[i];

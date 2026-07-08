@@ -8,25 +8,25 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/style.css?v=neon1" />
   <style>
-    .life-card { background: #fff; border: 2px solid #efe9db; border-radius: 16px; padding: 16px 18px; margin-bottom: 14px; }
+    .life-card { background: var(--surface); border: 2px solid var(--line); border-radius: 16px; padding: 16px 18px; margin-bottom: 14px; }
     .life-era { display: inline-block; background: var(--cream); border-radius: 999px; padding: 4px 12px; font-size: 0.82rem; color: var(--ink-soft); margin-bottom: 8px; }
     .life-title { font-size: 1.12rem; margin-bottom: 6px; }
     .life-body { color: var(--ink-soft); line-height: 1.7; white-space: pre-wrap; }
     .life-art { margin: 10px 0 6px; text-align: center; }
-    .life-card.bad { border-color: #f2b8b8; }
-    .summon { background: var(--purple); color: #fff; border: none; border-radius: 999px; padding: 8px 16px;
+    .life-card.bad { border-color: rgba(255,110,199,0.55); }
+    .summon { background: var(--purple); color: #1d0a40; border: none; border-radius: 999px; padding: 8px 16px;
       font-family: inherit; font-size: 0.9rem; cursor: pointer; margin-top: 10px; }
     .muncher { display: inline-block; font-size: 1.3rem; }
     .chew { animation: chew 0.18s ease infinite; }
     @keyframes chew { 50% { transform: rotate(14deg) scale(1.25); } }
-    .svg-box { border: 2px dashed #e8e2d4; border-radius: 16px; padding: 10px; margin-top: 8px; }
+    .svg-box { border: 2px dashed var(--line); border-radius: 16px; padding: 10px; margin-top: 8px; }
     .svg-box svg { width: 100%; height: auto; display: block; border-radius: 10px; }
-    .svg-missing { border: 2px dashed #e8d9c4; border-radius: 16px; padding: 22px 14px; margin-top: 8px;
-      text-align: center; color: #a3937a; background: #fffdf7; line-height: 1.6; }
+    .svg-missing { border: 2px dashed var(--line); border-radius: 16px; padding: 22px 14px; margin-top: 8px;
+      text-align: center; color: #8f7fc0; background: var(--surface); line-height: 1.6; }
     .svg-missing .big { font-size: 2rem; display: block; margin-bottom: 6px; }
-    .art-hint { margin: 4px 0 12px; color: var(--ink-soft); background: #fff7e8; border: 1.5px solid #f0e2c4;
+    .art-hint { margin: 4px 0 12px; color: var(--ink-soft); background: #2c2064; border: 1.5px solid var(--line);
       border-radius: 12px; padding: 10px 14px; font-size: 0.92rem; }
     .digging { text-align: center; font-size: 2.6rem; }
     .digging .shovel { display: inline-block; animation: dig 0.7s ease infinite; }
@@ -179,7 +179,7 @@
                 if (j >= fixText.length) {
                   clearInterval(typeIn);
                   card.classList.remove("bad");
-                  card.style.borderColor = "#cdeccd";
+                  card.style.borderColor = "var(--mint)";
                 }
               }, 28);
             }, 500);

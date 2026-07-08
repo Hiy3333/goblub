@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/style.css?v=neon1" />
   <style>
     .cookie-stage { text-align: center; padding: 10px 0 4px; }
     .cookie { font-size: 6.4rem; line-height: 1.1; cursor: pointer; display: inline-block; transition: transform 0.18s; }
@@ -22,7 +22,7 @@
     .crumb { position: absolute; font-size: 1.2rem; opacity: 0; pointer-events: none; }
     .crumb.go { animation: crumb 0.7s ease forwards; }
     @keyframes crumb { 0% { opacity: 1; transform: translate(0,0) scale(1); } 100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(0.4); } }
-    .slip { max-width: 440px; margin: 6px auto 0; background: #fffdf6; border: 2px dashed #e0d6bf; border-radius: 16px; padding: 24px 22px; opacity: 0; }
+    .slip { max-width: 440px; margin: 6px auto 0; background: var(--surface); border: 2px dashed var(--line); border-radius: 16px; padding: 24px 22px; opacity: 0; }
     .slip.show { opacity: 1; animation: slip-in 0.5s ease; }
     @keyframes slip-in { from { transform: translateY(14px) scale(0.96); } to { transform: none; } }
     .fortune { font-size: 1.2rem; line-height: 1.7; color: var(--ink); }

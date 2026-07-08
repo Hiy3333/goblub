@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/style.css?v=neon1" />
   <style>
     .tcard { width: 130px; height: 200px; perspective: 800px; cursor: pointer; margin: 0 auto; }
     .tcard .inner { position: relative; width: 100%; height: 100%; transition: transform 0.7s; transform-style: preserve-3d; }
@@ -19,7 +19,7 @@
     .tback { background: linear-gradient(135deg, var(--purple), var(--sky));
       color: #fff; font-size: 2.4rem; }
     .tback::after { content: "✦ ✧ ✦"; font-size: 0.9rem; opacity: 0.8; }
-    .tfront { background: #fff; transform: rotateY(180deg); border: 2px solid var(--purple); }
+    .tfront { background: var(--surface); transform: rotateY(180deg); border: 2px solid var(--purple); }
     .tfront .te { font-size: 3rem; }
     .tfront .tn { font-size: 0.95rem; }
     .tfront .ten { font-size: 0.7rem; color: var(--ink-soft); }
@@ -44,7 +44,7 @@
     .slot-label { color: var(--ink-soft); font-size: 0.88rem; margin-bottom: 8px; }
     .tmeaning { line-height: 1.75; margin-top: 10px; }
     .q-input { width: 100%; font-family: inherit; font-size: 0.95rem; padding: 10px 12px;
-      border: 2px solid #e8e2d4; border-radius: 12px; color: var(--ink); margin-bottom: 12px; }
+      border: 2px solid var(--line); border-radius: 12px; background: var(--surface); color: var(--ink); margin-bottom: 12px; }
   </style>
 </head>
 <body>

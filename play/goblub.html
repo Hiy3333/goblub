@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/style.css?v=neon1" />
   <style>
     .pet { position: relative; text-align: center; margin: 6px 0 2px; transition: transform 0.25s; }
     .pet.nom { animation: nom 0.5s ease; }
@@ -17,17 +17,17 @@
     .pet .pet-deco { position: absolute; top: -4px; left: 50%; transform: translateX(-50%); font-size: 1.9rem; pointer-events: none; }
     .pet-name { text-align: center; font-size: 1.3rem; margin-bottom: 2px; }
     .pet-level { text-align: center; color: var(--ink-soft); margin-bottom: 12px; }
-    .xp-track { background: #efe9db; border-radius: 999px; height: 14px; overflow: hidden; }
+    .xp-track { background: var(--cream); border-radius: 999px; height: 14px; overflow: hidden; }
     .xp-fill { background: linear-gradient(90deg, var(--mint), var(--purple)); height: 14px; border-radius: 999px; transition: width 0.4s; }
     .xp-label { text-align: center; color: var(--ink-soft); font-size: 0.85rem; margin: 6px 0 14px; }
     .snack { font-size: 1.4rem; letter-spacing: 4px; text-align: center; min-height: 1.8em; }
     .earn-list { list-style: none; }
     .earn-list li { margin-bottom: 8px; }
     .earn-list a { display: block; background: var(--cream); border-radius: 12px; padding: 12px 14px; }
-    .earn-list a:hover { background: #f4edda; }
+    .earn-list a:hover { background: #2c2064; }
     .levelup { text-align: center; font-size: 1.2rem; color: var(--coral); display: none; margin-top: 10px; }
     .name-edit { display: flex; gap: 8px; justify-content: center; margin-bottom: 10px; }
-    .name-edit input { font-family: inherit; font-size: 0.95rem; padding: 8px 12px; border: 2px solid #e8e2d4; border-radius: 10px; width: 160px; }
+    .name-edit input { font-family: inherit; font-size: 0.95rem; padding: 8px 12px; border: 2px solid var(--line); border-radius: 10px; width: 160px; background: var(--surface); color: var(--ink); }
   </style>
 </head>
 <body>
