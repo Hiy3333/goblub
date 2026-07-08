@@ -38,6 +38,20 @@
     .line-row .ball { width: 40px; height: 40px; font-size: 1.05rem; }
     .disclaimer { background: var(--cream); border-radius: 12px; padding: 12px 14px; margin-top: 16px;
       color: var(--ink-soft); font-size: 0.85rem; line-height: 1.6; }
+    /* 내 번호 성적 조회 */
+    .num-grid { display: grid; grid-template-columns: repeat(9, 1fr); gap: 6px; margin: 12px 0; }
+    .num-cell { aspect-ratio: 1/1; border-radius: 50%; border: 1.5px solid var(--line); background: var(--cream);
+      color: var(--ink-soft); font-family: inherit; font-size: 0.92rem; cursor: pointer; padding: 0; }
+    .num-cell.on { color: #fff; border-color: rgba(255,255,255,0.65); text-shadow: 0 1px 2px rgba(0,0,0,.3);
+      box-shadow: 0 0 10px rgba(255,255,255,.3); }
+    .rank-row { display: flex; justify-content: space-between; padding: 8px 12px; border-bottom: 1px dashed var(--line); }
+    .rank-row.zero { opacity: 0.45; }
+    .rank-row b { color: #fff; }
+    .hit-best { background: var(--cream); border: 1.5px solid var(--line); border-radius: 12px; padding: 12px 14px;
+      margin-top: 12px; line-height: 1.7; }
+    .reco-tabs { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 6px; }
+    .dosa-box { white-space: pre-wrap; line-height: 1.8; background: var(--cream); border-radius: 14px;
+      padding: 16px; margin-top: 12px; display: none; text-align: left; }
   </style>
 </head>
 <body>
@@ -66,12 +80,45 @@
         복권 구매는 만 19세 이상 · 과도한 구매는 삼가세요. (공식 복권사와 무관한 재미 콘텐츠)
       </div>
     </section>
+
+    <section class="panel">
+      <h2>🔍 내 번호 역대 성적 조회</h2>
+      <p class="result-desc" style="margin-bottom:8px">1회부터 <b id="hist-latest">…</b>회까지 역대 전 회차와 대조해요. 아꼈던 번호 6개를 골라보세요!</p>
+      <div class="num-grid" id="pick-grid"></div>
+      <div class="result-actions">
+        <button class="btn-primary" id="btn-check" disabled>📜 역대 성적 조회</button>
+        <button class="btn-ghost" id="btn-clear">초기화</button>
+      </div>
+      <div id="check-out"></div>
+    </section>
+
+    <section class="panel">
+      <h2>📊 역대 데이터로 뽑는 추천 번호</h2>
+      <p class="result-desc" style="margin-bottom:10px">역대 당첨 번호의 출현 빈도·구간 밸런스로 조합을 만들어요. (경우의 수 놀이일 뿐, 확률은 모든 조합이 똑같아요 🙂)</p>
+      <div class="reco-tabs">
+        <button class="btn-ghost reco-btn" data-mode="hot">🔥 핫넘버픽</button>
+        <button class="btn-ghost reco-btn" data-mode="cold">🥶 콜드넘버픽</button>
+        <button class="btn-ghost reco-btn" data-mode="bal">⚖️ 밸런스픽</button>
+      </div>
+      <div class="balls" id="reco-balls"></div>
+      <p class="fine-print" id="reco-note" style="min-height:1.2em"></p>
+    </section>
+
+    <section class="panel">
+      <h2>🧙 고블럽 도사 AI 분석</h2>
+      <p class="result-desc" style="margin-bottom:10px">역대 전 회차 당첨 통계를 도사님이 통째로 읽고 기운이 뜨거운 조합을 점지해드려요.</p>
+      <div class="result-actions"><button class="btn-primary" id="btn-dosa">🔮 도사님, 분석해주세요</button></div>
+      <p class="fine-print" id="dosa-status" style="display:none"></p>
+      <div class="dosa-box" id="dosa-text"></div>
+      <div class="balls" id="dosa-balls"></div>
+    </section>
   </main>
   <div id="site-footer"></div>
   <script src="../js/common.js" data-root=".."></script>
   <script src="js/goblub-art.js"></script>
   <script src="js/feed.js"></script>
   <script src="js/sharecard.js"></script>
+  <script src="js/dosa.js"></script>
   <script>
     (function () {
       var $ = function (id) { return document.getElementById(id); };
@@ -154,6 +201,194 @@
 
       $("btn-spit").onclick = spitOneByOne;
       $("btn-auto").onclick = auto5;
+
+      // ================= 역대 당첨 데이터 (1회~최신) =================
+      var HIST = null, FREQ = null, LAST_SEEN = null;
+      function loadHist() {
+        if (HIST) return Promise.resolve(HIST);
+        return fetch("data/lotto-history.json")
+          .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+          .then(function (d) {
+            HIST = d; FREQ = {}; LAST_SEEN = {};
+            for (var i = 1; i <= 45; i++) { FREQ[i] = 0; LAST_SEEN[i] = 0; }
+            d.list.forEach(function (x) {
+              x.n.forEach(function (v) { FREQ[v]++; if (x.r > LAST_SEEN[v]) LAST_SEEN[v] = x.r; });
+            });
+            $("hist-latest").textContent = d.latest;
+            return d;
+          });
+      }
+      loadHist().catch(function () { $("hist-latest").textContent = "?"; });
+
+      function fmtDate(ymd) { return ymd.slice(0, 4) + "." + ymd.slice(4, 6) + "." + ymd.slice(6, 8); }
+      function zoneOf(n) { return n <= 10 ? 0 : n <= 20 ? 1 : n <= 30 ? 2 : n <= 40 ? 3 : 4; }
+
+      // ================= ① 내 번호 역대 성적 조회 =================
+      var picked = [];
+      var grid = $("pick-grid");
+      for (var pn = 1; pn <= 45; pn++) {
+        (function (n) {
+          var c = document.createElement("button");
+          c.className = "num-cell"; c.textContent = n; c.type = "button";
+          c.onclick = function () {
+            var idx = picked.indexOf(n);
+            if (idx > -1) { picked.splice(idx, 1); c.classList.remove("on"); c.style.background = ""; }
+            else {
+              if (picked.length >= 6) return;
+              picked.push(n); c.classList.add("on"); c.style.background = ballColor(n);
+            }
+            $("btn-check").disabled = picked.length !== 6;
+          };
+          grid.appendChild(c);
+        })(pn);
+      }
+      $("btn-clear").onclick = function () {
+        picked = [];
+        Array.prototype.forEach.call(grid.children, function (c) { c.classList.remove("on"); c.style.background = ""; });
+        $("btn-check").disabled = true; $("check-out").innerHTML = "";
+      };
+
+      var RANK_LABEL = { 1: "🏆 1등 (6개 일치)", 2: "🥈 2등 (5개+보너스)", 3: "🥉 3등 (5개 일치)", 4: "4등 (4개 일치)", 5: "5등 (3개 일치)" };
+      $("btn-check").onclick = function () {
+        loadHist().then(function (d) {
+          var mine = picked.slice().sort(function (a, b) { return a - b; });
+          var counts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+          var best = null;
+          d.list.forEach(function (x) {
+            var m = 0;
+            x.n.forEach(function (v) { if (mine.indexOf(v) > -1) m++; });
+            var hasBonus = mine.indexOf(x.b) > -1;
+            var rank = 0;
+            if (m === 6) rank = 1; else if (m === 5 && hasBonus) rank = 2;
+            else if (m === 5) rank = 3; else if (m === 4) rank = 4; else if (m === 3) rank = 5;
+            if (rank) counts[rank]++;
+            var score = m * 10 + (hasBonus ? 1 : 0);
+            if (!best || score > best.score) best = { score: score, m: m, hasBonus: hasBonus, x: x };
+          });
+          var totalWin = counts[1] + counts[2] + counts[3] + counts[4] + counts[5];
+          var estWon = counts[5] * 5000 + counts[4] * 50000;
+          var html = '<div style="margin-top:14px">';
+          for (var rk = 1; rk <= 5; rk++) {
+            html += '<div class="rank-row' + (counts[rk] ? "" : " zero") + '"><span>' + RANK_LABEL[rk] + "</span><b>" + counts[rk] + "번</b></div>";
+          }
+          html += "</div>";
+          var summary;
+          if (counts[1]) summary = "😱 이 조합, 역대 <b>1등</b>이 나왔던 바로 그 번호예요!!";
+          else if (counts[2] || counts[3]) summary = "🔥 5개 일치 경험이 있는 아까운 조합! 소름 돋는 기록이네요.";
+          else if (totalWin) summary = "🍀 " + d.latest + "번 샀다고 치면 총 <b>" + totalWin + "번</b> 당첨(5등 이상), 4·5등 상금만 약 <b>" + estWon.toLocaleString() + "원</b>어치!";
+          else summary = "💨 " + d.latest + "회 동안 3개 일치도 없던 청정 조합… 오히려 이제 나올 때가 됐다는 뜻?! (아님)";
+          var bestLine = "";
+          if (best && best.m >= 3) {
+            bestLine = "<br>✨ 최고 기록: <b>" + best.x.r + "회</b> (" + fmtDate(String(best.x.d)) + ") — <b>" + best.m + "개 일치" + (best.m === 5 && best.hasBonus ? " + 보너스" : "") + "</b> (당첨번호 " + best.x.n.join(", ") + " + " + best.x.b + ")";
+          }
+          html += '<div class="hit-best">' + summary + bestLine + "</div>";
+          $("check-out").innerHTML = html;
+        }).catch(function () { $("check-out").innerHTML = '<p class="fine-print">데이터를 불러오지 못했어요. 새로고침 해주세요.</p>'; });
+      };
+
+      // ================= ② 통계 기반 추천 =================
+      function weightedPick(weightFn) {
+        var pool = [], out = [], i;
+        for (i = 1; i <= 45; i++) pool.push(i);
+        while (out.length < 6) {
+          var total = 0, w = [];
+          for (i = 0; i < pool.length; i++) { w[i] = weightFn(pool[i]); total += w[i]; }
+          var t = Math.random() * total, acc = 0, idx = pool.length - 1;
+          for (i = 0; i < pool.length; i++) { acc += w[i]; if (t <= acc) { idx = i; break; } }
+          out.push(pool[idx]); pool.splice(idx, 1);
+        }
+        return out.sort(function (a, b) { return a - b; });
+      }
+      function balancedPick() {
+        for (var t = 0; t < 300; t++) {
+          var g = pick6().nums;
+          var odd = g.filter(function (n) { return n % 2; }).length;
+          var zones = [0, 0, 0, 0, 0];
+          g.forEach(function (n) { zones[zoneOf(n)]++; });
+          var maxZone = Math.max.apply(null, zones);
+          var sum = g.reduce(function (a, b) { return a + b; }, 0);
+          if (odd >= 2 && odd <= 4 && maxZone <= 3 && sum >= 100 && sum <= 175) return g;
+        }
+        return pick6().nums;
+      }
+      Array.prototype.forEach.call(document.querySelectorAll(".reco-btn"), function (btn) {
+        btn.onclick = function () {
+          loadHist().then(function (d) {
+            var mode = btn.getAttribute("data-mode");
+            var maxF = 0, minF = 9999, i;
+            for (i = 1; i <= 45; i++) { if (FREQ[i] > maxF) maxF = FREQ[i]; if (FREQ[i] < minF) minF = FREQ[i]; }
+            var nums, note;
+            if (mode === "hot") {
+              nums = weightedPick(function (n) { return FREQ[n] * FREQ[n]; });
+              note = "🔥 역대 " + d.latest + "회에서 많이 나온 번호일수록 잘 뽑히게 가중치를 줬어요";
+            } else if (mode === "cold") {
+              nums = weightedPick(function (n) { return (maxF - FREQ[n]) * (maxF - FREQ[n]) + 4; });
+              note = "🥶 덜 나온 번호일수록 잘 뽑히게 — '이제 나올 때 됐다' 파를 위해";
+            } else {
+              nums = balancedPick();
+              note = "⚖️ 역대 당첨 번호의 전형적 패턴(홀짝 2~4·구간 분산·합 100~175)에 맞춘 조합";
+            }
+            gobSpit();
+            var rb = $("reco-balls"); rb.innerHTML = "";
+            nums.forEach(function (n) { rb.appendChild(ballEl(n)); });
+            $("reco-note").textContent = note + " · 물론 확률은 모두 같아요!";
+          }).catch(function () { $("reco-note").textContent = "데이터를 불러오지 못했어요. 새로고침 해주세요."; });
+        };
+      });
+
+      // ================= ③ 고블럽 도사 AI 분석 =================
+      $("btn-dosa").onclick = function () {
+        loadHist().then(function (d) {
+          var freqArr = [], n;
+          for (n = 1; n <= 45; n++) freqArr.push({ n: n, c: FREQ[n] });
+          var hot = freqArr.slice().sort(function (a, b) { return b.c - a.c; }).slice(0, 10);
+          var cold = freqArr.slice().sort(function (a, b) { return a.c - b.c; }).slice(0, 10);
+          var overdue = [];
+          for (n = 1; n <= 45; n++) overdue.push({ n: n, gap: d.latest - LAST_SEEN[n] });
+          overdue.sort(function (a, b) { return b.gap - a.gap; });
+          overdue = overdue.slice(0, 8);
+          var recent = d.list.slice(-10).map(function (x) { return x.n; });
+          var zoneCnt = [0, 0, 0, 0, 0], oddCnt = 0, tot = 0;
+          d.list.forEach(function (x) {
+            x.n.forEach(function (v) { zoneCnt[zoneOf(v)]++; tot++; if (v % 2) oddCnt++; });
+          });
+          var zoneAvg = zoneCnt.map(function (c) { return Math.round(c / d.list.length * 100) / 100; });
+          var stats = { latest: d.latest, hot: hot, cold: cold, overdue: overdue, recent: recent,
+            zoneAvg: zoneAvg, oddPct: Math.round(oddCnt / tot * 1000) / 10 };
+
+          var btn = $("btn-dosa"), st = $("dosa-status"), box = $("dosa-text");
+          btn.disabled = true;
+          st.style.display = "block"; st.textContent = "🧙 도사님이 " + d.latest + "회치 두루마리를 펼치는 중…";
+          box.style.display = "block"; box.textContent = "";
+          $("dosa-balls").innerHTML = "";
+          var buffer = "";
+          Dosa.fetchAI("/api/lotto-dosa", { stats: stats }, "goblub_ld1_", {
+            accept: function (full) { return /@@PICK\|\s*\d/.test(full); },
+            onChunk: function (t) { buffer += t; box.textContent = buffer.replace(/@@PICK\|[\d,\s]*/, "").trim(); },
+            onDone: function () {
+              st.textContent = "🧙 점지 완료! 재미로 봐주세요 — 어떤 조합이든 확률은 똑같답니다.";
+              var m = buffer.match(/@@PICK\|([\d,\s]+)/);
+              if (m) {
+                var nums = m[1].split(",").map(function (s) { return +s.trim(); })
+                  .filter(function (v, i2, arr) { return v >= 1 && v <= 45 && arr.indexOf(v) === i2; })
+                  .slice(0, 6).sort(function (a, b) { return a - b; });
+                var db = $("dosa-balls");
+                nums.forEach(function (n2) { db.appendChild(ballEl(n2)); });
+                gobSpit();
+              }
+              btn.disabled = false;
+            },
+            onError: function (code, sec) {
+              st.textContent =
+                code === "not_configured" ? "도사님이 아직 수련 중이에요. 곧 찾아옵니다!" :
+                code === "cooldown" ? "도사님이 숨 고르는 중… " + sec + "초 후에 다시!" :
+                "두루마리가 엉켰어요. 잠시 후 다시 시도해 주세요!";
+              box.style.display = "none";
+              btn.disabled = false;
+            }
+          });
+        }).catch(function () { $("dosa-status").style.display = "block"; $("dosa-status").textContent = "데이터를 불러오지 못했어요."; });
+      };
     })();
   </script>
 </body>
