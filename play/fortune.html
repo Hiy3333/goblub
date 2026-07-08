@@ -18,8 +18,6 @@
     .menu-grid a:hover { background: #f4edda; }
     .menu-grid .mi { font-size: 1.8rem; display: block; margin-bottom: 6px; }
     .menu-grid .mt { font-size: 0.98rem; }
-    .chew-gob { display: inline-block; animation: gchew 0.18s ease infinite; }
-    @keyframes gchew { 50% { transform: rotate(14deg) scale(1.25); } }
   </style>
 </head>
 <body>
@@ -69,7 +67,7 @@
       <section class="panel"><h2>🍀 오늘의 총운 <span class="stars" id="s-total"></span></h2><p class="result-desc" id="t-total"></p></section>
       <section class="panel"><h2>💘 오늘의 연애운 <span class="stars" id="s-love"></span></h2><p class="result-desc" id="t-love"></p></section>
       <section class="panel"><h2>💰 오늘의 재물운 <span class="stars" id="s-money"></span></h2><p class="result-desc" id="t-money"></p></section>
-      <section class="panel"><h2>📚 오늘의 시험·집중운 <span class="stars" id="s-study"></span></h2><p class="result-desc" id="t-study"></p><div id="study-fix"></div></section>
+      <section class="panel"><h2>📚 오늘의 시험·집중운 <span class="stars" id="s-study"></span></h2><p class="result-desc" id="t-study"></p></section>
       <section class="panel"><h2>📆 이번 달의 운세 <span class="stars" id="s-month"></span></h2><p class="result-desc" id="t-month"></p></section>
     </div>
 
@@ -109,38 +107,6 @@
       function showErr(msg) { var e = $("err"); e.textContent = msg; e.style.display = "block"; }
       function stars(n) { return "★★★★★".slice(0, n) + "☆☆☆☆☆".slice(0, 5 - n); }
 
-      // 시험운이 나쁘면(≤2) 고블럽이 나쁜 기운을 씹어먹고 반전 운세로 바꿔줌
-      function eatBadStudy(btn, f) {
-        var bodyEl = $("t-study");
-        var gob = window.GoblubArt ? GoblubArt.svg(32) : "👾";
-        var m = document.createElement("span");
-        m.className = "chew-gob";
-        m.innerHTML = gob;
-        btn.replaceWith(m);
-        var text = bodyEl.textContent, i = text.length;
-        var eat = setInterval(function () {
-          i = Math.max(0, i - 3);
-          bodyEl.textContent = text.slice(0, i);
-          if (i <= 0) {
-            clearInterval(eat);
-            m.classList.remove("chew-gob");
-            m.innerHTML = gob + ' <b style="color:var(--purple)">냠— 나쁜 기운 꿀꺽!</b>';
-            setTimeout(function () {
-              var fix = f.study.fix, j = 0;
-              var typeIn = setInterval(function () {
-                j += 2;
-                bodyEl.textContent = fix.slice(0, j);
-                if (j >= fix.length) {
-                  clearInterval(typeIn);
-                  $("s-study").textContent = stars(Math.min(5, f.study.score + 2)) + "✨";
-                  m.innerHTML = gob + ' <b style="color:var(--purple)">반짝반짝 새 기운으로 바꿔놨어요! ✨</b>';
-                }
-              }, 26);
-            }, 450);
-          }
-        }, 26);
-      }
-
       function fillForm(p) {
         y.value = p.y; m.value = p.m; d.value = p.d;
         h.value = p.hour == null ? "" : p.hour;
@@ -172,17 +138,6 @@
         $("s-money").textContent = stars(f.money.score); $("t-money").textContent = f.money.text;
         $("s-study").textContent = stars(f.study.score); $("t-study").textContent = f.study.text;
         $("s-month").textContent = stars(f.month.score); $("t-month").textContent = f.month.text;
-
-        var fixArea = $("study-fix");
-        fixArea.innerHTML = "";
-        if (f.study.score <= 2) {
-          var eatBtn = document.createElement("button");
-          eatBtn.className = "btn-primary";
-          eatBtn.style.marginTop = "12px";
-          eatBtn.textContent = "🌀 고블럽 소환 — 나쁜 기운 씹어먹기";
-          eatBtn.onclick = function () { eatBadStudy(eatBtn, f); };
-          fixArea.appendChild(eatBtn);
-        }
 
         $("input-panel").style.display = "none";
         $("profile-panel").style.display = "block";
