@@ -116,6 +116,16 @@
       levelInfo: LEVELS[lv], nextNeed: next, maxLevel: lv === LEVELS.length - 1 };
   }
 
+  // 종합 프로필 카드용 — 테스트 결과를 goblub_card 에 모아둠
+  function record(key, data) {
+    try {
+      var c = JSON.parse(localStorage.getItem("goblub_card") || "{}");
+      c[key] = { e: (data && data.emoji) || "", t: (data && data.title) || "", tags: (data && data.tags) || [] };
+      localStorage.setItem("goblub_card", JSON.stringify(c));
+    } catch (e) {}
+  }
+  function cardData() { try { return JSON.parse(localStorage.getItem("goblub_card") || "{}"); } catch (e) { return {}; } }
+
   window.GoblubFeed = { grant: grant, feedOne: feedOne, state: state, setName: setName,
-    todayRemaining: todayRemaining, LEVELS: LEVELS };
+    todayRemaining: todayRemaining, LEVELS: LEVELS, record: record, cardData: cardData };
 })();

@@ -124,6 +124,7 @@
       }));
       el.querySelector("#qz-retry").onclick = api.restart;
       el.querySelector("#qz-share").onclick = function () { api.shareLink(el.querySelector("#qz-share")); };
+      if (window.GoblubFeed && GoblubFeed.record) GoblubFeed.record("zombie", { emoji: r.emoji, title: (r.short || r.name), tags: r.tags });
     }
 
     Quiz.init(document.getElementById("quiz"), {

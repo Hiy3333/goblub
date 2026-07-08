@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>나의 종합 프로필 카드 — goblub</title>
+  <meta name="description" content="사주·MBTI·연애세포·음식형까지 — 흩어진 내 결과를 한 장으로 모아 자랑하기" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    .nick-row { display: flex; gap: 8px; justify-content: center; margin-bottom: 14px; }
+    .nick-row input { font-family: inherit; font-size: 1rem; padding: 9px 14px; border: 2px solid #e8e2d4; border-radius: 12px; width: 200px; text-align: center; }
+    .pcard { background: linear-gradient(160deg, #fff, var(--cream)); border-radius: 18px; padding: 18px 16px 6px; box-shadow: var(--shadow); }
+    .pcard .pc-head { text-align: center; margin-bottom: 6px; }
+    .pcard .pc-head .who { font-size: 1.35rem; }
+    .pcard .pc-head .sub { color: var(--ink-soft); font-size: 0.9rem; margin-top: 2px; }
+    .pc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 14px 0 6px; }
+    .pc-tile { background: #fff; border: 2px solid #efe6d3; border-radius: 14px; padding: 12px 10px; display: flex; align-items: center; gap: 10px; }
+    .pc-tile .em { font-size: 1.9rem; flex: none; }
+    .pc-tile .tx .lb { font-size: 0.72rem; color: var(--ink-soft); }
+    .pc-tile .tx .vl { font-size: 0.98rem; color: var(--ink); line-height: 1.25; }
+    .pc-tile.empty { opacity: 0.65; }
+    .pc-tile.empty .vl { color: var(--ink-soft); }
+    .pc-tags { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin: 10px 4px 4px; }
+    .pc-tags .tag { background: var(--cream); border: 1.5px solid #e8e2d4; border-radius: 999px; padding: 4px 11px; font-size: 0.82rem; color: var(--ink-soft); }
+    .todo-a { display: block; background: var(--cream); border-radius: 12px; padding: 11px 14px; }
+    .todo-a:hover { background: #f4edda; }
+    .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  </style>
+</head>
+<body>
+  <div id="site-header"></div>
+  <main>
+    <section class="hero">
+      <h1>🎫 나의 종합 프로필 카드</h1>
+      <p>흩어진 내 결과를 한 장에 모아 — 친구에게 자랑해요!</p>
+    </section>
+
+    <section class="panel">
+      <div class="nick-row">
+        <input type="text" id="nick" maxlength="12" placeholder="닉네임 (선택)" />
+        <button class="btn-ghost" id="btn-nick" style="padding:9px 16px">적용</button>
+      </div>
+      <div class="pcard" id="pcard"></div>
+      <div class="result-actions">
+        <button class="btn-primary" id="btn-save">🖼 프로필 카드 저장</button>
+        <a class="btn-ghost" href="../index.html">🎡 다른 즐길거리</a>
+      </div>
+    </section>
+
+    <section class="panel" id="todo-panel" style="display:none">
+      <h2>🧩 아직 안 한 것 채우기</h2>
+      <p class="result-desc" style="margin:8px 0 12px">하면 프로필 카드가 더 꽉 차요!</p>
+      <div class="menu-grid" id="todo"></div>
+    </section>
+    <p class="fine-print">결과는 이 브라우저에만 저장돼요 · 재미로 봐주세요 🙂</p>
+  </main>
+  <div id="site-footer"></div>
+  <script src="../js/common.js" data-root=".."></script>
+  <script src="js/feed.js"></script>
+  <script src="js/saju.js"></script>
+  <script>
+    (function () {
+      var $ = function (id) { return document.getElementById(id); };
+      var ZE = { 쥐: "🐭", 소: "🐮", 호랑이: "🐯", 토끼: "🐰", 용: "🐲", 뱀: "🐍", 말: "🐴", 양: "🐑", 원숭이: "🐵", 닭: "🐔", 개: "🐶", 돼지: "🐷" };
+      var ITEMS = [
+        { key: "saju", label: "사주", url: "saju.html" },
+        { key: "mbti", label: "대환장 MBTI", url: "mbti.html" },
+        { key: "love", label: "연애세포", url: "love-test.html" },
+        { key: "stress", label: "스트레스 몬스터", url: "stress-test.html" },
+        { key: "foodtype", label: "음식형 인간", url: "foodtype.html" },
+        { key: "zombie", label: "좀비 생존", url: "zombie.html" },
+        { key: "chatroom", label: "단톡방 캐릭터", url: "chatroom.html" }
+      ];
+      var data = null, sajuInfo = null;
+
+      function computeSaju() {
+        try {
+          var b = JSON.parse(localStorage.getItem("goblub_birth"));
+          if (!b || !b.y || !data) return null;
+          var r = Saju.compute(data, { y: b.y, m: b.m, d: b.d, hour: b.hour, min: b.min || 0 }, { trueSolar: true });
+          var most = "목"; ["목", "화", "토", "금", "수"].forEach(function (k) { if (r.oheng[k] > r.oheng[most]) most = k; });
+          return { emoji: ZE[r.zodiac] || "🔮", title: r.zodiac + "띠 · " + Saju.GAN[r.ilgan] + "일간 · " + most + " 기운" };
+        } catch (e) { return null; }
+      }
+
+      function collect() {
+        var card = (window.GoblubFeed && GoblubFeed.cardData()) || {};
+        sajuInfo = computeSaju();
+        var out = ITEMS.map(function (it) {
+          if (it.key === "saju") return { label: it.label, url: it.url, done: !!sajuInfo, emoji: sajuInfo ? sajuInfo.emoji : "🔮", title: sajuInfo ? sajuInfo.title : "사주 프로필 입력하기" };
+          var d = card[it.key];
+          return { label: it.label, url: it.url, done: !!(d && d.t), emoji: d ? d.e : "❓", title: d && d.t ? d.t : "아직 안 했어요", tags: d && d.tags || [] };
+        });
+        return out;
+      }
+
+      function pet() { return (window.GoblubFeed && GoblubFeed.state()) || { name: "고블럽", level: 0, levelInfo: { name: "알" } }; }
+      function nick() { try { return localStorage.getItem("goblub_card_nick") || ""; } catch (e) { return ""; } }
+
+      function render() {
+        var items = collect(), p = pet();
+        var doneCount = items.filter(function (i) { return i.done; }).length;
+        var nm = nick() || (p.name && p.name !== "이름 없는 고블럽" ? p.name : "이름 모를 goblub");
+        var tags = [];
+        items.forEach(function (i) { (i.tags || []).forEach(function (t) { if (tags.indexOf(t) < 0 && tags.length < 8) tags.push(t); }); });
+
+        var html = '<div class="pc-head"><p class="who">🧑‍🚀 ' + esc(nm) + '</p>' +
+          '<p class="sub">Lv.' + (p.level + 1) + ' ' + esc(p.levelInfo.name) + ' · 완성도 ' + doneCount + '/' + items.length + '</p></div>' +
+          '<div class="pc-grid">' + items.map(function (i) {
+            return '<div class="pc-tile' + (i.done ? "" : " empty") + '"><span class="em">' + i.emoji + '</span>' +
+              '<span class="tx"><span class="lb">' + esc(i.label) + '</span><span class="vl">' + esc(i.title) + '</span></span></div>';
+          }).join("") + "</div>" +
+          (tags.length ? '<div class="pc-tags">' + tags.map(function (t) { return '<span class="tag">#' + esc(t) + "</span>"; }).join("") + "</div>" : "");
+        $("pcard").innerHTML = html;
+
+        var todo = items.filter(function (i) { return !i.done; });
+        if (todo.length) {
+          $("todo-panel").style.display = "block";
+          $("todo").innerHTML = todo.map(function (i) { return '<a class="todo-a" href="' + i.url + '">' + i.emoji + " " + esc(i.label) + " 하러 가기 →</a>"; }).join("");
+        } else $("todo-panel").style.display = "none";
+        window.__cardState = { items: items, nm: nm, p: p, tags: tags, doneCount: doneCount };
+      }
+      function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+
+      // ---- Canvas 이미지 저장 ----
+      function roundRect(g, x, y, w, h, r) { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); }
+      function saveImage() {
+        var s = window.__cardState; if (!s) return;
+        var W = 720, H = 1080, g = document.createElement("canvas"); g.width = W; g.height = H;
+        var c = g.getContext("2d");
+        c.fillStyle = "#fff9ec"; c.fillRect(0, 0, W, H);
+        var cols = ["#ff6b6b", "#ffd93d", "#6bcb77", "#4d96ff", "#b983ff"];
+        for (var i = 0; i < 5; i++) { c.fillStyle = cols[i]; c.fillRect(i * 144, 0, 144, 16); }
+        c.textAlign = "center";
+        c.fillStyle = "#38352f"; c.font = "46px 'Jua','Malgun Gothic',sans-serif";
+        c.fillText("🧑‍🚀 " + s.nm, W / 2, 92);
+        c.fillStyle = "#7a766d"; c.font = "26px 'Jua','Malgun Gothic',sans-serif";
+        c.fillText("goblub 종합 프로필 · Lv." + (s.p.level + 1) + " " + s.p.levelInfo.name, W / 2, 132);
+        // tiles 2 cols
+        var tx = 40, ty = 168, tw = (W - 80 - 20) / 2, th = 108, gap = 20;
+        s.items.forEach(function (it, n) {
+          var col = n % 2, row = Math.floor(n / 2);
+          var x = tx + col * (tw + gap), y = ty + row * (th + gap);
+          c.fillStyle = it.done ? "#ffffff" : "#f3eee2"; roundRect(c, x, y, tw, th, 16); c.fill();
+          c.lineWidth = 2; c.strokeStyle = "#e8ddc6"; c.stroke();
+          c.textAlign = "left";
+          c.font = "42px 'Segoe UI Emoji',sans-serif"; c.fillStyle = "#000"; c.fillText(it.emoji, x + 18, y + 62);
+          c.font = "20px 'Jua','Malgun Gothic',sans-serif"; c.fillStyle = "#b0a99a"; c.fillText(it.label, x + 78, y + 42);
+          c.font = "24px 'Jua','Malgun Gothic',sans-serif"; c.fillStyle = it.done ? "#38352f" : "#b0a99a";
+          var t = it.title.length > 12 ? it.title.slice(0, 12) + "…" : it.title;
+          c.fillText(t, x + 78, y + 74);
+          c.textAlign = "center";
+        });
+        var afterTiles = ty + Math.ceil(s.items.length / 2) * (th + gap) + 8;
+        if (s.tags.length) {
+          c.fillStyle = "#7a766d"; c.font = "24px 'Jua','Malgun Gothic',sans-serif";
+          c.fillText("# " + s.tags.slice(0, 6).join("  # "), W / 2, afterTiles + 26);
+        }
+        c.fillStyle = "#b0a99a"; c.font = "24px 'Jua','Malgun Gothic',sans-serif";
+        c.fillText("🎡 goblub.vercel.app", W / 2, H - 34);
+        var dl = function (url) { var a = document.createElement("a"); a.href = url; a.download = "goblub-profile.png"; document.body.appendChild(a); a.click(); a.remove(); };
+        if (g.toBlob) g.toBlob(function (b) { if (!b) { dl(g.toDataURL("image/png")); return; } var u = URL.createObjectURL(b); dl(u); setTimeout(function () { URL.revokeObjectURL(u); }, 5000); }, "image/png");
+        else dl(g.toDataURL("image/png"));
+      }
+
+      $("btn-save").onclick = saveImage;
+      $("btn-nick").onclick = function () { var v = $("nick").value.trim(); try { localStorage.setItem("goblub_card_nick", v); } catch (e) {} render(); };
+      $("nick").value = nick();
+
+      fetch("data/saju-terms.json").then(function (r) { return r.ok ? r.json() : null; }).then(function (d) { data = d; render(); }).catch(function () { render(); });
+      render();
+    })();
+  </script>
+</body>
+</html>

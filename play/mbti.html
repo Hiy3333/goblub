@@ -244,6 +244,7 @@
         show("result");
         window.__resultType = type;
         if (setHash && window.GoblubFeed) GoblubFeed.grant("mbti");
+        if (window.GoblubFeed && GoblubFeed.record) GoblubFeed.record("mbti", { emoji: r.emoji, title: type + " · " + r.title, tags: [] });
       }
 
       $("btn-start").onclick = function () { idx = 0; scores = {}; renderQ(); show("quiz"); };

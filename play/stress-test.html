@@ -98,6 +98,7 @@
 
     function renderResult(totals, el, api){
       var key = Quiz.top(totals, MORDER), r = MONS[key];
+      if (window.GoblubFeed && GoblubFeed.record) GoblubFeed.record("stress", { emoji: r.emoji, title: r.name });
       el.innerHTML =
         '<span class="result-emoji">'+r.emoji+'</span>'+
         '<p class="result-name">스트레스 받으면… '+r.name+' 변신!</p>'+
