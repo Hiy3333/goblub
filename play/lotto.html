@@ -362,7 +362,7 @@
           box.style.display = "block"; box.textContent = "";
           $("dosa-balls").innerHTML = "";
           var buffer = "";
-          Dosa.fetchAI("/api/lotto-dosa", { stats: stats }, "goblub_ld1_", {
+          Dosa.fetchAI("/api/lotto-dosa", { stats: stats }, "goblub_ld2_", {
             accept: function (full) { return /@@PICK\|\s*\d/.test(full); },
             onChunk: function (t) { buffer += t; box.textContent = buffer.replace(/@@PICK\|[\d,\s]*/, "").trim(); },
             onDone: function () {
