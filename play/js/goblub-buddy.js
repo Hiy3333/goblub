@@ -9,6 +9,18 @@
   var KEY = "goblub_buddy";
   var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
   var SIZE = window.innerWidth < 520 ? 54 : 74;
+  var base = (function () {
+    var b = (document.currentScript && document.currentScript.src) || "";
+    if (!b) { var ss = document.getElementsByTagName("script"); for (var i = 0; i < ss.length; i++) if (ss[i].src && /\/play\/js\/goblub-/.test(ss[i].src)) { b = ss[i].src; break; } }
+    return b.replace(/[^/]+$/, "");
+  })();
+
+  function openTama() {
+    if (window.GoblubTama) { GoblubTama.open(); return; }
+    var sc = document.createElement("script"); sc.src = base + "goblub-tama.js";
+    sc.onload = function () { if (window.GoblubTama) GoblubTama.open(); };
+    document.head.appendChild(sc);
+  }
 
   var LINES = [
     "냠냠, 나쁜 기분 없어?", "오늘도 잘 놀다 가!", "심심하면 날 눌러줘~",
@@ -85,9 +97,9 @@
 
   bodyEl.addEventListener("click", function (e) {
     if (e.target === xBtn) return;
-    say(LINES[Math.floor(Math.random() * LINES.length)]);
     bodyEl.classList.remove("bob"); void bodyEl.offsetWidth; bodyEl.classList.add("pop");
     setTimeout(function () { bodyEl.classList.remove("pop"); if (!reduce) bodyEl.classList.add("bob"); }, 520);
+    openTama();
   });
 
   function setState(s) {
