@@ -114,6 +114,35 @@ main {
   font-size: 1.15rem;
 }
 
+/* 홈 히어로 밴드 — 헤더 문구와 카드 사이 여백 + 레트로 선(달) 장식 */
+.hero-band {
+  text-align: center;
+  padding: 34px 0 40px;
+  margin-bottom: 8px;
+}
+.hero-band .retro-sun {
+  width: 200px;
+  height: 200px;
+  margin: 0 auto 18px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #ffd93d 0%, #ff9a5a 40%, #ff6ec7 75%, #c85cff 100%);
+  -webkit-mask: repeating-linear-gradient(180deg, #000 0 22px, transparent 22px 30px);
+          mask: repeating-linear-gradient(180deg, #000 0 22px, transparent 22px 30px);
+  opacity: 0.85;
+  filter: drop-shadow(0 0 26px rgba(255, 110, 199, 0.45));
+}
+.hero-band .hero-sub {
+  color: var(--ink-soft);
+  font-size: 1.12rem;
+}
+@media (max-width: 480px) {
+  .hero-band { padding: 22px 0 28px; }
+  .hero-band .retro-sun { width: 150px; height: 150px;
+    -webkit-mask: repeating-linear-gradient(180deg, #000 0 17px, transparent 17px 23px);
+            mask: repeating-linear-gradient(180deg, #000 0 17px, transparent 17px 23px); }
+  .hero-band .hero-sub { font-size: 1rem; }
+}
+
 /* 카드 그리드 */
 .card-grid {
   display: grid;
