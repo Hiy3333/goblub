@@ -13,11 +13,14 @@
     .profile-badge { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
     .profile-badge .who { font-size: 1.15rem; }
     .profile-badge .sub { color: var(--ink-soft); font-size: 0.9rem; }
-    .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
-    .menu-grid a { display: block; background: var(--cream); border-radius: 14px; padding: 16px 14px; text-align: center; }
-    .menu-grid a:hover { background: #2c2064; }
-    .menu-grid .mi { font-size: 1.8rem; display: block; margin-bottom: 6px; }
-    .menu-grid .mt { font-size: 0.98rem; }
+    .premium-panel { border: 2px solid var(--yellow); text-align: center;
+      box-shadow: 0 0 22px rgba(255,217,61,.22), inset 0 0 22px rgba(255,217,61,.05); }
+    .prem-badge { display: inline-block; background: linear-gradient(90deg, var(--yellow), var(--orange));
+      color: #2a2005; font-size: 0.76rem; font-weight: bold; padding: 4px 12px; border-radius: 999px;
+      box-shadow: 0 0 12px rgba(255,217,61,.5); }
+    .prem-btn { background: linear-gradient(90deg, var(--yellow), var(--orange)); color: #2a1a05;
+      box-shadow: 0 0 16px rgba(255,217,61,.5); }
+    .prem-btn:hover { filter: brightness(1.08); box-shadow: 0 0 24px rgba(255,217,61,.7); }
     .luck-cta { margin-top: 12px; }
     .luck-cta a { display: inline-block; background: var(--cream); border: 1.5px solid var(--sky);
       border-radius: 999px; padding: 9px 18px; font-size: 0.95rem; color: var(--ink);
@@ -78,16 +81,13 @@
       <section class="panel"><h2>📆 이번 달의 운세 <span class="stars" id="s-month"></span></h2><p class="result-desc" id="t-month"></p></section>
     </div>
 
-    <section class="panel">
-      <h2>🎪 더 깊이 보기</h2>
-      <p class="result-desc" style="margin:8px 0 14px">프로필이 저장돼 있으면 어디서든 자동으로 채워져요.</p>
-      <div class="menu-grid">
-        <a href="saju.html"><span class="mi">🔮</span><span class="mt">사주팔자 심층</span></a>
-        <a href="gunghap.html"><span class="mi">💑</span><span class="mt">우리 궁합</span></a>
-        <a href="tarot.html"><span class="mi">🃏</span><span class="mt">타로</span></a>
-        <a href="cookie.html"><span class="mi">🥠</span><span class="mt">오늘의 포춘쿠키</span></a>
-        <a href="today.html"><span class="mi">📅</span><span class="mt">오늘의 사주</span></a>
-        <a href="pastlife.html"><span class="mi">🌀</span><span class="mt">전생 대환장 파티</span></a>
+    <section class="panel premium-panel">
+      <span class="prem-badge">✨ PREMIUM · 준비 중</span>
+      <h2 style="margin-top:10px">🔮 프리미엄 심층 AI 사주 풀이</h2>
+      <p class="result-desc" style="margin:8px 0 16px">고블럽 도사가 내 사주팔자를 페이지째 깊이 파고드는 프리미엄 리포트 —<br>성격·재물·직업·연애·건강·대운 흐름까지 한 번에. 곧 만나요!</p>
+      <div class="result-actions">
+        <a class="btn-primary prem-btn" href="saju-premium.html">✨ 프리미엄 풀이 받기</a>
+        <a class="btn-ghost" href="saju.html">🔮 무료 사주팔자 심층 먼저 보기</a>
       </div>
     </section>
 
