@@ -43,9 +43,22 @@ a {
   align-items: center;
   justify-content: space-between;
   padding: 18px 24px;
-  max-width: 960px;
+  max-width: 1100px;
   width: 100%;
   margin: 0 auto;
+}
+
+/* 헤더 중앙 히어로 문구(홈) */
+.hero-inline {
+  font-family: "Black Han Sans", "Jua", sans-serif;
+  font-size: 1.5rem;
+  color: #fff;
+  letter-spacing: 1px;
+  text-shadow: 0 0 10px var(--coral), 0 0 28px var(--coral);
+}
+@media (max-width: 640px) {
+  .site-header { flex-wrap: wrap; }
+  .hero-inline { order: 3; width: 100%; text-align: center; margin-top: 6px; font-size: 1.25rem; }
 }
 
 .logo {
@@ -76,7 +89,7 @@ a {
 /* 본문 공통 */
 main {
   flex: 1;
-  max-width: 960px;
+  max-width: 1100px;
   width: 100%;
   margin: 0 auto;
   padding: 16px 24px 48px;
@@ -104,7 +117,7 @@ main {
 /* 카드 그리드 */
 .card-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 20px;
 }
 
@@ -154,23 +167,32 @@ a.card:hover,
 .card.tint-sky { --nc: var(--sky); }
 .card.tint-purple { --nc: var(--purple); }
 
-/* 허브 카드 안 콘텐츠 바로가기 칩 */
-.card .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
-.card .chips a {
-  font-size: 0.78rem;
-  color: #e6dcff;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid color-mix(in srgb, var(--nc) 55%, transparent);
-  border-radius: 999px;
-  padding: 4px 10px;
-  white-space: nowrap;
-}
-.card .chips a:hover {
-  border-color: var(--nc);
-  color: #fff;
-  box-shadow: 0 0 10px color-mix(in srgb, var(--nc) 50%, transparent);
-}
+/* 허브 카드: 왼쪽 소개 + 오른쪽 콘텐츠 바로가기 리스트 */
 .card[data-href] { cursor: pointer; }
+.card.hub { display: flex; gap: 16px; align-items: stretch; }
+.card.hub .left { flex: 1 1 52%; min-width: 0; }
+.card.hub .sub {
+  flex: 0 0 42%;
+  border-left: 1.5px dashed color-mix(in srgb, var(--nc) 45%, transparent);
+  padding-left: 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 7px;
+}
+.card.hub .sub a {
+  font-size: 0.86rem;
+  color: #d7cbf5;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.card.hub .sub a:hover { color: #fff; text-shadow: 0 0 9px var(--nc); }
+@media (max-width: 420px) {
+  .card.hub { flex-direction: column; gap: 12px; }
+  .card.hub .sub { flex-basis: auto; border-left: none; padding-left: 0;
+    border-top: 1.5px dashed color-mix(in srgb, var(--nc) 45%, transparent); padding-top: 12px; }
+}
 
 /* 준비 중 카드 */
 .card.soon {
