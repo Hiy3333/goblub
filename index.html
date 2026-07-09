@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/style.css?v=neon1" />
+  <link rel="stylesheet" href="css/style.css?v=neon2" />
 </head>
 <body>
   <div id="site-header"></div>
@@ -24,17 +24,33 @@
     </section>
 
     <section class="card-grid">
-      <a class="card tint-purple" href="play/fortune.html">
+      <div class="card tint-purple" data-href="play/fortune.html">
         <span class="icon">🔮</span>
         <h2>운세</h2>
-        <p>사주 프로필 하나로 — 오늘의 운세·궁합·타로·전생까지</p>
-      </a>
+        <p>사주 프로필 하나로 전부</p>
+        <span class="chips">
+          <a href="play/fortune.html">🌞 오늘의 운세</a>
+          <a href="play/saju.html">🔮 사주팔자</a>
+          <a href="play/gunghap.html">💑 궁합</a>
+          <a href="play/tarot.html">🃏 타로</a>
+          <a href="play/cookie.html">🥠 포춘쿠키</a>
+          <a href="play/pastlife.html">🌀 전생 파티</a>
+        </span>
+      </div>
 
-      <a class="card tint-mint" href="play/tests.html">
+      <div class="card tint-mint" data-href="play/tests.html">
         <span class="icon">🧪</span>
         <h2>대환장 테스트</h2>
-        <p>대환장 MBTI·연애·스트레스·스펙트럼 — 테스트 모음</p>
-      </a>
+        <p>내 유형 다 털리는 테스트</p>
+        <span class="chips">
+          <a href="play/mbti.html">🍞 MBTI</a>
+          <a href="play/love-test.html">💘 연애세포</a>
+          <a href="play/stress-test.html">🌋 스트레스</a>
+          <a href="play/zombie.html">🧟 좀비 생존</a>
+          <a href="play/chatroom.html">💬 단톡방</a>
+          <a href="play/foodtype.html">🍜 음식형</a>
+        </span>
+      </div>
 
       <a class="card tint-coral" href="play/goblub.html">
         <span class="icon" data-goblub="52"></span>
@@ -66,11 +82,19 @@
         <p>고백·사과를 링크로 보내고, 답장은 이미지로 받기</p>
       </a>
 
-      <a class="card tint-yellow" href="play/mini.html">
+      <div class="card tint-yellow" data-href="play/mini.html">
         <span class="icon">🎲</span>
         <h2>미니 놀이터</h2>
-        <p>복불복 룰렛·질문 카드·고블럽 작명소 — 심심할 때 툭!</p>
-      </a>
+        <p>심심할 때 툭!</p>
+        <span class="chips">
+          <a href="play/roulette.html">🎡 룰렛</a>
+          <a href="play/questions.html">🎴 질문 카드</a>
+          <a href="play/naming.html">📛 작명소</a>
+          <a href="play/whack.html">🕳️ 몬스터 팡팡</a>
+          <a href="play/reflex.html">⚡ 반응속도</a>
+          <a href="play/lotto.html">🎱 로또 번호</a>
+        </span>
+      </div>
 
       <a class="card tint-sky" href="apps.html">
         <span class="icon">📱</span>
@@ -103,5 +127,14 @@
   <div id="site-footer"></div>
   <script src="play/js/goblub-art.js"></script>
   <script src="js/common.js" data-root="."></script>
+  <script>
+    // 허브 카드: 몸통 클릭은 허브로, 칩(a) 클릭은 해당 콘텐츠로
+    document.querySelectorAll(".card[data-href]").forEach(function (c) {
+      c.addEventListener("click", function (e) {
+        if (e.target.closest("a")) return;
+        location.href = c.getAttribute("data-href");
+      });
+    });
+  </script>
 </body>
 </html>

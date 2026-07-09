@@ -121,7 +121,8 @@ main {
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
-a.card:hover {
+a.card:hover,
+.card[data-href]:hover {
   transform: translateY(-4px);
   box-shadow: 0 0 26px var(--nc), inset 0 0 22px rgba(255, 255, 255, 0.05);
 }
@@ -152,6 +153,24 @@ a.card:hover {
 .card.tint-mint { --nc: var(--mint); }
 .card.tint-sky { --nc: var(--sky); }
 .card.tint-purple { --nc: var(--purple); }
+
+/* 허브 카드 안 콘텐츠 바로가기 칩 */
+.card .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+.card .chips a {
+  font-size: 0.78rem;
+  color: #e6dcff;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid color-mix(in srgb, var(--nc) 55%, transparent);
+  border-radius: 999px;
+  padding: 4px 10px;
+  white-space: nowrap;
+}
+.card .chips a:hover {
+  border-color: var(--nc);
+  color: #fff;
+  box-shadow: 0 0 10px color-mix(in srgb, var(--nc) 50%, transparent);
+}
+.card[data-href] { cursor: pointer; }
 
 /* 준비 중 카드 */
 .card.soon {
