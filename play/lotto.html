@@ -49,7 +49,6 @@
     .rank-row b { color: #fff; }
     .hit-best { background: var(--cream); border: 1.5px solid var(--line); border-radius: 12px; padding: 12px 14px;
       margin-top: 12px; line-height: 1.7; }
-    .reco-tabs { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 6px; }
     .dosa-box { white-space: pre-wrap; line-height: 1.8; background: var(--cream); border-radius: 14px;
       padding: 16px; margin-top: 12px; display: none; text-align: left; }
   </style>
@@ -90,18 +89,6 @@
         <button class="btn-ghost" id="btn-clear">초기화</button>
       </div>
       <div id="check-out"></div>
-    </section>
-
-    <section class="panel">
-      <h2>📊 역대 데이터로 뽑는 추천 번호</h2>
-      <p class="result-desc" style="margin-bottom:10px">역대 당첨 번호의 출현 빈도·구간 밸런스로 조합을 만들어요. (경우의 수 놀이일 뿐, 확률은 모든 조합이 똑같아요 🙂)</p>
-      <div class="reco-tabs">
-        <button class="btn-ghost reco-btn" data-mode="hot">🔥 핫넘버픽</button>
-        <button class="btn-ghost reco-btn" data-mode="cold">🥶 콜드넘버픽</button>
-        <button class="btn-ghost reco-btn" data-mode="bal">⚖️ 밸런스픽</button>
-      </div>
-      <div class="balls" id="reco-balls"></div>
-      <p class="fine-print" id="reco-note" style="min-height:1.2em"></p>
     </section>
 
     <section class="panel">
@@ -286,57 +273,7 @@
         }).catch(function () { $("check-out").innerHTML = '<p class="fine-print">데이터를 불러오지 못했어요. 새로고침 해주세요.</p>'; });
       };
 
-      // ================= ② 통계 기반 추천 =================
-      function weightedPick(weightFn) {
-        var pool = [], out = [], i;
-        for (i = 1; i <= 45; i++) pool.push(i);
-        while (out.length < 6) {
-          var total = 0, w = [];
-          for (i = 0; i < pool.length; i++) { w[i] = weightFn(pool[i]); total += w[i]; }
-          var t = Math.random() * total, acc = 0, idx = pool.length - 1;
-          for (i = 0; i < pool.length; i++) { acc += w[i]; if (t <= acc) { idx = i; break; } }
-          out.push(pool[idx]); pool.splice(idx, 1);
-        }
-        return out.sort(function (a, b) { return a - b; });
-      }
-      function balancedPick() {
-        for (var t = 0; t < 300; t++) {
-          var g = pick6().nums;
-          var odd = g.filter(function (n) { return n % 2; }).length;
-          var zones = [0, 0, 0, 0, 0];
-          g.forEach(function (n) { zones[zoneOf(n)]++; });
-          var maxZone = Math.max.apply(null, zones);
-          var sum = g.reduce(function (a, b) { return a + b; }, 0);
-          if (odd >= 2 && odd <= 4 && maxZone <= 3 && sum >= 100 && sum <= 175) return g;
-        }
-        return pick6().nums;
-      }
-      Array.prototype.forEach.call(document.querySelectorAll(".reco-btn"), function (btn) {
-        btn.onclick = function () {
-          loadHist().then(function (d) {
-            var mode = btn.getAttribute("data-mode");
-            var maxF = 0, minF = 9999, i;
-            for (i = 1; i <= 45; i++) { if (FREQ[i] > maxF) maxF = FREQ[i]; if (FREQ[i] < minF) minF = FREQ[i]; }
-            var nums, note;
-            if (mode === "hot") {
-              nums = weightedPick(function (n) { return FREQ[n] * FREQ[n]; });
-              note = "🔥 역대 " + d.latest + "회에서 많이 나온 번호일수록 잘 뽑히게 가중치를 줬어요";
-            } else if (mode === "cold") {
-              nums = weightedPick(function (n) { return (maxF - FREQ[n]) * (maxF - FREQ[n]) + 4; });
-              note = "🥶 덜 나온 번호일수록 잘 뽑히게 — '이제 나올 때 됐다' 파를 위해";
-            } else {
-              nums = balancedPick();
-              note = "⚖️ 역대 당첨 번호의 전형적 패턴(홀짝 2~4·구간 분산·합 100~175)에 맞춘 조합";
-            }
-            gobSpit();
-            var rb = $("reco-balls"); rb.innerHTML = "";
-            nums.forEach(function (n) { rb.appendChild(ballEl(n)); });
-            $("reco-note").textContent = note + " · 물론 확률은 모두 같아요!";
-          }).catch(function () { $("reco-note").textContent = "데이터를 불러오지 못했어요. 새로고침 해주세요."; });
-        };
-      });
-
-      // ================= ③ 고블럽 도사 AI 분석 =================
+      // ================= ② 고블럽 도사 AI 분석 =================
       $("btn-dosa").onclick = function () {
         loadHist().then(function (d) {
           var freqArr = [], n;
