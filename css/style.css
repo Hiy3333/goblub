@@ -51,14 +51,14 @@ a {
 /* 헤더 중앙 히어로 문구(홈) */
 .hero-inline {
   font-family: "Black Han Sans", "Jua", sans-serif;
-  font-size: 1.5rem;
+  font-size: 2rem;
   color: #fff;
   letter-spacing: 1px;
   text-shadow: 0 0 10px var(--coral), 0 0 28px var(--coral);
 }
 @media (max-width: 640px) {
   .site-header { flex-wrap: wrap; }
-  .hero-inline { order: 3; width: 100%; text-align: center; margin-top: 6px; font-size: 1.25rem; }
+  .hero-inline { order: 3; width: 100%; text-align: center; margin-top: 6px; font-size: 1.6rem; }
 }
 
 .logo {
