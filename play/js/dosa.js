@@ -100,7 +100,11 @@
   }
 
   function fetchReading(payload, cb) {
-    fetchStream("/api/saju-reading", { saju: payload }, "goblub_dosa_", cb);
+    // 마지막 도사 서명이 있어야(=잘리지 않은 완결 응답) 캐시. 잘린 풀이가 고착되는 것 방지.
+    var wrapped = {};
+    for (var k in cb) wrapped[k] = cb[k];
+    wrapped.accept = function (full) { return /고블럽 도사\s*$/.test((full || "").trim()); };
+    fetchStream("/api/saju-reading", { saju: payload }, "goblub_dosa2_", wrapped);
   }
 
   function fetchGunghap(payload, cb) {
