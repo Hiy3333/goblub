@@ -129,6 +129,20 @@
       var cx = 100, cy = 100, r = 96, rotation = 0;
       function P(a, rad) { var t = a * Math.PI / 180; return [cx + rad * Math.sin(t), cy - rad * Math.cos(t)]; }
 
+      // 긴 항목을 조각 안에 다 들어가게 줄바꿈(공백 우선, 긴 단어는 강제 분할)
+      function wrapLabel(text, maxLen, maxLines) {
+        var words = text.split(/\s+/).filter(Boolean), lines = [], cur = "";
+        words.forEach(function (w) {
+          while (w.length > maxLen) { if (cur) { lines.push(cur); cur = ""; } lines.push(w.slice(0, maxLen)); w = w.slice(maxLen); }
+          if (!cur) cur = w;
+          else if ((cur + " " + w).length <= maxLen) cur += " " + w;
+          else { lines.push(cur); cur = w; }
+        });
+        if (cur) lines.push(cur);
+        if (lines.length > maxLines) { lines = lines.slice(0, maxLines); lines[maxLines - 1] = lines[maxLines - 1].slice(0, maxLen - 1) + "…"; }
+        return lines.length ? lines : [""];
+      }
+
       function build() {
         var items = readItems();
         var wrap = $("wheel-spin");
@@ -146,16 +160,24 @@
           path.setAttribute("fill", COLS[i % COLS.length]);
           path.setAttribute("stroke", "#17103e"); path.setAttribute("stroke-width", "1.5");
           svg.appendChild(path);
-          var am = a1 + seg / 2, lp = P(am, r * 0.62);
-          var label = items[i].length > (n > 8 ? 5 : 8) ? items[i].slice(0, n > 8 ? 5 : 8) + "…" : items[i];
+          var am = a1 + seg / 2, lp = P(am, r * 0.6);
+          var maxLen = n > 8 ? 4 : n > 6 ? 5 : 6;
+          var lines = wrapLabel(items[i], maxLen, 3);
+          var lineH = fs * 1.12;
           var t = document.createElementNS(SVGNS, "text");
           t.setAttribute("x", lp[0].toFixed(2)); t.setAttribute("y", lp[1].toFixed(2));
           t.setAttribute("font-size", fs); t.setAttribute("font-family", "Jua, sans-serif");
           t.setAttribute("fill", "#38352f"); t.setAttribute("text-anchor", "middle");
-          t.setAttribute("dominant-baseline", "middle");
+          t.setAttribute("dominant-baseline", "central");
           var rot = (am > 90 && am < 270) ? am + 180 : am;
           t.setAttribute("transform", "rotate(" + rot.toFixed(1) + " " + lp[0].toFixed(2) + " " + lp[1].toFixed(2) + ")");
-          t.textContent = label;
+          for (var k = 0; k < lines.length; k++) {
+            var ts = document.createElementNS(SVGNS, "tspan");
+            ts.setAttribute("x", lp[0].toFixed(2));
+            ts.setAttribute("dy", (k === 0 ? -(lines.length - 1) / 2 * lineH : lineH).toFixed(2));
+            ts.textContent = lines[k];
+            t.appendChild(ts);
+          }
           svg.appendChild(t);
         }
         wrap.innerHTML = ""; wrap.appendChild(svg);
