@@ -44,56 +44,56 @@
     var MORDER = ["pokbal","jamsu","nunmul","meokbo","yemin","eoreum"];
 
     var QUESTIONS = [
-      { q:"팀플 조원이 또 잠수를 탔다. 마감은 내일. 지금 나는?", choices:[
-        { text:"단톡방에 대문자로 '지금 어디임?!'", scores:{ pokbal:2 } },
-        { text:"조용히 나 혼자 다 해버림", scores:{ eoreum:1, jamsu:2 } },
-        { text:"화장실에서 몰래 눈물 찔끔", scores:{ nunmul:2 } },
-        { text:"배달앱부터 켠다", scores:{ meokbo:2 } } ] },
-      { q:"상사가 다 보는 앞에서 나만 지적한다. 심장이 쿵!", choices:[
-        { text:"얼굴이 화끈, 그 자리에서 바로 따지고 싶다", scores:{ pokbal:2 } },
-        { text:"눈물이 왈칵. 억울해서 참기 힘들다", scores:{ nunmul:2 } },
-        { text:"머릿속이 하얘지고 아무 말도 안 나온다", scores:{ eoreum:2 } },
-        { text:"괜히 사소한 걸로 옆 사람한테 짜증 남", scores:{ yemin:2 } } ] },
-      { q:"주말 약속이 갑자기 취소됐다. 혼자가 된 오후, 나는?", choices:[
-        { text:"연락 다 끊고 이불 속으로 잠수", scores:{ jamsu:2 } },
-        { text:"배달 음식 3인분 시켜서 혼자 다 먹음", scores:{ meokbo:2 } },
-        { text:"괜히 서러워서 혼자 훌쩍임", scores:{ nunmul:1, jamsu:1 } },
-        { text:"아무것도 하기 싫어 그냥 누워만 있음", scores:{ eoreum:2 } } ] },
-      { q:"단톡방에서 나를 저격하는 듯한 메시지를 봤다.", choices:[
-        { text:"바로 캡처해서 '이거 나 얘기임?' 전송", scores:{ pokbal:2 } },
-        { text:"메시지를 스무 번쯤 다시 읽으며 예민해짐", scores:{ yemin:2 } },
-        { text:"조용히 방 나가기 버튼을 누른다", scores:{ jamsu:2 } },
-        { text:"머리가 멍해져서 폰만 붙잡고 굳어버림", scores:{ eoreum:1, nunmul:1 } } ] },
-      { q:"중요한 발표 전날 밤, 스트레스 몬스터가 슬슬 등장한다.", choices:[
-        { text:"별거 아닌 일에도 예민하게 날 세움", scores:{ yemin:2 } },
-        { text:"긴장 풀겠다며 야식 폭풍 흡입", scores:{ meokbo:2 } },
-        { text:"연습은 안 하고 방 청소하며 현실도피", scores:{ jamsu:1, eoreum:1 } },
-        { text:"이불킥하며 혼자 분노 게이지 상승", scores:{ pokbal:2 } } ] },
-      { q:"친구가 별생각 없이 던진 농담이 마음에 콱 박혔다.", choices:[
-        { text:"그날 밤 이불 속에서 서럽게 운다", scores:{ nunmul:2 } },
-        { text:"괜히 다른 일에 날카롭게 반응함", scores:{ yemin:2 } },
-        { text:"그 친구 연락을 며칠간 은근슬쩍 피함", scores:{ jamsu:2 } },
-        { text:"당장 전화해서 '그거 무슨 뜻이야?' 따짐", scores:{ pokbal:1, yemin:1 } } ] },
-      { q:"할 일이 산더미인데 손도 대기 싫은 날. 몸은 이미 몬스터.", choices:[
-        { text:"책상 앞에 앉아만 있고 멍— 아무것도 못함", scores:{ eoreum:2 } },
-        { text:"과자 한 봉지 다 비우고서야 정신 차림", scores:{ meokbo:2 } },
-        { text:"괜히 물건 던지듯 짜증 내며 시작함", scores:{ pokbal:1, yemin:1 } },
-        { text:"폰 무음으로 돌려놓고 다 회피", scores:{ jamsu:2 } } ] },
-      { q:"연인과 다툰 다음 날 아침. 스트레스 몬스터 컨디션은?", choices:[
-        { text:"먼저 연락 안 하고 며칠 잠수", scores:{ jamsu:2 } },
-        { text:"베개에 얼굴 묻고 펑펑 운다", scores:{ nunmul:2 } },
-        { text:"사소한 일에도 계속 예민하게 반응", scores:{ yemin:2 } },
-        { text:"아침 댓바람부터 폭발해서 전화로 따짐", scores:{ pokbal:2 } } ] },
-      { q:"번아웃 직전, 몸이 먼저 신호를 보낸다.", choices:[
-        { text:"'다 그만둘래!' 소리부터 지르고 봄", scores:{ pokbal:2 } },
-        { text:"손가락 하나 까딱하기 싫어 침대와 한몸", scores:{ eoreum:2 } },
-        { text:"이유 없이 계속 뭔가를 우물거리며 먹음", scores:{ meokbo:2 } },
-        { text:"괜히 눈물부터 핑 돈다", scores:{ nunmul:1, eoreum:1 } } ] },
-      { q:"오랜만에 친구들이 '너 스트레스 받으면 어떤 사람이야?' 라고 묻는다.", choices:[
-        { text:"'터지기 전엔 멀쩡, 터지면 화산이야'", scores:{ pokbal:2 } },
-        { text:"'연락 안 되면 그냥 충전 중인 거야'", scores:{ jamsu:2 } },
-        { text:"'울면서 스트레스 배출하는 스타일'", scores:{ nunmul:2 } },
-        { text:"'예민 지수 폭발, 건드리면 위험'", scores:{ yemin:2 } } ] }
+      { q:"출근/등교했는데 오늘 내가 발표라는 걸 방금 알았다. 심지어 주제도 모른다.", choices:[
+        { text:"뇌 강제 재부팅 — 화면보호기 상태로 그 자리에 서 있음", scores:{ eoreum:2 } },
+        { text:"'왜 아무도 말 안 해줬어?!' 복도가 울리는 사자후", scores:{ pokbal:2 } },
+        { text:"목소리부터 떨리고 시야가 뿌옇게 촉촉해짐", scores:{ nunmul:2 } },
+        { text:"일단 매점부터 간다. 초코바 없이는 못 싸우는 몸", scores:{ meokbo:2 } } ] },
+      { q:"엘리베이터에 제일 어려운 상사/교수님과 단둘이 갇혔다. 구조까지 1시간.", choices:[
+        { text:"영혼의 전원을 끄고 벽지와 물아일체", scores:{ jamsu:2 } },
+        { text:"상대 숨소리, 시계 초침 소리까지 하나하나 거슬리기 시작", scores:{ yemin:2 } },
+        { text:"비상벨을 광클 연타하며 '여기 사람 있어요!!' 절규", scores:{ pokbal:2 } },
+        { text:"그대로 시스템 종료. 1시간째 같은 자세로 발견됨", scores:{ eoreum:2 } } ] },
+      { q:"내 스트레스가 실체화되어 몬스터로 눈앞에 나타났다. 첫마디는?", choices:[
+        { text:"'너 잘 만났다. 오늘 여기서 끝장 보자'", scores:{ pokbal:2 } },
+        { text:"몬스터를 보자마자 내가 먼저 울어버림 — 몬스터가 당황함", scores:{ nunmul:2 } },
+        { text:"'너도 배고파서 그러는 거지? 뭐 시켜줄까?'", scores:{ meokbo:2 } },
+        { text:"몬스터를 차단하고 이불 속으로 로그아웃", scores:{ jamsu:2 } } ] },
+      { q:"폰을 켜니 단톡 300개, 부재중 5통, 메일 27통이 동시에 나를 기다리고 있다.", choices:[
+        { text:"폰을 뒤집어 놓는다. 못 본 알림은 없는 알림이다", scores:{ jamsu:2 } },
+        { text:"알림 목록을 바라보다 그대로 프리즈. 아무것도 못 누름", scores:{ eoreum:2 } },
+        { text:"진동 소리마다 어깨가 움찔. 오늘 만나는 사람들 다 조심해라", scores:{ yemin:2 } },
+        { text:"'다들 나한테 왜 그러는데!!' 허공에 외침", scores:{ pokbal:2 } } ] },
+      { q:"신이 '스트레스 1개 영구 삭제권'을 줬다. 단, 고르는 시간은 10초.", choices:[
+        { text:"10초 내내 버퍼링만 돌다가 기회가 증발함", scores:{ eoreum:2 } },
+        { text:"'야식 먹고 드는 죄책감 삭제해주세요' 0.5초 컷 대답", scores:{ meokbo:2 } },
+        { text:"뭘 지울지 고르다가 서러워져서 눈물부터 남", scores:{ nunmul:2 } },
+        { text:"'10초 안에 고르라는 것 자체가 새 스트레스인데요?'", scores:{ yemin:2 } } ] },
+      { q:"여행 전날 밤 11시, 캐리어가 안 닫힌다. 멘탈 과부하 시작.", choices:[
+        { text:"짐은 내일의 나에게 맡기고 일단 라면 물부터 올림", scores:{ meokbo:2 } },
+        { text:"캐리어에게 화를 낸다. '네가 그러고도 캐리어야?!'", scores:{ pokbal:2 } },
+        { text:"'안 가면 그만이야…' 하며 캐리어 옆에서 잠수", scores:{ jamsu:1, eoreum:1 } },
+        { text:"양말 한 짝이 없다는 이유로 울컥 눈물이 차오름", scores:{ nunmul:2 } } ] },
+      { q:"노래방에서 아껴둔 내 18번을 친구가 먼저 불렀다. 심지어 나보다 잘 부름.", choices:[
+        { text:"미소는 유지 중인데 탬버린 치는 소리가 점점 타악기 공연이 됨", scores:{ yemin:2 } },
+        { text:"마이크 강탈해서 2절부터 기습 참전", scores:{ pokbal:2 } },
+        { text:"화장실 간다고 나가서 30분째 미귀환", scores:{ jamsu:2 } },
+        { text:"말없이 서비스 안주를 폭풍 흡입하며 화풀이", scores:{ meokbo:2 } } ] },
+      { q:"시험/마감 5분 전. 지금 내 뇌 속을 스캔해 보면?", choices:[
+        { text:"새하얀 설원. 텅 비어서 오히려 평화로움", scores:{ eoreum:2 } },
+        { text:"옆 사람 볼펜 딸깍 소리에 살의 감지 센서 작동 중", scores:{ yemin:2 } },
+        { text:"눈물 반, 글자 반이라 화면이 잘 안 보임", scores:{ nunmul:2 } },
+        { text:"활화산 분화 3초 전 카운트다운", scores:{ pokbal:1, yemin:1 } } ] },
+      { q:"스트레스 게이지 100% 돌파! 몬스터 변신 직전, 몸에 나타나는 신호는?", choices:[
+        { text:"눈에 수도꼭지 장착 — 틀면 바로 나옴", scores:{ nunmul:2 } },
+        { text:"위장이 블랙홀로 진화 — 냉장고가 위험하다", scores:{ meokbo:2 } },
+        { text:"온몸이 서서히 석상화 — 침대에서 화석 발굴 예정", scores:{ eoreum:2 } },
+        { text:"다리에 잠수함 엔진 장착 — 연락 두절 카운트다운", scores:{ jamsu:2 } } ] },
+      { q:"고블럽이 다가와 묻는다. '네 스트레스, 어떻게 요리해 줄까?'", choices:[
+        { text:"'터지기 전에 통째로 삼켜줘. 지금 3초 남았어'", scores:{ pokbal:2 } },
+        { text:"'당분간 나 대신 세상이랑 연락 좀 해줘'", scores:{ jamsu:2 } },
+        { text:"'가시부터 좀 뽑아줘… 나도 나한테 찔려'", scores:{ yemin:2 } },
+        { text:"'얼음땡의 땡… 땡만 좀 해줘'", scores:{ eoreum:2 } } ] }
     ];
 
     function renderResult(totals, el, api){

@@ -44,65 +44,65 @@
     var ORDER = ["leader","fighter","supplier","hermit","traitor","firstday"];
 
     var QUESTIONS = [
-      { q: "새벽, 창밖에서 비명 소리와 사이렌이 울린다. 가장 먼저 하는 행동은?", choices: [
-        { text: "커튼 젖히고 창문 열어서 무슨 일인지 구경", scores: { firstday: 2 } },
-        { text: "가족·룸메이트부터 깨워서 상황 설명하고 지시 내림", scores: { leader: 2, supplier: 1 } },
-        { text: "야구방망이부터 챙겨 들고 문 앞을 지킴", scores: { fighter: 2 } },
-        { text: "불부터 끄고 조용히 숨어서 상황 파악", scores: { hermit: 2 } } ] },
+      { q: "새벽 3시, 창밖에서 '우어어…' 소리. 원래 옆집 아저씨가 좀 그러시긴 하는데, 확인해보니 진짜 좀비 사태다!", choices: [
+        { text: "폰 들고 나가서 좀비와 셀카부터 — 인증이 먼저다", scores: { firstday: 2 } },
+        { text: "아파트 안내방송 마이크를 잡는다. '주민 여러분, 침착하십시오'", scores: { leader: 2 } },
+        { text: "프라이팬 들고 현관 앞 1인 방어선 구축", scores: { fighter: 2 } },
+        { text: "조용히 불 끄고 '이 집은 빈집입니다' 컨셉 유지", scores: { hermit: 2 } } ] },
 
-      { q: "TV·SNS로 '정체불명의 감염 확산' 속보가 뜬다. 당신의 다음 스텝은?", choices: [
-        { text: "물, 통조림, 상비약부터 정리해서 챙기기 시작", scores: { supplier: 2 } },
-        { text: "옆집·이웃한테 알려주러 뛰어나감", scores: { leader: 2 } },
-        { text: "'설마 진짜겠어' 하고 확인하러 밖에 나가봄", scores: { firstday: 2 } },
-        { text: "혼자 조용히 짐 싸서 아무도 모르게 빠져나갈 준비", scores: { hermit: 2, traitor: 1 } } ] },
+      { q: "마트에 딱 하나 남은 카트. 저쪽에서 다른 생존자도 눈독 들이고 있다.", choices: [
+        { text: "카트는 양보하고 장바구니 12개를 몸에 두르는 쪽을 택함", scores: { supplier: 2 } },
+        { text: "상대가 통조림에 한눈판 사이 카트 끌고 유유히 퇴장", scores: { traitor: 2 } },
+        { text: "'먼저 잡는 사람이 임자죠?' 전력질주 스피드 대결 신청", scores: { fighter: 2 } },
+        { text: "카트 필요 없음. 어차피 혼자 다닐 거라 배낭 하나면 충분", scores: { hermit: 2 } } ] },
 
-      { q: "피난 행렬에 합류했다. 무리 안에서 당신의 포지션은?", choices: [
-        { text: "맨 앞에서 길을 정하고 대열을 통솔", scores: { leader: 2 } },
-        { text: "맨 뒤에서 좀비 접근을 경계하며 후위를 맡음", scores: { fighter: 2 } },
-        { text: "누가 뭘 들고 있는지 파악하며 물자를 분배", scores: { supplier: 2 } },
-        { text: "무리랑 슬쩍 거리 두고 혼자 움직일 타이밍 봄", scores: { hermit: 2, traitor: 1 } } ] },
+      { q: "일행 중 한 명이 '좀비도 사실 착할지 몰라'라며 대화를 시도하러 걸어간다.", choices: [
+        { text: "'오? 통하려나?' 옆에서 팔짱 끼고 같이 구경", scores: { firstday: 2 } },
+        { text: "목덜미 잡고 끌고 온다. '단체 행동 규칙 1조 낭독해봐'", scores: { leader: 2 } },
+        { text: "말리진 않되 뒤에서 무기 들고 엄호 자세", scores: { fighter: 2 } },
+        { text: "'이 무리랑 다니면 죽겠구나' 조용히 이탈 준비", scores: { hermit: 2, traitor: 1 } } ] },
 
-      { q: "폐건물에서 좀비 한 마리와 딱 마주쳤다! 반응은?", choices: [
-        { text: "망설임 없이 무기 들고 정면으로 처치", scores: { fighter: 2 } },
-        { text: "일행에게 신호 보내며 침착하게 후퇴 경로 지시", scores: { leader: 2 } },
-        { text: "재빨리 좀비가 안 보는 틈을 타 혼자 빠져나감", scores: { hermit: 2, traitor: 1 } },
-        { text: "너무 신기해서 잠깐 관찰하다가 늦게 반응", scores: { firstday: 2 } } ] },
+      { q: "좀비들이 이상하게 나만 안 문다. 알고 보니 내가 마늘을 너무 먹어서(그런 설정이다).", choices: [
+        { text: "이 능력으로 '좀비 구역 안전 통행' 유료 서비스 개업", scores: { traitor: 2 } },
+        { text: "'내가 미끼가 된다. 다들 그 사이에 도망쳐!'", scores: { leader: 2 } },
+        { text: "위험 구역 물자 회수 전담 셔틀을 자원함", scores: { supplier: 2 } },
+        { text: "좀비 무리 한가운데로 산책 가서 어깨동무 시도", scores: { firstday: 2 } } ] },
 
-      { q: "은신처에서 며칠 버틸 물자를 발견했다. 양은 4인분인데 일행은 6명. 당신은?", choices: [
-        { text: "다 같이 조금씩 나눠서 최대한 오래 버티자고 제안", scores: { supplier: 2, leader: 1 } },
-        { text: "체력 약한 사람들 먼저 챙기고 내 몫은 나중에", scores: { supplier: 2 } },
-        { text: "몰래 내 몫부터 확보해두고 티 안 냄", scores: { traitor: 2 } },
-        { text: "귀찮은 논쟁 피해서 혼자 다른 곳으로 이동", scores: { hermit: 2 } } ] },
+      { q: "은신처 냉장고에 마지막 초코파이 1개. 그리고 그걸 목격한 6명.", choices: [
+        { text: "6등분 칼질 장인 등판. 부스러기까지 공평 분배", scores: { supplier: 2 } },
+        { text: "새벽에 몰래 냉장고를… 어? 이미 내 입안에 있네", scores: { traitor: 2 } },
+        { text: "초코파이 포기 선언 후 그 논쟁 자체에서 이탈", scores: { hermit: 2 } },
+        { text: "'팔씨름 토너먼트로 정하자' 제안 (본인 우승 확신)", scores: { fighter: 2 } } ] },
 
-      { q: "무리 중 한 명이 물린 것 같다는 의심이 든다. 당신의 선택은?", choices: [
-        { text: "직접 확인하고 사실이면 모두를 위해 냉정하게 조치", scores: { leader: 2, traitor: 1 } },
-        { text: "밤에 조용히 다른 텐트로 몰래 도망침", scores: { traitor: 2 } },
-        { text: "일단 무기 들고 만약을 대비해 지켜봄", scores: { fighter: 2 } },
-        { text: "진짜 물렸는지 너무 궁금해서 가까이 가서 확인함", scores: { firstday: 2 } } ] },
+      { q: "라디오: '남쪽 캠프가 안전합니다.' 근데 어제는 분명 북쪽이 안전하댔는데?", choices: [
+        { text: "지도 펴고 정보 교차검증 후 무리 투표에 부침", scores: { leader: 2 } },
+        { text: "방송 자체를 안 믿음. 내 안전가옥 2층 증축이나 하련다", scores: { hermit: 2 } },
+        { text: "'일단 남쪽 가보자! 아니면 어때, 궁금하잖아!'", scores: { firstday: 2 } },
+        { text: "어느 쪽이 됐든 떠날 수 있게 비상 배낭 2세트 준비", scores: { supplier: 2 } } ] },
 
-      { q: "폐허가 된 마트에서 물자를 뒤지는 중, 좀비 무리 소리가 가까워진다. 당신은?", choices: [
-        { text: "일행에게 빨리 튀라고 소리치고 방어선부터 침", scores: { fighter: 2, leader: 1 } },
-        { text: "챙길 수 있는 물자만 최대한 빠르게 쓸어 담음", scores: { supplier: 2 } },
-        { text: "혼자 빠져나갈 뒷문부터 확인해둠", scores: { hermit: 2 } },
-        { text: "소리가 어디서 나는지 궁금해서 살짝 다가가봄", scores: { firstday: 2 } } ] },
+      { q: "한밤중 보초 근무 중, 문 두드리는 소리. '살려주세요… 사람이에요…'", choices: [
+        { text: "규칙대로 진행. '손 보여주시고, 물린 자국 검사부터 할게요'", scores: { leader: 2 } },
+        { text: "못 들은 척 스르륵 자리 이동. 우리 식량도 간당한데…", scores: { traitor: 2 } },
+        { text: "문은 열어주되 프라이팬은 머리 위에서 대기", scores: { fighter: 2 } },
+        { text: "문구멍에 눈 딱 붙이고 '누구세요~? 진짜 사람이에요~?'", scores: { firstday: 2 } } ] },
 
-      { q: "안전해 보이는 폐가를 발견했다. 근데 이미 누가 살고 있는 흔적이 있다. 당신은?", choices: [
-        { text: "그 사람들과 협상해서 같이 지내는 쪽으로 이끔", scores: { leader: 2 } },
-        { text: "혹시 모르니 몰래 물자만 슬쩍 챙겨서 빠져나감", scores: { traitor: 2 } },
-        { text: "누가 있든 상관없이 조용히 내 자리만 찾아 눕는다", scores: { hermit: 2 } },
-        { text: "누가 사는지 궁금해서 집 안까지 둘러봄", scores: { firstday: 2, fighter: 1 } } ] },
+      { q: "옆 생존자 캠프가 우리 물자를 노린다는 소문이 돈다.", choices: [
+        { text: "방어 훈련 개시. 내 프라이팬은 오늘부로 명검이다", scores: { fighter: 2 } },
+        { text: "오히려 저쪽 캠프에 이직 면접 보러 감(연봉: 통조림)", scores: { traitor: 2 } },
+        { text: "물자 분산 은닉 완료. 창고 위치는 나만 안다", scores: { supplier: 2 } },
+        { text: "저쪽 대표에게 정상회담 제안 — 의제: 라면 반 나누기", scores: { leader: 2 } } ] },
 
-      { q: "마지막 총알 혹은 마지막 무기 하나가 남았다. 누가 가져야 할까?", choices: [
-        { text: "전투 경험 많은 나나 전투원이 들어야 함", scores: { fighter: 2 } },
-        { text: "무리 전체를 지킬 사람, 즉 리더가 들어야 함", scores: { leader: 2 } },
-        { text: "물자 관리하는 나한테 우선 맡겨서 상황 보고 배분", scores: { supplier: 2 } },
-        { text: "그냥 나 혼자 챙겨서 조용히 빠질 궁리부터 함", scores: { traitor: 2, hermit: 1 } } ] },
+      { q: "구조 헬기 등장! 남은 좌석은 1개, 우리 일행은 4명.", choices: [
+        { text: "'미안!' …소리가 들릴 땐 이미 탑승 완료", scores: { traitor: 2 } },
+        { text: "제일 약한 사람 태워 보내고 손 흔들어줌", scores: { leader: 2 } },
+        { text: "'헬기? 난 저거 안 믿어.' 걸어서 살아남는 길 선택", scores: { hermit: 2 } },
+        { text: "타는 사람 주머니에 비상식량 쑤셔 넣어 보냄", scores: { supplier: 2 } } ] },
 
-      { q: "몇 달째 생존 중, 무리에 위기가 닥쳤다. 당신의 최종 선택은?", choices: [
-        { text: "다 같이 살 방법을 끝까지 찾아보자고 사람들 설득", scores: { leader: 2 } },
-        { text: "몸으로 부딪혀서라도 무리를 지키고 버팀", scores: { fighter: 2 } },
-        { text: "위험하지만 나 혼자라면 살 수 있는 길을 택함", scores: { traitor: 2, hermit: 1 } },
-        { text: "애초에 무리에 낄 걸 그랬나 후회하며 혼자 헤맴", scores: { hermit: 2 } } ] }
+      { q: "6개월 뒤, 생존자 다큐멘터리에 내가 나왔다. 화면 아래 소개 자막은?", choices: [
+        { text: "'프라이팬의 전설 — 좀비 격퇴 137회'", scores: { fighter: 2 } },
+        { text: "'목격담만 존재하는 유령 생존자'", scores: { hermit: 2 } },
+        { text: "'1화에서 하차 (시청자 여러분이 많이 우셨습니다)'", scores: { firstday: 2 } },
+        { text: "'전국 생존 캠프를 먹여 살린 물류왕'", scores: { supplier: 2 } } ] }
     ];
 
     function renderResult(totals, el, api) {

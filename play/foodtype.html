@@ -44,56 +44,56 @@
     var ORDER = ["mala","naengmyeon","gukbap","mintcho","tteokbokki","dosirak"];
 
     var QUESTIONS = [
-      { q: "친구들과의 약속, 나의 스타일은?", choices: [
-        { text: "불금엔 무조건 화끈하게 놀아야지", scores: { mala: 2 } },
-        { text: "조용한 카페에서 여유롭게", scores: { naengmyeon: 2 } },
-        { text: "다 같이 밥 한끼 먹으면서 정 나누기", scores: { gukbap: 2 } },
-        { text: "굳이 안 나가도 그만, 내 시간이 더 중요", scores: { mintcho: 1, dosirak: 1 } } ] },
-      { q: "새로운 사람들과의 모임 자리, 나는?", choices: [
-        { text: "먼저 말 걸고 분위기 띄우는 편", scores: { tteokbokki: 2 } },
-        { text: "친해지기 전까진 적당히 거리 유지", scores: { naengmyeon: 2 } },
-        { text: "내 취향 아니면 굳이 안 맞춰줌", scores: { mintcho: 2 } },
-        { text: "필요한 얘기만 하고 효율적으로 마무리", scores: { dosirak: 2 } } ] },
-      { q: "갈등이 생겼을 때 나의 대처법은?", choices: [
-        { text: "일단 화끈하게 부딪혀서 끝장 봄", scores: { mala: 2 } },
-        { text: "감정 빼고 냉정하게 정리부터", scores: { naengmyeon: 2 } },
-        { text: "밥이나 한끼 하면서 풀자고 함", scores: { gukbap: 2 } },
-        { text: "내 입장은 확실히 밝히고 안 굽힘", scores: { mintcho: 2 } } ] },
-      { q: "주말 계획을 세울 때 나는?", choices: [
-        { text: "즉흥적으로 끌리는 대로 신나게", scores: { mala: 1, tteokbokki: 1 } },
-        { text: "미리 다 계획해서 낭비 없이", scores: { dosirak: 2 } },
-        { text: "집에서 푹 쉬면서 재충전", scores: { naengmyeon: 1, mintcho: 1 } },
-        { text: "가족이나 친한 사람들과 소소하게", scores: { gukbap: 2 } } ] },
-      { q: "옷을 고를 때 나의 기준은?", choices: [
-        { text: "튀어도 좋으니 개성 있게", scores: { mintcho: 2 } },
-        { text: "무난하고 실용적인 게 최고", scores: { dosirak: 2 } },
-        { text: "화려하고 눈에 띄는 컬러 선호", scores: { mala: 1, tteokbokki: 1 } },
-        { text: "심플하고 깔끔한 톤 선호", scores: { naengmyeon: 2 } } ] },
-      { q: "연애할 때 나의 스타일은?", choices: [
-        { text: "만나자마자 화끈하게 직진", scores: { mala: 2 } },
-        { text: "은근하지만 늘 곁에서 챙겨주는 편", scores: { gukbap: 2 } },
-        { text: "내 취향 확고해서 맞는 사람만 만남", scores: { mintcho: 2 } },
-        { text: "누구에게나 다정해서 인기 많음", scores: { tteokbokki: 1, gukbap: 1 } } ] },
-      { q: "스트레스 받을 때 푸는 방법은?", choices: [
-        { text: "매운 거 먹고 땀 빼면서 스트레스 날림", scores: { mala: 2 } },
-        { text: "혼자 시원한 곳에서 머리 식히기", scores: { naengmyeon: 2 } },
-        { text: "친한 사람 불러서 수다 떨며 풀기", scores: { tteokbokki: 1, gukbap: 1 } },
-        { text: "일단 할 일부터 빠르게 해치우고 쉼", scores: { dosirak: 2 } } ] },
-      { q: "회식이나 모임에서 나의 포지션은?", choices: [
-        { text: "분위기 메이커, 다들 나만 쳐다봄", scores: { tteokbokki: 2 } },
-        { text: "묵묵히 자리 지키며 든든하게 있어줌", scores: { gukbap: 2 } },
-        { text: "적당히 있다가 조용히 먼저 빠짐", scores: { naengmyeon: 1, dosirak: 1 } },
-        { text: "내 얘기하고 싶을 때만 화끈하게 참전", scores: { mala: 1, mintcho: 1 } } ] },
-      { q: "MBTI로 치면 나는?", choices: [
-        { text: "E, 에너지 넘치고 사람들과 함께일 때 살아남", scores: { tteokbokki: 2 } },
-        { text: "I, 혼자 있을 때 제일 편하고 효율적", scores: { dosirak: 1, naengmyeon: 1 } },
-        { text: "T, 논리적이고 쿨하게 판단", scores: { naengmyeon: 2 } },
-        { text: "F, 정 많고 따뜻하게 챙겨줌", scores: { gukbap: 2 } } ] },
-      { q: "누가 내 취향을 비웃으면 나는?", choices: [
-        { text: "'네 입맛이나 잘 챙겨' 하고 신경 안 씀", scores: { mintcho: 2 } },
-        { text: "화끈하게 받아쳐서 논쟁 승리", scores: { mala: 2 } },
-        { text: "굳이 설명 안 하고 웃어넘김", scores: { gukbap: 1, dosirak: 1 } },
-        { text: "쿨하게 '취향 존중'이라며 넘어감", scores: { naengmyeon: 2 } } ] }
+      { q: "무인도에 떨어졌다. 구조 요정이 나타나 '평생 한 가지 음식 무한 제공' 소원을 들어준단다.", choices: [
+        { text: "물냉면. 무인도 더위엔 살얼음 육수가 답이다", scores: { naengmyeon: 2 } },
+        { text: "국밥. 어디서든 속이 든든해야 버틴다", scores: { gukbap: 2 } },
+        { text: "편의점 도시락. 반찬 구성 완벽, 영양 균형, 효율 갑", scores: { dosirak: 2 } },
+        { text: "민초 아이스크림. 논쟁할 사람이 없는 게 좀 아쉽지만", scores: { mintcho: 2 } } ] },
+      { q: "내 인생이 요리 서바이벌 프로그램이라면, 심사위원의 평가는?", choices: [
+        { text: "'자극적인데… 자꾸 손이 갑니다. 이거 위험한데요'", scores: { mala: 2 } },
+        { text: "'첫맛은 밍밍한데 끝에서 깊은 육수가 올라옵니다'", scores: { naengmyeon: 2 } },
+        { text: "'전 국민 취향 저격. 이 맛은 미워할 수가 없어요'", scores: { tteokbokki: 2 } },
+        { text: "'심사위원단 의견이 갈립니다. 지금 싸우고 있습니다'", scores: { mintcho: 2 } } ] },
+      { q: "새벽 냉장고에서 요정이 튀어나왔다. '네 성격을 온도로 표현해봐라.'", choices: [
+        { text: "'영하 1도. 살얼음 동동, 시원한 게 최고'", scores: { naengmyeon: 2 } },
+        { text: "'화산 온도. 만지면 데이니까 조심하도록'", scores: { mala: 2 } },
+        { text: "'뚝배기 온도. 늦게 데워져도 끝까지 안 식음'", scores: { gukbap: 2 } },
+        { text: "'전자레인지 2분. 필요할 때 딱 맞게 데워짐'", scores: { dosirak: 2 } } ] },
+      { q: "친구 넷이 배달 메뉴로 1시간째 전쟁 중이다. 나의 등판!", choices: [
+        { text: "'떡볶이 세트 시켜서 다 같이 나눠 먹자!' 만장일치 유도", scores: { tteokbokki: 2 } },
+        { text: "'난 이거 먹을래.' 혼자 다른 가게에서 단독 주문", scores: { mintcho: 2 } },
+        { text: "각자 시키는 게 배달비 포함 총비용이 최소임을 3줄로 증명", scores: { dosirak: 2 } },
+        { text: "'난 아무거나 다 좋아~' 하며 네 명 의견 다 받아줌", scores: { gukbap: 2 } } ] },
+      { q: "로또 1등 당첨! 통장에 찍힌 숫자를 본 직후 나의 행동은?", choices: [
+        { text: "심장 화끈. 그날 밤 일단 뭐라도 지르고 봄", scores: { mala: 2 } },
+        { text: "예적금·투자 포트폴리오 엑셀부터 작성", scores: { dosirak: 2 } },
+        { text: "친구들 전원 소집. '오늘 다 내가 쏜다!!'", scores: { tteokbokki: 2 } },
+        { text: "아무한테도 말 안 하고 평소처럼 출근 (지만 속으로 민초 평생 구독권 결제함)", scores: { mintcho: 2 } } ] },
+      { q: "외계인이 '지구 대표 음식 인간'으로 나를 납치했다. 자기소개를 해보자.", choices: [
+        { text: "'지구인들이 힘들 때 가장 먼저 찾는 존재입니다'", scores: { gukbap: 2 } },
+        { text: "'저 하나로 지구가 두 편으로 갈라져 싸웁니다'", scores: { mintcho: 2 } },
+        { text: "'지구인 화합의 상징. 저를 싫어하는 사람을 못 봤습니다'", scores: { tteokbokki: 2 } },
+        { text: "'중독성 지구 1위. 취급주의 라벨이 붙어 있습니다'", scores: { mala: 2 } } ] },
+      { q: "첫 데이트. 상대가 '아무거나 괜찮아요'라고 말했다. 나의 진짜 대응은?", choices: [
+        { text: "리뷰 4.8 이상 · 웨이팅 없음 · 역에서 3분 식당을 3초 만에 검색 완료", scores: { dosirak: 2 } },
+        { text: "'그럼 맵기 테스트부터 갑시다.' 마라탕집으로 직행", scores: { mala: 2 } },
+        { text: "실패 확률 0%의 따뜻한 국물집으로 안내", scores: { gukbap: 2 } },
+        { text: "'그럼 정해지면 알려주세요.' 쿨하게 산책 시작", scores: { naengmyeon: 2 } } ] },
+      { q: "단체 사진이 나왔다. 사진 속 나를 찾는 방법은?", choices: [
+        { text: "가운데에서 브이. 어느 사진이든 무조건 가운데", scores: { tteokbokki: 2 } },
+        { text: "맨 끝에서 시크하게 반쯤 잘려 있음", scores: { naengmyeon: 2 } },
+        { text: "혼자 아무도 이해 못 할 컨셉 포즈 중", scores: { mintcho: 2 } },
+        { text: "맨 뒷줄에서 다 받쳐주는 든든한 배경 담당", scores: { gukbap: 2 } } ] },
+      { q: "졸업앨범 한 줄 소개에 뭐라고 적혀 있을까?", choices: [
+        { text: "'건드리면 매운맛'", scores: { mala: 2 } },
+        { text: "'전교생의 밥친구'", scores: { gukbap: 2 } },
+        { text: "'준비물은 쟤한테 빌리면 됨'", scores: { dosirak: 2 } },
+        { text: "'독보적 취향. 아무도 못 말림'", scores: { mintcho: 2 } } ] },
+      { q: "성격 감정 결과지 마지막 줄, 나에게 붙은 경고 문구는?", choices: [
+        { text: "'⚠️ 과다 섭취 시 얼얼함 주의'", scores: { mala: 2 } },
+        { text: "'⚠️ 첫입은 밍밍해도 끊을 수 없음'", scores: { naengmyeon: 2 } },
+        { text: "'⚠️ 주변인을 살찌움 (행복으로)'", scores: { tteokbokki: 2 } },
+        { text: "'⚠️ 데우기 전엔 차가워 보일 수 있음'", scores: { dosirak: 2 } } ] }
     ];
 
     function renderResult(totals, el, api) {
