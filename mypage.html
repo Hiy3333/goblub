@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>마이페이지 — goblub</title>
+  <meta name="description" content="내 프로필, 보유 젬리, 설정까지 — goblub 마이페이지" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css?v=neon7" />
+  <style>
+    .me-row { display: flex; align-items: center; gap: 16px; }
+    .me-pic { width: 64px; height: 64px; border-radius: 50%; border: 2px solid var(--purple);
+      box-shadow: 0 0 12px rgba(157,107,255,.45); object-fit: cover; flex: none; background: var(--cream); }
+    .me-pic.ph { display: flex; align-items: center; justify-content: center; font-size: 1.8rem; }
+    .me-name { font-size: 1.25rem; color: #fff; }
+    .me-mail { color: var(--ink-soft); font-size: 0.9rem; }
+    .sec-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .sec-head h2 { margin: 0; }
+    .jelly-big { font-size: 1.6rem; color: #fff; }
+    .jelly-big b { color: var(--yellow); }
+    .set-row { display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      background: var(--cream); border: 1.5px solid var(--line); border-radius: 12px; padding: 13px 15px; margin-bottom: 9px; }
+    .set-row .lb { color: var(--ink); }
+    .set-row .hint { display: block; color: var(--ink-soft); font-size: 0.8rem; margin-top: 2px; }
+    .toggle { position: relative; width: 48px; height: 26px; flex: none; }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle .knob { position: absolute; inset: 0; border-radius: 999px; background: #1b1240; border: 1.5px solid var(--line); cursor: pointer; transition: background .2s, border-color .2s; }
+    .toggle .knob::after { content: ""; position: absolute; top: 2px; left: 3px; width: 18px; height: 18px; border-radius: 50%;
+      background: var(--ink-soft); transition: transform .2s, background .2s; }
+    .toggle input:checked + .knob { background: rgba(157,107,255,.35); border-color: var(--purple); }
+    .toggle input:checked + .knob::after { transform: translateX(21px); background: var(--purple); box-shadow: 0 0 8px var(--purple); }
+    .danger { color: #ff9ec2; border-color: rgba(255,110,150,.5) !important; }
+    .pay-badge { display: inline-block; background: var(--cream); border: 1.5px solid var(--line);
+      border-radius: 999px; padding: 4px 12px; font-size: 0.78rem; color: var(--ink-soft); }
+  </style>
+</head>
+<body>
+  <div id="site-header"></div>
+  <main>
+    <section class="hero">
+      <h1>👤 마이페이지</h1>
+      <p>내 프로필과 젬리, 설정을 한곳에서</p>
+    </section>
+
+    <!-- 로그인 전 -->
+    <section class="panel" id="login-panel" style="display:none; text-align:center">
+      <h2>🔑 로그인</h2>
+      <p class="result-desc" style="margin:8px 0 18px">구글 계정으로 3초 만에 시작해요.<br>로그인하면 이 페이지에서 젬리·설정·프로필 카드를 한 번에 관리할 수 있어요.</p>
+      <div id="gsi-btn" style="display:flex; justify-content:center"></div>
+      <p class="fine-print" style="margin-top:14px">지금은 로그인 없이도 모든 콘텐츠를 즐길 수 있어요 🙂</p>
+    </section>
+
+    <!-- 로그인 후: 프로필 -->
+    <section class="panel" id="me-panel" style="display:none">
+      <div class="me-row">
+        <img class="me-pic" id="me-pic" alt="프로필 사진" referrerpolicy="no-referrer" />
+        <div style="flex:1; min-width:0">
+          <p class="me-name" id="me-name"></p>
+          <p class="me-mail" id="me-mail"></p>
+        </div>
+        <button class="btn-ghost" id="btn-logout" style="flex:none">로그아웃</button>
+      </div>
+    </section>
+
+    <!-- 보유 젬리 -->
+    <section class="panel">
+      <div class="sec-head">
+        <h2>🍬 보유 젬리</h2>
+        <a class="btn-ghost" href="play/goblub.html" style="padding:8px 16px; font-size:0.88rem">출석하고 모으기 →</a>
+      </div>
+      <p class="jelly-big">🍬 <b id="w-bal">0</b> 젬리 <span id="w-streak" style="font-size:0.9rem; color:var(--ink-soft)"></span></p>
+      <p class="result-desc" style="margin-top:6px">출석 도장·콘텐츠 즐기기·다마고치 케어로 모으고, ✨프리미엄 풀이에 쓸 수 있어요.</p>
+    </section>
+
+    <!-- 나의 프로필 카드 -->
+    <section class="panel">
+      <div class="sec-head">
+        <h2>🎫 나의 프로필 카드</h2>
+        <a class="btn-ghost" href="play/profile-card.html" style="padding:8px 16px; font-size:0.88rem">보러 가기 →</a>
+      </div>
+      <p class="result-desc" id="card-summary">사주·MBTI·연애세포까지 — 흩어진 내 결과를 한 장으로 모아 자랑해요.</p>
+    </section>
+
+    <!-- 설정 -->
+    <section class="panel">
+      <h2 style="margin-bottom:12px">⚙️ 설정</h2>
+      <div class="set-row">
+        <span class="lb">떠다니는 고블럽 마스코트 표시<span class="hint">끄면 화면 구석 버튼으로 접혀요 (새로고침 후 적용)</span></span>
+        <label class="toggle"><input type="checkbox" id="tg-buddy" /><span class="knob"></span></label>
+      </div>
+      <div class="set-row">
+        <span class="lb">사주 프로필<span class="hint" id="birth-hint">저장된 프로필 없음</span></span>
+        <a class="btn-ghost" href="play/fortune.html" style="padding:7px 14px; font-size:0.85rem; flex:none">수정하기</a>
+      </div>
+      <div class="set-row danger">
+        <span class="lb">전체 데이터 초기화<span class="hint">젬리·고블럽·테스트 기록 등 이 기기의 모든 goblub 데이터 삭제</span></span>
+        <button class="btn-ghost danger" id="btn-reset" style="padding:7px 14px; font-size:0.85rem; flex:none">초기화</button>
+      </div>
+    </section>
+
+    <!-- 결제 -->
+    <section class="panel">
+      <div class="sec-head">
+        <h2>💳 결제</h2>
+        <span class="pay-badge">준비 중</span>
+      </div>
+      <p class="result-desc">젬리 충전과 프리미엄 상품 결제를 준비하고 있어요. 지금은 출석·플레이로 젬리를 모아주세요! 🍬</p>
+    </section>
+
+    <p class="fine-print">모든 데이터는 이 브라우저에 저장돼요 · 재미로 즐겨주세요 🙂</p>
+  </main>
+  <div id="site-footer"></div>
+  <script src="js/common.js?v=2" data-root="."></script>
+  <script src="js/auth.js"></script>
+  <script src="play/js/feed.js?v=2"></script>
+  <script>
+    (function () {
+      var $ = function (id) { return document.getElementById(id); };
+
+      function renderAuth() {
+        var u = GoblubAuth.user();
+        $("login-panel").style.display = u ? "none" : "block";
+        $("me-panel").style.display = u ? "block" : "none";
+        if (u) {
+          $("me-name").textContent = u.name || "고블럽 친구";
+          $("me-mail").textContent = u.email || "";
+          if (u.picture) { $("me-pic").src = u.picture; $("me-pic").classList.remove("ph"); }
+          else { $("me-pic").removeAttribute("src"); $("me-pic").classList.add("ph"); }
+        } else {
+          GoblubAuth.renderButton($("gsi-btn"), function () { location.reload(); });
+        }
+      }
+
+      function renderWallet() {
+        var w = GoblubFeed.wallet();
+        $("w-bal").textContent = w.balance;
+        $("w-streak").textContent = w.streak > 0 ? "· 🔥 연속 출석 " + w.streak + "일" : "";
+      }
+
+      function renderCardSummary() {
+        try {
+          var card = GoblubFeed.cardData() || {};
+          var done = Object.keys(card).length;
+          var hasBirth = !!JSON.parse(localStorage.getItem("goblub_birth") || "null");
+          var total = 7;
+          var n = done + (hasBirth ? 1 : 0);
+          if (n > 0) $("card-summary").textContent = "완성도 " + Math.min(n, total) + "/" + total + " — 채울수록 카드가 꽉 차요!";
+        } catch (e) {}
+      }
+
+      function renderBirth() {
+        try {
+          var b = JSON.parse(localStorage.getItem("goblub_birth"));
+          if (b && b.y) $("birth-hint").textContent = b.y + "년 " + b.m + "월 " + b.d + "일" + (b.hour != null ? " " + b.hour + "시" : "");
+        } catch (e) {}
+      }
+
+      // 설정: 마스코트 토글
+      var buddyOn = true;
+      try { buddyOn = localStorage.getItem("goblub_buddy") !== "min"; } catch (e) {}
+      $("tg-buddy").checked = buddyOn;
+      $("tg-buddy").onchange = function () {
+        try { localStorage.setItem("goblub_buddy", this.checked ? "on" : "min"); } catch (e) {}
+      };
+
+      $("btn-logout").onclick = function () {
+        GoblubAuth.signOut();
+        location.reload();
+      };
+
+      $("btn-reset").onclick = function () {
+        if (!confirm("정말 초기화할까요?\n젬리·고블럽 성장·테스트 기록·사주 프로필 등 이 기기의 모든 goblub 데이터가 삭제되고, 로그인도 해제됩니다.")) return;
+        try {
+          Object.keys(localStorage).filter(function (k) { return k.indexOf("goblub") === 0; })
+            .forEach(function (k) { localStorage.removeItem(k); });
+        } catch (e) {}
+        location.reload();
+      };
+
+      renderAuth();
+      renderWallet();
+      renderCardSummary();
+      renderBirth();
+    })();
+  </script>
+</body>
+</html>

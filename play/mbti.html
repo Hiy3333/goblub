@@ -72,7 +72,7 @@
 
   </main>
   <div id="site-footer"></div>
-  <script src="../js/common.js" data-root=".."></script>
+  <script src="../js/common.js?v=2" data-root=".."></script>
   <script src="js/feed.js?v=2"></script>
   <script>
     (function () {
@@ -258,7 +258,13 @@
       };
 
       $("r-link").onclick = function () {
-        copyText(location.origin + location.pathname + "#" + window.__resultType, $("r-link"), "복사됨!");
+        var url = location.origin + location.pathname + "#" + window.__resultType;
+        if (navigator.share) {
+          navigator.share({ title: "대환장 상황극 MBTI — 나는 " + window.__resultType, url: url })
+            .catch(function () {});
+          return;
+        }
+        copyText(url, $("r-link"), "복사됨!");
       };
 
       $("r-retry").onclick = function () {

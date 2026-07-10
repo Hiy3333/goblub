@@ -2,6 +2,10 @@
 (function () {
   var root = (document.currentScript && document.currentScript.dataset.root) || ".";
 
+  // 로그인 상태에 따라 '로그인' ↔ '마이페이지' (둘 다 mypage.html로 — 페이지가 상태별 화면 처리)
+  var loggedIn = false;
+  try { var u = JSON.parse(localStorage.getItem("goblub_user")); loggedIn = !!(u && u.sub); } catch (e) {}
+
   var headerHTML =
     '<header class="site-header">' +
     '<a class="logo" href="' + root + '/index.html">' +
@@ -11,6 +15,7 @@
     '<nav class="site-nav">' +
     '<a href="' + root + '/index.html">홈</a>' +
     '<a href="' + root + '/apps.html">앱</a>' +
+    '<a href="' + root + '/mypage.html">' + (loggedIn ? "마이페이지" : "로그인") + "</a>" +
     "</nav>" +
     "</header>";
 

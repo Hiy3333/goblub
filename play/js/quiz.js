@@ -46,6 +46,13 @@
     }
 
     function shareLink(btn) {
+      // 모바일: 네이티브 공유 시트(카톡·인스타 바로), 미지원 시 링크 복사
+      if (navigator.share) {
+        navigator.share({ title: config.title + " — goblub", url: location.href })
+          .then(function () { btn.textContent = "공유 완료!"; })
+          .catch(function () { /* 사용자가 시트 닫음 — 조용히 무시 */ });
+        return;
+      }
       (navigator.clipboard ? navigator.clipboard.writeText(location.href) : Promise.reject())
         .then(function () { btn.textContent = "복사됨!"; })
         .catch(function () { btn.textContent = location.href; });
