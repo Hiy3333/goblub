@@ -217,6 +217,8 @@ a.card:hover,
   text-overflow: ellipsis;
 }
 .card.hub .sub a:hover { color: #fff; text-shadow: 0 0 9px var(--nc); }
+/* .whole: 리스트는 미리보기만 — 카드 어디를 눌러도 data-href 허브로 이동 */
+.card.hub.whole .sub a { pointer-events: none; }
 @media (max-width: 420px) {
   .card.hub { flex-direction: column; gap: 12px; }
   .card.hub .sub { flex-basis: auto; border-left: none; padding-left: 0;
