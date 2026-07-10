@@ -45,7 +45,7 @@
   <div id="site-footer"></div>
   <script src="../js/common.js" data-root=".."></script>
   <script src="js/feed.js?v=2"></script>
-  <script src="js/dosa.js"></script>
+  <script src="js/dosa.js?v=2"></script>
   <script>
     (function () {
       var $ = function (id) { return document.getElementById(id); };
@@ -78,11 +78,12 @@
         out.style.display = "block";
         out.textContent = "";
         Dosa.fetchAI("/api/naming", { naming: { category: chosen, keywords: $("kw").value.trim() } }, "goblub_name_", {
+          noCache: true, cooldownMs: 8000, cooldownKey: "goblub_name_last",
           onChunk: function (t) { out.textContent += t; },
-          onDone: function (fromCache) {
-            st.textContent = fromCache ? "🐙 (지난번에 지어준 이름이에요)" : "🐙 짜잔! 맘에 드는 게 있나요?";
+          onDone: function () {
+            st.textContent = "🐙 짜잔! 맘에 드는 게 있나요? (다시 누르면 새 이름!)";
             btn.disabled = false;
-            if (!fromCache && window.GoblubFeed) GoblubFeed.grant("naming");
+            if (window.GoblubFeed) GoblubFeed.grant("naming");
           },
           onError: function (code, sec) {
             out.style.display = "none";

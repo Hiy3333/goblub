@@ -53,19 +53,24 @@
     };
   }
 
-  // cb = { onChunk(text), onDone(fromCache), onError(code, sec?) }
+  // cb = { onChunk(text), onDone(fromCache), onError(code, sec?), accept?(full), noCache?, cooldownMs?, cooldownKey? }
+  // noCache: 매번 새로 생성(작명소 등 생성기). cooldownMs/cooldownKey: 기능별 쿨다운 커스텀.
   function fetchStream(path, body, cacheKeyPrefix, cb) {
     var key = cacheKeyPrefix + hash(JSON.stringify(body));
-    try {
-      var cached = localStorage.getItem(key);
-      if (cached) { cb.onChunk(cached); cb.onDone(true); return; }
-    } catch (e) {}
+    if (!cb.noCache) {
+      try {
+        var cached = localStorage.getItem(key);
+        if (cached) { cb.onChunk(cached); cb.onDone(true); return; }
+      } catch (e) {}
+    }
 
+    var cdKey = cb.cooldownKey || COOLDOWN_KEY;
+    var cdMs = cb.cooldownMs || COOLDOWN_MS;
     var last = 0;
-    try { last = +localStorage.getItem(COOLDOWN_KEY) || 0; } catch (e) {}
-    var wait = COOLDOWN_MS - (Date.now() - last);
+    try { last = +localStorage.getItem(cdKey) || 0; } catch (e) {}
+    var wait = cdMs - (Date.now() - last);
     if (wait > 0) { cb.onError("cooldown", Math.ceil(wait / 1000)); return; }
-    try { localStorage.setItem(COOLDOWN_KEY, String(Date.now())); } catch (e) {}
+    try { localStorage.setItem(cdKey, String(Date.now())); } catch (e) {}
 
     fetch(API_BASE + path, {
       method: "POST",
@@ -82,8 +87,8 @@
           reader.read().then(function (x) {
             if (x.done) {
               if (full.trim()) {
-                // cb.accept(full) 가 있으면 통과한 응답만 캐시(불완전 결과가 영구 고착되는 것 방지)
-                var okToCache = !cb.accept || cb.accept(full);
+                // noCache가 아니고, cb.accept 통과한 응답만 캐시(불완전 결과 고착 방지)
+                var okToCache = !cb.noCache && (!cb.accept || cb.accept(full));
                 if (okToCache) { try { localStorage.setItem(key, full); } catch (e) {} }
                 cb.onDone(false);
               } else cb.onError("busy");
