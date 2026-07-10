@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>우리 사이 질문 카드 — goblub</title>
-  <meta name="description" content="커플·친구 질문 카드와 19금 스파이시 질문까지 — 카드 한 장으로 대화를 열어보세요" />
+  <meta name="description" content="커플·친구 질문 카드와 야릇한 썸 질문까지 — 카드 한 장으로 분위기를 띄워보세요" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
@@ -39,21 +39,8 @@
     }
 
     .q-meta { text-align: center; color: var(--ink-soft); font-size: 0.85rem; margin-bottom: 14px; }
-    .cat-tab.spicy.active { background: #ff2e6e; border-color: #ff2e6e; }
+    .cat-tab.spicy.active { background: #ff2e6e; border-color: #ff2e6e; color: #fff; }
     .cat-tab.spicy { border-color: #ff2e6e; color: #ff9ec2; }
-    /* 성인 인증 모달 */
-    .age-back { position: fixed; inset: 0; z-index: 10000; background: rgba(4,2,20,.72); backdrop-filter: blur(3px);
-      display: none; align-items: center; justify-content: center; padding: 20px; }
-    .age-box { background: var(--surface); border: 2px solid #ff2e6e; border-radius: 20px; padding: 26px 22px;
-      max-width: 360px; text-align: center; box-shadow: 0 0 26px rgba(255,46,110,.4); }
-    .age-box .em { font-size: 2.6rem; display: block; margin-bottom: 8px; }
-    .age-box h2 { color: #fff; font-size: 1.25rem; margin-bottom: 10px; }
-    .age-box p { color: var(--ink-soft); font-size: 0.92rem; line-height: 1.6; margin-bottom: 18px; }
-    .age-box .btn-row { display: flex; gap: 10px; justify-content: center; }
-    .age-yes { background: #ff2e6e; color: #fff; border: none; border-radius: 999px; padding: 11px 22px;
-      font-family: inherit; font-size: 1rem; cursor: pointer; box-shadow: 0 0 14px rgba(255,46,110,.5); }
-    .age-no { background: transparent; color: var(--ink-soft); border: 2px solid var(--line);
-      border-radius: 999px; padding: 9px 20px; font-family: inherit; font-size: 0.95rem; cursor: pointer; }
   </style>
 </head>
 <body>
@@ -61,14 +48,14 @@
   <main>
     <section class="hero">
       <h1>🎴 우리 사이 질문 카드</h1>
-      <p>커플·친구, 그리고 19금 스파이시까지 — 카드 한 장으로 대화를 열어보세요</p>
+      <p>커플·친구, 그리고 야릇한 썸까지 — 카드 한 장으로 분위기를 띄워보세요</p>
     </section>
 
     <section class="panel">
       <div class="cat-tabs" id="cat-tabs">
         <button class="cat-tab active" data-cat="couple">💑 커플</button>
         <button class="cat-tab" data-cat="friend">🤝 친구</button>
-        <button class="cat-tab spicy" data-cat="spicy">🔞 19금</button>
+        <button class="cat-tab spicy" data-cat="spicy">🔥 야릇</button>
       </div>
 
       <p class="q-meta" id="q-meta">💑 커플 카드</p>
@@ -87,18 +74,6 @@
 
     <p class="fine-print">답하기 싫은 질문은 패스해도 괜찮아요. 즐겁게, 편하게! 🙂</p>
   </main>
-
-  <div class="age-back" id="age-back">
-    <div class="age-box" role="dialog" aria-label="성인 인증">
-      <span class="em">🔞</span>
-      <h2>19세 이상 성인 인증</h2>
-      <p>이 카드에는 수위 높은 성인용 질문이 포함돼 있어요.<br>만 19세 이상이며, 성인 콘텐츠 열람에 동의하시나요?</p>
-      <div class="btn-row">
-        <button class="age-yes" id="age-yes" type="button">네, 19세 이상이에요</button>
-        <button class="age-no" id="age-no" type="button">아니요</button>
-      </div>
-    </div>
-  </div>
   <div id="site-footer"></div>
   <script src="../js/common.js" data-root=".."></script>
   <script src="js/feed.js?v=2"></script>
@@ -212,48 +187,51 @@
           "내가 연예인이면 어떤 컨셉으로 데뷔할 것 같아?"
         ],
         spicy: [
-          "처음 봤을 때 눈길이 제일 먼저 간 부위는 어디였어?",
-          "나랑 있을 때 심장이 제일 빨리 뛰었던 순간은?",
-          "지금 당장 하고 싶은 스킨십 딱 하나만 고른다면?",
-          "내 몸에서 제일 매력적이라고 생각하는 곳은?",
-          "상상만 하고 아직 말 못 한 은밀한 바람이 있다면?",
-          "내 옷차림 중에 유독 눈을 못 떼게 하는 스타일은?",
-          "키스할 때 제일 좋아하는 분위기나 타이밍은?",
-          "나랑 단둘이 있을 때 참기 힘들었던 적 있어?",
-          "손이 먼저 가는 순간은 보통 언제야?",
-          "둘만의 은밀한 규칙을 하나 만든다면 뭐가 좋을까?",
-          "나랑 해보고 싶은 밤 데이트 판타지가 있어?",
-          "내 목소리가 유독 설레게 들리는 순간이 있어?",
-          "지금까지 중 가장 짜릿했던 순간을 한 장면으로 떠올린다면?",
-          "지금 나를 보며 드는 가장 솔직한 생각은?",
-          "나랑 있을 때 가장 유혹적이라고 느낀 내 행동은?",
-          "내가 어떤 눈빛을 보낼 때 넘어갈 것 같아?",
-          "둘만 아는 은밀한 신호를 만든다면 어떤 게 좋을까?",
-          "내가 무심코 한 행동 중에 심쿵했던 거 있어?",
-          "상상 속 완벽한 밤은 어떤 그림이야?",
-          "내가 먼저 훅 다가가면 어떤 반응이 나올 것 같아?",
-          "옷 위로도 느껴지는 내 매력 포인트가 있다면?",
-          "지금 우리 사이 온도를 숫자로 표현하면 몇 도야?",
-          "가장 대담했던 연애 경험 하나 살짝 고백해줄래?",
-          "내 향기 중에 유독 약해지는 순간이 있어?",
-          "함께 있을 때 제일 아찔했던 기억은?",
-          "말 안 해도 통했으면 하는 순간이 언제야?",
-          "지금 이 방에 우리 둘뿐이라면 제일 먼저 뭐 하고 싶어?",
-          "내 어떤 표정에 제일 무너져?",
-          "가장 로맨틱하면서도 대담했던 데이트를 상상한다면?",
-          "내가 귓가에 뭐라고 속삭이면 좋겠어?",
-          "스킨십에서 속도를 정한다면 넌 어떤 편이야?",
-          "나랑 여행 가면 밤에 제일 기대되는 건 뭐야?",
-          "지금 가장 만지고 싶은 곳을 눈으로만 가리켜본다면?",
-          "우리만의 위험한 비밀 하나 만든다면?",
-          "내가 어떤 옷을 입고 나오면 정신 못 차릴 것 같아?",
-          "가장 뜨거웠던 순간을 떠올릴 때 어떤 장면이 먼저 떠올라?",
-          "말보다 행동으로 표현하고 싶은 마음이 있다면?",
+          "지금 이 분위기, 너도 나만큼 야릇하게 느껴져?",
+          "내가 지금 살짝 다가가면 넌 어떻게 할 것 같아?",
+          "지금 이 손, 잡아도 돼?",
+          "내 입술 보면 무슨 생각 들어?",
+          "나랑 키스한다면 지금 이 순간이 딱일까?",
+          "지금 제일 하고 싶은 스킨십을 말 대신 눈빛으로 해봐",
+          "우리 사이 지금 몇 도야? 조금만 더 뜨거워져 볼까?",
+          "내 어디를 자꾸 훔쳐보게 돼? 솔직히",
+          "지금 나 안아봐도 돼?",
+          "내가 귓가에 뭐라고 속삭이면 넘어올 것 같아?",
+          "오늘 나랑 있으면서 제일 아찔했던 순간은?",
+          "내가 먼저 확 들이대면 당황할 거야, 좋아할 거야?",
+          "지금 우리 둘뿐이라면 제일 먼저 뭐 하고 싶어?",
+          "너랑 나, 오늘 밤 이대로 헤어지기 아쉽지 않아?",
+          "내 목소리 톤 중에 제일 위험하게 들리는 게 있어?",
+          "나랑 술 한잔하면 무슨 일이 벌어질 것 같아?",
+          "내 어떤 표정에 이성이 훅 무너져?",
+          "지금 만지고 싶은 곳을 눈으로만 딱 가리켜봐",
+          "나랑 단둘이 여행 가면 밤에 뭘 기대해?",
+          "내가 오늘 유독 야릇해 보인 순간 있었어?",
+          "우리만 아는 은밀한 신호 하나 만들래?",
+          "지금 이 눈빛, 계속 봐도 될까 아님 위험할까?",
+          "내가 살짝 스칠 때 어떤 느낌이었어?",
+          "지금 상상하고 있는 거, 나한테만 말해줄 수 있어?",
+          "네 상상 속에서 나랑 제일 가까웠던 장면은?",
+          "이 밤이 더 길어지면 우리 어떻게 될 것 같아?",
+          "내가 어떤 옷 입고 나오면 정신 못 차릴 것 같아?",
+          "지금 참고 있는 거 있지? 딱 하나만 털어놔",
+          "나한테 제일 먼저 무너지는 순간은 언제야?",
+          "말보다 행동으로 지금 보여주고 싶은 게 있어?",
           "내 어떤 습관이 은근히 야하게 느껴진 적 있어?",
-          "지금 이 분위기, 조금 더 가까워져도 될까?",
-          "나한테만 보여주고 싶은 은밀한 모습이 있어?",
-          "가장 참기 어려웠던 유혹의 순간을 고백한다면?",
-          "우리 사이 상상력을 마음껏 펼친다면 어디까지 가봤어?"
+          "지금 이 거리, 더 좁혀도 될까?",
+          "너랑 나 사이에 지금 흐르는 이 긴장감, 뭐라고 부를래?",
+          "내가 지금 눈 감으면 무슨 일이 일어날까?",
+          "오늘 밤 딱 하나 대담해질 수 있다면 뭐 할래?",
+          "네 손이 먼저 가는 순간은 보통 언제야?",
+          "지금 내 어깨에 기대도 될 만큼 편해?",
+          "나랑 있을 때 제일 참기 힘든 순간은 언제야?",
+          "우리 지금 이 순간을 사진으로 남긴다면 어떤 장면일까?",
+          "내가 조금만 더 다가가도 밀어내지 않을 거지?",
+          "너랑 나, 오늘 어디까지 솔직해질 수 있을까?",
+          "지금 이 노래 끝나기 전에 우리 뭐라도 해볼까?",
+          "내 향기 중에 유독 약해지는 순간이 있어?",
+          "지금 이 분위기, 내가 리드해도 될까?",
+          "네가 상상만 하고 아직 말 못 한 거, 오늘 밤 말해줄래?"
         ]
       };
 
@@ -266,9 +244,8 @@
       var META = {
         couple: "💑 커플 카드",
         friend: "🤝 친구 카드",
-        spicy: "🔞 19금 스파이시 카드 (성인 전용)"
+        spicy: "🔥 야릇한 썸 카드"
       };
-      function adultOk() { try { return localStorage.getItem("goblub_adult19") === "yes"; } catch (e) { return false; } }
 
       function draw() {
         var arr = pool();
@@ -304,28 +281,8 @@
         draw();
       }
       for (var i = 0; i < tabs.length; i++) {
-        tabs[i].onclick = function () {
-          if (this.getAttribute("data-cat") === "spicy" && !adultOk()) {
-            pendingTab = this;
-            $("age-back").style.display = "flex";
-            return;
-          }
-          activate(this);
-        };
+        tabs[i].onclick = function () { activate(this); };
       }
-
-      // 성인 인증 모달
-      var pendingTab = null;
-      $("age-yes").onclick = function () {
-        try { localStorage.setItem("goblub_adult19", "yes"); } catch (e) {}
-        $("age-back").style.display = "none";
-        if (pendingTab) activate(pendingTab);
-      };
-      $("age-no").onclick = function () {
-        $("age-back").style.display = "none";
-        pendingTab = null;
-      };
-      $("age-back").onclick = function (e) { if (e.target === $("age-back")) { $("age-back").style.display = "none"; pendingTab = null; } };
     })();
   </script>
 </body>
