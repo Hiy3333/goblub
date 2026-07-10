@@ -17,7 +17,7 @@
 
   function openTama() {
     if (window.GoblubTama) { GoblubTama.open(); return; }
-    var sc = document.createElement("script"); sc.src = base + "goblub-tama.js";
+    var sc = document.createElement("script"); sc.src = base + "goblub-tama.js?v=2";
     sc.onload = function () { if (window.GoblubTama) GoblubTama.open(); };
     document.head.appendChild(sc);
   }

@@ -28,6 +28,17 @@
     .levelup { text-align: center; font-size: 1.2rem; color: var(--coral); display: none; margin-top: 10px; }
     .name-edit { display: flex; gap: 8px; justify-content: center; margin-bottom: 10px; }
     .name-edit input { font-family: inherit; font-size: 0.95rem; padding: 8px 12px; border: 2px solid var(--line); border-radius: 10px; width: 160px; background: var(--surface); color: var(--ink); }
+    .wallet-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+    .wallet-bal { font-size: 1.2rem; color: #fff; }
+    .wallet-bal b { color: var(--yellow); }
+    .wallet-streak { color: var(--ink-soft); font-size: 0.92rem; }
+    .stamp-dots { display: flex; gap: 7px; justify-content: center; margin: 12px 0 6px; flex-wrap: wrap; }
+    .stamp-dot { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--line);
+      display: flex; align-items: center; justify-content: center; font-size: 0.82rem; color: var(--ink-soft); background: var(--cream); }
+    .stamp-dot.done { border-color: var(--yellow); color: #2a2005; background: linear-gradient(180deg, var(--yellow), var(--orange)); }
+    .stamp-dot.jackpot { border-color: var(--coral); }
+    .stamp-dot.jackpot.done { background: linear-gradient(180deg, var(--coral), var(--purple)); color: #fff; border-color: var(--coral); }
+    .check-msg { text-align: center; color: var(--ink-soft); font-size: 0.9rem; min-height: 1.3em; margin-top: 8px; }
   </style>
 </head>
 <body>
@@ -56,6 +67,19 @@
     </section>
 
     <section class="panel">
+      <div class="wallet-row">
+        <span class="wallet-bal">🍬 <b id="w-bal">0</b> 젬리</span>
+        <span class="wallet-streak" id="w-streak"></span>
+      </div>
+      <p class="result-desc" style="margin:2px 0 4px">매일 출석 도장을 찍고 젬리를 모아요 — 7일 연속이면 🎁 잭팟!</p>
+      <div class="stamp-dots" id="stamp-dots"></div>
+      <div class="result-actions">
+        <button class="btn-primary" id="btn-check">📅 오늘 출석 도장 찍기</button>
+      </div>
+      <p class="check-msg" id="check-msg"></p>
+    </section>
+
+    <section class="panel">
       <h2>🧺 오늘 먹이가 남아 있는 곳</h2>
       <p class="result-desc" style="margin:8px 0 12px">아래 콘텐츠를 즐기면 먹이를 1개씩 얻어요. (콘텐츠당 하루 1개)</p>
       <ul class="earn-list" id="earn-list"></ul>
@@ -65,7 +89,7 @@
   </main>
   <div id="site-footer"></div>
   <script src="../js/common.js" data-root=".."></script>
-  <script src="js/feed.js"></script>
+  <script src="js/feed.js?v=2"></script>
   <script src="js/goblub-art.js"></script>
   <script>
     (function () {
@@ -125,7 +149,34 @@
         if (v.trim()) { GoblubFeed.setName(v); $("in-name").value = ""; refresh(); }
       };
 
+      // ---- 지갑 + 출석 도장 ----
+      function refreshWallet() {
+        var w = GoblubFeed.wallet();
+        $("w-bal").textContent = w.balance;
+        $("w-streak").textContent = w.streak > 0 ? "🔥 연속 " + w.streak + "일" : "";
+        var filled = w.streak > 0 && w.streak % 7 === 0 ? 7 : w.streak % 7;
+        var dots = $("stamp-dots"); dots.innerHTML = "";
+        for (var i = 1; i <= 7; i++) {
+          var d = document.createElement("span");
+          d.className = "stamp-dot" + (i === 7 ? " jackpot" : "") + (i <= filled ? " done" : "");
+          d.textContent = i === 7 ? "🎁" : (i <= filled ? "🍬" : i);
+          dots.appendChild(d);
+        }
+        var btn = $("btn-check");
+        btn.disabled = w.checkedToday;
+        btn.textContent = w.checkedToday ? "오늘 출석 완료 ✓" : "📅 오늘 출석 도장 찍기";
+      }
+
+      $("btn-check").onclick = function () {
+        var r = GoblubFeed.checkIn();
+        if (r.already) { $("check-msg").textContent = "오늘은 이미 출석했어요! 내일 또 만나요 🍬"; return; }
+        $("check-msg").textContent = "출석 완료! 🍬 젬리 +" + r.reward +
+          " (기본 " + r.base + (r.bonus ? " ·연속 +" + r.bonus : "") + (r.jackpot ? " ·🎁잭팟 +" + r.jackpot : "") + ")";
+        refreshWallet();
+      };
+
       refresh();
+      refreshWallet();
     })();
   </script>
 </body>

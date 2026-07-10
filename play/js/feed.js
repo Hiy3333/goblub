@@ -80,7 +80,8 @@
     p.log[key] = 1;
     p.pending = (p.pending || 0) + 1;
     save(p);
-    toast("🍬 고블럽 먹이 +1! (" + SOURCES[src].label + ") — 고블럽 키우기에서 먹여주세요");
+    var g = earnOnce("play_" + src, 2); // 콘텐츠 즐기기 → 젬리 +2 (소스당 하루 1회)
+    toast("🍬 먹이 +1" + (g ? " · 젬리 +" + g : "") + " (" + SOURCES[src].label + ")");
     return true;
   }
 
@@ -100,7 +101,32 @@
     p.xp++;
     save(p);
     var after = levelOf(p.xp);
+    if (after > before) earn(20); // 진화(레벨업) 보너스 젬리
     return { fed: true, levelUp: after > before, level: after };
+  }
+
+  // ================= 가상재화 '젬리' 지갑 + 출석 =================
+  var WKEY = "goblub_wallet";
+  function today() { var d = new Date(); return "" + d.getFullYear() + ("0" + (d.getMonth() + 1)).slice(-2) + ("0" + d.getDate()).slice(-2); }
+  function yesterday() { var d = new Date(); d.setDate(d.getDate() - 1); return "" + d.getFullYear() + ("0" + (d.getMonth() + 1)).slice(-2) + ("0" + d.getDate()).slice(-2); }
+  function wload() { try { var w = JSON.parse(localStorage.getItem(WKEY)); if (w && typeof w.balance === "number") return w; } catch (e) {} return { balance: 0, streak: 0, lastCheck: "", earnLog: {}, careDate: "", careCount: 0 }; }
+  function wsave(w) { try { localStorage.setItem(WKEY, JSON.stringify(w)); } catch (e) {} }
+
+  function wallet() { var w = wload(); return { balance: w.balance, streak: w.streak, checkedToday: w.lastCheck === today() }; }
+  function earn(n, silent) { var w = wload(); w.balance += n; wsave(w); if (!silent) toast("🍬 젬리 +" + n + "! (보유 " + w.balance + ")"); return w.balance; }
+  function earnOnce(reason, n) { var w = wload(); var k = reason + "_" + today(); if (w.earnLog[k]) return 0; w.earnLog[k] = 1; w.balance += n; wsave(w); return n; }
+  function spend(n) { var w = wload(); if (w.balance < n) return false; w.balance -= n; wsave(w); return true; }
+  function earnCare() { var w = wload(); var t = today(); if (w.careDate !== t) { w.careDate = t; w.careCount = 0; } if (w.careCount >= 5) return 0; w.careCount++; w.balance += 1; wsave(w); return 1; }
+  function checkIn() {
+    var w = wload(), t = today();
+    if (w.lastCheck === t) return { already: true, streak: w.streak, balance: w.balance };
+    w.streak = (w.lastCheck === yesterday()) ? (w.streak + 1) : 1;
+    w.lastCheck = t;
+    var base = 5, bonus = w.streak >= 3 ? 3 : 0, jackpot = (w.streak % 7 === 0) ? 30 : 0;
+    var reward = base + bonus + jackpot;
+    w.balance += reward;
+    wsave(w);
+    return { already: false, reward: reward, base: base, bonus: bonus, jackpot: jackpot, streak: w.streak, balance: w.balance };
   }
 
   function setName(name) {
@@ -128,5 +154,6 @@
   function cardData() { try { return JSON.parse(localStorage.getItem("goblub_card") || "{}"); } catch (e) { return {}; } }
 
   window.GoblubFeed = { grant: grant, feedOne: feedOne, state: state, setName: setName,
-    todayRemaining: todayRemaining, LEVELS: LEVELS, record: record, cardData: cardData };
+    todayRemaining: todayRemaining, LEVELS: LEVELS, record: record, cardData: cardData,
+    wallet: wallet, earn: earn, spend: spend, checkIn: checkIn, earnCare: earnCare };
 })();

@@ -244,6 +244,7 @@
       msg = "나쁜 기분을 고블럽 입에 쏙!";
       setTimeout(function () { say("우걱우걱… 꺼억! 나쁜 기분 냠 — 개운하지? 😎"); }, 700);
     }
+    if (window.GoblubFeed && GoblubFeed.earnCare) GoblubFeed.earnCare(); // 케어 → 젬리 +1 (하루 최대 5)
     save(s); render();
     if (msg) say(msg);
   }
@@ -251,7 +252,7 @@
   function loop() { tick(s); save(s); render(); }
 
   function open() {
-    if (!window.GoblubFeed) { var sc = document.createElement("script"); sc.src = base + "feed.js"; sc.onload = open; sc.onerror = open; document.head.appendChild(sc); return; }
+    if (!window.GoblubFeed) { var sc = document.createElement("script"); sc.src = base + "feed.js?v=2"; sc.onload = open; sc.onerror = open; document.head.appendChild(sc); return; }
     if (!el.back) build();
     s = tick(load()); save(s);
     render();
