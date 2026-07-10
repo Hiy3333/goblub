@@ -4,11 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>우리 사이 질문 카드 — goblub</title>
-  <meta name="description" content="커플, 친구, 진실게임까지 — 랜덤 질문 카드로 대화를 시작해보세요" />
+  <meta name="description" content="커플·친구 질문 카드와 19금 스파이시 질문까지 — 카드 한 장으로 대화를 열어보세요" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../css/style.css?v=neon1" />
+  <link rel="stylesheet" href="../css/style.css?v=neon6" />
   <style>
     .cat-tabs { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 20px; }
     .cat-tab {
@@ -39,6 +39,21 @@
     }
 
     .q-meta { text-align: center; color: var(--ink-soft); font-size: 0.85rem; margin-bottom: 14px; }
+    .cat-tab.spicy.active { background: #ff2e6e; border-color: #ff2e6e; }
+    .cat-tab.spicy { border-color: #ff2e6e; color: #ff9ec2; }
+    /* 성인 인증 모달 */
+    .age-back { position: fixed; inset: 0; z-index: 10000; background: rgba(4,2,20,.72); backdrop-filter: blur(3px);
+      display: none; align-items: center; justify-content: center; padding: 20px; }
+    .age-box { background: var(--surface); border: 2px solid #ff2e6e; border-radius: 20px; padding: 26px 22px;
+      max-width: 360px; text-align: center; box-shadow: 0 0 26px rgba(255,46,110,.4); }
+    .age-box .em { font-size: 2.6rem; display: block; margin-bottom: 8px; }
+    .age-box h2 { color: #fff; font-size: 1.25rem; margin-bottom: 10px; }
+    .age-box p { color: var(--ink-soft); font-size: 0.92rem; line-height: 1.6; margin-bottom: 18px; }
+    .age-box .btn-row { display: flex; gap: 10px; justify-content: center; }
+    .age-yes { background: #ff2e6e; color: #fff; border: none; border-radius: 999px; padding: 11px 22px;
+      font-family: inherit; font-size: 1rem; cursor: pointer; box-shadow: 0 0 14px rgba(255,46,110,.5); }
+    .age-no { background: transparent; color: var(--ink-soft); border: 2px solid var(--line);
+      border-radius: 999px; padding: 9px 20px; font-family: inherit; font-size: 0.95rem; cursor: pointer; }
   </style>
 </head>
 <body>
@@ -46,15 +61,14 @@
   <main>
     <section class="hero">
       <h1>🎴 우리 사이 질문 카드</h1>
-      <p>커플, 친구, 진실게임까지 — 카드 한 장으로 대화를 열어보세요</p>
+      <p>커플·친구, 그리고 19금 스파이시까지 — 카드 한 장으로 대화를 열어보세요</p>
     </section>
 
     <section class="panel">
       <div class="cat-tabs" id="cat-tabs">
         <button class="cat-tab active" data-cat="couple">💑 커플</button>
         <button class="cat-tab" data-cat="friend">🤝 친구</button>
-        <button class="cat-tab" data-cat="random">🎲 랜덤</button>
-        <button class="cat-tab" data-cat="truth">🔥 진실게임</button>
+        <button class="cat-tab spicy" data-cat="spicy">🔞 19금</button>
       </div>
 
       <p class="q-meta" id="q-meta">💑 커플 카드</p>
@@ -73,6 +87,18 @@
 
     <p class="fine-print">답하기 싫은 질문은 패스해도 괜찮아요. 즐겁게, 편하게! 🙂</p>
   </main>
+
+  <div class="age-back" id="age-back">
+    <div class="age-box" role="dialog" aria-label="성인 인증">
+      <span class="em">🔞</span>
+      <h2>19세 이상 성인 인증</h2>
+      <p>이 카드에는 수위 높은 성인용 질문이 포함돼 있어요.<br>만 19세 이상이며, 성인 콘텐츠 열람에 동의하시나요?</p>
+      <div class="btn-row">
+        <button class="age-yes" id="age-yes" type="button">네, 19세 이상이에요</button>
+        <button class="age-no" id="age-no" type="button">아니요</button>
+      </div>
+    </div>
+  </div>
   <div id="site-footer"></div>
   <script src="../js/common.js" data-root=".."></script>
   <script src="js/feed.js"></script>
@@ -185,57 +211,49 @@
           "무인도에 딱 세 명 데려간다면 나 챙길 거야?",
           "내가 연예인이면 어떤 컨셉으로 데뷔할 것 같아?"
         ],
-        truth: [
-          "최근에 몰래 스토킹한 인스타 계정 있어?",
-          "지금 이 자리에서 제일 눈치 보이는 사람은?",
-          "최근에 거짓말했던 일 하나만 말해줘",
-          "핸드폰 최근 검색어 하나 공개할 수 있어?",
-          "짝사랑했던 사람 중 제일 오래간 사람은?",
-          "여기 있는 사람 중 이상형에 가장 가까운 사람은?",
-          "제일 최근에 누군가한테 서운했던 순간은?",
-          "몰래 좋아했던 친구의 친구 있었어?",
-          "자다가 이불킥한 흑역사 하나만 공개해줘",
-          "최근 한 달 안에 가장 크게 후회한 선택은?",
-          "여기서 누구랑 하루 바꿔 살아보고 싶어?",
-          "짝사랑 고백했다가 차인 적 있어?",
-          "누군가를 질투했던 적, 최근에 있었어?",
-          "SNS에 올렸다가 지운 게시물 있어?",
-          "제일 오래 짝사랑한 기간은 얼마나 돼?",
-          "여기 있는 사람 중 소개팅 시켜주고 싶은 사람은?",
-          "최근에 제일 부러웠던 사람은 누구야?",
-          "몰래 팔로우 끊었다가 다시 한 계정 있어?",
-          "여기서 제일 먼저 연애할 것 같은 사람은?",
-          "핸드폰 사진첩 맨 마지막 사진은 뭐야?",
-          "가장 최근에 설렜던 순간은 언제야?",
-          "누군가한테 답장 늦게 해서 미안했던 적 있어?",
-          "여기 있는 사람 중 가장 재밌는 사람은?",
-          "최근에 홧김에 산 물건 있어?",
-          "썸 타다가 흐지부지된 적 있어?",
-          "지금 이 순간 가장 생각나는 사람은 누구야?",
-          "지금 폰에 저장된 이름 중 제일 오글거리는 거는?",
-          "최근에 인스타 스토리 몰래 캡처한 적 있어?",
-          "최근에 확인한 상대방 프로필 중에 가장 오래 봤던 건?",
-          "핸드폰 배경화면 지금 뭐야? 왜 그걸로 했어?",
-          "최근에 나도 모르게 흥얼거린 노래 뭐야?",
-          "여기서 제일 목소리 좋다고 생각하는 사람은?",
-          "최근에 산 물건 중에 가장 후회되는 건?",
-          "가장 최근에 본 웃긴 밈이나 영상 하나만 공유해줘",
-          "지금 카톡 프사 바꾼 지 얼마나 됐어?",
-          "최근에 답장 씹은 사람 있어? (이유도 살짝)",
-          "여기서 제일 패션 센스 좋다고 생각하는 사람은?",
-          "최근에 혼자 낄낄대며 웃었던 순간은?",
-          "지금 가장 듣고 있는 노래 플레이리스트 1위는?",
-          "최근에 실수로 다른 사람한테 잘못 보낸 메시지 있어?",
-          "여기 있는 사람 중 제일 유머 감각 좋은 사람은?",
-          "최근에 자기 전에 제일 오래 붙잡고 있던 앱은?",
-          "지금 이 자리에서 가장 편하게 느껴지는 사람은?",
-          "최근에 셀카 몇 장 찍고 몇 장 지웠어?",
-          "여기서 제일 잠꾸러기일 것 같은 사람은?",
-          "최근에 알람 몇 번 미루고 일어났어?",
-          "지금 안 읽은 카톡이 몇 개나 쌓여 있어?",
-          "최근에 '좋아요' 눌렀다가 급하게 취소한 적 있어?",
-          "여기서 몰래 연락처 알고 싶은 사람 있어?",
-          "최근에 제일 많이 쓴 이모티콘이 뭐야?"
+        spicy: [
+          "처음 봤을 때 눈길이 제일 먼저 간 부위는 어디였어?",
+          "나랑 있을 때 심장이 제일 빨리 뛰었던 순간은?",
+          "지금 당장 하고 싶은 스킨십 딱 하나만 고른다면?",
+          "내 몸에서 제일 매력적이라고 생각하는 곳은?",
+          "상상만 하고 아직 말 못 한 은밀한 바람이 있다면?",
+          "내 옷차림 중에 유독 눈을 못 떼게 하는 스타일은?",
+          "키스할 때 제일 좋아하는 분위기나 타이밍은?",
+          "나랑 단둘이 있을 때 참기 힘들었던 적 있어?",
+          "손이 먼저 가는 순간은 보통 언제야?",
+          "둘만의 은밀한 규칙을 하나 만든다면 뭐가 좋을까?",
+          "나랑 해보고 싶은 밤 데이트 판타지가 있어?",
+          "내 목소리가 유독 설레게 들리는 순간이 있어?",
+          "지금까지 중 가장 짜릿했던 순간을 한 장면으로 떠올린다면?",
+          "지금 나를 보며 드는 가장 솔직한 생각은?",
+          "나랑 있을 때 가장 유혹적이라고 느낀 내 행동은?",
+          "내가 어떤 눈빛을 보낼 때 넘어갈 것 같아?",
+          "둘만 아는 은밀한 신호를 만든다면 어떤 게 좋을까?",
+          "내가 무심코 한 행동 중에 심쿵했던 거 있어?",
+          "상상 속 완벽한 밤은 어떤 그림이야?",
+          "내가 먼저 훅 다가가면 어떤 반응이 나올 것 같아?",
+          "옷 위로도 느껴지는 내 매력 포인트가 있다면?",
+          "지금 우리 사이 온도를 숫자로 표현하면 몇 도야?",
+          "가장 대담했던 연애 경험 하나 살짝 고백해줄래?",
+          "내 향기 중에 유독 약해지는 순간이 있어?",
+          "함께 있을 때 제일 아찔했던 기억은?",
+          "말 안 해도 통했으면 하는 순간이 언제야?",
+          "지금 이 방에 우리 둘뿐이라면 제일 먼저 뭐 하고 싶어?",
+          "내 어떤 표정에 제일 무너져?",
+          "가장 로맨틱하면서도 대담했던 데이트를 상상한다면?",
+          "내가 귓가에 뭐라고 속삭이면 좋겠어?",
+          "스킨십에서 속도를 정한다면 넌 어떤 편이야?",
+          "나랑 여행 가면 밤에 제일 기대되는 건 뭐야?",
+          "지금 가장 만지고 싶은 곳을 눈으로만 가리켜본다면?",
+          "우리만의 위험한 비밀 하나 만든다면?",
+          "내가 어떤 옷을 입고 나오면 정신 못 차릴 것 같아?",
+          "가장 뜨거웠던 순간을 떠올릴 때 어떤 장면이 먼저 떠올라?",
+          "말보다 행동으로 표현하고 싶은 마음이 있다면?",
+          "내 어떤 습관이 은근히 야하게 느껴진 적 있어?",
+          "지금 이 분위기, 조금 더 가까워져도 될까?",
+          "나한테만 보여주고 싶은 은밀한 모습이 있어?",
+          "가장 참기 어려웠던 유혹의 순간을 고백한다면?",
+          "우리 사이 상상력을 마음껏 펼친다면 어디까지 가봤어?"
         ]
       };
 
@@ -243,18 +261,14 @@
       var lastQ = null;
       var granted = false;
 
-      function pool() {
-        return cat === "random"
-          ? QUESTIONS.couple.concat(QUESTIONS.friend, QUESTIONS.truth)
-          : QUESTIONS[cat];
-      }
+      function pool() { return QUESTIONS[cat]; }
 
       var META = {
         couple: "💑 커플 카드",
         friend: "🤝 친구 카드",
-        random: "🎲 랜덤 카드",
-        truth: "🔥 진실게임 카드"
+        spicy: "🔞 19금 스파이시 카드 (성인 전용)"
       };
+      function adultOk() { try { return localStorage.getItem("goblub_adult19") === "yes"; } catch (e) { return false; } }
 
       function draw() {
         var arr = pool();
@@ -281,16 +295,37 @@
       $("btn-draw").onclick = draw;
 
       var tabs = document.querySelectorAll(".cat-tab");
+      function activate(tab) {
+        for (var j = 0; j < tabs.length; j++) tabs[j].classList.remove("active");
+        tab.classList.add("active");
+        cat = tab.getAttribute("data-cat");
+        $("q-meta").textContent = META[cat];
+        lastQ = null;
+        draw();
+      }
       for (var i = 0; i < tabs.length; i++) {
         tabs[i].onclick = function () {
-          for (var j = 0; j < tabs.length; j++) tabs[j].classList.remove("active");
-          this.classList.add("active");
-          cat = this.getAttribute("data-cat");
-          $("q-meta").textContent = META[cat];
-          lastQ = null;
-          draw();
+          if (this.getAttribute("data-cat") === "spicy" && !adultOk()) {
+            pendingTab = this;
+            $("age-back").style.display = "flex";
+            return;
+          }
+          activate(this);
         };
       }
+
+      // 성인 인증 모달
+      var pendingTab = null;
+      $("age-yes").onclick = function () {
+        try { localStorage.setItem("goblub_adult19", "yes"); } catch (e) {}
+        $("age-back").style.display = "none";
+        if (pendingTab) activate(pendingTab);
+      };
+      $("age-no").onclick = function () {
+        $("age-back").style.display = "none";
+        pendingTab = null;
+      };
+      $("age-back").onclick = function (e) { if (e.target === $("age-back")) { $("age-back").style.display = "none"; pendingTab = null; } };
     })();
   </script>
 </body>

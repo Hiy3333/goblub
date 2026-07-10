@@ -54,7 +54,7 @@ a {
   font-size: 2rem;
   color: #fff;
   letter-spacing: 1px;
-  text-shadow: 0 0 10px var(--coral), 0 0 28px var(--coral);
+  text-shadow: 0 0 5px rgba(255, 110, 199, .65), 0 0 12px rgba(255, 110, 199, .35);
 }
 @media (max-width: 640px) {
   .site-header { flex-wrap: wrap; }
@@ -67,7 +67,7 @@ a {
   font-family: "Black Han Sans", "Jua", sans-serif;
 }
 
-.logo span { text-shadow: 0 0 8px currentColor, 0 0 22px currentColor; }
+.logo span { text-shadow: 0 0 5px currentColor, 0 0 11px currentColor; }
 .logo .l1 { color: var(--coral); }
 .logo .l2 { color: var(--yellow); }
 .logo .l3 { color: var(--sky); }
@@ -106,7 +106,7 @@ main {
   letter-spacing: 1px;
   margin-bottom: 10px;
   color: #fff;
-  text-shadow: 0 0 10px var(--coral), 0 0 32px var(--coral), 0 0 64px #c85cff;
+  text-shadow: 0 0 6px rgba(255, 110, 199, .6), 0 0 16px rgba(200, 92, 255, .3);
 }
 
 .hero p {
@@ -180,7 +180,7 @@ a.card:hover,
   font-size: 1.3rem;
   margin-bottom: 6px;
   color: #fff;
-  text-shadow: 0 0 10px color-mix(in srgb, var(--nc) 65%, transparent);
+  text-shadow: 0 0 6px color-mix(in srgb, var(--nc) 42%, transparent);
 }
 
 .card p {
@@ -449,7 +449,7 @@ select:focus, input:focus {
 }
 .choice-btn:hover { border-color: var(--sky); box-shadow: 0 0 12px color-mix(in srgb, var(--sky) 40%, transparent); }
 .result-emoji { font-size: 3.2rem; text-align: center; display: block; margin-bottom: 8px; filter: drop-shadow(0 0 14px rgba(255, 110, 199, 0.55)); }
-.result-name { text-align: center; font-size: 1.5rem; margin-bottom: 10px; color: #fff; text-shadow: 0 0 14px rgba(157, 107, 255, 0.6); }
+.result-name { text-align: center; font-size: 1.5rem; margin-bottom: 10px; color: #fff; text-shadow: 0 0 8px rgba(157, 107, 255, 0.4); }
 .result-desc { color: var(--ink-soft); line-height: 1.6; }
 .result-actions { display: flex; gap: 10px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
 
@@ -462,7 +462,7 @@ select:focus, input:focus {
 .daeun-item .age { font-size: 0.78rem; color: var(--ink-soft); display: block; }
 .daeun-item .gj { font-size: 1.1rem; }
 .daeun-item .ss { font-size: 0.72rem; color: var(--ink-soft); display: block; }
-.stars { color: var(--yellow); letter-spacing: 2px; text-shadow: 0 0 10px rgba(255, 217, 61, 0.6); }
+.stars { color: var(--yellow); letter-spacing: 2px; text-shadow: 0 0 6px rgba(255, 217, 61, 0.45); }
 .tag-list { list-style: none; margin: 6px 0 0; }
 .tag-list li { display: inline-block; background: var(--cream); border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; margin: 0 6px 6px 0; font-size: 0.92rem; }
 
