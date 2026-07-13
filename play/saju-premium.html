@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../css/style.css?v=glass1" />
+  <link rel="stylesheet" href="../css/style.css?v=glass2" />
   <style>
     .prem-badge { display: inline-block; background: linear-gradient(90deg, var(--yellow), var(--orange));
       color: #2a2005; font-size: 0.8rem; font-weight: bold; padding: 5px 14px; border-radius: 999px;
@@ -50,7 +50,7 @@
       <span class="prem-badge">✨ PREMIUM</span>
       <span class="prem-emoji">📜</span>
       <h1 style="font-size:1.5rem; margin-bottom:6px">심층 리포트 — 성격 &amp; 인연</h1>
-      <p class="result-desc">고블럽 도사가 젬리 낸 손님에게만 여는 <b>속마음 직설 모드</b>.<br>신살·합충·용신·10년 세운까지 계산해 총 4편, 1만 자급으로 씁니다.</p>
+      <p class="result-desc">고블럽 도사가 각 잡고 여는 <b>속마음 직설 모드</b>.<br>신살·합충·용신·10년 세운까지 계산해 총 4편, 1만 자급으로 씁니다.</p>
 
       <ul class="vol-list">
         <li><b>📕 1권 ①</b> 남들은 죽어도 모르는 네 진짜 성격<span>본질 · 절대 안 보여주는 얼굴 · 열등감의 정체</span></li>
@@ -93,7 +93,7 @@
   <script>
     (function () {
       var $ = function (id) { return document.getElementById(id); };
-      var COST = 100;
+      var COST = 0; // 런칭 기념 무료 — 추후 젬리 가격 부여 예정
       var PARTS = [
         { id: "p1", title: "📕 1권 ① 남들은 죽어도 모르는 네 진짜 성격" },
         { id: "p2", title: "📕 1권 ② 결국 네가 이기게 되는 이유" },
@@ -134,6 +134,14 @@
         var bal = GoblubFeed.wallet().balance;
         $("gate").style.display = "block";
         $("report-panel").style.display = "none";
+        if (COST === 0) {
+          document.querySelector(".cost-row").innerHTML = '지금은 <span class="cost">🎁 무료 공개</span>';
+          document.querySelector(".wallet-mini").textContent = "오픈 기념 무료! 나중에 젬리 상품으로 바뀔 예정이에요.";
+          $("btn-unlock").style.display = "inline-block";
+          $("btn-unlock").textContent = "🎁 무료로 심층 리포트 받기";
+          $("need-more").style.display = "none";
+          return;
+        }
         $("w-have").textContent = bal;
         if (bal >= COST) { $("btn-unlock").style.display = "inline-block"; $("need-more").style.display = "none"; }
         else { $("btn-unlock").style.display = "none"; $("need-more").style.display = "block"; $("need-gap").textContent = COST - bal; }
@@ -197,7 +205,7 @@
           onError: function (code, sec2) {
             st.classList.remove("writing");
             if (paid && i === 0) {
-              GoblubFeed.earn(COST, true); paid = false;
+              if (COST > 0) GoblubFeed.earn(COST, true); paid = false;
               try { localStorage.removeItem(paidKey()); } catch (e) {}
               st.textContent = "⚠️ 생성 실패 — 젬리를 돌려드렸어요. 다시 시도해 주세요.";
               renderGate(); return;
