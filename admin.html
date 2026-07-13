@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>goblub 관리자</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css?v=glass2" />
+  <style>
+    main { max-width: 980px; }
+    .panel { max-width: none; }
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 8px; }
+    .stat { background: var(--cream); border: 1px solid rgba(255,255,255,.9); border-radius: 16px; padding: 14px 16px; text-align: center;
+      box-shadow: 0 6px 14px rgba(88,99,172,.10), inset 0 1px 0 rgba(255,255,255,.9); }
+    .stat .n { font-size: 1.7rem; color: var(--ink); display: block; }
+    .stat .l { color: var(--ink-soft); font-size: 0.84rem; }
+    .u-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    .u-table th { text-align: left; color: var(--ink-soft); font-weight: normal; padding: 8px 8px; border-bottom: 1.5px solid var(--line); }
+    .u-table td { padding: 9px 8px; border-bottom: 1px dashed var(--line); vertical-align: middle; }
+    .u-table .em { color: var(--ink); }
+    .u-table .sub2 { color: var(--ink-soft); font-size: 0.8rem; display: block; }
+    .u-table input.g { width: 74px; font-family: inherit; padding: 6px 8px; border: 1.5px solid var(--line); border-radius: 8px; background: rgba(255,255,255,.85); color: var(--ink); }
+    .mini-btn { font-family: inherit; font-size: 0.82rem; border-radius: 999px; padding: 6px 12px; cursor: pointer;
+      background: rgba(255,255,255,.6); border: 1.5px solid rgba(255,255,255,.9); color: var(--ink);
+      box-shadow: 0 4px 10px rgba(88,99,172,.12); }
+    .mini-btn.warn { color: #e84a72; border-color: rgba(232,74,114,.4); }
+    .mini-btn.ok { color: var(--sky); border-color: rgba(58,139,255,.4); }
+    .banned-row td { opacity: .5; }
+    .banned-tag { color: #e84a72; font-size: 0.78rem; }
+    .ev-list { list-style: none; max-height: 300px; overflow-y: auto; }
+    .ev-list li { padding: 7px 4px; border-bottom: 1px dashed var(--line); font-size: 0.88rem; color: var(--ink); }
+    .ev-list .tm { color: var(--ink-soft); font-size: 0.78rem; margin-left: 6px; }
+    .toolbar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 12px; }
+    .toolbar input { flex: 1; min-width: 180px; }
+    #err-box { color: #e84a72; text-align: center; margin: 8px 0; display: none; }
+    @media (max-width: 640px) { .u-table .hide-m { display: none; } }
+  </style>
+</head>
+<body>
+  <div id="site-header"></div>
+  <main>
+    <section class="hero">
+      <h1>🛠 goblub 관리자</h1>
+      <p>가입자 · 이용 현황 · 젬리 지급 · 이용 제한</p>
+    </section>
+
+    <section class="panel" id="login-panel" style="max-width:520px; text-align:center">
+      <h2>🔑 관리자 로그인</h2>
+      <p class="result-desc" style="margin:8px 0 18px">등록된 관리자 구글 계정으로만 접근할 수 있어요.</p>
+      <div id="gsi-btn" style="display:flex; justify-content:center"></div>
+      <p id="err-box"></p>
+    </section>
+
+    <div id="dash" style="display:none">
+      <section class="panel">
+        <div class="toolbar">
+          <h2 style="margin:0; flex:1">📊 현황</h2>
+          <button class="mini-btn" id="btn-refresh">🔄 새로고침</button>
+        </div>
+        <div class="stat-grid">
+          <div class="stat"><span class="n" id="st-total">-</span><span class="l">총 가입자</span></div>
+          <div class="stat"><span class="n" id="st-today">-</span><span class="l">오늘 가입</span></div>
+          <div class="stat"><span class="n" id="st-week">-</span><span class="l">최근 7일 가입</span></div>
+          <div class="stat"><span class="n" id="st-unlock-today">-</span><span class="l">오늘 리포트 발급</span></div>
+          <div class="stat"><span class="n" id="st-unlock-week">-</span><span class="l">7일 리포트 발급</span></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>👥 회원 (<span id="u-count">0</span>)</h2>
+        <div class="toolbar">
+          <input type="text" id="u-search" placeholder="이메일·이름 검색" />
+        </div>
+        <div style="overflow-x:auto">
+          <table class="u-table">
+            <thead><tr><th>회원</th><th class="hide-m">가입</th><th class="hide-m">최근 접속</th><th>대기 젬리</th><th>젬리 지급</th><th>관리</th></tr></thead>
+            <tbody id="u-body"></tbody>
+          </table>
+        </div>
+        <p class="fine-print" style="text-align:left; margin-top:10px">💡 지급한 젬리는 해당 유저가 <b>다음에 로그인할 때</b> 지갑에 들어가요. · 강퇴된 계정은 다음 로그인 시 차단돼요.</p>
+      </section>
+
+      <section class="panel">
+        <h2>🕘 최근 활동</h2>
+        <ul class="ev-list" id="ev-list"></ul>
+      </section>
+    </div>
+  </main>
+  <div id="site-footer"></div>
+  <script src="js/common.js?v=2" data-root="."></script>
+  <script src="js/auth.js?v=2"></script>
+  <script>
+    (function () {
+      var $ = function (id) { return document.getElementById(id); };
+      var API = "https://goblub.vercel.app/api/admin";
+      var tok = null;
+      var allUsers = [];
+
+      function err(msg) { var e = $("err-box"); e.textContent = msg; e.style.display = "block"; }
+
+      function call(body, cb) {
+        body.id_token = tok;
+        fetch(API, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) })
+          .then(function (r) { return r.json().then(function (j) { return { s: r.status, j: j }; }); })
+          .then(function (x) {
+            if (x.s === 401) { err("로그인이 만료됐어요 — 새로고침 후 다시 로그인해 주세요."); $("dash").style.display = "none"; $("login-panel").style.display = "block"; return; }
+            if (x.s === 403) { err("관리자 계정이 아니에요."); return; }
+            if (x.s === 501) { err("서버 저장소(KV)가 아직 연동되지 않았어요 — Vercel에서 Upstash를 연결해 주세요."); return; }
+            if (!x.j || !x.j.ok) { err("요청 실패: " + (x.j && x.j.error || x.s)); return; }
+            cb(x.j);
+          })
+          .catch(function () { err("네트워크 오류 — 잠시 후 다시."); });
+      }
+
+      function fmt(t) {
+        if (!t) return "-";
+        var d = new Date(t);
+        return (d.getMonth() + 1) + "/" + d.getDate() + " " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);
+      }
+
+      function loadStats() {
+        call({ action: "stats" }, function (j) {
+          $("st-total").textContent = j.total;
+          $("st-today").textContent = j.signupToday;
+          $("st-week").textContent = j.signup7;
+          $("st-unlock-today").textContent = j.unlockToday;
+          $("st-unlock-week").textContent = j.unlock7;
+          var names = { signup: "🙋 가입", unlock: "📜 리포트 발급", grant: "🍬 젬리 지급", ban: "⛔ 강퇴", unban: "✅ 강퇴 해제" };
+          $("ev-list").innerHTML = (j.events || []).map(function (e) {
+            return "<li>" + (names[e.t] || e.t) + " — " + (e.email || "") +
+              (e.n ? " (+" + e.n + ")" : "") + '<span class="tm">' + fmt(e.at) + "</span></li>";
+          }).join("") || '<li style="color:var(--ink-soft)">아직 활동이 없어요.</li>';
+        });
+      }
+
+      function renderUsers() {
+        var q = ($("u-search").value || "").toLowerCase();
+        var list = allUsers.filter(function (u) {
+          return !q || (u.email || "").toLowerCase().indexOf(q) >= 0 || (u.name || "").toLowerCase().indexOf(q) >= 0;
+        });
+        $("u-count").textContent = allUsers.length;
+        $("u-body").innerHTML = list.map(function (u, i) {
+          return '<tr class="' + (u.banned ? "banned-row" : "") + '" data-i="' + i + '">' +
+            '<td><span class="em">' + (u.email || "-") + '</span><span class="sub2">' + (u.name || "") +
+            (u.banned ? ' <span class="banned-tag">⛔ 강퇴됨</span>' : "") + "</span></td>" +
+            '<td class="hide-m">' + fmt(u.created) + "</td>" +
+            '<td class="hide-m">' + fmt(u.seen) + "</td>" +
+            "<td>🍬 " + (u.gems || 0) + "</td>" +
+            '<td><input class="g" type="number" min="1" placeholder="개수" data-sub="' + u.sub + '" /> ' +
+            '<button class="mini-btn ok btn-grant" data-sub="' + u.sub + '">지급</button></td>' +
+            "<td>" + (u.banned
+              ? '<button class="mini-btn ok btn-unban" data-sub="' + u.sub + '">해제</button>'
+              : '<button class="mini-btn warn btn-ban" data-sub="' + u.sub + '" data-em="' + (u.email || "") + '">강퇴</button>') + "</td>" +
+            "</tr>";
+        }).join("") || '<tr><td colspan="6" style="color:var(--ink-soft)">회원이 없어요.</td></tr>';
+      }
+
+      function loadUsers() {
+        call({ action: "users" }, function (j) { allUsers = j.users || []; renderUsers(); });
+      }
+
+      $("u-search") && ($("u-search").oninput = function () { renderUsers(); });
+      document.addEventListener("click", function (e) {
+        var t = e.target;
+        if (t.classList.contains("btn-grant")) {
+          var inp = document.querySelector('input.g[data-sub="' + t.getAttribute("data-sub") + '"]');
+          var n = Math.floor(+inp.value);
+          if (!n || n <= 0) { inp.focus(); return; }
+          t.disabled = true;
+          call({ action: "grant", sub: t.getAttribute("data-sub"), amount: n }, function () {
+            t.disabled = false; inp.value = "";
+            loadUsers(); loadStats();
+          });
+        }
+        if (t.classList.contains("btn-ban")) {
+          if (!confirm((t.getAttribute("data-em") || "이 회원") + " 을(를) 강퇴할까요?\n다음 로그인부터 차단돼요.")) return;
+          call({ action: "ban", sub: t.getAttribute("data-sub") }, function () { loadUsers(); loadStats(); });
+        }
+        if (t.classList.contains("btn-unban")) {
+          call({ action: "unban", sub: t.getAttribute("data-sub") }, function () { loadUsers(); loadStats(); });
+        }
+      });
+      $("btn-refresh").onclick = function () { loadStats(); loadUsers(); };
+
+      function openDash() {
+        $("login-panel").style.display = "none";
+        $("dash").style.display = "block";
+        loadStats(); loadUsers();
+      }
+
+      // 로그인 흐름: GIS 버튼 → 토큰 확보 → 대시보드 (관리자 여부는 서버가 판정)
+      GoblubAuth.renderButton($("gsi-btn"), function (u) {
+        tok = u.tok;
+        openDash();
+      });
+      var u0 = GoblubAuth.user();
+      if (u0 && u0.tok) { tok = u0.tok; openDash(); }
+    })();
+  </script>
+</body>
+</html>

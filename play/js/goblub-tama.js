@@ -252,7 +252,7 @@
   function loop() { tick(s); save(s); render(); }
 
   function open() {
-    if (!window.GoblubFeed) { var sc = document.createElement("script"); sc.src = base + "feed.js?v=3"; sc.onload = open; sc.onerror = open; document.head.appendChild(sc); return; }
+    if (!window.GoblubFeed) { var sc = document.createElement("script"); sc.src = base + "feed.js?v=4"; sc.onload = open; sc.onerror = open; document.head.appendChild(sc); return; }
     if (!el.back) build();
     s = tick(load()); save(s);
     render();

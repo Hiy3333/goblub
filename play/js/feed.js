@@ -153,6 +153,16 @@
   }
   function cardData() { try { return JSON.parse(localStorage.getItem("goblub_card") || "{}"); } catch (e) { return {}; } }
 
+  // 관리자 지급 젬리 보관분 수령(로그인 순간 feed.js가 없던 페이지 대비)
+  try {
+    var gift = +(localStorage.getItem("goblub_gift_pending") || 0);
+    if (gift > 0) {
+      localStorage.removeItem("goblub_gift_pending");
+      earn(gift, true);
+      toast("🎁 운영자가 보낸 젬리 +" + gift + " 도착!");
+    }
+  } catch (e) {}
+
   window.GoblubFeed = { grant: grant, feedOne: feedOne, state: state, setName: setName,
     todayRemaining: todayRemaining, LEVELS: LEVELS, record: record, cardData: cardData,
     wallet: wallet, earn: earn, spend: spend, checkIn: checkIn, earnCare: earnCare };

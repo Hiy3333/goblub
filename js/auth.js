@@ -7,11 +7,48 @@
 (function () {
   var CLIENT_ID = ""; // TODO: 구글 OAuth 클라이언트 ID 입력 (예: "1234567890-abc.apps.googleusercontent.com")
   var KEY = "goblub_user";
+  var API_BASE = "https://goblub.vercel.app";
 
   function user() {
     try { var u = JSON.parse(localStorage.getItem(KEY)); return (u && u.sub) ? u : null; } catch (e) { return null; }
   }
   function save(u) { try { localStorage.setItem(KEY, JSON.stringify(u)); } catch (e) {} }
+
+  // 서버 회원 동기화: 등록/강퇴 확인/관리자 지급 젬리 수령
+  function syncServer(u, done) {
+    if (!u || !u.tok) { if (done) done(); return; }
+    fetch(API_BASE + "/api/auth-sync", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id_token: u.tok })
+    }).then(function (r) { return r.json(); }).then(function (res) {
+      if (res && res.banned) {
+        signOut();
+        alert("운영자에 의해 이용이 제한된 계정이에요.");
+        location.reload();
+        return;
+      }
+      if (res && res.ok && res.pendingGems > 0) {
+        // feed.js가 로드돼 있으면 즉시 지급+토스트, 아니면 보관해뒀다 feed.js가 지급
+        if (window.GoblubFeed && GoblubFeed.earn) {
+          GoblubFeed.earn(res.pendingGems, true);
+          try {
+            var t = document.createElement("div");
+            t.textContent = "🎁 운영자가 보낸 젬리 +" + res.pendingGems + " 도착!";
+            t.style.cssText = "position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:rgba(255,255,255,.94);color:#2b3057;padding:10px 18px;border-radius:999px;border:1px solid rgba(255,255,255,.95);box-shadow:0 12px 26px rgba(88,99,172,.28);font-family:inherit;z-index:9999";
+            document.body.appendChild(t);
+            setTimeout(function () { t.remove(); }, 3200);
+          } catch (e) {}
+        } else {
+          try {
+            var p = +(localStorage.getItem("goblub_gift_pending") || 0);
+            localStorage.setItem("goblub_gift_pending", String(p + res.pendingGems));
+          } catch (e) {}
+        }
+      }
+      if (done) done();
+    }).catch(function () { if (done) done(); });
+  }
   function signOut() {
     try { localStorage.removeItem(KEY); } catch (e) {}
     try { if (window.google && google.accounts && google.accounts.id) google.accounts.id.disableAutoSelect(); } catch (e) {}
@@ -38,9 +75,9 @@
         callback: function (resp) {
           var p = decodeJwt(resp.credential);
           if (!p || !p.sub) return;
-          var u = { name: p.name || "", email: p.email || "", picture: p.picture || "", sub: p.sub };
+          var u = { name: p.name || "", email: p.email || "", picture: p.picture || "", sub: p.sub, tok: resp.credential };
           save(u);
-          if (onLogin) onLogin(u);
+          syncServer(u, function () { if (onLogin) onLogin(u); });
         }
       });
       google.accounts.id.renderButton(el, { theme: "outline", size: "large", shape: "pill", text: "signin_with", locale: "ko" });
@@ -55,5 +92,5 @@
     }
   }
 
-  window.GoblubAuth = { user: user, signOut: signOut, renderButton: renderButton, ready: ready };
+  window.GoblubAuth = { user: user, signOut: signOut, renderButton: renderButton, ready: ready, sync: syncServer };
 })();
