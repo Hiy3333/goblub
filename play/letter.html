@@ -4,15 +4,15 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>마음 배달 — goblub</title>
-  <meta name="description" content="고백·사과를 링크로 보내고, 답장은 이미지로 받는 마음 배달" />
+  <meta name="description" content="데이트 신청·사과·술 한잔을 링크로 보내고, 답장까지 받는 마음 배달" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../css/style.css?v=neon6" />
   <style>
-    .type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+    .type-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 16px; }
     .type-tile { background: var(--cream); border: 2px solid transparent; border-radius: 16px;
-      padding: 20px 10px; text-align: center; cursor: pointer; font-family: inherit; font-size: 1.05rem; color: var(--ink); }
+      padding: 18px 6px; text-align: center; cursor: pointer; font-family: inherit; font-size: 0.98rem; color: var(--ink); }
     .type-tile .em { font-size: 2.4rem; display: block; margin-bottom: 6px; }
     .type-tile.sel { border-color: var(--coral); background: rgba(255,110,199,0.16); }
     .txt-input { width: 100%; font-family: inherit; font-size: 1rem; padding: 12px;
@@ -86,6 +86,28 @@
     .heart { position: fixed; top: -40px; font-size: 26px; pointer-events: none; animation: fall linear forwards; z-index: 50; }
     @keyframes fall { to { transform: translateY(110vh) rotate(360deg); opacity: .2; } }
     .out-card { background: var(--cream); border-radius: 14px; padding: 18px; line-height: 2; margin: 12px 0; }
+    /* ===== 게이지 스텝 ===== */
+    .gauge-ask { text-align: center; color: var(--ink-soft); margin-bottom: 12px; }
+    .gauge-val { text-align: center; font-size: 2.7rem; color: #fff; text-shadow: 0 0 16px var(--coral); line-height: 1.2; }
+    .gauge-band { text-align: center; color: var(--coral); font-size: 1.05rem; min-height: 1.6em; margin: 4px 0 14px; }
+    .gauge-range { width: 100%; -webkit-appearance: none; appearance: none; height: 14px; border-radius: 999px;
+      background: linear-gradient(90deg, #3a2a6e, var(--coral) 60%, var(--yellow)); outline: none; }
+    .gauge-range::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 34px; height: 34px; border-radius: 50%;
+      background: #fff; border: 3px solid var(--coral); box-shadow: 0 0 14px var(--coral); cursor: pointer; }
+    .gauge-range::-moz-range-thumb { width: 30px; height: 30px; border-radius: 50%;
+      background: #fff; border: 3px solid var(--coral); box-shadow: 0 0 14px var(--coral); cursor: pointer; }
+    /* ===== 답장 스텝 ===== */
+    .reply-list { display: flex; flex-direction: column; gap: 9px; }
+    .reply-opt { background: var(--cream); border: 2px solid transparent; border-radius: 12px; padding: 13px 14px;
+      text-align: left; cursor: pointer; font-family: inherit; font-size: 0.98rem; color: var(--ink); }
+    .reply-opt:hover { border-color: var(--coral); }
+    .reply-opt.write { color: var(--sky); text-align: center; }
+    /* ===== NO 버튼 도망 개그 ===== */
+    .no-taunt { text-align: center; color: var(--ink-soft); min-height: 1.5em; font-size: 0.92rem; margin-top: 8px; opacity: 0; transition: opacity .3s; }
+    .no-taunt.show { opacity: 1; }
+    .gob-eater { position: fixed; z-index: 70; pointer-events: none; }
+    .gob-eater.chomp { animation: eat-chomp .4s ease 3; }
+    @keyframes eat-chomp { 0%,100% { transform: scale(1,1); } 35% { transform: scale(1.15,.8); } 70% { transform: scale(.9,1.12); } }
   </style>
 </head>
 <body>
@@ -93,7 +115,7 @@
   <main>
     <section class="hero">
       <h1>💌 마음 배달</h1>
-      <p id="hero-sub">고백·사과를 링크로 보내고, 답장은 이미지로 받아요</p>
+      <p id="hero-sub">데이트 신청·사과·술 한잔을 링크로 보내고, 답장까지 받아요</p>
     </section>
 
     <section class="panel" id="make-panel" style="display:none"></section>
@@ -136,14 +158,38 @@
 
       var TYPES = {
         date: { emoji: "💚", label: "데이트 신청", q: "나랑 데이트 갈래?",
-          yes: "응! 좋아 💚", no: "싫어", success: "데이트 성사! 🎉", steps: ["menu", "date", "time"] },
+          yes: "응! 좋아 💚", no: "싫어", success: "데이트 성사! 🎉",
+          steps: ["menu", "date", "time", "gauge", "reply"],
+          menuQ: "🍴 뭐 먹으러 갈까?", menuLine: "🍴 메뉴",
+          gauge: { name: "💘 호감도 게이지", ask: "이 데이트, 기대치는 얼마?",
+            bands: [[20,"🫥 아직 간 보는 중"],[45,"😊 은근 기대되는데?"],[70,"😆 벌써 설레기 시작"],[95,"🫀 심장 과부하 주의"],[100,"💥 심쿵 임계점 돌파!"]] },
+          replies: ["완전 기대돼, 늦지 마! 💚","좋아, 근데 네가 사는 거다? 😏","가는 길에 심장 챙겨 와, 떨어질 수도 있음 🫀","늦으면 벌금 만원이다 ⏰"] },
         apology: { emoji: "🍎", label: "사과하기", q: "내 사과 받아줄래?",
-          yes: "사과 받을게 🍎", no: "안 받아", success: "사과 수락! 🍎", steps: ["date", "time"] }
+          yes: "사과 받을게 🍎", no: "안 받아", success: "사과 수락! 🍎",
+          steps: ["cond", "gauge", "reply"],
+          gauge: { name: "🧊 삐짐 해동 게이지", ask: "꽁했던 마음, 얼마나 녹았어?",
+            bands: [[20,"🧊 아직 냉동실이야"],[45,"🍧 겉만 살짝 녹음"],[70,"💧 거의 다 녹았어"],[95,"♨️ 몽글몽글 해동 완료"],[100,"♨️ 완전 해동 + 마음 보글보글"]] },
+          replies: ["이번만 특별히 봐준다 😤","조건 꼭 지켜라? 안 지키면 2배 🧾","사실 나도 좀 미안했어… 🥲","다음에 또 그러면 국물도 없다 🍜"] },
+        drink: { emoji: "🍻", label: "술 한잔", q: "오늘 나랑 한잔 어때?",
+          yes: "콜! 🍻", no: "안 마셔", success: "술 약속 성사! 🍻",
+          steps: ["menu", "date", "time", "gauge", "reply"],
+          menuQ: "🍻 뭐로 달릴까?", menuLine: "🍻 오늘의 술",
+          gauge: { name: "🍻 오늘 달릴 각 게이지", ask: "오늘 어디까지 달릴 수 있어?",
+            bands: [[20,"🍺 딱 한 잔 각"],[45,"🍻 기분 좋게 알딸딸 각"],[70,"🔥 2차까지 달릴 각"],[95,"🌙 막차 아슬아슬 각"],[100,"🌅 해 뜰 때까지 완주 각"]] },
+          replies: ["콜! 오늘 막차는 없는 걸로 🍻","1차는 네가 쏘는 거다? 😎","딱 한 잔만 한다 (아마 거짓말) 🤥","안주 선택권은 나한테 있다 🍗"] }
       };
       var MENUS = [["🍚","한식"],["🥢","중식"],["🍣","일식"],["🍝","양식"],["🍜","분식"],["☕","카페"]];
       var TIMES = ["11:00","12:00","13:00","14:00","17:00","18:00","19:00","20:00"];
+      var DRINKS = [["🍺","맥주"],["🍶","소주"],["🥂","소맥"],["🍷","와인"],["🥛","막걸리"],["🍹","하이볼"]];
+      var CONDS = [["🍜","맛있는 거 사기"],["☕","일주일 커피 셔틀"],["🥺","애교 3번 시전"],["🎁","소원 1개 들어주기"],["📸","굴욕샷 1장 제출"],["🆓","무조건 용서 (대인배)"]];
 
-      window.LETTER = { enc: enc, dec: dec, parseHash: parseHash, TYPES: TYPES, MENUS: MENUS, TIMES: TIMES, $: $ };
+      function gaugeBand(t, v) {
+        var bands = (t.gauge && t.gauge.bands) || [];
+        for (var i = 0; i < bands.length; i++) if (v <= bands[i][0]) return bands[i][1];
+        return bands.length ? bands[bands.length - 1][1] : "";
+      }
+
+      window.LETTER = { enc: enc, dec: dec, parseHash: parseHash, TYPES: TYPES, MENUS: MENUS, DRINKS: DRINKS, CONDS: CONDS, TIMES: TIMES, $: $ };
 
       function show(which) {
         $("make-panel").style.display = which === "make" ? "block" : "none";
@@ -159,6 +205,7 @@
           '<div class="type-grid" id="type-grid"></div>' +
           '<input class="txt-input" id="in-name" maxlength="20" placeholder="받는 사람 이름 (필수)" />' +
           '<input class="txt-input" id="in-from" maxlength="20" placeholder="보내는 사람 이름 (선택)" />' +
+          '<input class="txt-input" id="in-q" maxlength="40" placeholder="" />' +
           '<input class="txt-input" id="in-msg" maxlength="60" placeholder="한 줄 메시지 (선택 — 비워도 돼요)" />' +
           '<button class="btn-primary" id="btn-make">🔗 공유 링크 만들기</button>' +
           '<p class="error-msg" id="mk-err"></p>' +
@@ -167,6 +214,7 @@
           '<button class="btn-ghost" id="btn-preview">👀 미리보기</button></div>';
         var tg = $("type-grid");
         var chosen = "date";
+        function updQ() { $("in-q").placeholder = '질문 문구 바꾸기 (기본: "' + TYPES[chosen].q + '")'; }
         Object.keys(TYPES).forEach(function (k) {
           var t = TYPES[k];
           var b = document.createElement("button");
@@ -176,19 +224,23 @@
             chosen = k;
             tg.querySelectorAll(".type-tile").forEach(function (x) { x.classList.remove("sel"); });
             b.classList.add("sel");
+            updQ();
           };
           tg.appendChild(b);
         });
+        updQ();
         var madeUrl = "";
         $("btn-make").onclick = function () {
           var name = $("in-name").value.trim();
           var from = $("in-from").value.trim();
+          var q = $("in-q").value.trim();
           var msg = $("in-msg").value.trim();
           var err = $("mk-err");
           if (!name) { err.textContent = "받는 사람 이름을 적어주세요!"; err.style.display = "block"; return; }
           err.style.display = "none";
           var d = { t: chosen, n: name.slice(0, 20) };
           if (from) d.f = from.slice(0, 20);
+          if (q) d.q = q.slice(0, 40);
           if (msg) d.m = msg.slice(0, 60);
           madeUrl = location.origin + location.pathname + "#d=" + enc(d);
           var lb = $("link-box");
@@ -205,7 +257,7 @@
       }
 
       // ================= 플레이 모드 =================
-      var choice = { menu: null, day: null, time: null };
+      var choice = { menu: null, day: null, time: null, cond: null, g: null, rm: null };
       var playData = null;
 
       function renderPlay(d) {
@@ -223,6 +275,7 @@
           '<div class="ask" id="ask"></div>' +
           '<div class="yn" id="yn"><button class="btn-primary" id="yes"></button>' +
           '<button class="btn-ghost" id="no"></button></div>' +
+          '<div class="no-taunt" id="taunt"></div>' +
           '<div id="steps"></div>' +
           '<p class="fine-print" style="margin-top:22px">💜 이 편지는 <b>goblub</b>(무료 운세·테스트·미니게임 놀이터)의 마음 배달로 만들어졌어요 · 로그인·개인정보 수집 없음, 링크 속 내용은 보낸 사람만 알아요</p>';
         show("play");
@@ -250,7 +303,7 @@
           env.classList.remove("fly");
           env.classList.add("open"); env.classList.add("pop");
           caption("");
-          $("ask").textContent = t.q;
+          $("ask").textContent = d.q || t.q;
           $("ask").classList.add("show");
           $("yn").classList.add("show");
         }, 2750);
@@ -261,14 +314,42 @@
           $("msgtag").style.display = "none";
           $("ask").style.display = "none";
           $("yn").style.display = "none";
+          $("taunt").style.display = "none";
           runSteps(t);
         };
-        setupRunaway();
+        setupRunaway(t);
       }
 
-      function setupRunaway() {
+      function setupRunaway(t) {
         var no = $("no"), yes = $("yes"), yn = $("yn");
         var TRIGGER = 140, SAFE = 120, fixed = false;
+        var dodge = 0, lastDodge = 0, eaten = false;
+        var TAUNTS = { 2: "🫢 앗, 버튼이 미끄러졌네?", 3: "😏 어딜 도망가~",
+          5: "🤣 벌써 5번째… 포기하면 편해요", 7: "😮‍💨 고블럽: 나 슬슬 배고픈데…",
+          9: "👀 고블럽이 '" + t.no + "' 버튼을 노려보기 시작했다…" };
+        function taunt(msg) {
+          var el = $("taunt"); if (!el) return;
+          el.classList.remove("show");
+          setTimeout(function () { el.textContent = msg; el.classList.add("show"); }, 150);
+        }
+        function eatNo() {
+          eaten = true;
+          var nr = no.getBoundingClientRect();
+          taunt("😋 고블럽: 못 참겠다, 냠!!");
+          var g2 = document.createElement("div");
+          g2.className = "gob-eater";
+          g2.style.left = (nr.left + nr.width / 2 - 42) + "px";
+          g2.style.top = (nr.top - 74) + "px";
+          g2.innerHTML = window.GoblubArt ? GoblubArt.svg(84) : '<span style="font-size:64px">👾</span>';
+          document.body.appendChild(g2);
+          setTimeout(function () { g2.classList.add("chomp"); no.style.visibility = "hidden"; }, 500);
+          setTimeout(function () {
+            g2.remove();
+            no.style.display = "none";
+            taunt("😋 고블럽이 '" + t.no + "' 버튼을 먹어버렸어요! 이제 남은 선택지는 하나 뿐…");
+            yes.style.boxShadow = "0 0 22px var(--coral)";
+          }, 1800);
+        }
         function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
         function ensureFixed() {
           if (fixed) return;
@@ -283,12 +364,19 @@
           fixed = true;
         }
         function glide(px, py) {
-          if (no.style.display === "none" || !yn.classList.contains("show")) return;
+          if (eaten || no.style.display === "none" || !yn.classList.contains("show")) return;
           var nb = no.getBoundingClientRect();
           var cx = nb.left + nb.width / 2, cy = nb.top + nb.height / 2;
           var dx = cx - px, dy = cy - py, dist = Math.hypot(dx, dy);
           if (dist > TRIGGER) return;
           ensureFixed();
+          var now = Date.now();
+          if (now - lastDodge > 450) {
+            lastDodge = now;
+            dodge++;
+            if (dodge >= 10) { eatNo(); return; }
+            if (TAUNTS[dodge]) taunt(TAUNTS[dodge]);
+          }
           if (dist < 0.001) { dx = 1; dy = 0; dist = 1; }
           var m = 12, maxL = window.innerWidth - nb.width - m, maxT = window.innerHeight - nb.height - m;
           var ux = dx / dist, uy = dy / dist;
@@ -318,15 +406,74 @@
           if (s === "menu") stepMenu(nextStep);
           else if (s === "date") stepDate(nextStep);
           else if (s === "time") stepTime(nextStep);
+          else if (s === "cond") stepCond(nextStep);
+          else if (s === "gauge") stepGauge(nextStep);
+          else if (s === "reply") stepReply(nextStep);
+          else nextStep();
         }
         function stepMenu(done) {
-          box.innerHTML = '<div class="step-q">🍴 뭐 먹으러 갈까?</div><div class="choice-grid" id="mg"></div>';
-          MENUS.forEach(function (m) {
+          var items = t.menus || (t.label === "술 한잔" ? DRINKS : MENUS);
+          box.innerHTML = '<div class="step-q">' + (t.menuQ || "🍴 뭐 먹으러 갈까?") + '</div><div class="choice-grid" id="mg"></div>';
+          items.forEach(function (m) {
             var b = document.createElement("button");
             b.className = "choice"; b.innerHTML = '<span class="em">' + m[0] + "</span>" + m[1];
             b.onclick = function () { choice.menu = m[0] + " " + m[1]; done(); };
             $("mg").appendChild(b);
           });
+        }
+        function stepCond(done) {
+          box.innerHTML = '<div class="step-q">🤙 사과 받는 대신, 조건 하나 걸자!</div>' +
+            '<div class="choice-grid" style="grid-template-columns:repeat(2,1fr)" id="cd"></div>';
+          CONDS.forEach(function (c2) {
+            var b = document.createElement("button");
+            b.className = "choice"; b.innerHTML = '<span class="em">' + c2[0] + "</span>" + c2[1];
+            b.onclick = function () { choice.cond = c2[0] + " " + c2[1]; done(); };
+            $("cd").appendChild(b);
+          });
+        }
+        function stepGauge(done) {
+          var gg = t.gauge;
+          if (!gg) { done(); return; }
+          box.innerHTML =
+            '<div class="step-q">' + gg.name + '</div>' +
+            '<p class="gauge-ask">' + gg.ask + ' 슬라이더로 솔직하게!</p>' +
+            '<div class="gauge-val" id="gv"></div>' +
+            '<div class="gauge-band" id="gb"></div>' +
+            '<input type="range" class="gauge-range" id="gr" min="0" max="100" value="50" />' +
+            '<div class="result-actions" style="margin-top:18px"><button class="btn-primary" id="g-ok"></button></div>';
+          var gr = $("gr");
+          function upd() {
+            var v = +gr.value;
+            $("gv").textContent = v + "%";
+            $("gb").textContent = gaugeBand(t, v);
+            $("g-ok").textContent = "📤 " + v + "%로 확정!";
+          }
+          gr.oninput = upd; upd();
+          $("g-ok").onclick = function () { choice.g = +gr.value; done(); };
+        }
+        function stepReply(done) {
+          box.innerHTML =
+            '<div class="step-q">💬 마지막으로, 한마디 답장!</div>' +
+            '<div class="reply-list" id="rl"></div>' +
+            '<div id="rw" style="display:none; margin-top:10px">' +
+            '<input class="txt-input" id="in-reply" maxlength="60" placeholder="하고 싶은 말을 적어줘 (60자)" />' +
+            '<button class="btn-primary" id="btn-reply-send" style="width:100%">📨 이 답장 보내기</button></div>';
+          var rl = $("rl");
+          (t.replies || []).forEach(function (msg) {
+            var b = document.createElement("button");
+            b.className = "reply-opt"; b.textContent = "💬 " + msg;
+            b.onclick = function () { choice.rm = msg; done(); };
+            rl.appendChild(b);
+          });
+          var w = document.createElement("button");
+          w.className = "reply-opt write"; w.textContent = "✍️ 직접 쓸래";
+          w.onclick = function () { $("rw").style.display = "block"; w.style.display = "none"; $("in-reply").focus(); };
+          rl.appendChild(w);
+          $("btn-reply-send").onclick = function () {
+            var v = $("in-reply").value.trim();
+            if (v) choice.rm = v.slice(0, 60);
+            done();
+          };
         }
         function stepDate(done) {
           box.innerHTML =
@@ -378,8 +525,13 @@
       // ================= 결과 모드 =================
       function finishPlay(t) {
         $("steps").innerHTML = "";
-        var r = { day: choice.day, time: choice.time };
+        var r = {};
         if (choice.menu) r.menu = choice.menu;
+        if (choice.day) r.day = choice.day;
+        if (choice.time) r.time = choice.time;
+        if (choice.cond) r.c = choice.cond;
+        if (choice.g != null) r.g = choice.g;
+        if (choice.rm) r.rm = choice.rm;
         renderResult(playData, r, true);
       }
 
@@ -400,13 +552,16 @@
           '<button class="btn-primary" id="btn-img">🖼 이미지 저장</button>' +
           '<button class="btn-ghost" id="btn-reply">🔗 되답 링크 복사</button>' +
           '<a class="btn-ghost" href="../index.html">🎡 다른 즐길거리</a></div>';
-        $("out").innerHTML =
-          '💌 To. <b>' + d.n + '</b><br>' +
-          (r.menu ? '🍴 메뉴: ' + r.menu + '<br>' : '') +
-          '📅 날짜: ' + r.day + ' (' + wd + ')<br>' +
-          '⏰ 시간: ' + r.time +
-          (d.m ? '<br>💬 "' + d.m + '"' : '') +
-          (d.f ? '<br>✍️ From. <b>' + d.f + '</b>' : '');
+        var lines = ['💌 To. <b>' + d.n + '</b>'];
+        if (r.menu) lines.push((t.menuLine || "🍴 메뉴") + ': ' + r.menu);
+        if (r.day) lines.push('📅 날짜: ' + r.day + ' (' + wd + ')');
+        if (r.time) lines.push('⏰ 시간: ' + r.time);
+        if (r.c) lines.push('🤙 용서 조건: <b>' + r.c + '</b>');
+        if (r.g != null && t.gauge) lines.push(t.gauge.name + ': <b>' + r.g + '%</b> — ' + gaugeBand(t, r.g));
+        if (d.m) lines.push('💬 보낸 한마디: "' + d.m + '"');
+        if (r.rm) lines.push('📨 답장: <b>"' + r.rm + '"</b>');
+        if (d.f) lines.push('✍️ From. <b>' + d.f + '</b>');
+        $("out").innerHTML = lines.join('<br>');
         show("result");
         if (doRain) rain(d.t);
         if (window.GoblubFeed) GoblubFeed.grant("letter");
@@ -422,7 +577,8 @@
       }
 
       function rain(type) {
-        var em = type === "apology" ? ["🍎","🍏","🤝","💚","✨"] : ["💚","💖","💗","✨","🎉"];
+        var em = type === "apology" ? ["🍎","🍏","🤝","💚","✨"] :
+                 type === "drink" ? ["🍻","🍺","🥂","🍶","✨","🎉"] : ["💚","💖","💗","✨","🎉"];
         var n = 0, iv = setInterval(function () {
           var h = document.createElement("div"); h.className = "heart";
           h.textContent = em[Math.floor(Math.random() * em.length)];
@@ -495,25 +651,57 @@
         // To.
         g.font = "38px 'Jua', 'Malgun Gothic', sans-serif"; g.fillStyle = "#ffffff";
         g.save(); g.shadowColor = "#4deeea"; g.shadowBlur = 14;
-        g.fillText("💌 To. " + d.n, W / 2, 690);
+        g.fillText("💌 To. " + d.n, W / 2, 676);
         g.restore();
-        // 메뉴/날짜/시간 — 연보라
-        g.fillStyle = "#cdbdf6"; g.font = "32px 'Jua', 'Malgun Gothic', sans-serif";
-        var y = 772;
-        if (r.menu) { g.fillText("🍴 " + r.menu, W / 2, y); y += 58; }
-        g.fillText("📅 " + r.day + " (" + wd + ")", W / 2, y); y += 58;
-        g.fillText("⏰ " + r.time, W / 2, y); y += 58;
-        // 메시지 — 핑크 글로우 인용문
+        // 상세 라인(있는 것만) — 연보라
+        g.fillStyle = "#cdbdf6"; g.font = "30px 'Jua', 'Malgun Gothic', sans-serif";
+        var y = 742;
+        if (r.menu) { g.fillText((d.t === "drink" ? "🍻 " : "🍴 ") + r.menu, W / 2, y); y += 50; }
+        if (r.day) { g.fillText("📅 " + r.day + " (" + wd + ")", W / 2, y); y += 50; }
+        if (r.time) { g.fillText("⏰ " + r.time, W / 2, y); y += 50; }
+        if (r.c) {
+          g.fillStyle = "#ffd93d";
+          g.save(); g.shadowColor = "#ffd93d"; g.shadowBlur = 12;
+          g.fillText("🤙 조건: " + r.c, W / 2, y);
+          g.restore(); g.fillStyle = "#cdbdf6";
+          y += 50;
+        }
+        // 게이지 — 네온 바
+        if (r.g != null && t.gauge) {
+          g.fillText(t.gauge.name + " " + r.g + "%", W / 2, y); y += 18;
+          var bw2 = 400, bx = (W - bw2) / 2;
+          rr(bx, y, bw2, 22, 11); g.fillStyle = "#241a52"; g.fill();
+          if (r.g > 0) {
+            rr(bx, y, Math.max(22, bw2 * r.g / 100), 22, 11);
+            var bg2 = g.createLinearGradient(bx, 0, bx + bw2, 0);
+            bg2.addColorStop(0, "#4deeea"); bg2.addColorStop(1, "#ff6ec7");
+            g.save(); g.shadowColor = neon; g.shadowBlur = 10; g.fillStyle = bg2; g.fill(); g.restore();
+          }
+          y += 46;
+          g.fillStyle = "#ff9edb"; g.font = "26px 'Jua', 'Malgun Gothic', sans-serif";
+          g.fillText(gaugeBand(t, r.g), W / 2, y);
+          g.fillStyle = "#cdbdf6"; g.font = "30px 'Jua', 'Malgun Gothic', sans-serif";
+          y += 52;
+        }
+        // 보낸 한마디 — 핑크 글로우 인용문
         if (d.m) {
-          g.fillStyle = "#ff9edb"; g.font = "30px 'Jua', 'Malgun Gothic', sans-serif";
+          g.fillStyle = "#ff9edb"; g.font = "28px 'Jua', 'Malgun Gothic', sans-serif";
           g.save(); g.shadowColor = neon; g.shadowBlur = 16;
-          g.fillText("“" + d.m + "”", W / 2, y + 18);
+          g.fillText("“" + d.m + "”", W / 2, y);
           g.restore();
-          y += 76;
+          y += 50;
+        }
+        // 답장 — 시안 글로우
+        if (r.rm) {
+          g.fillStyle = "#9df3ef"; g.font = "28px 'Jua', 'Malgun Gothic', sans-serif";
+          g.save(); g.shadowColor = "#4deeea"; g.shadowBlur = 14;
+          g.fillText("📨 답장 “" + r.rm + "”", W / 2, y);
+          g.restore();
+          y += 50;
         }
         if (d.f) {
-          g.fillStyle = "#cdbdf6"; g.font = "30px 'Jua', 'Malgun Gothic', sans-serif";
-          g.fillText("✍️ From. " + d.f, W / 2, y + 18);
+          g.fillStyle = "#cdbdf6"; g.font = "28px 'Jua', 'Malgun Gothic', sans-serif";
+          g.fillText("✍️ From. " + d.f, W / 2, y);
         }
         // 하단 CTA
         g.font = "26px 'Jua', 'Malgun Gothic', sans-serif"; g.fillStyle = "#b9a8e8";
