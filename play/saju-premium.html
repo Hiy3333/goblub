@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>프리미엄 심층 AI 사주 풀이 — goblub</title>
-  <meta name="description" content="젬리로 여는 고블럽 도사의 프리미엄 심층 AI 사주 풀이 — 성격·재물·연애·직업·건강·대운까지" />
+  <title>프리미엄 심층 리포트 · 성격+인연 — goblub</title>
+  <meta name="description" content="고블럽 도사의 속마음 직설 모드 — 신살·합충·용신·세운까지 계산해 쓰는 1만자급 성격+인연 심층 리포트" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
@@ -20,12 +20,27 @@
     .prem-btn { background: linear-gradient(90deg, var(--yellow), var(--orange)); color: #2a1a05;
       box-shadow: 0 0 16px rgba(255,217,61,.5); }
     .prem-btn:hover { filter: brightness(1.08); box-shadow: 0 0 24px rgba(255,217,61,.7); }
-    .feat-list { list-style: none; margin: 14px auto 6px; max-width: 430px; text-align: left; }
-    .feat-list li { background: var(--cream); border: 1.5px solid var(--line); border-radius: 12px;
-      padding: 10px 14px; margin-bottom: 7px; color: var(--ink-soft); font-size: 0.92rem; }
-    .dosa-box { white-space: pre-wrap; line-height: 1.9; background: var(--cream); border-radius: 14px;
-      padding: 18px; margin-top: 12px; text-align: left; color: var(--ink); }
     .need-more { color: #ffb3c8; margin: 4px 0 10px; }
+    /* 목차(구성) */
+    .vol-list { list-style: none; margin: 16px auto 6px; max-width: 460px; text-align: left; }
+    .vol-list li { background: var(--cream); border: 1.5px solid var(--line); border-radius: 12px;
+      padding: 12px 15px; margin-bottom: 8px; color: var(--ink); font-size: 0.95rem; }
+    .vol-list li b { color: var(--yellow); }
+    .vol-list li span { display: block; color: var(--ink-soft); font-size: 0.85rem; margin-top: 3px; }
+    /* 리포트 섹션 */
+    .rep-progress { text-align: center; color: var(--ink-soft); margin: 6px 0 14px; min-height: 1.6em; }
+    .rep-sec { background: var(--cream); border: 1.5px solid var(--line); border-radius: 16px;
+      padding: 18px; margin-bottom: 16px; text-align: left; }
+    .rep-sec h3 { color: var(--yellow); font-size: 1.08rem; margin-bottom: 10px;
+      text-shadow: 0 0 10px rgba(255,217,61,.3); }
+    .rep-sec .body { white-space: pre-wrap; line-height: 1.95; color: var(--ink); font-size: 0.97rem; }
+    .rep-sec .body .sub { display: block; color: var(--coral); font-size: 1.02rem; margin: 14px 0 2px;
+      text-shadow: 0 0 8px rgba(255,110,199,.3); }
+    .rep-sec .st { color: var(--ink-soft); font-size: 0.84rem; margin-bottom: 6px; }
+    .rep-sec.pending { opacity: .55; }
+    .rep-retry { margin-top: 10px; }
+    .writing::after { content: "✍️"; animation: blink 1s infinite; }
+    @keyframes blink { 50% { opacity: .2; } }
   </style>
 </head>
 <body>
@@ -33,15 +48,15 @@
   <main>
     <section class="panel" style="text-align:center; border:2px solid var(--yellow); box-shadow:0 0 22px rgba(255,217,61,.22), inset 0 0 22px rgba(255,217,61,.05)">
       <span class="prem-badge">✨ PREMIUM</span>
-      <span class="prem-emoji">🔮</span>
-      <h1 style="font-size:1.5rem; margin-bottom:6px">프리미엄 심층 AI 사주 풀이</h1>
-      <p class="result-desc">고블럽 도사가 내 사주팔자를 페이지째 깊이 파고드는 프리미엄 리포트예요.</p>
+      <span class="prem-emoji">📜</span>
+      <h1 style="font-size:1.5rem; margin-bottom:6px">심층 리포트 — 성격 &amp; 인연</h1>
+      <p class="result-desc">고블럽 도사가 젬리 낸 손님에게만 여는 <b>속마음 직설 모드</b>.<br>신살·합충·용신·10년 세운까지 계산해 총 4편, 1만 자급으로 씁니다.</p>
 
-      <ul class="feat-list">
-        <li>🌱 타고난 성격·기질 정밀 분석</li>
-        <li>💰 재물과 일 · 💘 연애운 · 🤝 인간관계</li>
-        <li>🎯 올해의 흐름 · 💼 직업·적성·재능</li>
-        <li>🩺 건강 밸런스 · 🚉 10년 단위 대운 스토리</li>
+      <ul class="vol-list">
+        <li><b>📕 1권 ①</b> 남들은 죽어도 모르는 네 진짜 성격<span>본질 · 절대 안 보여주는 얼굴 · 열등감의 정체</span></li>
+        <li><b>📕 1권 ②</b> 결국 네가 이기게 되는 이유<span>진짜 무기 · 사기급 능력 조합 · 버프 카드 · 판이 바뀌는 시점</span></li>
+        <li><b>📗 2권 ①</b> 내 앞에 나타날 진짜 인연<span>짝의 프로필 · 만나는 시기와 장소 · 반복되는 연애 함정</span></li>
+        <li><b>📗 2권 ②</b> 홀리는 매력과 연애운 처방<span>결정적 매력 · 케미 터지는 파트너 · 용신 처방 · 당장 할 일</span></li>
       </ul>
 
       <div id="no-profile" style="display:none">
@@ -53,93 +68,162 @@
         <div class="cost-row">가격 <span class="cost">🍬 <span id="cost">100</span> 젬리</span></div>
         <p class="wallet-mini">보유 젬리: 🍬 <b id="w-have">0</b></p>
         <div class="result-actions">
-          <button class="btn-primary prem-btn" id="btn-unlock" style="display:none">🍬 젬리로 프리미엄 풀이 열기</button>
+          <button class="btn-primary prem-btn" id="btn-unlock" style="display:none">🍬 젬리 내고 리포트 받기</button>
           <a class="btn-ghost" href="saju.html">🔮 무료 사주팔자 심층 먼저 보기</a>
         </div>
         <p class="need-more" id="need-more" style="display:none">젬리가 <b id="need-gap">0</b> 개 더 필요해요 — <a href="goblub.html" style="color:var(--sky)">고블럽 키우기</a>에서 출석·케어로 모아보세요!</p>
+        <p class="fine-print" id="gender-hint" style="display:none">💡 사주 프로필에 성별까지 저장하면 시기(대운) 분석이 훨씬 깊어져요.</p>
       </div>
 
-      <div id="reading-panel" style="display:none">
-        <p class="fine-print" id="read-status" style="margin-bottom:4px"></p>
-        <div class="dosa-box" id="reading"></div>
-        <div class="result-actions"><a class="btn-ghost" href="fortune-hub.html">← 운세로 돌아가기</a></div>
+      <div id="report-panel" style="display:none; text-align:left">
+        <p class="rep-progress" id="rep-progress"></p>
+        <div id="rep-secs"></div>
+        <div class="result-actions" style="justify-content:center"><a class="btn-ghost" href="fortune-hub.html">← 운세로 돌아가기</a></div>
       </div>
 
-      <p class="fine-print" style="margin-top:14px">사주는 재미로 봐주세요 🙂</p>
+      <p class="fine-print" style="margin-top:14px">사주는 재미로 봐주세요 🙂 · 리포트는 이 브라우저에 저장돼 언제든 다시 볼 수 있어요</p>
     </section>
   </main>
   <div id="site-footer"></div>
   <script src="../js/common.js?v=2" data-root=".."></script>
   <script src="js/saju.js"></script>
+  <script src="js/saju-deep.js"></script>
   <script src="js/dosa.js?v=2"></script>
   <script src="js/feed.js?v=2"></script>
   <script>
     (function () {
       var $ = function (id) { return document.getElementById(id); };
       var COST = 100;
-      var data = null, body = null, key = null, paid = false;
+      var PARTS = [
+        { id: "p1", title: "📕 1권 ① 남들은 죽어도 모르는 네 진짜 성격" },
+        { id: "p2", title: "📕 1권 ② 결국 네가 이기게 되는 이유" },
+        { id: "l1", title: "📗 2권 ① 내 앞에 나타날 진짜 인연" },
+        { id: "l2", title: "📗 2권 ② 홀리는 매력과 연애운 처방" }
+      ];
+      var data = null, base = null, deep = null, baseKey = null, paid = false;
       $("cost").textContent = COST;
 
       function djb2(s) { var h = 5381; for (var i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0; return (h >>> 0).toString(36); }
       function birth() { try { var b = JSON.parse(localStorage.getItem("goblub_birth")); return (b && b.y) ? b : null; } catch (e) { return null; } }
-      function unlocked() { try { return key && !!localStorage.getItem(key); } catch (e) { return false; } }
       function signed(t) { return /고블럽 도사\s*$/.test((t || "").trim()); }
+      function esc(s) { return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+      function paidKey() { return "goblub_prem2_paid_" + baseKey; }
+      function unlocked() {
+        try {
+          if (localStorage.getItem(paidKey())) return true;
+          // 구버전 프리미엄 풀이 구매자는 새 리포트로 무료 업그레이드
+          var legacy = "goblub_saju_prem_" + djb2(JSON.stringify({ saju: base, premium: true }));
+          return !!localStorage.getItem(legacy);
+        } catch (e) { return false; }
+      }
 
       function setup() {
         var b = birth();
         if (!b) { $("no-profile").style.display = "block"; return; }
         if (!data) return;
-        var r = Saju.compute(data, { y: b.y, m: b.m, d: b.d, hour: b.hour, min: b.min || 0 }, { trueSolar: true });
-        var payload = Dosa.buildPayload(r, b, b.gender || null, true);
-        body = { saju: payload, premium: true };
-        key = "goblub_saju_prem_" + djb2(JSON.stringify(body));
-        if (unlocked()) { openReading(); return; }
+        var r = Saju.compute(data, { y: b.y, m: b.m, d: b.d, hour: b.hour, min: b.min || 0 }, { trueSolar: true, gender: b.gender || null });
+        base = Dosa.buildPayload(r, b, b.gender || null, true);
+        deep = SajuDeep.facts(r, b, b.gender || null);
+        baseKey = djb2(JSON.stringify(base));
+        if (!b.gender) $("gender-hint").style.display = "block";
+        if (unlocked()) { openReport(); return; }
         renderGate();
       }
 
       function renderGate() {
         var bal = GoblubFeed.wallet().balance;
         $("gate").style.display = "block";
-        $("reading-panel").style.display = "none";
+        $("report-panel").style.display = "none";
         $("w-have").textContent = bal;
         if (bal >= COST) { $("btn-unlock").style.display = "inline-block"; $("need-more").style.display = "none"; }
         else { $("btn-unlock").style.display = "none"; $("need-more").style.display = "block"; $("need-gap").textContent = COST - bal; }
       }
 
-      function openReading() {
+      // ◆ 소제목을 강조해 렌더
+      function renderBody(el, text) {
+        var html = esc(text.trim()).split("\n").map(function (line) {
+          if (/^◆/.test(line.trim())) return '<span class="sub">' + line.trim() + "</span>";
+          return line;
+        }).join("\n");
+        el.innerHTML = html;
+      }
+
+      function openReport() {
         $("gate").style.display = "none";
-        $("reading-panel").style.display = "block";
-        var box = $("reading"); box.textContent = "";
-        $("read-status").textContent = "🧙 도사님이 프리미엄 두루마리를 펼치는 중…";
+        $("report-panel").style.display = "block";
+        var wrap = $("rep-secs");
+        if (!wrap.childElementCount) {
+          PARTS.forEach(function (p) {
+            var sec = document.createElement("div");
+            sec.className = "rep-sec pending"; sec.id = "sec-" + p.id;
+            sec.innerHTML = '<h3>' + p.title + '</h3><p class="st" id="st-' + p.id + '">대기 중…</p><div class="body" id="body-' + p.id + '"></div>';
+            wrap.appendChild(sec);
+          });
+        }
+        genPart(0);
+      }
+
+      function setProgress(i, writing) {
+        var done = PARTS.filter(function (p) { return p.done; }).length;
+        $("rep-progress").textContent = writing
+          ? "🧙 도사님이 " + (i + 1) + "/4권을 집필 중… (완성된 권은 위에서 바로 읽으세요)"
+          : (done === 4 ? "🧙 4권 완성! 이 리포트는 저장되어 언제든 다시 볼 수 있다." : "");
+      }
+
+      function genPart(i) {
+        if (i >= PARTS.length) { setProgress(i, false); return; }
+        var p = PARTS[i];
+        var sec = $("sec-" + p.id), st = $("st-" + p.id), body = $("body-" + p.id);
+        sec.classList.remove("pending");
+        st.textContent = "집필 중"; st.classList.add("writing");
+        setProgress(i, true);
         var buffer = "";
-        Dosa.fetchAI("/api/saju-reading", body, "goblub_saju_prem_", {
+        Dosa.fetchAI("/api/saju-report", { saju: base, deep: deep, part: p.id }, "goblub_rep_", {
           accept: function (full) { return signed(full); },
-          onChunk: function (t) { buffer += t; box.textContent = buffer; },
+          cooldownMs: 4000, cooldownKey: "goblub_rep_cd",
+          onChunk: function (t) { buffer += t; body.textContent = buffer; },
           onDone: function (fromCache) {
+            st.classList.remove("writing");
             if (signed(buffer)) {
-              paid = false;
-              $("read-status").textContent = fromCache ? "🧙 (이미 열어본 프리미엄 풀이예요)" : "🧙 프리미엄 풀이 완성! 재미로 봐주세요.";
+              p.done = true; paid = false;
+              st.textContent = fromCache ? "완성 (저장된 권)" : "완성";
+              renderBody(body, buffer);
+              setTimeout(function () { genPart(i + 1); }, fromCache ? 50 : 800);
             } else {
-              if (paid) { GoblubFeed.earn(COST, true); paid = false; }
-              $("read-status").textContent = "⚠️ 풀이를 끝까지 받지 못했어요 — 젬리를 돌려드렸어요. 다시 시도해 주세요.";
-              renderGate();
+              st.textContent = "⚠️ 끝까지 받지 못했어요";
+              retryBtn(sec, i);
             }
           },
-          onError: function (code, sec) {
-            if (paid) { GoblubFeed.earn(COST, true); paid = false; }
-            renderGate();
-            $("read-status").textContent =
-              code === "not_configured" ? "도사님이 아직 수련 중이에요. 곧 찾아옵니다!" :
-              code === "cooldown" ? "도사님이 숨 고르는 중… " + sec + "초 후 다시! (젬리는 돌려드렸어요)" :
-              "잠시 후 다시 시도해 주세요. (젬리는 돌려드렸어요)";
+          onError: function (code, sec2) {
+            st.classList.remove("writing");
+            if (paid && i === 0) {
+              GoblubFeed.earn(COST, true); paid = false;
+              try { localStorage.removeItem(paidKey()); } catch (e) {}
+              st.textContent = "⚠️ 생성 실패 — 젬리를 돌려드렸어요. 다시 시도해 주세요.";
+              renderGate(); return;
+            }
+            st.textContent =
+              code === "cooldown" ? "도사님이 숨 고르는 중… " + sec2 + "초 후 이어서 눌러주세요." :
+              code === "not_configured" ? "도사님이 수련 중이에요. 잠시 후 다시!" :
+              "⚠️ 잠시 후 이어받기를 눌러주세요.";
+            retryBtn(sec, i);
           }
         });
+      }
+
+      function retryBtn(sec, i) {
+        if (sec.querySelector(".rep-retry")) return;
+        var b = document.createElement("button");
+        b.className = "btn-ghost rep-retry"; b.textContent = "📜 이어서 받기";
+        b.onclick = function () { b.remove(); genPart(i); };
+        sec.appendChild(b);
       }
 
       $("btn-unlock").onclick = function () {
         if (!GoblubFeed.spend(COST)) { renderGate(); return; }
         paid = true;
-        openReading();
+        try { localStorage.setItem(paidKey(), String(Date.now())); } catch (e) {}
+        openReport();
       };
 
       fetch("data/saju-terms.json").then(function (r) { return r.ok ? r.json() : null; })
