@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../css/style.css?v=neon8" />
+  <link rel="stylesheet" href="../css/style.css?v=glass1" />
   <style>
     .type-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 16px; }
     .type-tile { background: var(--cream); border: 2px solid transparent; border-radius: 16px;
@@ -75,7 +75,7 @@
     .cal-grid .day { aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center;
       background: var(--cream); border: 2px solid transparent; border-radius: 10px; cursor: pointer; font-family: inherit; font-size: 0.95rem; }
     .cal-grid .day.blank { background: transparent; cursor: default; }
-    .cal-grid .day.past { color: #6a5a9f; cursor: not-allowed; background: #1d1548; }
+    .cal-grid .day.past { color: #b3b9d6; cursor: not-allowed; background: rgba(140,150,210,.12); }
     .cal-grid .day:not(.blank):not(.past):hover { border-color: var(--mint); }
     .cal-grid .day.sel { background: var(--mint); color: #17103e; font-weight: 700; }
     .time-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin-top: 8px; }
@@ -89,10 +89,10 @@
     .out-card { background: var(--cream); border-radius: 14px; padding: 18px; line-height: 2; margin: 12px 0; }
     /* ===== 게이지 스텝 ===== */
     .gauge-ask { text-align: center; color: var(--ink-soft); margin-bottom: 12px; }
-    .gauge-val { text-align: center; font-size: 2.7rem; color: #fff; text-shadow: 0 0 16px var(--coral); line-height: 1.2; }
+    .gauge-val { text-align: center; font-size: 2.7rem; color: var(--ink); text-shadow: 0 2px 8px rgba(255,90,118,.25); line-height: 1.2; }
     .gauge-band { text-align: center; color: var(--coral); font-size: 1.05rem; min-height: 1.6em; margin: 4px 0 14px; }
     .gauge-range { width: 100%; -webkit-appearance: none; appearance: none; height: 14px; border-radius: 999px;
-      background: linear-gradient(90deg, #3a2a6e, var(--coral) 60%, var(--yellow)); outline: none; }
+      background: linear-gradient(90deg, #dfe4f5, var(--coral) 60%, var(--yellow)); outline: none; }
     .gauge-range::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 34px; height: 34px; border-radius: 50%;
       background: #fff; border: 3px solid var(--coral); box-shadow: 0 0 14px var(--coral); cursor: pointer; }
     .gauge-range::-moz-range-thumb { width: 30px; height: 30px; border-radius: 50%;
@@ -127,7 +127,7 @@
   </main>
   <div id="site-footer"></div>
   <script src="../js/common.js?v=2" data-root=".."></script>
-  <script src="js/feed.js?v=2"></script>
+  <script src="js/feed.js?v=3"></script>
   <script src="js/goblub-art.js"></script>
   <script>
     (function () {

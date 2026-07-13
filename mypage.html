@@ -8,17 +8,17 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/style.css?v=neon8" />
+  <link rel="stylesheet" href="css/style.css?v=glass1" />
   <style>
     .me-row { display: flex; align-items: center; gap: 16px; }
     .me-pic { width: 64px; height: 64px; border-radius: 50%; border: 2px solid var(--purple);
       box-shadow: 0 0 12px rgba(157,107,255,.45); object-fit: cover; flex: none; background: var(--cream); }
     .me-pic.ph { display: flex; align-items: center; justify-content: center; font-size: 1.8rem; }
-    .me-name { font-size: 1.25rem; color: #fff; }
+    .me-name { font-size: 1.25rem; color: var(--ink); }
     .me-mail { color: var(--ink-soft); font-size: 0.9rem; }
     .sec-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
     .sec-head h2 { margin: 0; }
-    .jelly-big { font-size: 1.6rem; color: #fff; }
+    .jelly-big { font-size: 1.6rem; color: var(--ink); }
     .jelly-big b { color: var(--yellow); }
     .set-row { display: flex; align-items: center; justify-content: space-between; gap: 12px;
       background: var(--cream); border: 1.5px solid var(--line); border-radius: 12px; padding: 13px 15px; margin-bottom: 9px; }
@@ -26,12 +26,12 @@
     .set-row .hint { display: block; color: var(--ink-soft); font-size: 0.8rem; margin-top: 2px; }
     .toggle { position: relative; width: 48px; height: 26px; flex: none; }
     .toggle input { opacity: 0; width: 0; height: 0; }
-    .toggle .knob { position: absolute; inset: 0; border-radius: 999px; background: #1b1240; border: 1.5px solid var(--line); cursor: pointer; transition: background .2s, border-color .2s; }
+    .toggle .knob { position: absolute; inset: 0; border-radius: 999px; background: rgba(140,150,210,.25); border: 1.5px solid var(--line); cursor: pointer; transition: background .2s, border-color .2s; }
     .toggle .knob::after { content: ""; position: absolute; top: 2px; left: 3px; width: 18px; height: 18px; border-radius: 50%;
       background: var(--ink-soft); transition: transform .2s, background .2s; }
     .toggle input:checked + .knob { background: rgba(157,107,255,.35); border-color: var(--purple); }
     .toggle input:checked + .knob::after { transform: translateX(21px); background: var(--purple); box-shadow: 0 0 8px var(--purple); }
-    .danger { color: #ff9ec2; border-color: rgba(255,110,150,.5) !important; }
+    .danger { color: #e84a72; border-color: rgba(232,74,114,.45) !important; }
     .pay-badge { display: inline-block; background: var(--cream); border: 1.5px solid var(--line);
       border-radius: 999px; padding: 4px 12px; font-size: 0.78rem; color: var(--ink-soft); }
   </style>
@@ -114,7 +114,7 @@
   <div id="site-footer"></div>
   <script src="js/common.js?v=2" data-root="."></script>
   <script src="js/auth.js"></script>
-  <script src="play/js/feed.js?v=2"></script>
+  <script src="play/js/feed.js?v=3"></script>
   <script>
     (function () {
       var $ = function (id) { return document.getElementById(id); };
