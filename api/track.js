@@ -8,7 +8,7 @@ const ALLOWED_ORIGINS = [
   "http://localhost:8777",
   "http://localhost:3000",
 ];
-const ITEMS = ["premium_report"];
+const ITEMS = ["premium_report", "premium_report2"];
 
 function today() {
   const d = new Date(Date.now() + 9 * 3600e3);
