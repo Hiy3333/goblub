@@ -36,6 +36,10 @@
     .rep-sec .body { white-space: pre-wrap; line-height: 1.95; color: var(--ink); font-size: 0.97rem; }
     .rep-sec .body .sub { display: block; color: var(--coral); font-size: 1.02rem; margin: 14px 0 2px;
       text-shadow: 0 0 8px rgba(255,110,199,.3); }
+    .rep-sec .body .hl { color: #e8365f; font-weight: 700; }
+    .rep-sec .body .kv { display: block; background: rgba(255,255,255,.6); border: 1px solid rgba(150,160,205,.28);
+      border-radius: 10px; padding: 6px 12px; margin: 4px 0; line-height: 1.7; font-size: 0.93rem;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.9); }
     .rep-sec .st { color: var(--ink-soft); font-size: 0.84rem; margin-bottom: 6px; }
     .rep-sec.pending { opacity: .55; }
     .rep-retry { margin-top: 10px; }
@@ -147,12 +151,15 @@
         else { $("btn-unlock").style.display = "none"; $("need-more").style.display = "block"; $("need-gap").textContent = COST - bal; }
       }
 
-      // ◆ 소제목을 강조해 렌더
+      // ◆ 소제목 / ▸ 항목 줄 / 『강조』 를 꾸며서 렌더
       function renderBody(el, text) {
         var html = esc(text.trim()).split("\n").map(function (line) {
-          if (/^◆/.test(line.trim())) return '<span class="sub">' + line.trim() + "</span>";
+          var t = line.trim();
+          if (/^◆/.test(t)) return '<span class="sub">' + t + "</span>";
+          if (/^▸/.test(t)) return '<span class="kv">' + t.replace(/^▸\s*/, "") + "</span>";
           return line;
         }).join("\n");
+        html = html.replace(/『([^『』]{1,60})』/g, '<b class="hl">$1</b>');
         el.innerHTML = html;
       }
 
