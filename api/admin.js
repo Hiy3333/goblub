@@ -1,6 +1,17 @@
-// goblub 관리자 API — 구글 ID 토큰을 서버에서 검증하고, 관리자 이메일(ADMIN_EMAILS)만 허용.
+// goblub 관리자 API — 아이디/암호(SHA-256 해시 검증) 또는 구글 ID 토큰(관리자 이메일)으로 인증.
+// 암호 평문은 저장소에 없다: sha256("아이디:암호") 해시만 보관. ADMIN_ID/ADMIN_PW 환경변수가 있으면 그것이 우선.
 // actions: stats(요약+최근 이벤트) / users(회원 목록) / grant(젬리 지급) / ban / unban
+import crypto from "crypto";
 import { kv, kvPipe, kvConfigured, verifyGoogleToken, isAdmin } from "../lib/kv.js";
+
+const ADMIN_HASH = "f8b746bc5853eadc1941562b3e8f46194b9ea419d08d0512fb8e2b8573338295";
+
+function checkIdPw(id, pw) {
+  if (typeof id !== "string" || typeof pw !== "string" || id.length > 64 || pw.length > 128) return false;
+  if (process.env.ADMIN_ID && process.env.ADMIN_PW) return id === process.env.ADMIN_ID && pw === process.env.ADMIN_PW;
+  const h = crypto.createHash("sha256").update(id + ":" + pw).digest("hex");
+  return h === ADMIN_HASH;
+}
 
 const ALLOWED_ORIGINS = [
   "https://goblub.vercel.app",
@@ -26,10 +37,24 @@ export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "method_not_allowed" });
   if (!kvConfigured()) return res.status(501).json({ error: "not_configured" });
 
-  const { id_token, action } = req.body || {};
-  const g = await verifyGoogleToken(id_token);
-  if (!g) return res.status(401).json({ error: "bad_token" });
-  if (!isAdmin(g.email)) return res.status(403).json({ error: "not_admin" });
+  const { id_token, admin_id, admin_pw, action } = req.body || {};
+
+  // 무차별 대입 방어: IP당 10분 내 실패 20회 초과 시 차단
+  const ip = String(req.headers["x-forwarded-for"] || "").split(",")[0].trim() || "unknown";
+  const failKey = "af:" + ip;
+  try { const fails = +(await kv("GET", failKey)) || 0; if (fails > 20) return res.status(429).json({ error: "too_many_attempts" }); } catch {}
+
+  let authed = false;
+  if (admin_id != null) {
+    authed = checkIdPw(admin_id, admin_pw);
+  } else {
+    const g = await verifyGoogleToken(id_token);
+    authed = !!(g && isAdmin(g.email));
+  }
+  if (!authed) {
+    try { await kvPipe([["INCR", failKey], ["EXPIRE", failKey, 600]]); } catch {}
+    return res.status(403).json({ error: "bad_credentials" });
+  }
 
   try {
     if (action === "stats") {

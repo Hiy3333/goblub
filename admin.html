@@ -4,119 +4,168 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex, nofollow" />
-  <title>goblub 관리자</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/style.css?v=glass3" />
+  <title>GOBLUB Admin Console</title>
   <style>
-    main { max-width: 980px; }
-    .panel { max-width: none; }
-    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 8px; }
-    .stat { background: var(--cream); border: 1px solid rgba(255,255,255,.9); border-radius: 16px; padding: 14px 16px; text-align: center;
-      box-shadow: 0 6px 14px rgba(88,99,172,.10), inset 0 1px 0 rgba(255,255,255,.9); }
-    .stat .n { font-size: 1.7rem; color: var(--ink); display: block; }
-    .stat .l { color: var(--ink-soft); font-size: 0.84rem; }
-    .u-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-    .u-table th { text-align: left; color: var(--ink-soft); font-weight: normal; padding: 8px 8px; border-bottom: 1.5px solid var(--line); }
-    .u-table td { padding: 9px 8px; border-bottom: 1px dashed var(--line); vertical-align: middle; }
-    .u-table .em { color: var(--ink); }
-    .u-table .sub2 { color: var(--ink-soft); font-size: 0.8rem; display: block; }
-    .u-table input.g { width: 74px; font-family: inherit; padding: 6px 8px; border: 1.5px solid var(--line); border-radius: 8px; background: rgba(255,255,255,.85); color: var(--ink); }
-    .mini-btn { font-family: inherit; font-size: 0.82rem; border-radius: 999px; padding: 6px 12px; cursor: pointer;
-      background: rgba(255,255,255,.6); border: 1.5px solid rgba(255,255,255,.9); color: var(--ink);
-      box-shadow: 0 4px 10px rgba(88,99,172,.12); }
-    .mini-btn.warn { color: #e84a72; border-color: rgba(232,74,114,.4); }
-    .mini-btn.ok { color: var(--sky); border-color: rgba(58,139,255,.4); }
-    .banned-row td { opacity: .5; }
-    .banned-tag { color: #e84a72; font-size: 0.78rem; }
-    .ev-list { list-style: none; max-height: 300px; overflow-y: auto; }
-    .ev-list li { padding: 7px 4px; border-bottom: 1px dashed var(--line); font-size: 0.88rem; color: var(--ink); }
-    .ev-list .tm { color: var(--ink-soft); font-size: 0.78rem; margin-left: 6px; }
-    .toolbar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 12px; }
-    .toolbar input { flex: 1; min-width: 180px; }
-    #err-box { color: #e84a72; text-align: center; margin: 8px 0; display: none; }
-    @media (max-width: 640px) { .u-table .hide-m { display: none; } }
+    :root {
+      --bg: #0e1320; --panel: #161d2e; --panel2: #1b2436; --line: #263048;
+      --txt: #d9e1f2; --dim: #7c88a6; --acc: #4f8cff; --ok: #2ecc8f; --warn: #ff5470; --amber: #f2b33d;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--txt); min-height: 100vh;
+      font-family: "Segoe UI", "Malgun Gothic", system-ui, sans-serif; font-size: 14px; }
+    a { color: var(--acc); text-decoration: none; }
+    .wrap { max-width: 1080px; margin: 0 auto; padding: 0 20px 60px; }
+
+    /* 상단 바 */
+    .topbar { display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 20px; border-bottom: 1px solid var(--line); background: var(--panel);
+      position: sticky; top: 0; z-index: 10; }
+    .topbar .brand { font-weight: 700; letter-spacing: 2px; font-size: 15px; }
+    .topbar .brand b { color: var(--acc); }
+    .topbar .who { color: var(--dim); font-size: 12px; display: flex; gap: 12px; align-items: center; }
+
+    /* 로그인 */
+    .login-box { max-width: 360px; margin: 12vh auto 0; background: var(--panel);
+      border: 1px solid var(--line); border-radius: 10px; padding: 28px 26px; }
+    .login-box h1 { font-size: 16px; letter-spacing: 2px; margin-bottom: 4px; }
+    .login-box p { color: var(--dim); font-size: 12px; margin-bottom: 18px; }
+    .login-box label { display: block; color: var(--dim); font-size: 12px; margin: 12px 0 5px; }
+    .login-box input { width: 100%; background: var(--bg); border: 1px solid var(--line); border-radius: 6px;
+      color: var(--txt); padding: 10px 12px; font-size: 14px; font-family: inherit; }
+    .login-box input:focus { outline: none; border-color: var(--acc); }
+    .login-box button { width: 100%; margin-top: 20px; background: var(--acc); color: #fff; border: none;
+      border-radius: 6px; padding: 11px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; }
+    .login-box button:hover { filter: brightness(1.1); }
+    .login-box button:disabled { opacity: .5; cursor: default; }
+    #login-err { color: var(--warn); font-size: 12px; margin-top: 12px; min-height: 1.2em; }
+
+    /* 대시보드 */
+    h2 { font-size: 13px; letter-spacing: 1.5px; color: var(--dim); text-transform: uppercase;
+      margin: 30px 0 12px; font-weight: 600; }
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+    .stat { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; }
+    .stat .n { font-size: 24px; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .stat .l { color: var(--dim); font-size: 11.5px; margin-top: 3px; }
+    .stat.hot .n { color: var(--acc); }
+
+    .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 16px; }
+    .toolbar { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; }
+    .toolbar input { flex: 1; background: var(--bg); border: 1px solid var(--line); border-radius: 6px;
+      color: var(--txt); padding: 8px 12px; font-size: 13px; font-family: inherit; }
+    .toolbar input:focus { outline: none; border-color: var(--acc); }
+    .btn { background: var(--panel2); border: 1px solid var(--line); border-radius: 6px; color: var(--txt);
+      padding: 7px 14px; font-size: 12.5px; cursor: pointer; font-family: inherit; white-space: nowrap; }
+    .btn:hover { border-color: var(--acc); }
+    .btn.ok { color: var(--ok); }
+    .btn.warn { color: var(--warn); }
+    .btn:disabled { opacity: .45; cursor: default; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { text-align: left; color: var(--dim); font-weight: 600; font-size: 11.5px; text-transform: uppercase;
+      letter-spacing: .5px; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+    td { padding: 10px; border-bottom: 1px solid rgba(38, 48, 72, .55); vertical-align: middle;
+      font-variant-numeric: tabular-nums; }
+    tr:hover td { background: rgba(79, 140, 255, .04); }
+    td .name { color: var(--dim); font-size: 11.5px; display: block; }
+    td input.g { width: 72px; background: var(--bg); border: 1px solid var(--line); border-radius: 6px;
+      color: var(--txt); padding: 6px 8px; font-size: 12.5px; font-family: inherit; }
+    .tag { display: inline-block; font-size: 10.5px; padding: 2px 8px; border-radius: 4px; margin-left: 6px; }
+    .tag.ban { background: rgba(255, 84, 112, .15); color: var(--warn); }
+    .tag.gem { background: rgba(242, 179, 61, .15); color: var(--amber); }
+    .banned td { opacity: .45; }
+
+    .feed { list-style: none; max-height: 340px; overflow-y: auto; }
+    .feed li { display: flex; gap: 10px; align-items: baseline; padding: 8px 6px;
+      border-bottom: 1px solid rgba(38, 48, 72, .55); font-size: 13px; }
+    .feed .k { flex: none; width: 96px; font-size: 11.5px; font-weight: 600; }
+    .feed .k.signup { color: var(--ok); } .feed .k.unlock { color: var(--acc); }
+    .feed .k.grant { color: var(--amber); } .feed .k.ban { color: var(--warn); } .feed .k.unban { color: var(--dim); }
+    .feed .tm { margin-left: auto; color: var(--dim); font-size: 11.5px; flex: none; }
+    .empty { color: var(--dim); padding: 14px 6px; }
+    #dash-err { color: var(--warn); font-size: 12.5px; margin: 10px 0 0; min-height: 1.2em; }
+    .hint { color: var(--dim); font-size: 11.5px; margin-top: 10px; line-height: 1.6; }
+    @media (max-width: 640px) { .hide-m { display: none; } }
   </style>
 </head>
 <body>
-  <div id="site-header"></div>
-  <main>
-    <section class="hero">
-      <h1>🛠 goblub 관리자</h1>
-      <p>가입자 · 이용 현황 · 젬리 지급 · 이용 제한</p>
-    </section>
+  <!-- 로그인 -->
+  <div id="login-view">
+    <div class="login-box">
+      <h1>⬡ GOBLUB <b style="color:var(--acc)">ADMIN</b></h1>
+      <p>Authorized personnel only</p>
+      <label for="in-id">ID</label>
+      <input id="in-id" autocomplete="username" />
+      <label for="in-pw">Password</label>
+      <input id="in-pw" type="password" autocomplete="current-password" />
+      <button id="btn-login">로그인</button>
+      <p id="login-err"></p>
+    </div>
+  </div>
 
-    <section class="panel" id="login-panel" style="max-width:520px; text-align:center">
-      <h2>🔑 관리자 로그인</h2>
-      <p class="result-desc" style="margin:8px 0 18px">등록된 관리자 구글 계정으로만 접근할 수 있어요.</p>
-      <div id="gsi-btn" style="display:flex; justify-content:center"></div>
-      <p id="err-box"></p>
-    </section>
+  <!-- 콘솔 -->
+  <div id="console-view" style="display:none">
+    <div class="topbar">
+      <span class="brand">⬡ GOBLUB <b>ADMIN</b> CONSOLE</span>
+      <span class="who"><span id="clock"></span><button class="btn" id="btn-refresh">새로고침</button><button class="btn" id="btn-logout">로그아웃</button></span>
+    </div>
+    <div class="wrap">
+      <h2>Overview</h2>
+      <div class="stat-grid">
+        <div class="stat hot"><div class="n" id="st-total">–</div><div class="l">총 가입자</div></div>
+        <div class="stat"><div class="n" id="st-today">–</div><div class="l">오늘 가입</div></div>
+        <div class="stat"><div class="n" id="st-week">–</div><div class="l">최근 7일 가입</div></div>
+        <div class="stat"><div class="n" id="st-unlock-today">–</div><div class="l">오늘 리포트 발급</div></div>
+        <div class="stat"><div class="n" id="st-unlock-week">–</div><div class="l">7일 리포트 발급</div></div>
+      </div>
+      <p id="dash-err"></p>
 
-    <div id="dash" style="display:none">
-      <section class="panel">
+      <h2>Users <span id="u-count" style="color:var(--acc)"></span></h2>
+      <div class="panel">
         <div class="toolbar">
-          <h2 style="margin:0; flex:1">📊 현황</h2>
-          <button class="mini-btn" id="btn-refresh">🔄 새로고침</button>
-        </div>
-        <div class="stat-grid">
-          <div class="stat"><span class="n" id="st-total">-</span><span class="l">총 가입자</span></div>
-          <div class="stat"><span class="n" id="st-today">-</span><span class="l">오늘 가입</span></div>
-          <div class="stat"><span class="n" id="st-week">-</span><span class="l">최근 7일 가입</span></div>
-          <div class="stat"><span class="n" id="st-unlock-today">-</span><span class="l">오늘 리포트 발급</span></div>
-          <div class="stat"><span class="n" id="st-unlock-week">-</span><span class="l">7일 리포트 발급</span></div>
-        </div>
-      </section>
-
-      <section class="panel">
-        <h2>👥 회원 (<span id="u-count">0</span>)</h2>
-        <div class="toolbar">
-          <input type="text" id="u-search" placeholder="이메일·이름 검색" />
+          <input type="text" id="u-search" placeholder="이메일·이름 검색…" />
         </div>
         <div style="overflow-x:auto">
-          <table class="u-table">
+          <table>
             <thead><tr><th>회원</th><th class="hide-m">가입</th><th class="hide-m">최근 접속</th><th>대기 젬리</th><th>젬리 지급</th><th>관리</th></tr></thead>
-            <tbody id="u-body"></tbody>
+            <tbody id="u-body"><tr><td colspan="6" class="empty">불러오는 중…</td></tr></tbody>
           </table>
         </div>
-        <p class="fine-print" style="text-align:left; margin-top:10px">💡 지급한 젬리는 해당 유저가 <b>다음에 로그인할 때</b> 지갑에 들어가요. · 강퇴된 계정은 다음 로그인 시 차단돼요.</p>
-      </section>
+        <p class="hint">지급한 젬리는 해당 유저가 <b>다음 로그인 시</b> 지갑에 들어갑니다 · 강퇴된 계정은 다음 로그인부터 차단됩니다</p>
+      </div>
 
-      <section class="panel">
-        <h2>🕘 최근 활동</h2>
-        <ul class="ev-list" id="ev-list"></ul>
-      </section>
+      <h2>Activity</h2>
+      <div class="panel">
+        <ul class="feed" id="ev-list"><li class="empty">불러오는 중…</li></ul>
+      </div>
     </div>
-  </main>
-  <div id="site-footer"></div>
-  <script src="js/common.js?v=2" data-root="."></script>
-  <script src="js/auth.js?v=2"></script>
+  </div>
+
   <script>
     (function () {
       var $ = function (id) { return document.getElementById(id); };
       var API = "https://goblub.vercel.app/api/admin";
-      var tok = null;
+      var cred = null;
       var allUsers = [];
 
-      function err(msg) { var e = $("err-box"); e.textContent = msg; e.style.display = "block"; }
+      try { cred = JSON.parse(sessionStorage.getItem("gb_admin") || "null"); } catch (e) {}
 
-      function call(body, cb) {
-        body.id_token = tok;
+      function call(body, cb, onFail) {
+        body.admin_id = cred.id; body.admin_pw = cred.pw;
         fetch(API, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) })
           .then(function (r) { return r.json().then(function (j) { return { s: r.status, j: j }; }); })
           .then(function (x) {
-            if (x.s === 401) { err("로그인이 만료됐어요 — 새로고침 후 다시 로그인해 주세요."); $("dash").style.display = "none"; $("login-panel").style.display = "block"; return; }
-            if (x.s === 403) { err("관리자 계정이 아니에요."); return; }
-            if (x.s === 501) { err("서버 저장소(KV)가 아직 연동되지 않았어요 — Vercel에서 Upstash를 연결해 주세요."); return; }
-            if (!x.j || !x.j.ok) { err("요청 실패: " + (x.j && x.j.error || x.s)); return; }
+            if (x.s === 403) { if (onFail) onFail("아이디 또는 암호가 올바르지 않습니다."); else logout(); return; }
+            if (x.s === 429) { (onFail || dashErr)("시도가 너무 많습니다 — 10분 후 다시."); return; }
+            if (x.s === 501) { (onFail || dashErr)("서버 저장소(KV)가 연동되지 않았습니다."); return; }
+            if (!x.j || !x.j.ok) { (onFail || dashErr)("요청 실패: " + (x.j && x.j.error || x.s)); return; }
             cb(x.j);
           })
-          .catch(function () { err("네트워크 오류 — 잠시 후 다시."); });
+          .catch(function () { (onFail || dashErr)("네트워크 오류 — 잠시 후 다시 시도하세요."); });
       }
+      function dashErr(m) { $("dash-err").textContent = m; setTimeout(function () { $("dash-err").textContent = ""; }, 5000); }
 
       function fmt(t) {
-        if (!t) return "-";
+        if (!t) return "–";
         var d = new Date(t);
         return (d.getMonth() + 1) + "/" + d.getDate() + " " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);
       }
@@ -128,11 +177,12 @@
           $("st-week").textContent = j.signup7;
           $("st-unlock-today").textContent = j.unlockToday;
           $("st-unlock-week").textContent = j.unlock7;
-          var names = { signup: "🙋 가입", unlock: "📜 리포트 발급", grant: "🍬 젬리 지급", ban: "⛔ 강퇴", unban: "✅ 강퇴 해제" };
+          var names = { signup: "SIGNUP", unlock: "REPORT", grant: "GRANT", ban: "BAN", unban: "UNBAN" };
           $("ev-list").innerHTML = (j.events || []).map(function (e) {
-            return "<li>" + (names[e.t] || e.t) + " — " + (e.email || "") +
-              (e.n ? " (+" + e.n + ")" : "") + '<span class="tm">' + fmt(e.at) + "</span></li>";
-          }).join("") || '<li style="color:var(--ink-soft)">아직 활동이 없어요.</li>';
+            return '<li><span class="k ' + e.t + '">' + (names[e.t] || e.t.toUpperCase()) + "</span>" +
+              "<span>" + (e.email || "") + (e.n ? ' <span class="tag gem">+' + e.n + "</span>" : "") + "</span>" +
+              '<span class="tm">' + fmt(e.at) + "</span></li>";
+          }).join("") || '<li class="empty">아직 활동이 없습니다.</li>';
         });
       }
 
@@ -141,28 +191,59 @@
         var list = allUsers.filter(function (u) {
           return !q || (u.email || "").toLowerCase().indexOf(q) >= 0 || (u.name || "").toLowerCase().indexOf(q) >= 0;
         });
-        $("u-count").textContent = allUsers.length;
-        $("u-body").innerHTML = list.map(function (u, i) {
-          return '<tr class="' + (u.banned ? "banned-row" : "") + '" data-i="' + i + '">' +
-            '<td><span class="em">' + (u.email || "-") + '</span><span class="sub2">' + (u.name || "") +
-            (u.banned ? ' <span class="banned-tag">⛔ 강퇴됨</span>' : "") + "</span></td>" +
+        $("u-count").textContent = "(" + allUsers.length + ")";
+        $("u-body").innerHTML = list.map(function (u) {
+          return '<tr class="' + (u.banned ? "banned" : "") + '">' +
+            "<td>" + (u.email || "–") + (u.banned ? '<span class="tag ban">BANNED</span>' : "") +
+            '<span class="name">' + (u.name || "") + "</span></td>" +
             '<td class="hide-m">' + fmt(u.created) + "</td>" +
             '<td class="hide-m">' + fmt(u.seen) + "</td>" +
-            "<td>🍬 " + (u.gems || 0) + "</td>" +
+            "<td>" + (u.gems || 0) + "</td>" +
             '<td><input class="g" type="number" min="1" placeholder="개수" data-sub="' + u.sub + '" /> ' +
-            '<button class="mini-btn ok btn-grant" data-sub="' + u.sub + '">지급</button></td>' +
+            '<button class="btn ok btn-grant" data-sub="' + u.sub + '">지급</button></td>' +
             "<td>" + (u.banned
-              ? '<button class="mini-btn ok btn-unban" data-sub="' + u.sub + '">해제</button>'
-              : '<button class="mini-btn warn btn-ban" data-sub="' + u.sub + '" data-em="' + (u.email || "") + '">강퇴</button>') + "</td>" +
+              ? '<button class="btn ok btn-unban" data-sub="' + u.sub + '">해제</button>'
+              : '<button class="btn warn btn-ban" data-sub="' + u.sub + '" data-em="' + (u.email || "") + '">강퇴</button>') + "</td>" +
             "</tr>";
-        }).join("") || '<tr><td colspan="6" style="color:var(--ink-soft)">회원이 없어요.</td></tr>';
+        }).join("") || '<tr><td colspan="6" class="empty">회원이 없습니다.</td></tr>';
       }
 
       function loadUsers() {
         call({ action: "users" }, function (j) { allUsers = j.users || []; renderUsers(); });
       }
 
-      $("u-search") && ($("u-search").oninput = function () { renderUsers(); });
+      function openConsole() {
+        $("login-view").style.display = "none";
+        $("console-view").style.display = "block";
+        loadStats(); loadUsers();
+      }
+      function logout() {
+        cred = null;
+        try { sessionStorage.removeItem("gb_admin"); } catch (e) {}
+        $("console-view").style.display = "none";
+        $("login-view").style.display = "block";
+        $("login-err").textContent = "";
+      }
+
+      // ---- 로그인 ----
+      function doLogin() {
+        var id = $("in-id").value.trim(), pw = $("in-pw").value;
+        if (!id || !pw) { $("login-err").textContent = "아이디와 암호를 입력하세요."; return; }
+        var b = $("btn-login"); b.disabled = true;
+        cred = { id: id, pw: pw };
+        call({ action: "stats" }, function () {
+          b.disabled = false;
+          try { sessionStorage.setItem("gb_admin", JSON.stringify(cred)); } catch (e) {}
+          openConsole();
+        }, function (msg) {
+          b.disabled = false; cred = null;
+          $("login-err").textContent = msg;
+        });
+      }
+      $("btn-login").onclick = doLogin;
+      $("in-pw").addEventListener("keydown", function (e) { if (e.key === "Enter") doLogin(); });
+
+      // ---- 액션 ----
       document.addEventListener("click", function (e) {
         var t = e.target;
         if (t.classList.contains("btn-grant")) {
@@ -176,28 +257,26 @@
           });
         }
         if (t.classList.contains("btn-ban")) {
-          if (!confirm((t.getAttribute("data-em") || "이 회원") + " 을(를) 강퇴할까요?\n다음 로그인부터 차단돼요.")) return;
+          if (!confirm((t.getAttribute("data-em") || "이 회원") + " 을(를) 강퇴할까요?\n다음 로그인부터 차단됩니다.")) return;
           call({ action: "ban", sub: t.getAttribute("data-sub") }, function () { loadUsers(); loadStats(); });
         }
         if (t.classList.contains("btn-unban")) {
           call({ action: "unban", sub: t.getAttribute("data-sub") }, function () { loadUsers(); loadStats(); });
         }
       });
+      $("u-search").oninput = renderUsers;
       $("btn-refresh").onclick = function () { loadStats(); loadUsers(); };
+      $("btn-logout").onclick = logout;
 
-      function openDash() {
-        $("login-panel").style.display = "none";
-        $("dash").style.display = "block";
-        loadStats(); loadUsers();
-      }
+      // 시계
+      setInterval(function () {
+        var d = new Date();
+        var el = $("clock");
+        if (el) el.textContent = d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2) +
+          " " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);
+      }, 1000);
 
-      // 로그인 흐름: GIS 버튼 → 토큰 확보 → 대시보드 (관리자 여부는 서버가 판정)
-      GoblubAuth.renderButton($("gsi-btn"), function (u) {
-        tok = u.tok;
-        openDash();
-      });
-      var u0 = GoblubAuth.user();
-      if (u0 && u0.tok) { tok = u0.tok; openDash(); }
+      if (cred && cred.id) openConsole();
     })();
   </script>
 </body>
