@@ -99,6 +99,8 @@
   <script src="js/saju-deep.js"></script>
   <script src="js/dosa.js?v=2"></script>
   <script src="js/feed.js?v=4"></script>
+  <script src="js/goblub-art.js"></script>
+  <script src="js/report-ui.js?v=1"></script>
   <script>
     (function () {
       var $ = function (id) { return document.getElementById(id); };
@@ -157,23 +159,17 @@
         else { $("btn-unlock").style.display = "none"; $("need-more").style.display = "block"; $("need-gap").textContent = COST - bal; }
       }
 
-      // ◆ 소제목 / ▸ 항목 줄 / 『강조』 를 꾸며서 렌더
-      function renderBody(el, text) {
-        var html = esc(text.trim()).split("\n").map(function (line) {
-          var t = line.trim();
-          if (/^◆/.test(t)) return '<span class="sub">' + t + "</span>";
-          if (/^▸/.test(t)) return '<span class="kv">' + t.replace(/^▸\s*/, "") + "</span>";
-          return line;
-        }).join("\n");
-        html = html.replace(/『([^『』]{1,60})』/g, '<b class="hl">$1</b>');
-        el.innerHTML = html;
-      }
-
       function openReport() {
         $("gate").style.display = "none";
         $("report-panel").style.display = "block";
         var wrap = $("rep-secs");
         if (!wrap.childElementCount) {
+          var dash = document.createElement("div");
+          wrap.appendChild(dash);
+          ReportUI.dashboard(dash, base, deep);
+          var tl = document.createElement("div");
+          wrap.appendChild(tl);
+          ReportUI.timeline(tl, deep);
           PARTS.forEach(function (p) {
             var sec = document.createElement("div");
             sec.className = "rep-sec pending"; sec.id = "sec-" + p.id;
@@ -218,7 +214,7 @@
             if (signed(buffer)) {
               p.done = true; p.text = buffer; paid = false;
               st.textContent = fromCache ? "완성 (저장된 권)" : "완성";
-              renderBody(body, buffer);
+              ReportUI.render(body, buffer, { animate: !fromCache });
               setTimeout(function () { genPart(i + 1); }, fromCache ? 50 : 800);
             } else {
               if (failSoft()) return;
