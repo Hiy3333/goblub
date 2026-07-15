@@ -164,9 +164,19 @@ export default async function handler(req, res) {
   if (!PARTS[part]) return res.status(400).json({ error: "bad_part" });
   const deep = sanitizeDeep(req.body.deep);
 
+  // 손님 정보(이름·특히 궁금한 것) — 있으면 집중 답변 유도
+  const name = typeof req.body.name === "string" ? req.body.name.slice(0, 20).replace(/[<>]/g, "") : "";
+  const focus = typeof req.body.focus === "string" ? req.body.focus.slice(0, 80).replace(/[<>]/g, "") : "";
+  let guestBlock = "";
+  if (name || focus) {
+    guestBlock = "\n\n[손님 정보]\n";
+    if (name) guestBlock += `이름: ${name} — 글 속에서 가끔 이름을 자연스럽게 불러 친밀하게. 남발 금지(파트당 1~2회).\n`;
+    if (focus) guestBlock += `특히 궁금해하는 것: ${focus} — 이 파트가 이 관심사와 닿는 대목에서는 한 발 더 깊이 파고들어 직접적으로 답해라. 단, 이 파트 본래 주제를 벗어나지 말고 데이터 근거는 그대로 유지.\n`;
+  }
+
   try {
     const wrote = await streamGemini(res, {
-      system: PERSONA + "\n\n" + PARTS[part],
+      system: PERSONA + guestBlock + "\n\n" + PARTS[part],
       user:
         "다음은 만세력 엔진이 계산한 사주 팩트 데이터다. base는 원국, deep은 신살·합충·용신·대운·세운 팩트. 이 데이터만 근거로 이번 파트를 집필하라.\n" +
         JSON.stringify({ base: saju, deep }),
