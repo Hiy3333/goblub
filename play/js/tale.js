@@ -124,7 +124,7 @@ padding:12px 14px;font-family:inherit;font-size:.98rem;cursor:pointer;text-align
     function setBg(key, walk) {
       if (key === "black") { bgA.classList.remove("on"); bgB.classList.remove("on"); return; }
       var el = useA ? bgA : bgB, other = useA ? bgB : bgA;
-      el.style.backgroundImage = "url('" + IMG + key + ".webp')";
+      el.style.backgroundImage = "url('" + IMG + key + ".webp?v=2')";
       el.classList.remove("walk"); void el.offsetWidth;
       if (walk) el.classList.add("walk");
       el.classList.add("on"); other.classList.remove("on");
