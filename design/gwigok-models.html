@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>귀곡 — 모델별 비교</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #08060e; color: #e6dff5; font-family: "Malgun Gothic", sans-serif; padding: 26px 14px 60px; }
+    h1 { text-align: center; font-size: 1.25rem; margin-bottom: 4px; }
+    .sub { text-align: center; color: #8a7fb0; font-size: .88rem; margin-bottom: 26px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; max-width: 1200px; margin: 0 auto; }
+    .m { background: #120e22; border: 1px solid #2c2450; border-radius: 14px; overflow: hidden; }
+    .m img { width: 100%; display: block; }
+    .m .info { padding: 13px 16px 16px; }
+    .m h2 { font-size: 1.02rem; margin-bottom: 5px; }
+    .m .badge { display: inline-block; background: #2a2258; border-radius: 999px; padding: 2px 10px; font-size: .74rem; color: #cabfef; margin-bottom: 6px; }
+    .m p { color: #9a8fc4; font-size: .84rem; line-height: 1.55; }
+    .m .id { color: #6a5f8c; font-size: .74rem; margin-top: 6px; font-family: monospace; }
+  </style>
+</head>
+<body>
+  <h1>🕯 귀곡 — 3개 모델 비교</h1>
+  <p class="sub">동일 프롬프트 · 얼굴 없는 저승사자 (흰 눈) · 9:16 실사 호러</p>
+  <div class="grid">
+    <div class="m">
+      <img src="img/cmp-seedream.webp" alt="Seedream 5.0 Pro" />
+      <div class="info">
+        <span class="badge">Bytedance</span>
+        <h2>① Seedream 5.0 Pro</h2>
+        <p>2K · 최고 해상도(1536×2720). 지시 이해·디테일 강점.</p>
+        <div class="id">seedream_v5_pro</div>
+      </div>
+    </div>
+    <div class="m">
+      <img src="img/cmp-soul.webp" alt="Higgsfield Soul 2.0" />
+      <div class="info">
+        <span class="badge">Higgsfield</span>
+        <h2>② Soul 2.0</h2>
+        <p>2K(1152×2048). 실사 인물·영화 질감 특화 — 현재 사이트 적용 계열.</p>
+        <div class="id">soul_2</div>
+      </div>
+    </div>
+    <div class="m">
+      <img src="img/cmp-gpt.webp" alt="GPT Image 2" onerror="this.src='img/cmp-gpt-low.webp'" />
+      <div class="info">
+        <span class="badge">OpenAI</span>
+        <h2>③ GPT Image 2</h2>
+        <p>2K·high 품질. (고품질 버전 반영 — 로딩 실패 시 저품질 임시 표시)</p>
+        <div class="id">gpt_image_2</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
