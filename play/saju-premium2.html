@@ -52,7 +52,7 @@
       <span class="prem-badge">✨ PREMIUM 2탄</span>
       <span class="prem-emoji">💰</span>
       <h1 style="font-size:1.5rem; margin-bottom:6px">심층 리포트 — 재물 &amp; 대운</h1>
-      <p class="result-desc">고블럽 도사의 <b>속마음 직설 모드</b> 두 번째 두루마리.<br>돈그릇·대박 타이밍부터 억까가 끝나는 시점까지 총 4편, 1만 자급.</p>
+      <p class="result-desc">어두운 숲의 주인, <b>귀곡(鬼哭) 선생</b>의 두 번째 두루마리.<br>돈그릇·대박 타이밍부터 억까가 끝나는 시점까지 총 4편, 1만 자급.</p>
 
       <ul class="vol-list">
         <li><b>📒 1권 ①</b> 네 팔자에 박힌 돈그릇의 크기<span>돈그릇 · 돈이 들어오는 파이프라인 · 돈과 운명의 관계</span></li>
@@ -114,7 +114,7 @@
 
       function djb2(s) { var h = 5381; for (var i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0; return (h >>> 0).toString(36); }
       function birth() { try { var b = JSON.parse(localStorage.getItem("goblub_birth")); return (b && b.y) ? b : null; } catch (e) { return null; } }
-      function signed(t) { return /고블럽 도사\s*$/.test((t || "").trim()); }
+      function signed(t) { return /(고블럽 도사|귀곡 선생)\s*$/.test((t || "").trim()); }
       function esc(s) { return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
       function paidKey() { return "goblub_prem3_paid_" + baseKey; }
       function unlocked() {
@@ -176,8 +176,8 @@
       function setProgress(i, writing) {
         var done = PARTS.filter(function (p) { return p.done; }).length;
         $("rep-progress").textContent = writing
-          ? "🧙 도사님이 " + (i + 1) + "/4권을 집필 중… (완성된 권은 위에서 바로 읽으세요)"
-          : (done === 4 ? "🧙 4권 완성! 이 리포트는 저장되어 언제든 다시 볼 수 있다." : "");
+          ? "🕯 귀곡 선생이 " + (i + 1) + "/4권을 쓰고 있다… (완성된 권은 위에서 바로 읽으세요)"
+          : (done === 4 ? "🕯 4권 완성. 이 두루마리는 저장되어 언제든 다시 볼 수 있다." : "");
         if (done === 4) { $("btn-sum").style.display = "inline-block"; $("link-next").style.display = "inline-block"; }
       }
 
@@ -192,7 +192,7 @@
         var buffer = "";
         function failSoft() {
           if (attempt >= 1) return false;
-          st.textContent = "🔁 도사님이 붓을 바꿔 다시 쓰는 중…";
+          st.textContent = "🔁 귀곡 선생이 붓을 바꿔 다시 쓰는 중…";
           try { localStorage.removeItem("goblub_rep_cd"); } catch (e) {}
           setTimeout(function () { genPart(i, 1); }, 3000);
           return true;
@@ -307,7 +307,7 @@
         g.strokeStyle = "rgba(150,160,205,.35)"; g.lineWidth = 1.5;
         g.beginPath(); g.moveTo(110, 412); g.lineTo(W - 110, 412); g.stroke();
         g.fillStyle = "#ff5a76"; g.font = "30px 'Jua','Malgun Gothic',sans-serif";
-        g.fillText("🧙 도사가 콕 집은 대목", W / 2, 468);
+        g.fillText("🕯 귀곡 선생이 콕 집은 대목", W / 2, 468);
         var hs = collectHighlights();
         var y = 528;
         g.textAlign = "left";
@@ -324,7 +324,7 @@
         });
         g.textAlign = "center";
         g.fillStyle = "#7079a8"; g.font = "26px 'Jua','Malgun Gothic',sans-serif";
-        g.fillText("— 고블럽 도사", W / 2, 1062);
+        g.fillText("— 귀곡 선생", W / 2, 1062);
         g.fillStyle = "#2b3057"; g.font = "28px 'Jua','Malgun Gothic',sans-serif";
         g.fillText("나도 받아보기 ▶ goblub.vercel.app", W / 2, 1176);
         g.fillStyle = "#3a8bff"; g.font = "24px 'Jua','Malgun Gothic',sans-serif";
