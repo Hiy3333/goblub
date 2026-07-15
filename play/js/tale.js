@@ -1,7 +1,9 @@
-// 이계 인트로 스토리 엔진 — 프리미엄 리포트 진입 연출 (고블럽 → 흡입 → 숲 → 천막 → 귀곡 선생)
+// 이계 인트로 스토리 엔진 — 프리미엄 리포트 진입 연출 (고블럽 → 흡입 → 숲 → 천막 → 저승사자 → 점사 영상)
 // window.GoblubTale = { start({ base, deep, onEnter, onExit }) }
 (function () {
   var IMG = "img/tale/";
+  var IMGV = "?v=3";                 // 이미지 캐시버스트(저승사자 교체분)
+  var RITUAL_VID = IMG + "ritual.mp4"; // 점사 영상(저승사자가 명부를 읽는 5초)
   var GAN_H = { 갑: "甲", 을: "乙", 병: "丙", 정: "丁", 무: "戊", 기: "己", 경: "庚", 신: "辛", 임: "壬", 계: "癸" };
   var JI_H = { 자: "子", 축: "丑", 인: "寅", 묘: "卯", 진: "辰", 사: "巳", 오: "午", 미: "未", 신: "申", 유: "酉", 술: "戌", 해: "亥" };
 
@@ -20,7 +22,7 @@ opacity:0;transition:transform 2.1s cubic-bezier(.5,0,.8,.4),opacity .5s}\
 .tale-vortex.on{transform:translate(-50%,-50%) scale(1) rotate(720deg);opacity:1;transition:transform 2.1s cubic-bezier(.5,0,.8,.4),opacity .5s,rotate 0s}\
 .tale.shake{animation:tale-shake .5s ease 3}\
 @keyframes tale-shake{0%,100%{transform:translate(0,0)}25%{transform:translate(-8px,4px)}50%{transform:translate(7px,-5px)}75%{transform:translate(-5px,-3px)}}\
-.tale-skip{position:absolute;top:14px;right:14px;z-index:5;background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.28);color:rgba(255,255,255,.75);\
+.tale-skip{position:absolute;top:14px;right:14px;z-index:9;background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.28);color:rgba(255,255,255,.75);\
 border-radius:999px;padding:7px 15px;font-family:inherit;font-size:.82rem;cursor:pointer;backdrop-filter:blur(4px)}\
 .tale-box{position:absolute;left:50%;bottom:max(20px,env(safe-area-inset-bottom));transform:translateX(-50%);width:min(92vw,560px);z-index:4;\
 background:rgba(8,6,18,.82);border:1px solid rgba(140,110,220,.35);border-radius:16px;padding:16px 18px 14px;backdrop-filter:blur(6px);\
@@ -36,6 +38,11 @@ box-shadow:0 10px 40px rgba(0,0,0,.6)}\
 padding:12px 14px;font-family:inherit;font-size:.98rem;cursor:pointer;text-align:left;transition:background .15s,border-color .15s}\
 .tale-choices button:hover{background:rgba(60,40,120,.9);border-color:#b18cff}\
 .tale.fadeout{opacity:0;transition:opacity 1s}\
+.tale-vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000;opacity:0;transition:opacity .8s;z-index:6;pointer-events:none}\
+.tale-vid.on{opacity:1}\
+.tale-vcap{position:absolute;left:50%;bottom:12%;transform:translateX(-50%);z-index:7;color:#e9e2ff;font-family:'Jua','Malgun Gothic',sans-serif;font-size:1rem;letter-spacing:2px;text-shadow:0 0 14px rgba(0,0,0,.9);opacity:0;transition:opacity .6s;text-align:center;pointer-events:none}\
+.tale-vcap.on{opacity:1}\
+.tale-vcap .dot{animation:tale-blink 1.1s infinite}\
 @media (prefers-reduced-motion:reduce){.tale-bg,.tale-gob,.tale-vortex{transition-duration:.01s!important;animation:none!important}}";
   var st = document.createElement("style");
   st.textContent = css;
@@ -87,7 +94,7 @@ padding:12px 14px;font-family:inherit;font-size:.98rem;cursor:pointer;text-align
       { id: 16, bg: "gwigok", name: "귀곡 선생", cls: "n-gwi", text: "…앉거라." },
       { id: 17, name: "귀곡 선생", cls: "n-gwi", text: "[" + hj(ilju) + "(" + ilju + ")] 일주.\n" + strengthLine },
       { id: 18, name: "귀곡 선생", cls: "n-gwi", text: miss ? ("…오행에 [" + miss + "]이 비었어.\n그래서 " + (missFlavor[miss] || "늘 허전했겠지") + ".") : "…팔자의 결이 또렷하군.", },
-      { id: 19, name: "귀곡 선생", cls: "n-gwi", text: "내 이름은 [귀곡(鬼哭)].\n고블럽들의 스승이자, 이 숲의 주인이다." },
+      { id: 19, name: "귀곡 선생", cls: "n-gwi", text: "내 이름은 [귀곡(鬼哭)].\n산 자의 팔자를 읽는 저승의 사자다." },
       { id: 20, name: "귀곡 선생", cls: "n-gwi", text: "네 팔자… 보겠나?", choices: [
         { label: "🙏 보여주세요", enter: true },
         { label: "❓ 당신은… 대체 누구죠?", goto: 21 }
@@ -109,6 +116,8 @@ padding:12px 14px;font-family:inherit;font-size:.98rem;cursor:pointer;text-align
       '<div class="tale-vig"></div>' +
       '<div class="tale-gob">' + (window.GoblubArt ? GoblubArt.svg(150) : '<span style="font-size:110px">👾</span>') + "</div>" +
       '<div class="tale-vortex"></div>' +
+      '<video class="tale-vid" playsinline preload="auto"></video>' +
+      '<p class="tale-vcap"></p>' +
       '<button class="tale-skip">건너뛰기 ➤</button>' +
       '<div class="tale-box"><p class="tale-name"></p><p class="tale-text"></p>' +
       '<div class="tale-next">▼</div><div class="tale-choices"></div></div>';
@@ -119,12 +128,33 @@ padding:12px 14px;font-family:inherit;font-size:.98rem;cursor:pointer;text-align
     var gob = root.querySelector(".tale-gob"), vortex = root.querySelector(".tale-vortex");
     var nameEl = root.querySelector(".tale-name"), textEl = root.querySelector(".tale-text");
     var nextEl = root.querySelector(".tale-next"), chEl = root.querySelector(".tale-choices");
-    var typing = null, fullText = "", canTap = false, ended = false;
+    var vid = root.querySelector(".tale-vid"), vcap = root.querySelector(".tale-vcap");
+    var box = root.querySelector(".tale-box");
+    var typing = null, fullText = "", canTap = false, ended = false, ritualDone = false;
+
+    // 점사 영상: 저승사자가 명부를 읽는 5초 → 끝나면 리포트로 진입
+    function playRitual() {
+      if (ritualDone) { end("enter"); return; }
+      ritualDone = true;
+      box.style.display = "none";
+      root.querySelector(".tale-skip").textContent = "건너뛰기 ➤";
+      var go = false;
+      function proceed() { if (go) return; go = true; end("enter"); }
+      vid.src = RITUAL_VID;
+      vid.onended = proceed;
+      vid.onerror = function () { end("enter"); }; // 영상 없으면 조용히 진입
+      var p = vid.play();
+      if (p && p.catch) p.catch(function () { vid.muted = true; vid.play().catch(function () { end("enter"); }); });
+      setTimeout(function () { vid.classList.add("on"); }, 30);
+      setTimeout(function () { vcap.innerHTML = '🕯 귀곡이 네 명부(冥府)를 펼친다<span class="dot">…</span>'; vcap.classList.add("on"); }, 900);
+      // 안전장치: 영상이 8초 넘게 끝나지 않으면 강제 진입
+      setTimeout(proceed, 8000);
+    }
 
     function setBg(key, walk) {
       if (key === "black") { bgA.classList.remove("on"); bgB.classList.remove("on"); return; }
       var el = useA ? bgA : bgB, other = useA ? bgB : bgA;
-      el.style.backgroundImage = "url('" + IMG + key + ".webp?v=2')";
+      el.style.backgroundImage = "url('" + IMG + key + ".webp" + IMGV + "')";
       el.classList.remove("walk"); void el.offsetWidth;
       if (walk) el.classList.add("walk");
       el.classList.add("on"); other.classList.remove("on");
@@ -194,7 +224,7 @@ padding:12px 14px;font-family:inherit;font-size:.98rem;cursor:pointer;text-align
             b.innerHTML = c.label;
             b.onclick = function (e) {
               e.stopPropagation();
-              if (c.enter) { end("enter"); return; }
+              if (c.enter) { playRitual(); return; }
               if (c.exit) { end("exit"); return; }
               show(c.goto);
             };
@@ -216,7 +246,7 @@ padding:12px 14px;font-family:inherit;font-size:.98rem;cursor:pointer;text-align
             b.innerHTML = c.label;
             b.onclick = function (ev) {
               ev.stopPropagation();
-              if (c.enter) { end("enter"); return; }
+              if (c.enter) { playRitual(); return; }
               if (c.exit) { end("exit"); return; }
               show(c.goto);
             };
@@ -229,7 +259,10 @@ padding:12px 14px;font-family:inherit;font-size:.98rem;cursor:pointer;text-align
       if (cur.goto != null) show(cur.goto);
       else show(cur.id + 1);
     });
-    root.querySelector(".tale-skip").onclick = function () { end("skip"); };
+    root.querySelector(".tale-skip").onclick = function () {
+      // 점사 영상 재생 중 건너뛰기는 리포트로 바로 진입, 그 외엔 게이트로
+      if (ritualDone) { end("enter"); } else { end("skip"); }
+    };
 
     show(0);
   }
