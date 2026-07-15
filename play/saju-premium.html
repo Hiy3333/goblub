@@ -45,6 +45,43 @@
     .rep-retry { margin-top: 10px; }
     .writing::after { content: "✍️"; animation: blink 1s infinite; }
     @keyframes blink { 50% { opacity: .2; } }
+
+    /* ===== 귀곡의 명부(冥府) — 어두운 호러 테마 (인트로와 세계관 통일) ===== */
+    body { background:
+      radial-gradient(600px 380px at 50% -8%, rgba(150,30,40,.20), transparent 62%),
+      radial-gradient(700px 520px at 50% 108%, rgba(60,20,80,.22), transparent 64%),
+      linear-gradient(180deg, #0b0810 0%, #0e0a16 55%, #0b0812 100%) fixed !important;
+      color: #d8cee8 !important; }
+    #site-header, #site-footer { filter: brightness(.7) saturate(.8); }
+    .panel { background: rgba(18,13,26,.82) !important; border: 1px solid rgba(150,60,70,.4) !important;
+      box-shadow: 0 20px 60px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,180,150,.06), 0 0 40px rgba(120,20,30,.15) !important;
+      backdrop-filter: blur(6px); }
+    .panel::before, .panel::after { display: none !important; }
+    .panel > * { position: relative; z-index: 1; }
+    h1, .result-desc, .fine-print { color: #cdc2e0 !important; text-shadow: none !important; }
+    .result-desc b { color: #ff6b7e; }
+    .prem-badge { background: linear-gradient(90deg, #7a1f2e, #b0384a) !important; color: #ffe7ea !important;
+      box-shadow: 0 0 16px rgba(180,40,60,.55) !important; }
+    .prem-emoji { filter: drop-shadow(0 0 16px rgba(200,50,70,.5)) !important; }
+    .prem-btn { background: linear-gradient(180deg, #8a2436, #5a1424) !important; color: #ffe7ea !important;
+      border: 1px solid rgba(255,120,140,.4); box-shadow: 0 0 18px rgba(180,30,50,.5) !important; }
+    .prem-btn:hover { box-shadow: 0 0 26px rgba(220,40,60,.7) !important; }
+    .btn-ghost { background: rgba(40,26,40,.6) !important; color: #d8cee8 !important; border: 1px solid rgba(150,80,90,.4) !important; }
+    .btn-ghost:hover { color: #ff8a98 !important; border-color: rgba(220,80,100,.6) !important; }
+    .btn-primary:not(.prem-btn) { background: linear-gradient(180deg, #5a3a8a, #3a2258) !important; color: #efe7ff !important; box-shadow: 0 0 16px rgba(90,50,150,.5) !important; }
+    .cost-row { color: #e8dff2 !important; }
+    .cost-row .cost, .vol-list li b { color: #ffb84a !important; }
+    .wallet-mini, .vol-list li span, .rep-progress, .rep-sec .st { color: #9a8ba8 !important; }
+    .vol-list li { background: rgba(30,22,38,.7) !important; border: 1px solid rgba(120,70,80,.35) !important; color: #d8cee8 !important; }
+    .rep-sec { background: rgba(16,12,24,.78) !important; border: 1px solid rgba(150,60,70,.35) !important;
+      box-shadow: 0 8px 26px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,180,150,.05) !important; }
+    .rep-sec h3 { color: #ff8a5a !important; text-shadow: 0 0 12px rgba(220,90,50,.35) !important; }
+    .rep-sec .body { color: #d5cbe6 !important; }
+    .rep-sec .body .sub { color: #ff6b7e !important; text-shadow: 0 0 10px rgba(255,60,80,.3) !important; }
+    .rep-sec .body .kv { background: rgba(30,22,36,.75) !important; border: 1px solid rgba(150,80,90,.3) !important;
+      box-shadow: inset 0 1px 0 rgba(255,180,150,.05) !important; color: #cdc2e0; }
+    .need-more { color: #ff8a98 !important; }
+    .need-more a, .wallet-mini a { color: #ffb84a !important; }
   </style>
 </head>
 <body>
@@ -101,7 +138,7 @@
   <script src="js/dosa.js?v=2"></script>
   <script src="js/feed.js?v=4"></script>
   <script src="js/goblub-art.js"></script>
-  <script src="js/report-ui.js?v=1"></script>
+  <script src="js/report-ui.js?v=2"></script>
   <script src="js/tale.js?v=5"></script>
   <script>
     (function () {
@@ -327,68 +364,76 @@
           g.arcTo(x + w, y2, x + w, y2 + h, rad); g.arcTo(x + w, y2 + h, x, y2 + h, rad);
           g.arcTo(x, y2 + h, x, y2, rad); g.arcTo(x, y2, x + w, y2, rad); g.closePath();
         }
-        // 라이트 배경 + 파스텔 블롭
+        // 어두운 명부 배경 + 촛불 글로우
         var bg = g.createLinearGradient(0, 0, 0, H);
-        bg.addColorStop(0, "#f7f8fc"); bg.addColorStop(1, "#e7eaf6");
+        bg.addColorStop(0, "#0b0810"); bg.addColorStop(0.5, "#0e0a16"); bg.addColorStop(1, "#0a0710");
         g.fillStyle = bg; g.fillRect(0, 0, W, H);
         function blob(x, y2, r, col) {
           var rg = g.createRadialGradient(x, y2, 0, x, y2, r);
-          rg.addColorStop(0, col); rg.addColorStop(1, "rgba(255,255,255,0)");
+          rg.addColorStop(0, col); rg.addColorStop(1, "rgba(0,0,0,0)");
           g.fillStyle = rg; g.fillRect(0, 0, W, H);
         }
-        blob(90, 140, 380, "rgba(255,110,145,.28)");
-        blob(640, 320, 420, "rgba(70,135,255,.26)");
-        blob(360, 1180, 460, "rgba(150,96,255,.22)");
-        // 유리 카드
-        g.save(); g.shadowColor = "rgba(96,106,155,.35)"; g.shadowBlur = 34; g.shadowOffsetY = 16;
-        rr(36, 150, W - 72, 960, 34); g.fillStyle = "rgba(255,255,255,.78)"; g.fill(); g.restore();
-        g.strokeStyle = "rgba(255,255,255,.95)"; g.lineWidth = 2.5;
-        rr(36, 150, W - 72, 960, 34); g.stroke();
-        g.strokeStyle = "rgba(150,160,205,.3)"; g.lineWidth = 1;
-        rr(48, 162, W - 96, 936, 26); g.stroke();
+        blob(360, 120, 420, "rgba(150,30,40,.28)");
+        blob(360, 1180, 460, "rgba(70,25,95,.24)");
+        blob(140, 640, 260, "rgba(200,90,40,.10)");
+        blob(600, 720, 260, "rgba(200,90,40,.10)");
+        // 필름 그레인
+        for (var gi = 0; gi < 2600; gi++) {
+          g.fillStyle = "rgba(255,255,255," + (Math.random() * 0.035) + ")";
+          g.fillRect(Math.random() * W, Math.random() * H, 1, 1);
+        }
+        // 명부(검은 양피지) 카드 + 붉은 인장 테두리
+        g.save(); g.shadowColor = "rgba(120,20,30,.5)"; g.shadowBlur = 40; g.shadowOffsetY = 14;
+        rr(36, 150, W - 72, 960, 26); g.fillStyle = "rgba(18,13,24,.92)"; g.fill(); g.restore();
+        g.strokeStyle = "rgba(180,50,65,.75)"; g.lineWidth = 2.5;
+        rr(36, 150, W - 72, 960, 26); g.stroke();
+        g.strokeStyle = "rgba(120,80,90,.35)"; g.lineWidth = 1;
+        rr(48, 162, W - 96, 936, 18); g.stroke();
         // 배지
         g.textAlign = "center";
         g.font = "26px 'Jua','Malgun Gothic',sans-serif";
-        var btxt = "✨ PREMIUM 심층 리포트", bw = g.measureText(btxt).width + 52;
+        var btxt = "🕯 귀곡의 명부(冥府)", bw = g.measureText(btxt).width + 52;
         var bg2 = g.createLinearGradient((W - bw) / 2, 0, (W + bw) / 2, 0);
-        bg2.addColorStop(0, "#f5a623"); bg2.addColorStop(1, "#ff8a3d");
+        bg2.addColorStop(0, "#7a1f2e"); bg2.addColorStop(1, "#b0384a");
         rr((W - bw) / 2, 200, bw, 52, 26); g.fillStyle = bg2; g.fill();
-        g.fillStyle = "#fff"; g.fillText(btxt, W / 2, 235);
+        g.fillStyle = "#ffe7ea"; g.fillText(btxt, W / 2, 235);
         // 제목·명식
-        g.fillStyle = "#2b3057"; g.font = "56px 'Jua','Malgun Gothic',sans-serif";
-        g.fillText("성격 & 인연", W / 2, 330);
-        g.fillStyle = "#7079a8"; g.font = "28px 'Jua','Malgun Gothic',sans-serif";
+        g.save(); g.shadowColor = "rgba(200,50,70,.5)"; g.shadowBlur = 18;
+        g.fillStyle = "#efe4f2"; g.font = "54px 'Jua','Malgun Gothic',sans-serif";
+        g.fillText("프리미엄 심층 리포트", W / 2, 330); g.restore();
+        g.fillStyle = "#9a8ba8"; g.font = "28px 'Jua','Malgun Gothic',sans-serif";
         var sub = base.pillars.day.ganji + "일주 · " + base.strength.label +
           (deep && deep.yongshin && deep.yongshin.use.length ? " · 용신 " + deep.yongshin.use.join("·") : "");
         g.fillText(sub, W / 2, 378);
-        g.strokeStyle = "rgba(150,160,205,.35)"; g.lineWidth = 1.5;
+        g.strokeStyle = "rgba(150,80,90,.4)"; g.lineWidth = 1.5;
         g.beginPath(); g.moveTo(110, 412); g.lineTo(W - 110, 412); g.stroke();
         // 콕 집은 대목
-        g.fillStyle = "#ff5a76"; g.font = "30px 'Jua','Malgun Gothic',sans-serif";
-        g.fillText("🕯 귀곡 선생이 콕 집은 대목", W / 2, 468);
+        g.save(); g.shadowColor = "rgba(255,60,80,.5)"; g.shadowBlur = 14;
+        g.fillStyle = "#ff6b7e"; g.font = "30px 'Jua','Malgun Gothic',sans-serif";
+        g.fillText("🩸 귀곡이 콕 집은 대목", W / 2, 468); g.restore();
         var hs = collectHighlights();
         var y = 528;
         g.textAlign = "left";
         hs.forEach(function (h2) {
           g.font = "28px 'Jua','Malgun Gothic',sans-serif";
           var lines = wrapText(g, h2, W - 240);
-          g.fillStyle = "#e8365f";
-          g.fillText("▸", 92, y);
+          g.fillStyle = "#c0455a";
+          g.fillText("🔴", 88, y - 6);
           lines.forEach(function (ln, li) {
-            g.fillStyle = li === 0 ? "#e8365f" : "#d64a68";
-            g.fillText(ln, 128, y); y += 42;
+            g.fillStyle = li === 0 ? "#ff8a98" : "#e07a8a";
+            g.fillText(ln, 134, y); y += 42;
           });
           y += 22;
         });
         // 카드 하단 서명
         g.textAlign = "center";
-        g.fillStyle = "#7079a8"; g.font = "26px 'Jua','Malgun Gothic',sans-serif";
-        g.fillText("— 귀곡 선생", W / 2, 1062);
+        g.fillStyle = "#9a8ba8"; g.font = "26px 'Jua','Malgun Gothic',sans-serif";
+        g.fillText("— 귀곡(鬼哭)", W / 2, 1062);
         // CTA
-        g.fillStyle = "#2b3057"; g.font = "28px 'Jua','Malgun Gothic',sans-serif";
-        g.fillText("나도 받아보기 ▶ goblub.vercel.app", W / 2, 1176);
-        g.fillStyle = "#3a8bff"; g.font = "24px 'Jua','Malgun Gothic',sans-serif";
-        g.fillText("지금은 오픈 기념 무료 🎁", W / 2, 1216);
+        g.fillStyle = "#cdc2e0"; g.font = "28px 'Jua','Malgun Gothic',sans-serif";
+        g.fillText("네 팔자도 보러 오라 ▶ goblub.vercel.app", W / 2, 1176);
+        g.fillStyle = "#ffb84a"; g.font = "24px 'Jua','Malgun Gothic',sans-serif";
+        g.fillText("지금은 오픈 기념 무료 🕯", W / 2, 1216);
         c.toBlob(function (blob2) {
           if (!blob2) { window.open(c.toDataURL("image/png")); return; }
           var a = document.createElement("a");
