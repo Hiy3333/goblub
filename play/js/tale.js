@@ -5,8 +5,8 @@
 //   onEnter(collected) → { name, focus, focusLabel, birth?, base, deep }
 (function () {
   var IMG = "img/tale/";
-  var IMGV = "?v=4";                    // 이미지 캐시버스트(흰눈 저승사자)
-  var RITUAL_VID = IMG + "ritual.mp4?v=2";
+  var IMGV = "?v=5";                    // 이미지 캐시버스트(흰눈 저승사자)
+  var RITUAL_VID = IMG + "ritual.mp4?v=3";
   var GAN_H = { 갑: "甲", 을: "乙", 병: "丙", 정: "丁", 무: "戊", 기: "己", 경: "庚", 신: "辛", 임: "壬", 계: "癸" };
   var JI_H = { 자: "子", 축: "丑", 인: "寅", 묘: "卯", 진: "辰", 사: "巳", 오: "午", 미: "未", 신: "申", 유: "酉", 술: "戌", 해: "亥" };
 
@@ -52,7 +52,7 @@ padding:11px 13px;font-family:inherit;font-size:1rem;width:100%}\
 border-radius:12px;padding:12px;cursor:pointer;font-family:inherit;font-size:1rem}\
 .tale-inp .ok:hover{filter:brightness(1.12)}\
 .tale.fadeout{opacity:0;transition:opacity 1s}\
-.tale-vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000;opacity:0;transition:opacity .8s;z-index:6;pointer-events:none}\
+.tale-vid{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;opacity:0;transition:opacity .8s;z-index:6;pointer-events:none}\
 .tale-vid.on{opacity:1}\
 .tale-vcap{position:absolute;left:50%;bottom:12%;transform:translateX(-50%);z-index:7;color:#e9e2ff;font-family:'Jua','Malgun Gothic',sans-serif;font-size:1rem;letter-spacing:2px;text-shadow:0 0 14px rgba(0,0,0,.9);opacity:0;transition:opacity .6s;text-align:center;pointer-events:none}\
 .tale-vcap.on{opacity:1}\

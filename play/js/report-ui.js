@@ -182,7 +182,7 @@
 
     var html = "";
     if (intro) {
-      var av = '<img src="img/tale/gwigok.webp?v=4" alt="귀곡" onerror="this.parentNode.textContent=\'🕯\'">';
+      var av = '<img src="img/tale/gwigok.webp?v=5" alt="귀곡" onerror="this.parentNode.textContent=\'🕯\'">';
       html += '<div class="dosa-line"><span class="av">' + av + '</span><div class="dosa-bub"><span class="bub-txt">' + intro + "</span></div></div>";
     }
 
