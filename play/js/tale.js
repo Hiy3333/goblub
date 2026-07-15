@@ -12,7 +12,9 @@
 
   var css = "\
 .tale{position:fixed;inset:0;z-index:9999;background:#000;overflow:hidden;font-family:'Jua','Malgun Gothic',sans-serif;-webkit-user-select:none;user-select:none}\
-.tale-bg{position:absolute;inset:0;background-size:cover;background-position:center 30%;opacity:0;transition:opacity 1.4s ease;will-change:opacity,transform}\
+.tale-bgv{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000;opacity:0;transition:opacity 1.4s ease;z-index:0;pointer-events:none}\
+.tale-bgv.on{opacity:1}\
+.tale-bg{position:absolute;inset:0;background-size:cover;background-position:center 30%;opacity:0;transition:opacity 1.4s ease;will-change:opacity,transform;z-index:1}\
 .tale-bg.on{opacity:1}\
 .tale-bg.walk{animation:tale-walk 7s ease-in-out forwards}\
 @keyframes tale-walk{from{transform:scale(1)}to{transform:scale(1.18) translateY(-2%)}}\
@@ -173,7 +175,7 @@ border-radius:12px;padding:12px;cursor:pointer;font-family:inherit;font-size:1re
       ]},
       { id: 3, fx: "swallow", name: "", cls: "n-nar", text: "" },
       { id: 4, bg: "black", name: "", cls: "n-nar", text: "……\n차가운 흙냄새." },
-      { id: 5, bg: "forest", name: "", cls: "n-nar", text: "…눈을 떴다.\n여기가, 어디지?", choices: [
+      { id: 5, vbg: "forest", name: "", cls: "n-nar", text: "…눈을 떴다.\n여기가, 어디지?", choices: [
         { label: "👈 왼쪽을 둘러본다", goto: 6 },
         { label: "👉 오른쪽을 둘러본다", goto: 7 }
       ]},
@@ -182,7 +184,7 @@ border-radius:12px;padding:12px;cursor:pointer;font-family:inherit;font-size:1re
       { id: 8, name: "", cls: "n-nar", text: "…멀리, 불빛 하나가 흔들린다.", choices: [
         { label: "🕯 불빛을 향해 걷는다", goto: 9 }
       ]},
-      { id: 9, bg: "path", walk: true, name: "", cls: "n-nar", text: "발걸음을 옮긴다.\n숲이 등 뒤에서 닫히는 기분이다." },
+      { id: 9, vbg: "path", name: "", cls: "n-nar", text: "발걸음을 옮긴다.\n숲이 등 뒤에서 닫히는 기분이다." },
       { id: 10, name: "", cls: "n-nar", text: "…등 뒤에서, 바스락.", choices: [
         { label: "👀 뒤를 돌아본다", goto: 11 },
         { label: "🏃 무시하고 걷는다", goto: 12 }
@@ -231,6 +233,7 @@ border-radius:12px;padding:12px;cursor:pointer;font-family:inherit;font-size:1re
     var root = document.createElement("div");
     root.className = "tale";
     root.innerHTML =
+      '<video class="tale-bgv" playsinline muted autoplay loop preload="auto"></video>' +
       '<div class="tale-bg a"></div><div class="tale-bg b"></div>' +
       '<div class="tale-vig"></div>' +
       '<div class="tale-gob">' + (window.GoblubArt ? GoblubArt.svg(150) : '<span style="font-size:110px">👾</span>') + "</div>" +
@@ -250,12 +253,15 @@ border-radius:12px;padding:12px;cursor:pointer;font-family:inherit;font-size:1re
     var nextEl = root.querySelector(".tale-next"), chEl = root.querySelector(".tale-choices");
     var inpEl = root.querySelector(".tale-inp");
     var vid = root.querySelector(".tale-vid"), vcap = root.querySelector(".tale-vcap");
+    var bgv = root.querySelector(".tale-bgv");
     var box = root.querySelector(".tale-box");
-    var typing = null, fullText = "", canTap = false, ended = false, ritualDone = false, bgmOn = false;
+    var typing = null, fullText = "", canTap = false, ended = false, ritualDone = false, bgmOn = false, bgvKey = null;
 
     function kickBGM() { if (!bgmOn && bgm) { bgmOn = true; bgm.start(); } }
 
+    // 배경 정지 이미지
     function setBg(key, walk) {
+      hideBgVideo();
       if (key === "black") { bgA.classList.remove("on"); bgB.classList.remove("on"); return; }
       var el = useA ? bgA : bgB, other = useA ? bgB : bgA;
       el.style.backgroundImage = "url('" + IMG + key + ".webp" + IMGV + "')";
@@ -263,6 +269,23 @@ border-radius:12px;padding:12px;cursor:pointer;font-family:inherit;font-size:1re
       if (walk) el.classList.add("walk");
       el.classList.add("on"); other.classList.remove("on");
       useA = !useA;
+    }
+    // 배경 동영상(무한 루프) — 없으면 조용히 정지 이미지로 폴백
+    function setBgVideo(key) {
+      if (bgvKey === key) return;
+      bgvKey = key;
+      bgA.classList.remove("on"); bgB.classList.remove("on");
+      bgv.onerror = function () { if (bgvKey === key) { bgvKey = null; bgv.classList.remove("on"); setBg(key); } };
+      bgv.muted = true;
+      bgv.src = IMG + "vid_" + key + ".mp4" + IMGV;
+      function tryPlay() { var p = bgv.play(); if (p && p.catch) p.catch(function () {}); }
+      bgv.oncanplay = tryPlay; tryPlay();
+      bgv.classList.add("on"); // 자동재생 안 되는 브라우저도 첫 프레임(정지 이미지처럼)은 보임
+    }
+    function hideBgVideo() {
+      if (bgvKey == null) return;
+      bgvKey = null; bgv.classList.remove("on");
+      try { bgv.pause(); } catch (e) {}
     }
     function fmt(t) {
       return t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
@@ -383,7 +406,8 @@ border-radius:12px;padding:12px;cursor:pointer;font-family:inherit;font-size:1re
       if (!s) { end("enter"); return; }
       cur = s; canTap = false;
       chEl.innerHTML = ""; inpEl.style.display = "none"; inpEl.innerHTML = ""; nextEl.style.visibility = "hidden";
-      if (s.bg) setBg(s.bg, s.walk);
+      if (s.vbg) setBgVideo(s.vbg);
+      else if (s.bg) setBg(s.bg, s.walk);
       gob.style.display = (s.gob || s.fx === "swallow") ? "block" : "none";
       nameEl.textContent = (typeof s.name === "function" ? s.name() : s.name) || "";
       nameEl.className = "tale-name " + (s.cls || "n-nar");
