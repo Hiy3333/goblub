@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>귀곡 점사 영상 — 모델별 비교</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #08060e; color: #e6dff5; font-family: "Malgun Gothic", sans-serif; padding: 26px 14px 60px; }
+    h1 { text-align: center; font-size: 1.25rem; margin-bottom: 4px; }
+    .sub { text-align: center; color: #8a7fb0; font-size: .88rem; margin-bottom: 26px; line-height: 1.6; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; max-width: 1100px; margin: 0 auto; }
+    .m { background: #120e22; border: 1px solid #2c2450; border-radius: 14px; overflow: hidden; }
+    .m video { width: 100%; display: block; background: #000; }
+    .m .info { padding: 13px 16px 16px; }
+    .m h2 { font-size: 1.02rem; margin-bottom: 5px; }
+    .m .badge { display: inline-block; background: #2a2258; border-radius: 999px; padding: 2px 10px; font-size: .74rem; color: #cabfef; margin-bottom: 6px; }
+    .m p { color: #9a8fc4; font-size: .84rem; line-height: 1.55; }
+    .note { max-width: 1100px; margin: 0 auto 22px; background: #140f24; border: 1px solid #2c2450; border-radius: 12px; padding: 14px 18px; color: #b3a8d8; font-size: .88rem; line-height: 1.7; }
+  </style>
+</head>
+<body>
+  <h1>🕯 귀곡 점사 영상 — 모델별 비교</h1>
+  <p class="sub">확정 이미지 기반 · 눈은 고정, 입만 기괴하게 웃는 연출 · [점사를 본다] 클릭 시 재생될 영상</p>
+  <div class="note">▶ 각 영상을 재생해보고 마음에 드는 걸 골라주세요. 고른 영상을 점사 장면(풀스크린)으로 넣고, 확정 이미지도 인트로·리포트 전체에 반영합니다. 소리는 사이트에서 공포 BGM으로 대체되니 무음으로 재생됩니다.</p>
+  <div class="grid">
+    <div class="m">
+      <video src="vid/smile-kling-web.mp4" controls loop muted playsinline></video>
+      <div class="info"><span class="badge">Kling</span><h2>① Kling 2.6</h2><p>시네마틱 모션 · 5초 · 1080×1920 원본</p></div>
+    </div>
+    <div class="m">
+      <video src="vid/smile-seedance15-web.mp4" controls loop muted playsinline></video>
+      <div class="info"><span class="badge">Bytedance</span><h2>② Seedance 1.5 Pro</h2><p>안정적 모션 · 4초</p></div>
+    </div>
+    <div class="m">
+      <video src="vid/smile-seedance2-web.mp4" controls loop muted playsinline></video>
+      <div class="info"><span class="badge">Bytedance</span><h2>③ Seedance 2.0</h2><p>정체성 보존 강점 · 5초</p></div>
+    </div>
+  </div>
+</body>
+</html>
