@@ -56,6 +56,7 @@
 .rx b{color:#ff6b7e;display:block;margin:3px 0 4px;font-size:.95rem}\
 .rx span{color:#9a8ba8;font-size:.83rem;line-height:1.55;display:block;white-space:normal}\
 @media (max-width:420px){.rx-grid{grid-template-columns:1fr}}\
+.rd-p .hj,.hanja{font-family:'Nanum Myeongjo',serif}\
 .hl-y{cursor:pointer;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px}";
   var st = document.createElement("style");
   st.textContent = css;
@@ -172,79 +173,58 @@
     return { html: t };
   }
 
-  function render(el, text, opts) {
-    opts = opts || {};
-    var lines = esc(text.trim()).split("\n");
-    // 도입부(첫 ◆ 이전) 분리 → 도사 말풍선
-    var introLines = [];
-    while (lines.length && !/^◆/.test(lines[0].trim())) introLines.push(lines.shift());
-    var intro = introLines.join("\n").trim();
-
-    var html = "";
-    if (intro) {
-      var av = '<img src="img/tale/gwigok.webp?v=5" alt="귀곡" onerror="this.parentNode.textContent=\'🕯\'">';
-      html += '<div class="dosa-line"><span class="av">' + av + '</span><div class="dosa-bub"><span class="bub-txt">' + intro + "</span></div></div>";
+  // 한 ◆ 블록의 본문을 HTML로 (▸카드 그룹 처리, 스포일러·도사말풍선 없음)
+  function blockHtml(lines) {
+    var html = "", rxGroup = [];
+    function flushRx() {
+      if (rxGroup.length >= 2) html += '<div class="rx-grid">' + rxGroup.join("") + "</div>";
+      else rxGroup.forEach(function (r2) { html += r2 + "\n"; });
+      rxGroup = [];
     }
+    lines.forEach(function (raw) {
+      var lh = lineHtml(raw.trim() ? raw.trim() : "");
+      if (lh.rx) rxGroup.push(lh.html);
+      else { flushRx(); html += (lh.kv ? lh.html : raw) + "\n"; }
+    });
+    flushRx();
+    return html;
+  }
+  // 『강조』 → 피 흘리는 붉은 글씨
+  function bleed(html) {
+    return html.replace(/『([^『』]{1,60})』/g, '<b class="hl">$1</b>');
+  }
 
-    // ◆ 블록 단위 조립 (+스포일러 / ▸카드 그룹)
-    var i = 0;
+  // 한 파트 텍스트 → 페이지 배열 [{title, html}] (◆ 소제목 단위로 분할)
+  // 도입부(첫 ◆ 이전)는 첫 페이지의 리드 문단으로 흡수(도사 말풍선 제거)
+  function pageify(text) {
+    var lines = esc(text.trim()).split("\n");
+    var intro = [];
+    while (lines.length && !/^◆/.test(lines[0].trim())) intro.push(lines.shift());
+    var introHtml = bleed(intro.join("\n").trim());
+
+    var pages = [], i = 0, first = true;
     while (i < lines.length) {
       var t = lines[i].trim();
       if (/^◆/.test(t)) {
-        var spoiler = SPOILER_RE.test(t);
-        html += '<span class="sub">' + t + "</span>\n";
+        var title = t.replace(/^◆\s*/, "");
         i++;
-        var block = "", rxGroup = [];
-        function flushRx() {
-          if (rxGroup.length >= 2) block += '<div class="rx-grid">' + rxGroup.join("") + "</div>";
-          else rxGroup.forEach(function (r2) { block += r2 + "\n"; });
-          rxGroup = [];
-        }
-        while (i < lines.length && !/^◆/.test(lines[i].trim())) {
-          var lh = lineHtml(lines[i].trim() ? lines[i].trim() : "");
-          if (lh.rx) rxGroup.push(lh.html);
-          else { flushRx(); block += (lh.kv ? lh.html : lines[i]) + "\n"; }
-          i++;
-        }
-        flushRx();
-        if (spoiler) {
-          html += '<span class="spoil"><span class="sp-body">' + block + "</span>" +
-            '<span class="sp-cover"><span>🫣 마음의 준비가 되면 탭하세요</span></span></span>';
-        } else html += block;
-      } else { html += lines[i] + "\n"; i++; }
+        var body = [];
+        while (i < lines.length && !/^◆/.test(lines[i].trim())) { body.push(lines[i]); i++; }
+        var html = bleed(blockHtml(body));
+        if (first && introHtml) { html = '<p class="lead">' + introHtml + "</p>" + html; first = false; }
+        pages.push({ title: title, html: html });
+      } else { i++; }
     }
-
-    // 『강조』 → 빨간 볼드 (+연도 포함 시 타임라인 링크)
-    html = html.replace(/『([^『』]{1,60})』/g, function (_, inner) {
-      var ym = inner.match(/20\d{2}/);
-      if (ym) return '<b class="hl hl-y" data-year="' + ym[0] + '">' + inner + "</b>";
-      return '<b class="hl">' + inner + "</b>";
-    });
-    el.innerHTML = html;
-
-    // ⑥ 도입부 타이핑 연출(새 생성일 때만)
-    if (opts.animate && intro) {
-      var bt = el.querySelector(".bub-txt");
-      if (bt) {
-        var full = bt.textContent;
-        bt.textContent = "";
-        var ci = 0, step = Math.max(1, Math.round(full.length / 120));
-        var iv = setInterval(function () {
-          ci += step;
-          bt.textContent = full.slice(0, ci);
-          if (ci >= full.length) { bt.textContent = full; clearInterval(iv); }
-        }, 24);
-      }
-    }
+    // ◆ 가 하나도 없으면 통째 한 페이지
+    if (!pages.length) pages.push({ title: "", html: (introHtml ? '<p class="lead">' + introHtml + "</p>" : "") + bleed(blockHtml(lines)) });
+    return pages;
   }
 
-  // 전역 위임: 스포일러 열기 · 연도 강조 → 타임라인
+  // 전역 위임: 연도 강조 → 타임라인
   document.addEventListener("click", function (e) {
-    var cov = e.target.closest ? e.target.closest(".sp-cover") : null;
-    if (cov) { cov.parentElement.classList.add("open"); return; }
     var hy = e.target.closest ? e.target.closest(".hl-y") : null;
     if (hy) flashYear(hy.getAttribute("data-year"));
   });
 
-  window.ReportUI = { dashboard: dashboard, timeline: timeline, render: render, flashYear: flashYear };
+  window.ReportUI = { dashboard: dashboard, timeline: timeline, pageify: pageify, flashYear: flashYear };
 })();

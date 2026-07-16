@@ -7,7 +7,7 @@
   <meta name="description" content="어두운 숲의 저승사자 귀곡이 읽는 팔자 — 신살·합충·용신·세운까지 계산해 성격·인연·재물·대운 8부, 2만 자급 심층 리포트" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Jua&family=Nanum+Myeongjo:wght@400;700;800&family=Gowun+Batang:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../css/style.css?v=glass3" />
   <style>
     .prem-badge { display: inline-block; background: linear-gradient(90deg, var(--yellow), var(--orange));
@@ -82,6 +82,53 @@
       box-shadow: inset 0 1px 0 rgba(255,180,150,.05) !important; color: #cdc2e0; }
     .need-more { color: #ff8a98 !important; }
     .need-more a, .wallet-mini a { color: #ffb84a !important; }
+
+    /* ===== 명부 페이지 넘김 뷰어 ===== */
+    #pager { max-width: 620px; margin: 0 auto; }
+    .pg-frame { position: relative; background:
+        radial-gradient(120% 100% at 50% 0%, rgba(60,20,26,.5), transparent 60%),
+        linear-gradient(180deg, #140d18, #0d0912);
+      border: 1px solid rgba(150,60,70,.4); border-radius: 12px; min-height: 62vh;
+      box-shadow: 0 18px 50px rgba(0,0,0,.6), inset 0 0 60px rgba(80,10,20,.25);
+      padding: 22px 20px 26px; overflow: hidden; }
+    .pg-vign { position: absolute; inset: 0; pointer-events: none; border-radius: 12px;
+      box-shadow: inset 0 0 90px 20px rgba(0,0,0,.7); }
+    .pg-page { position: relative; z-index: 1; opacity: 1; transition: opacity .35s ease, transform .35s ease; }
+    .pg-page.turning { opacity: 0; transform: translateX(-14px); }
+    .pg-plabel { color: #9a7f8a; font-size: .74rem; letter-spacing: 2px; text-align: center; margin-bottom: 4px; }
+    .pg-title { font-family: 'Nanum Myeongjo', serif; font-weight: 800; color: #ff8a5a; font-size: 1.32rem;
+      text-align: center; margin: 2px 0 16px; text-shadow: 0 0 16px rgba(220,90,50,.4); line-height: 1.4; }
+    .pg-body { font-family: 'Gowun Batang', 'Nanum Myeongjo', serif; color: #d9cfe4;
+      font-size: 1.03rem; line-height: 2.05; white-space: pre-wrap; letter-spacing: .2px; }
+    .pg-body .lead { color: #b9a8c8; font-style: italic; font-size: .98rem; margin-bottom: 14px;
+      padding-left: 12px; border-left: 2px solid rgba(180,60,70,.5); }
+    /* 피 흘리는 강조 */
+    .pg-body .hl { color: #ff2a2a; font-weight: 700; position: relative;
+      text-shadow: 0 0 8px rgba(210,0,0,.65), 0 0 2px rgba(255,0,0,.9); }
+    .pg-body .hl::after { content: ""; position: absolute; right: 3px; top: 100%; width: 2px; height: 0;
+      background: linear-gradient(#d10000, rgba(150,0,0,0)); border-radius: 0 0 2px 2px;
+      animation: blood-drip 4.5s ease-in infinite; }
+    @keyframes blood-drip { 0%,55% { height:0; opacity:0 } 62% { opacity:.95 } 100% { height:16px; opacity:0 } }
+    .pg-body .kv { display:block; background: rgba(30,20,26,.7); border:1px solid rgba(150,80,90,.35);
+      border-left: 3px solid #b0384a; border-radius: 8px; padding: 8px 13px; margin: 7px 0; line-height:1.75;
+      font-size:.96rem; color:#cdbfd0; }
+    .pg-cover-name { text-align:center; color:#cdc2e0; font-family:'Nanum Myeongjo',serif; font-size:1.05rem; margin: 2px 0 14px; }
+    .pg-img { text-align:center; }
+    .pg-img img { width: 100%; border-radius: 10px; border:1px solid rgba(150,60,70,.4);
+      box-shadow: 0 10px 34px rgba(0,0,0,.6), 0 0 40px rgba(120,20,30,.25); filter: contrast(1.05) saturate(.95); }
+    .pg-img .cap { color:#9a7f8a; font-family:'Nanum Myeongjo',serif; font-size:.9rem; letter-spacing:2px; margin-top:12px; }
+    .pg-bar { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:14px; }
+    .pg-btn { flex:none; background: rgba(40,26,40,.7); color:#e0d4e8; border:1px solid rgba(150,80,90,.45);
+      border-radius: 10px; padding: 11px 18px; font-family:inherit; font-size:.98rem; cursor:pointer; }
+    .pg-btn:hover:not(:disabled) { color:#ff8a98; border-color: rgba(220,80,100,.6); }
+    .pg-btn:disabled { opacity:.3; cursor:default; }
+    .pg-count { color:#9a8ba8; font-size:.86rem; letter-spacing:1px; }
+    .pg-writing { text-align:center; color:#8a7f9a; font-size:.85rem; min-height:1.4em; margin-top:8px; }
+    .pg-writing.on::after { content:"🕯"; margin-left:4px; animation: blink 1.2s infinite; }
+    .pg-tap { position:absolute; inset:0; display:flex; justify-content:space-between; z-index:2; pointer-events:none; }
+    .pg-tap .l, .pg-tap .r { width:16%; pointer-events:auto; cursor:pointer; }
+    .pg-tap .r { background: linear-gradient(270deg, rgba(180,50,60,.06), transparent); }
+    .pg-tap .l { background: linear-gradient(90deg, rgba(180,50,60,.06), transparent); }
   </style>
 </head>
 <body>
@@ -119,12 +166,23 @@
       </div>
 
       <div id="report-panel" style="display:none; text-align:left">
-        <p class="rep-progress" id="rep-progress"></p>
-        <div id="rep-secs"></div>
-        <div class="result-actions" style="justify-content:center">
-          <button class="btn-primary" id="btn-sum" style="display:none">🖼 핵심 요약 짤 저장</button>
-          <button class="btn-ghost" id="btn-replay">🎬 이계 스토리 다시 보기</button>
-          <a class="btn-ghost" href="fortune-hub.html">← 운세로 돌아가기</a>
+        <div id="pager">
+          <div class="pg-frame">
+            <div class="pg-vign"></div>
+            <div class="pg-page" id="pg-page"></div>
+            <div class="pg-tap"><div class="l" id="pg-tap-l"></div><div class="r" id="pg-tap-r"></div></div>
+          </div>
+          <div class="pg-bar">
+            <button class="pg-btn" id="pg-prev">◀ 이전</button>
+            <span class="pg-count" id="pg-count"></span>
+            <button class="pg-btn" id="pg-next">다음 ▶</button>
+          </div>
+          <p class="pg-writing" id="pg-writing"></p>
+          <div class="result-actions" id="pg-end" style="justify-content:center; display:none">
+            <button class="btn-primary" id="btn-sum">🖼 핵심 요약 짤 저장</button>
+            <button class="btn-ghost" id="btn-replay">🎬 이계 스토리 다시 보기</button>
+            <a class="btn-ghost" href="fortune-hub.html">← 운세로 돌아가기</a>
+          </div>
         </div>
       </div>
 
@@ -138,7 +196,7 @@
   <script src="js/dosa.js?v=2"></script>
   <script src="js/feed.js?v=4"></script>
   <script src="js/goblub-art.js"></script>
-  <script src="js/report-ui.js?v=3"></script>
+  <script src="js/report-ui.js?v=4"></script>
   <script src="js/tale.js?v=7"></script>
   <script>
     (function () {
@@ -233,54 +291,102 @@
         else { $("btn-unlock").style.display = "none"; $("need-more").style.display = "block"; $("need-gap").textContent = COST - bal; }
       }
 
+      // ===== 페이지 넘김 뷰어 =====
+      var GIMG = [
+        { src: "img/tale/gwigok.webp?v=5", cap: "…귀곡이 너를 바라본다" },
+        { src: "img/tale/gwigok-glare.webp?v=1", cap: "…눈을 피하지 마라" },
+        { src: "img/tale/gwigok-book.webp?v=1", cap: "…명부가 펼쳐진다" }
+      ];
+      var pages = [], cur = 0, imgTurn = 0, textSinceImg = 0, allDone = false, genFailed = false;
+
+      function partLabel(id) {
+        return { p1: "1부 · 성격", p2: "1부 · 성격", l1: "2부 · 인연", l2: "2부 · 인연",
+                 m1: "3부 · 재물", m2: "3부 · 재물", d1: "4부 · 대운", d2: "4부 · 대운" }[id] || "";
+      }
+      function pushImagePage() {
+        var g = GIMG[imgTurn % GIMG.length]; imgTurn++;
+        pages.push({ type: "image", src: g.src, cap: g.cap });
+      }
+      function addPartPages(p) {
+        var subs = ReportUI.pageify(p.text);
+        subs.forEach(function (s) {
+          pages.push({ type: "text", label: partLabel(p.id), title: s.title, html: s.html });
+          textSinceImg++;
+          if (textSinceImg >= 3) { pushImagePage(); textSinceImg = 0; }
+        });
+        renderPage();
+      }
+
+      function renderPage() {
+        var el = $("pg-page");
+        var pg = pages[cur];
+        $("pg-count").textContent = (cur + 1) + " / " + pages.length + (allDone ? "" : " …");
+        $("pg-prev").disabled = (cur === 0);
+        var atEnd = (cur >= pages.length - 1);
+        $("pg-next").disabled = atEnd && allDone;
+        el.classList.add("turning");
+        setTimeout(function () {
+          if (!pg) { el.classList.remove("turning"); return; }
+          if (pg.type === "cover") {
+            el.innerHTML = '<div class="pg-plabel">귀곡의 명부 · 序</div>' +
+              '<div class="pg-title">' + esc(userName || "이름 없는 자") + '의 팔자</div>' +
+              (userFocus ? '<p class="pg-cover-name">🕯 특히 궁금해한 것<br>' + esc(userFocus.length > 40 ? userFocus.slice(0, 40) + "…" : userFocus) + '</p>' : "") +
+              '<div id="pg-dash"></div><div id="pg-tl"></div>';
+            ReportUI.dashboard($("pg-dash"), base, deep);
+            ReportUI.timeline($("pg-tl"), deep);
+          } else if (pg.type === "image") {
+            el.innerHTML = '<div class="pg-img"><img src="' + pg.src + '" alt="귀곡" onerror="this.style.display=\'none\'"><p class="cap">' + pg.cap + '</p></div>';
+          } else {
+            el.innerHTML = '<div class="pg-plabel">' + esc(pg.label) + '</div>' +
+              (pg.title ? '<div class="pg-title">◆ ' + esc(pg.title) + '</div>' : "") +
+              '<div class="pg-body">' + pg.html + '</div>';
+          }
+          el.classList.remove("turning");
+          $("pg-page").parentElement.scrollTop = 0;
+          try { $("pager").scrollIntoView({ block: "start", behavior: "smooth" }); } catch (e) {}
+        }, 200);
+      }
+      function go(d) {
+        var ni = cur + d;
+        if (ni < 0) return;
+        if (ni >= pages.length) {
+          if (!allDone) { $("pg-writing").textContent = "귀곡이 다음 장을 새기는 중"; $("pg-writing").classList.add("on"); }
+          return;
+        }
+        cur = ni; renderPage();
+      }
+
       function openReport() {
         $("gate").style.display = "none";
         $("report-panel").style.display = "block";
-        var wrap = $("rep-secs");
-        wrap.innerHTML = "";
         PARTS.forEach(function (p) { p.done = false; p.text = ""; });
-        if (userFocus) {
-          var fo = document.createElement("p");
-          fo.className = "fine-print"; fo.style.cssText = "text-align:center;color:var(--coral);margin-bottom:6px";
-          fo.textContent = "🕯 " + (userName ? userName + "님이 " : "") + "특히 궁금해한 것: " + (userFocus.length > 40 ? userFocus.slice(0, 40) + "…" : userFocus);
-          wrap.appendChild(fo);
-        }
-        var dash = document.createElement("div");
-        wrap.appendChild(dash);
-        ReportUI.dashboard(dash, base, deep);
-        var tl = document.createElement("div");
-        wrap.appendChild(tl);
-        ReportUI.timeline(tl, deep);
-        PARTS.forEach(function (p) {
-          var sec = document.createElement("div");
-          sec.className = "rep-sec pending"; sec.id = "sec-" + p.id;
-          sec.innerHTML = '<h3>' + p.title + '</h3><p class="st" id="st-' + p.id + '">대기 중…</p><div class="body" id="body-' + p.id + '"></div>';
-          wrap.appendChild(sec);
-        });
+        pages = [{ type: "cover" }]; cur = 0; imgTurn = 0; textSinceImg = 0; allDone = false; genFailed = false;
+        $("pg-end").style.display = "none";
+        renderPage();
         genPart(0);
       }
 
-      function setProgress(i, writing) {
+      function progressMsg() {
         var done = PARTS.filter(function (p) { return p.done; }).length;
-        $("rep-progress").textContent = writing
-          ? "🕯 귀곡이 " + (i + 1) + "/" + TOTAL + "부를 쓰고 있다… (완성된 부는 위에서 바로 읽으세요)"
-          : (done === TOTAL ? "🕯 " + TOTAL + "부 완성. 이 명부(冥府)는 저장되어 언제든 다시 볼 수 있다." : "");
-        if (done === TOTAL) { $("btn-sum").style.display = "inline-block"; }
+        if (done >= TOTAL) {
+          allDone = true;
+          $("pg-writing").textContent = "🕯 명부 완성. 페이지를 넘겨 끝까지 읽어라."; $("pg-writing").classList.remove("on");
+          $("pg-end").style.display = "flex";
+          renderPage();
+        } else {
+          $("pg-writing").textContent = "귀곡이 " + (done) + "/" + TOTAL + "부를 새기는 중";
+          $("pg-writing").classList.add("on");
+        }
       }
 
       function genPart(i, attempt) {
-        if (i >= PARTS.length) { setProgress(i, false); return; }
+        if (i >= PARTS.length) { progressMsg(); return; }
         attempt = attempt || 0;
         var p = PARTS[i];
-        var sec = $("sec-" + p.id), st = $("st-" + p.id), body = $("body-" + p.id);
-        sec.classList.remove("pending");
-        st.textContent = attempt ? "다시 쓰는 중" : "집필 중"; st.classList.add("writing");
-        setProgress(i, true);
+        $("pg-writing").textContent = "귀곡이 " + (i + 1) + "/" + TOTAL + "부를 새기는 중"; $("pg-writing").classList.add("on");
         var buffer = "";
-        // 초반 끊김 등 실패 시 1회 자동 재시도
         function failSoft() {
           if (attempt >= 1) return false;
-          st.textContent = "🔁 귀곡 선생이 붓을 바꿔 다시 쓰는 중…";
           try { localStorage.removeItem("goblub_rep_cd"); } catch (e) {}
           setTimeout(function () { genPart(i, 1); }, 3000);
           return true;
@@ -288,44 +394,38 @@
         Dosa.fetchAI("/api/saju-report", { saju: base, deep: deep, part: p.id, name: userName || undefined, focus: userFocus || undefined }, "goblub_rep_", {
           accept: function (full) { return signed(full); },
           cooldownMs: 4000, cooldownKey: "goblub_rep_cd",
-          onChunk: function (t) { buffer += t; body.textContent = buffer; },
+          onChunk: function (t) { buffer += t; },
           onDone: function (fromCache) {
-            st.classList.remove("writing");
             if (signed(buffer)) {
               p.done = true; p.text = buffer; paid = false;
-              st.textContent = fromCache ? "완성 (저장된 권)" : "완성";
-              ReportUI.render(body, buffer, { animate: !fromCache });
-              setTimeout(function () { genPart(i + 1); }, fromCache ? 50 : 800);
+              addPartPages(p);
+              progressMsg();
+              setTimeout(function () { genPart(i + 1); }, fromCache ? 30 : 700);
             } else {
               if (failSoft()) return;
-              st.textContent = "⚠️ 끝까지 받지 못했어요";
-              retryBtn(sec, i);
+              retryFail(i, "⚠️ 이 장을 끝까지 받지 못했다.");
             }
           },
           onError: function (code, sec2) {
-            st.classList.remove("writing");
             if (code !== "cooldown" && code !== "not_configured" && failSoft()) return;
             if (paid && i === 0) {
               if (COST > 0) GoblubFeed.earn(COST, true); paid = false;
               try { localStorage.removeItem(paidKey()); } catch (e) {}
-              st.textContent = "⚠️ 생성 실패 — " + (COST > 0 ? "젬리를 돌려드렸어요. " : "") + "다시 시도해 주세요.";
               renderGate(); return;
             }
-            st.textContent =
-              code === "cooldown" ? "도사님이 숨 고르는 중… " + sec2 + "초 후 이어서 눌러주세요." :
-              code === "not_configured" ? "도사님이 수련 중이에요. 잠시 후 다시!" :
-              "⚠️ 잠시 후 이어받기를 눌러주세요.";
-            retryBtn(sec, i);
+            retryFail(i,
+              code === "cooldown" ? "귀곡이 숨을 고른다… " + sec2 + "초 후 이어진다." :
+              code === "not_configured" ? "귀곡이 아직 붓을 들지 않았다." :
+              "⚠️ 잠시 후 이어진다.");
           }
         });
       }
 
-      function retryBtn(sec, i) {
-        if (sec.querySelector(".rep-retry")) return;
-        var b = document.createElement("button");
-        b.className = "btn-ghost rep-retry"; b.textContent = "📜 이어서 받기";
-        b.onclick = function () { b.remove(); genPart(i); };
-        sec.appendChild(b);
+      function retryFail(i, msg) {
+        genFailed = true;
+        var w = $("pg-writing"); w.classList.remove("on");
+        w.innerHTML = msg + ' <button class="pg-btn" id="pg-retry" style="padding:6px 12px;font-size:.85rem">📜 이어서 받기</button>';
+        $("pg-retry").onclick = function () { genFailed = false; genPart(i); };
       }
 
       // ===== 핵심 요약 짤 (720×1280 · 라이트 글래스) =====
@@ -463,6 +563,16 @@
       function replay() { $("gate").style.display = "none"; $("report-panel").style.display = "none"; startTale(birth()); }
       $("btn-tale").onclick = replay;
       $("btn-replay").onclick = replay;
+
+      // 페이지 넘김 조작
+      $("pg-prev").onclick = function () { go(-1); };
+      $("pg-next").onclick = function () { go(1); };
+      $("pg-tap-l").onclick = function () { go(-1); };
+      $("pg-tap-r").onclick = function () { go(1); };
+      document.addEventListener("keydown", function (e) {
+        if ($("report-panel").style.display !== "block") return;
+        if (e.key === "ArrowRight") go(1); else if (e.key === "ArrowLeft") go(-1);
+      });
 
       fetch("data/saju-terms.json").then(function (r) { return r.ok ? r.json() : null; })
         .then(function (d) { data = d; setup(); })
