@@ -218,12 +218,19 @@ border-radius:12px;padding:12px;cursor:pointer;font-family:inherit;font-size:1re
       ]},
       { id: 23, name: "귀곡", cls: "n-gwi", text: "…말해 보아라.\n무엇이 네 밤잠을 앗아갔느냐.",
         input: { kind: "text", key: "focusFree", placeholder: "궁금한 것을 적어라 (예: 그 사람과 이어질까)", maxlen: 40, submit: "🕯 마음을 아뢴다" }, goto: 24 },
-      { id: 24, name: "귀곡", cls: "n-gwi", text: "…네 팔자, 보겠나?", choices: [
-        { label: "🙏 보여주세요", enter: true },
-        { label: "❓ …두렵소. 잠시만.", goto: 25 }
-      ]},
-      { id: 25, name: "귀곡", cls: "n-gwi", text: "두려움도 네 팔자의 일부다.\n…준비되거든, 눈을 마주쳐라.", choices: [
-        { label: "🙏 …보여주세요", enter: true }
+      { id: 24, name: "귀곡", cls: "n-gwi",
+        text: function () {
+          if (opts.owned) return "…또 왔구나.\n네 명부는 이미 내가 새겨두었다.\n다시 펼쳐 보겠나?";
+          if (opts.costText) return "네 팔자를 뼛속까지 들춰주마.\n대신 [" + opts.costText + "]을 바쳐야 한다.\n…자세히 알고 싶으냐?";
+          return "네 팔자를 뼛속까지 들춰주마.\n지금은 값을 받지 않으마.\n…자세히 알고 싶으냐?";
+        },
+        choices: [
+          { label: "🩸 낱낱이 보여주시오", enter: true },
+          { label: "❓ …두렵소. 잠시만.", goto: 25 }
+        ]
+      },
+      { id: 25, name: "귀곡", cls: "n-gwi", text: "두려움도 네 팔자의 일부다.\n…준비되거든, 내 눈을 마주쳐라.", choices: [
+        { label: "🩸 …보여주시오", enter: true }
       ]}
     ];
     var byId = {}; script.forEach(function (s) { byId[s.id] = s; });

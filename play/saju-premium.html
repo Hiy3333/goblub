@@ -129,6 +129,20 @@
     .pg-tap .l, .pg-tap .r { width:16%; pointer-events:auto; cursor:pointer; }
     .pg-tap .r { background: linear-gradient(270deg, rgba(180,50,60,.06), transparent); }
     .pg-tap .l { background: linear-gradient(90deg, rgba(180,50,60,.06), transparent); }
+
+    /* 분석 중 — 귀곡이 인생을 훑는 풀스크린 영상 */
+    #analyzing { position:fixed; inset:0; z-index:80; display:none; align-items:center; justify-content:center; background:#05040a; }
+    #analyzing.on { display:flex; }
+    #analyzing.fading { animation: an-fade .8s ease forwards; }
+    @keyframes an-fade { to { opacity:0; visibility:hidden; } }
+    #an-vid { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:.5; filter:contrast(1.05) saturate(.9); }
+    #analyzing .an-scrim { position:absolute; inset:0; background:radial-gradient(ellipse at center, rgba(5,4,10,.15) 0%, rgba(5,4,10,.82) 78%); }
+    #analyzing .an-wrap { position:relative; text-align:center; padding:0 26px; max-width:560px; }
+    #an-cap { font-family:"Nanum Myeongjo", serif; font-weight:800; font-size:1.4rem; line-height:1.55; color:#f3e9dd; letter-spacing:.02em; text-shadow:0 2px 20px rgba(0,0,0,.95), 0 0 34px rgba(140,20,20,.35); animation: an-breathe 3.2s ease-in-out infinite; }
+    @keyframes an-breathe { 0%,100%{opacity:.82} 50%{opacity:1} }
+    #an-sub { margin-top:18px; color:#c24040; font-size:.92rem; letter-spacing:.09em; font-family:"Nanum Myeongjo", serif; }
+    #an-flame { margin-top:24px; font-size:1.5rem; animation: an-flick 1.4s ease-in-out infinite; }
+    @keyframes an-flick { 0%,100%{opacity:1;transform:translateY(0) rotate(-2deg)} 45%{opacity:.55;transform:translateY(1px) rotate(3deg)} }
   </style>
 </head>
 <body>
@@ -189,6 +203,15 @@
       <p class="fine-print" style="margin-top:14px">사주는 재미로 봐주세요 🙂 · 리포트는 이 브라우저에 저장돼 언제든 다시 볼 수 있어요</p>
     </section>
   </main>
+  <div id="analyzing">
+    <video id="an-vid" muted loop playsinline preload="auto" src="img/tale/ritual.mp4?v=3"></video>
+    <div class="an-scrim"></div>
+    <div class="an-wrap">
+      <p class="an-cap" id="an-cap">귀곡이 네 인생을 훑는 중…</p>
+      <p class="an-sub" id="an-sub"></p>
+      <div id="an-flame">🕯</div>
+    </div>
+  </div>
   <div id="site-footer"></div>
   <script src="../js/common.js?v=2" data-root=".."></script>
   <script src="js/saju.js"></script>
@@ -197,7 +220,7 @@
   <script src="js/feed.js?v=4"></script>
   <script src="js/goblub-art.js"></script>
   <script src="js/report-ui.js?v=4"></script>
-  <script src="js/tale.js?v=7"></script>
+  <script src="js/tale.js?v=8"></script>
   <script>
     (function () {
       var $ = function (id) { return document.getElementById(id); };
@@ -242,18 +265,19 @@
         if (!data) return;
         var b = birth();
         if (b) computeFrom(b);
+        // 이미 봤더라도 다시 시작할 땐 귀곡을 만나러 가는 인트로부터 (스킵 버튼 제공)
+        if (window.GoblubTale) { startTale(b); return; }
+        // 폴백(스토리 엔진 없을 때)
         if (base && unlocked()) { openReport(); return; }
-        var seen = false;
-        try { seen = !!localStorage.getItem("goblub_tale_seen"); } catch (e) {}
-        // 첫 방문이거나 생년월일이 없으면 이계 인트로(스토리 안에서 정보 입력)
-        if (window.GoblubTale && (!seen || !b)) { startTale(b); return; }
         if (!base) { $("no-profile").style.display = "block"; return; }
         renderGate();
       }
+      function costLabel() { return COST > 0 ? ("젬리 " + COST + "개") : ""; }
 
       function startTale(b) {
         GoblubTale.start({
           base: base, deep: deep, hasBirth: !!b, initialBirth: b,
+          owned: !!(base && unlocked()), costText: costLabel(),
           compute: function (nb) {
             var merged = b ? { y: nb.y, m: nb.m, d: nb.d, hour: nb.hour, min: nb.min || 0, gender: nb.gender || b.gender || null } : nb;
             try { localStorage.setItem("goblub_birth", JSON.stringify(merged)); } catch (e) {}
@@ -264,7 +288,7 @@
             try { localStorage.setItem("goblub_tale_seen", "1"); } catch (e) {}
             if (payload && payload.base) { base = payload.base; deep = payload.deep; baseKey = djb2(JSON.stringify(base)); }
             userName = (payload && payload.name) || ""; userFocus = (payload && payload.focus) || "";
-            doUnlock();
+            enterReport();
           },
           onExit: function (payload) {
             try { localStorage.setItem("goblub_tale_seen", "1"); } catch (e) {}
@@ -299,6 +323,35 @@
       ];
       var pages = [], cur = 0, imgTurn = 0, textSinceImg = 0, allDone = false, genFailed = false;
 
+      // ===== 분석 중 풀스크린 영상 (다 쓸 때까지 반복) =====
+      var AN_CAPS = [
+        "귀곡이 네 인생을 훑는 중…",
+        "명부에 네 이름을 새기는 중…",
+        "네 팔자의 결을 따라 붓이 움직인다…",
+        "지나온 대운을 되짚는 중…",
+        "네가 숨긴 얼굴을 들춰내는 중…",
+        "여덟 글자를 하나하나 헤아리는 중…"
+      ];
+      var analyzing = false, anTimer = null, anIdx = 0;
+      function startCaptions() {
+        stopCaptions();
+        anTimer = setInterval(function () { anIdx = (anIdx + 1) % AN_CAPS.length; $("an-cap").textContent = AN_CAPS[anIdx]; }, 3200);
+      }
+      function stopCaptions() { if (anTimer) { clearInterval(anTimer); anTimer = null; } }
+      function showAnalyzing() {
+        analyzing = true; anIdx = 0;
+        var ov = $("analyzing"); ov.classList.remove("fading"); ov.classList.add("on");
+        $("an-cap").textContent = AN_CAPS[0];
+        $("an-sub").textContent = "귀곡이 명부를 펼친다…";
+        var v = $("an-vid"); try { v.currentTime = 0; var pr = v.play(); if (pr && pr.catch) pr.catch(function () {}); } catch (e) {}
+        startCaptions();
+      }
+      function hideAnalyzing() {
+        analyzing = false; stopCaptions();
+        var ov = $("analyzing"); ov.classList.add("fading");
+        setTimeout(function () { ov.classList.remove("on", "fading"); try { $("an-vid").pause(); } catch (e) {} }, 820);
+      }
+
       function partLabel(id) {
         return { p1: "1부 · 성격", p2: "1부 · 성격", l1: "2부 · 인연", l2: "2부 · 인연",
                  m1: "3부 · 재물", m2: "3부 · 재물", d1: "4부 · 대운", d2: "4부 · 대운" }[id] || "";
@@ -314,7 +367,7 @@
           textSinceImg++;
           if (textSinceImg >= 3) { pushImagePage(); textSinceImg = 0; }
         });
-        renderPage();
+        if (!analyzing) renderPage();
       }
 
       function renderPage() {
@@ -362,7 +415,8 @@
         PARTS.forEach(function (p) { p.done = false; p.text = ""; });
         pages = [{ type: "cover" }]; cur = 0; imgTurn = 0; textSinceImg = 0; allDone = false; genFailed = false;
         $("pg-end").style.display = "none";
-        renderPage();
+        showAnalyzing();   // 다 쓸 때까지 귀곡 분석 영상 반복
+        renderPage();      // 뒤에서 커버/페이지 미리 구성 (영상에 가려짐)
         genPart(0);
       }
 
@@ -372,10 +426,18 @@
           allDone = true;
           $("pg-writing").textContent = "🕯 명부 완성. 페이지를 넘겨 끝까지 읽어라."; $("pg-writing").classList.remove("on");
           $("pg-end").style.display = "flex";
-          renderPage();
+          if (analyzing) {
+            $("an-cap").textContent = "명부가 완성되었다."; stopCaptions();
+            $("an-sub").textContent = "네 팔자를 첫 장부터 넘겨라.";
+            hideAnalyzing();
+            cur = 0; setTimeout(renderPage, 860);
+          } else {
+            renderPage();
+          }
         } else {
           $("pg-writing").textContent = "귀곡이 " + (done) + "/" + TOTAL + "부를 새기는 중";
           $("pg-writing").classList.add("on");
+          if (analyzing) $("an-sub").textContent = "네 명부 " + done + " / " + TOTAL + " 장을 새기는 중…";
         }
       }
 
@@ -384,6 +446,7 @@
         attempt = attempt || 0;
         var p = PARTS[i];
         $("pg-writing").textContent = "귀곡이 " + (i + 1) + "/" + TOTAL + "부를 새기는 중"; $("pg-writing").classList.add("on");
+        if (analyzing) $("an-sub").textContent = "네 명부 " + i + " / " + TOTAL + " 장을 새기는 중…";
         var buffer = "";
         function failSoft() {
           if (attempt >= 1) return false;
@@ -411,6 +474,7 @@
             if (paid && i === 0) {
               if (COST > 0) GoblubFeed.earn(COST, true); paid = false;
               try { localStorage.removeItem(paidKey()); } catch (e) {}
+              if (analyzing) hideAnalyzing();
               renderGate(); return;
             }
             retryFail(i,
@@ -423,6 +487,13 @@
 
       function retryFail(i, msg) {
         genFailed = true;
+        if (analyzing) {
+          stopCaptions();
+          $("an-cap").textContent = "귀곡이 잠시 붓을 멈췄다";
+          $("an-sub").innerHTML = esc(msg) + ' <button class="pg-btn" id="an-retry" style="padding:6px 12px;font-size:.85rem;margin-left:6px">📜 이어서</button>';
+          $("an-retry").onclick = function () { genFailed = false; startCaptions(); genPart(i); };
+          return;
+        }
         var w = $("pg-writing"); w.classList.remove("on");
         w.innerHTML = msg + ' <button class="pg-btn" id="pg-retry" style="padding:6px 12px;font-size:.85rem">📜 이어서 받기</button>';
         $("pg-retry").onclick = function () { genFailed = false; genPart(i); };
@@ -545,9 +616,11 @@
       }
       $("btn-sum").onclick = saveSummary;
 
-      function doUnlock() {
-        if (!GoblubFeed.spend(COST)) { renderGate(); return; }
-        paid = true;
+      // 귀곡이 "자세히 볼래?"에 응한 순간 — 이미 본 자는 무료, 아니면 가상재화 소비 후 진입
+      function enterReport() {
+        if (base && unlocked()) { openReport(); return; }   // 이미 새겨둔 명부는 무료 재열람
+        if (!GoblubFeed.spend(COST)) { renderGate(); return; }  // 젬리 소비 (COST=0이면 통과)
+        paid = COST > 0;
         try { localStorage.setItem(paidKey(), String(Date.now())); } catch (e) {}
         // 발급 이벤트 기록(관리자 현황용) — 실패해도 무시
         try {
@@ -559,7 +632,7 @@
         } catch (e) {}
         openReport();
       }
-      $("btn-unlock").onclick = doUnlock;
+      $("btn-unlock").onclick = enterReport;
       function replay() { $("gate").style.display = "none"; $("report-panel").style.display = "none"; startTale(birth()); }
       $("btn-tale").onclick = replay;
       $("btn-replay").onclick = replay;
