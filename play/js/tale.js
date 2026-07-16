@@ -53,9 +53,10 @@ padding:11px 13px;font-family:inherit;font-size:1rem;width:100%}\
 .tale-inp .ok{background:linear-gradient(180deg,#7a3a52,#5a1f34);border:1px solid rgba(255,120,150,.5);color:#ffe;font-weight:bold;\
 border-radius:12px;padding:12px;cursor:pointer;font-family:inherit;font-size:1rem}\
 .tale-inp .ok:hover{filter:brightness(1.12)}\
-.tale.fadeout{opacity:0;transition:opacity 1s}\
+.tale.fadeout{opacity:0;transition:opacity .55s ease}\
 .tale-vid{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;opacity:0;transition:opacity .8s;z-index:6;pointer-events:none}\
 .tale-vid.on{opacity:1}\
+.tale-vid::-webkit-media-controls-start-playback-button,.tale-vid::-webkit-media-controls,.tale-bgv::-webkit-media-controls-start-playback-button,.tale-bgv::-webkit-media-controls{display:none!important;-webkit-appearance:none}\
 .tale-vcap{position:absolute;left:50%;bottom:12%;transform:translateX(-50%);z-index:7;color:#e9e2ff;font-family:'Jua','Malgun Gothic',sans-serif;font-size:1rem;letter-spacing:2px;text-shadow:0 0 14px rgba(0,0,0,.9);opacity:0;transition:opacity .6s;text-align:center;pointer-events:none}\
 .tale-vcap.on{opacity:1}\
 .tale-vcap .dot{animation:tale-blink 1.1s infinite}\
@@ -245,7 +246,7 @@ border-radius:12px;padding:12px;cursor:pointer;font-family:inherit;font-size:1re
       '<div class="tale-vig"></div>' +
       '<div class="tale-gob">' + (window.GoblubArt ? GoblubArt.svg(150) : '<span style="font-size:110px">👾</span>') + "</div>" +
       '<div class="tale-vortex"></div>' +
-      '<video class="tale-vid" playsinline preload="auto"></video>' +
+      '<video class="tale-vid" playsinline webkit-playsinline muted preload="auto"></video>' +
       '<p class="tale-vcap"></p>' +
       '<div class="tale-top"><button class="t-mute">🔊</button><button class="t-skip">건너뛰기 ➤</button></div>' +
       '<div class="tale-box"><p class="tale-name"></p><p class="tale-text"></p>' +
@@ -346,7 +347,7 @@ border-radius:12px;padding:12px;cursor:pointer;font-family:inherit;font-size:1re
         ok.onclick = function (e) { e.stopPropagation(); done(); };
         i.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); done(); } });
         inpEl.appendChild(i); inpEl.appendChild(ok);
-        setTimeout(function () { try { i.focus(); } catch (e) {} }, 50);
+        // 자동 포커스 안 함 — 사용자가 칸을 직접 눌러야 키보드가 올라오게
       } else if (inp.kind === "birth") {
         var pre = collected.birth || (opts.hasBirth && opts.initialBirth) || {};
         var wrapY = sel("y"), wrapM = sel("m"), wrapD = sel("d"), wrapH = sel("h"), wrapG = sel("g");

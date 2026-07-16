@@ -83,14 +83,24 @@
     .need-more { color: #ff8a98 !important; }
     .need-more a, .wallet-mini a { color: #ffb84a !important; }
 
+    /* 스토리→명부 진입 시 페이지 자체를 어둡게 (밝은 화면 번쩍임 방지·몰입 유지) */
+    body.story-mode { background:#05040a !important; }
+    body.story-mode main > section.panel { background: linear-gradient(180deg,#140d18,#0d0912) !important;
+      border-color: rgba(150,60,70,.4) !important; box-shadow: 0 18px 50px rgba(0,0,0,.6) !important; }
+    body.story-mode .fine-print { color:#7a6f8a !important; }
+
     /* ===== 명부 페이지 넘김 뷰어 ===== */
     #pager { max-width: 620px; margin: 0 auto; }
     .pg-frame { position: relative; background:
         radial-gradient(120% 100% at 50% 0%, rgba(60,20,26,.5), transparent 60%),
         linear-gradient(180deg, #140d18, #0d0912);
-      border: 1px solid rgba(150,60,70,.4); border-radius: 12px; min-height: 62vh;
+      border: 1px solid rgba(150,60,70,.4); border-radius: 12px; min-height: 58vh; max-height: 78vh;
       box-shadow: 0 18px 50px rgba(0,0,0,.6), inset 0 0 60px rgba(80,10,20,.25);
-      padding: 22px 20px 26px; overflow: hidden; }
+      padding: 22px 20px 26px; overflow-y: auto; overflow-x: hidden;
+      scroll-behavior: smooth; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
+    .pg-frame::-webkit-scrollbar { width: 6px; }
+    .pg-frame::-webkit-scrollbar-track { background: transparent; }
+    .pg-frame::-webkit-scrollbar-thumb { background: rgba(150,60,70,.45); border-radius: 3px; }
     .pg-vign { position: absolute; inset: 0; pointer-events: none; border-radius: 12px;
       box-shadow: inset 0 0 90px 20px rgba(0,0,0,.7); }
     .pg-page { position: relative; z-index: 1; opacity: 1; transition: opacity .35s ease, transform .35s ease; }
@@ -135,11 +145,12 @@
     #analyzing.on { display:flex; }
     #analyzing.fading { animation: an-fade .8s ease forwards; }
     @keyframes an-fade { to { opacity:0; visibility:hidden; } }
-    #an-vid { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:.5; filter:contrast(1.05) saturate(.9); }
+    #an-vid { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:.5; filter:contrast(1.05) saturate(.9); pointer-events:none; }
+    #an-vid::-webkit-media-controls-start-playback-button, #an-vid::-webkit-media-controls { display:none !important; -webkit-appearance:none; }
+    #an-cap { transition: opacity .5s ease; }
     #analyzing .an-scrim { position:absolute; inset:0; background:radial-gradient(ellipse at center, rgba(5,4,10,.15) 0%, rgba(5,4,10,.82) 78%); }
     #analyzing .an-wrap { position:relative; text-align:center; padding:0 26px; max-width:560px; }
-    #an-cap { font-family:"Nanum Myeongjo", serif; font-weight:800; font-size:1.4rem; line-height:1.55; color:#f3e9dd; letter-spacing:.02em; text-shadow:0 2px 20px rgba(0,0,0,.95), 0 0 34px rgba(140,20,20,.35); animation: an-breathe 3.2s ease-in-out infinite; }
-    @keyframes an-breathe { 0%,100%{opacity:.82} 50%{opacity:1} }
+    #an-cap { font-family:"Nanum Myeongjo", serif; font-weight:800; font-size:1.4rem; line-height:1.55; color:#f3e9dd; letter-spacing:.02em; text-shadow:0 2px 20px rgba(0,0,0,.95), 0 0 34px rgba(140,20,20,.35); }
     #an-sub { margin-top:18px; color:#c24040; font-size:.92rem; letter-spacing:.09em; font-family:"Nanum Myeongjo", serif; }
     #an-flame { margin-top:24px; font-size:1.5rem; animation: an-flick 1.4s ease-in-out infinite; }
     @keyframes an-flick { 0%,100%{opacity:1;transform:translateY(0) rotate(-2deg)} 45%{opacity:.55;transform:translateY(1px) rotate(3deg)} }
@@ -149,10 +160,11 @@
   <div id="site-header"></div>
   <main>
     <section class="panel" style="text-align:center; border:2px solid var(--yellow); box-shadow:0 0 22px rgba(255,217,61,.22), inset 0 0 22px rgba(255,217,61,.05)">
+      <div id="prem-head">
       <span class="prem-badge">✨ PREMIUM</span>
       <span class="prem-emoji">📜</span>
       <h1 style="font-size:1.5rem; margin-bottom:6px">프리미엄 심층 리포트</h1>
-      <p class="result-desc">어두운 숲의 저승사자, <b>귀곡(鬼哭)</b>이 직접 읽는 팔자.<br>신살·합충·용신·10년 세운까지 계산해 <b>성격·인연·재물·대운 8부, 2만 자급</b>으로 씁니다.</p>
+      <p class="result-desc">어두운 숲의 저승사자, <b>귀곡(鬼哭)</b>이 직접 읽는 팔자.<br>신살·합충·용신·10년 세운까지 계산해 <b>성격·인연·재물·대운 8부</b>로 씁니다.</p>
 
       <ul class="vol-list">
         <li><b>📕 1부 성격</b> 진짜 본질 · 안 보여주는 얼굴 · 결국 이기는 이유<span>①남들은 죽어도 모르는 진짜 성격 ②결국 네가 이기게 되는 이유</span></li>
@@ -160,6 +172,7 @@
         <li><b>📒 3부 재물</b> 돈그릇 · 대박 타이밍 · 돈구멍<span>①돈그릇의 크기 ②대박 연도와 새는 돈구멍</span></li>
         <li><b>📘 4부 대운</b> 억까 끝나는 시점 · 왕이 되는 처방<span>①억까가 끝나는 시점 ②역전의 해·용신 처방</span></li>
       </ul>
+      </div>
 
       <div id="no-profile" style="display:none">
         <p class="need-more">먼저 사주 프로필이 필요해요.</p>
@@ -275,6 +288,7 @@
       function costLabel() { return COST > 0 ? ("젬리 " + COST + "개") : ""; }
 
       function startTale(b) {
+        document.body.classList.add("story-mode");   // 페이지 어둡게 — 진입 번쩍임 방지
         GoblubTale.start({
           base: base, deep: deep, hasBirth: !!b, initialBirth: b,
           owned: !!(base && unlocked()), costText: costLabel(),
@@ -300,6 +314,8 @@
 
       function renderGate() {
         var bal = GoblubFeed.wallet().balance;
+        document.body.classList.remove("story-mode");   // 게이트는 라이트 테마로 복구
+        $("prem-head").style.display = "";   // 게이트에선 소개 헤더 복구
         $("gate").style.display = "block";
         $("report-panel").style.display = "none";
         if (COST === 0) {
@@ -335,7 +351,10 @@
       var analyzing = false, anTimer = null, anIdx = 0;
       function startCaptions() {
         stopCaptions();
-        anTimer = setInterval(function () { anIdx = (anIdx + 1) % AN_CAPS.length; $("an-cap").textContent = AN_CAPS[anIdx]; }, 3200);
+        anTimer = setInterval(function () {
+          var el = $("an-cap"); el.style.opacity = "0";
+          setTimeout(function () { anIdx = (anIdx + 1) % AN_CAPS.length; el.textContent = AN_CAPS[anIdx]; el.style.opacity = "1"; }, 500);
+        }, 6500);   // ~하는 중 문구가 충분히 오래 머물도록
       }
       function stopCaptions() { if (anTimer) { clearInterval(anTimer); anTimer = null; } }
       function showAnalyzing() {
@@ -377,6 +396,9 @@
         $("pg-prev").disabled = (cur === 0);
         var atEnd = (cur >= pages.length - 1);
         $("pg-next").disabled = atEnd && allDone;
+        // 상단 소개 헤더는 첫 장에서만, 하단 액션(요약짤·다시보기)은 마지막 장에서만
+        $("prem-head").style.display = (cur === 0) ? "" : "none";
+        $("pg-end").style.display = (allDone && atEnd) ? "flex" : "none";
         el.classList.add("turning");
         setTimeout(function () {
           if (!pg) { el.classList.remove("turning"); return; }
@@ -395,8 +417,8 @@
               '<div class="pg-body">' + pg.html + '</div>';
           }
           el.classList.remove("turning");
-          $("pg-page").parentElement.scrollTop = 0;
-          try { $("pager").scrollIntoView({ block: "start", behavior: "smooth" }); } catch (e) {}
+          // 새 장은 항상 맨 위부터 (프레임 내부 스크롤만 리셋 — 창 점프 없음)
+          var fr = el.parentElement; if (fr) fr.scrollTop = 0;
         }, 200);
       }
       function go(d) {
@@ -425,7 +447,6 @@
         if (done >= TOTAL) {
           allDone = true;
           $("pg-writing").textContent = "🕯 명부 완성. 페이지를 넘겨 끝까지 읽어라."; $("pg-writing").classList.remove("on");
-          $("pg-end").style.display = "flex";
           if (analyzing) {
             $("an-cap").textContent = "명부가 완성되었다."; stopCaptions();
             $("an-sub").textContent = "네 팔자를 첫 장부터 넘겨라.";
