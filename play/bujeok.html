@@ -92,32 +92,25 @@
           BujeokArt.render($("bujeok-cv"), { birth: b, elemKo: elem, pillars: pillars });
         });
 
-        // 모바일 사파리·인앱 브라우저는 a[download]가 안 먹는다 →
-        // ①공유 시트(파일) 시도(iOS '이미지 저장'/안드로이드 갤러리) ②실패 시 길게 눌러 저장 오버레이 ③데스크톱은 다운로드
+        // 모바일: 공유 시트의 '이미지 저장'이 iOS에서 간헐 실패(웹킷 버그) →
+        // 항상 성공하는 '길게 눌러 저장' 화면으로 직행(dataURL이라 인앱 브라우저에서도 저장됨). 데스크톱: 다운로드.
         var isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
         function longPressOverlay(url) {
           var ov = document.createElement("div");
-          ov.style.cssText = "position:fixed;inset:0;z-index:99;background:rgba(5,4,10,.96);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;";
+          ov.style.cssText = "position:fixed;inset:0;z-index:99;background:rgba(5,4,10,.97);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;overflow:auto;";
           ov.innerHTML =
-            '<img src="' + url + '" style="max-height:70vh;max-width:88vw;border-radius:10px;box-shadow:0 14px 44px rgba(0,0,0,.7)" alt="부적" />' +
-            '<p style="color:#e8dcc8;font-family:\'Nanum Myeongjo\',serif;margin:16px 0 4px;text-align:center;line-height:1.7">부적을 <b style="color:#ff8a5a">길게 꾹</b> 눌러<br>[이미지 저장 / 사진에 추가]를 선택해라</p>' +
-            '<button style="margin-top:14px;background:rgba(40,26,40,.9);color:#e0d4e8;border:1px solid rgba(150,80,90,.5);border-radius:10px;padding:11px 22px;font-family:inherit;font-size:1rem;cursor:pointer">닫기</button>';
+            '<p style="color:#ffb08a;font-family:\'Nanum Myeongjo\',serif;font-weight:800;margin-bottom:12px;font-size:1.05rem">🧧 부적을 <span style="color:#ff5a3a">길게 꾹</span> 눌러라</p>' +
+            '<img src="' + url + '" style="max-height:64vh;max-width:86vw;border-radius:10px;box-shadow:0 14px 44px rgba(0,0,0,.7)" alt="부적" />' +
+            '<p style="color:#e8dcc8;font-family:\'Nanum Myeongjo\',serif;margin:14px 0 0;text-align:center;line-height:1.7;font-size:.95rem">누르고 있으면 메뉴가 뜬다<br>→ <b style="color:#ff8a5a">[이미지 저장 / 사진에 추가]</b> 선택</p>' +
+            '<button style="margin-top:16px;background:rgba(40,26,40,.9);color:#e0d4e8;border:1px solid rgba(150,80,90,.5);border-radius:10px;padding:11px 22px;font-family:inherit;font-size:1rem;cursor:pointer">닫기</button>';
           ov.querySelector("button").onclick = function () { ov.remove(); };
           document.body.appendChild(ov);
         }
         $("btn-save").onclick = function () {
-          $("bujeok-cv").toBlob(function (blob) {
+          var cv = $("bujeok-cv");
+          if (isMobile) { longPressOverlay(cv.toDataURL("image/png")); return; }
+          cv.toBlob(function (blob) {
             var url = URL.createObjectURL(blob);
-            if (isMobile && navigator.canShare && navigator.share) {
-              var file;
-              try { file = new File([blob], "gwigok-bujeok.png", { type: "image/png" }); } catch (e) {}
-              if (file && navigator.canShare({ files: [file] })) {
-                navigator.share({ files: [file], title: "귀곡의 부적" })
-                  .catch(function () { longPressOverlay(url); });
-                return;
-              }
-            }
-            if (isMobile) { longPressOverlay(url); return; }
             var a = document.createElement("a");
             a.href = url; a.download = "gwigok-bujeok.png";
             document.body.appendChild(a); a.click(); a.remove();
