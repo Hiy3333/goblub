@@ -22,6 +22,10 @@
 .tale-gob{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);line-height:0;filter:drop-shadow(0 0 26px rgba(157,107,255,.5));transition:transform 2s cubic-bezier(.6,-0.2,.8,.4),opacity 1.8s}\
 .tale-gob.swallow{transform:translate(-50%,-50%) scale(26) rotate(50deg);opacity:0}\
 @keyframes gob-in{to{transform:translateX(-50%) translateY(0)}}\
+.tale-gob.peek{filter:drop-shadow(0 0 30px rgba(157,107,255,.95)) drop-shadow(0 0 70px rgba(120,60,220,.55))}\
+@keyframes gob-peek{0%{opacity:0;transform:translate(-50%,-50%) scale(.62)}\
+35%{opacity:.35}55%{opacity:.2}75%{opacity:1;transform:translate(-50%,-50%) scale(1.03)}\
+100%{opacity:1;transform:translate(-50%,-50%) scale(1)}}\
 .tale-vortex{position:absolute;left:50%;top:38%;width:160vmax;height:160vmax;transform:translate(-50%,-50%) scale(0);border-radius:50%;pointer-events:none;\
 background:conic-gradient(from 0deg,#000 0deg,#2a1c66 70deg,#000 140deg,#3a1258 210deg,#000 290deg,#241a52 340deg,#000 360deg);\
 opacity:0;transition:transform 2.1s cubic-bezier(.5,0,.8,.4),opacity .5s}\
@@ -180,8 +184,8 @@ border-radius:12px;padding:12px;cursor:pointer;font-family:inherit;font-size:1re
         { label: "👈 왼쪽을 둘러본다", goto: 6 },
         { label: "👉 오른쪽을 둘러본다", goto: 7 }
       ]},
-      { id: 6, name: "", cls: "n-nar", text: "뒤틀린 나무들 사이로\n안개가… 기어 다닌다.", goto: 8 },
-      { id: 7, name: "", cls: "n-nar", text: "까마귀 한 마리가 소리 없이\n이쪽을 내려다보고 있다.", goto: 8 },
+      { id: 6, vbg: "look_left", name: "", cls: "n-nar", text: "뒤틀린 나무들 사이로\n안개가… 기어 다닌다.", goto: 8 },
+      { id: 7, vbg: "look_right", name: "", cls: "n-nar", text: "까마귀 한 마리가 소리 없이\n이쪽을 내려다보고 있다.\n…눈이 마주쳤다.", goto: 8 },
       { id: 8, name: "", cls: "n-nar", text: "…멀리, 불빛 하나가 흔들린다.", choices: [
         { label: "🕯 불빛을 향해 걷는다", goto: 9 }
       ]},
@@ -190,7 +194,8 @@ border-radius:12px;padding:12px;cursor:pointer;font-family:inherit;font-size:1re
         { label: "👀 뒤를 돌아본다", goto: 11 },
         { label: "🏃 무시하고 걷는다", goto: 12 }
       ]},
-      { id: 11, name: "", cls: "n-nar", text: "어둠 속 — 낯익은 보라색 눈이\n껌뻑였다. …따라와 준 거야?", goto: 13 },
+      { id: 11, bg: "black", gob: true, gobPeek: true, name: "고블럽", cls: "n-gob",
+        text: "…나야.\n혼자 보내면 안 될 것 같아서.\n\n(낯익은 보라색 눈이 어둠 속에서 껌뻑인다)", goto: 13 },
       { id: 12, name: "", cls: "n-nar", text: "숨을 죽이고 발걸음을 서두른다.", goto: 13 },
       { id: 13, bg: "tent", name: "", cls: "n-nar", text: "낡은 천막.\n틈새로 촛불이 새어 나온다." },
       { id: 14, name: "???", cls: "n-unk", text: "……밖은 위험하다.\n들어와라.", choices: [
@@ -417,6 +422,14 @@ border-radius:12px;padding:12px;cursor:pointer;font-family:inherit;font-size:1re
       if (s.vbg) setBgVideo(s.vbg);
       else if (s.bg) setBg(s.bg, s.walk);
       gob.style.display = (s.gob || s.fx === "swallow") ? "block" : "none";
+      // 뒤를 돌아봤을 때 고블럽이 어둠 속에서 스르륵 드러나는 연출
+      if (s.gobPeek) {
+        gob.classList.remove("swallow");   // 삼킴 연출 잔여 상태(opacity:0) 해제
+        gob.classList.add("peek");         // 보라색 발광만 담당
+        gob.style.animation = "none";
+        void gob.offsetWidth;              // 리플로우 강제 — 애니메이션 재시작
+        gob.style.animation = "gob-peek 2s cubic-bezier(.2,.7,.3,1) forwards";
+      } else { gob.classList.remove("peek"); }
       nameEl.textContent = (typeof s.name === "function" ? s.name() : s.name) || "";
       nameEl.className = "tale-name " + (s.cls || "n-nar");
 
