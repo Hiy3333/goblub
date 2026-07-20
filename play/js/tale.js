@@ -355,16 +355,20 @@ border-radius:12px;padding:12px;cursor:pointer;font-family:inherit;font-size:1re
         // 자동 포커스 안 함 — 사용자가 칸을 직접 눌러야 키보드가 올라오게
       } else if (inp.kind === "birth") {
         var pre = collected.birth || (opts.hasBirth && opts.initialBirth) || {};
-        var wrapY = sel("y"), wrapM = sel("m"), wrapD = sel("d"), wrapH = sel("h"), wrapG = sel("g");
+        var wrapY = sel("y"), wrapM = sel("m"), wrapD = sel("d"), wrapH = sel("h"), wrapMi = sel("mi"), wrapG = sel("g");
         var row1 = document.createElement("div"); row1.className = "row";
         row1.appendChild(wrapY.el); row1.appendChild(wrapM.el); row1.appendChild(wrapD.el);
         var row2 = document.createElement("div"); row2.className = "row";
-        row2.appendChild(wrapH.el); row2.appendChild(wrapG.el);
+        row2.appendChild(wrapH.el); row2.appendChild(wrapMi.el); row2.appendChild(wrapG.el);
+        // 시를 모르면 분 선택 비활성화
+        function syncMin() { wrapMi.el.disabled = (wrapH.el.value === ""); if (wrapMi.el.disabled) wrapMi.el.value = 0; }
+        wrapH.el.addEventListener("change", syncMin); syncMin();
         var ok2 = document.createElement("button"); ok2.className = "ok"; ok2.textContent = inp.submit || "확인";
         ok2.onclick = function (e) {
           e.stopPropagation(); kickBGM();
           var b = { y: +wrapY.el.value, m: +wrapM.el.value, d: +wrapD.el.value };
-          var hv = wrapH.el.value; b.hour = hv === "" ? null : +hv; b.min = 0;
+          var hv = wrapH.el.value; b.hour = hv === "" ? null : +hv;
+          b.min = b.hour == null ? 0 : (+wrapMi.el.value || 0);
           b.gender = wrapG.el.value || null;
           collected.birth = b;
           if (opts.compute) { var r = opts.compute(b); if (r) { base = r.base; deep = r.deep; } }
@@ -377,6 +381,7 @@ border-radius:12px;padding:12px;cursor:pointer;font-family:inherit;font-size:1re
           if (kind === "m") { for (var m = 1; m <= 12; m++) s.add(new Option(m + "월", m)); s.value = pre.m || 1; }
           if (kind === "d") { for (var d = 1; d <= 31; d++) s.add(new Option(d + "일", d)); s.value = pre.d || 1; }
           if (kind === "h") { s.add(new Option("태어난 시 모름", "")); for (var h = 0; h < 24; h++) s.add(new Option(h + "시", h)); s.value = (pre.hour == null ? "" : pre.hour); }
+          if (kind === "mi") { for (var mi2 = 0; mi2 < 60; mi2++) s.add(new Option(mi2 + "분", mi2)); s.value = (pre.min == null ? 0 : pre.min); }
           if (kind === "g") { s.add(new Option("성별 안 밝힘", "")); s.add(new Option("남", "M")); s.add(new Option("여", "F")); s.value = pre.gender || ""; }
           return { el: s };
         }
