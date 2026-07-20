@@ -31,7 +31,7 @@
   // 고블럽 마스코트(모든 페이지) — GoblubArt가 없으면 먼저 로드한 뒤 buddy 실행
   function initBuddy() {
     if (window.__goblubBuddy) return;
-    loadScript(root + "/play/js/goblub-buddy.js?v=2");
+    loadScript(root + "/play/js/goblub-buddy.js?v=3");
   }
 
   document.addEventListener("DOMContentLoaded", function () {

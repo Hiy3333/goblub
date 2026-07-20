@@ -61,31 +61,37 @@
   minBtn.innerHTML = GoblubArt.svg(38);
   document.body.appendChild(minBtn);
 
-  var pos = { x: window.innerWidth - SIZE - 22, y: window.innerHeight - SIZE - 22 };
+  // 기본값: 우하단에 가만히. 클릭했을 때만 폴짝 이동했다가 잠시 후 제자리로.
+  function homePos() { return { x: window.innerWidth - SIZE - 22, y: window.innerHeight - SIZE - 22 }; }
+  var pos = homePos(), atHome = true;
   function place() { wrap.style.transform = "translate(" + pos.x + "px," + pos.y + "px)"; }
   place();
 
   var state = "on";
   try { if (localStorage.getItem(KEY) === "min") state = "min"; } catch (e) {}
 
-  var moveTimer = null, sayTimer = null;
+  var moveTimer = null, sayTimer = null, homeTimer = null;
 
   function moveRandom() {
-    if (state !== "on") return;
+    if (state !== "on" || reduce) return;
     var margin = 14, top = 92;
     var maxX = Math.max(margin, window.innerWidth - SIZE - margin);
     var maxY = Math.max(top, window.innerHeight - SIZE - margin);
     var nx = margin + Math.random() * (maxX - margin);
     var ny = top + Math.random() * (maxY - top);
     if (svgEl) svgEl.style.transform = "scaleX(" + (nx < pos.x ? -1 : 1) + ")";
-    pos = { x: nx, y: ny };
+    pos = { x: nx, y: ny }; atHome = false;
     place();
+    // 잠시 놀다가 스스로 제자리(우하단)로 복귀
+    clearTimeout(homeTimer);
+    homeTimer = setTimeout(goHome, 5000);
   }
 
-  function schedule() {
-    clearTimeout(moveTimer);
-    if (reduce || state !== "on") return;
-    moveTimer = setTimeout(function () { moveRandom(); schedule(); }, 6000 + Math.random() * 6000);
+  function goHome() {
+    if (state !== "on") return;
+    pos = homePos(); atHome = true;
+    if (svgEl) svgEl.style.transform = "";
+    place();
   }
 
   function say(txt) {
@@ -99,22 +105,34 @@
     if (e.target === xBtn) return;
     bodyEl.classList.remove("bob"); void bodyEl.offsetWidth; bodyEl.classList.add("pop");
     setTimeout(function () { bodyEl.classList.remove("pop"); if (!reduce) bodyEl.classList.add("bob"); }, 520);
-    openTama();
+    // 제자리에 있으면 폴짝 도망(움직임), 쫓아가 다시 잡으면 키우기 열림
+    if (atHome && !reduce) {
+      say(LINES[Math.floor(Math.random() * LINES.length)]);
+      moveRandom();
+    } else {
+      say("히히, 잡았다 요놈!");
+      clearTimeout(homeTimer);
+      openTama();
+      goHome();
+    }
   });
 
   function setState(s) {
     state = s;
     try { localStorage.setItem(KEY, s); } catch (e) {}
-    if (s === "min") { wrap.style.display = "none"; minBtn.style.display = "block"; clearTimeout(moveTimer); }
-    else { wrap.style.display = ""; minBtn.style.display = "none"; schedule(); }
+    if (s === "min") { wrap.style.display = "none"; minBtn.style.display = "block"; clearTimeout(moveTimer); clearTimeout(homeTimer); }
+    else { wrap.style.display = ""; minBtn.style.display = "none"; goHome(); }
   }
 
   xBtn.addEventListener("click", function (e) { e.stopPropagation(); setState("min"); });
   minBtn.addEventListener("click", function () { setState("on"); });
 
   window.addEventListener("resize", function () {
-    pos.x = Math.min(pos.x, window.innerWidth - SIZE - 8);
-    pos.y = Math.min(pos.y, window.innerHeight - SIZE - 8);
+    if (atHome) { pos = homePos(); }
+    else {
+      pos.x = Math.min(pos.x, window.innerWidth - SIZE - 8);
+      pos.y = Math.min(pos.y, window.innerHeight - SIZE - 8);
+    }
     place();
   });
 
