@@ -184,8 +184,8 @@ border-radius:12px;padding:12px;cursor:pointer;font-family:inherit;font-size:1re
         { label: "👈 왼쪽을 둘러본다", goto: 6 },
         { label: "👉 오른쪽을 둘러본다", goto: 7 }
       ]},
-      { id: 6, vbg: "look_left", name: "", cls: "n-nar", text: "뒤틀린 나무들 사이로\n안개가… 기어 다닌다.", goto: 8 },
-      { id: 7, vbg: "look_right", name: "", cls: "n-nar", text: "까마귀 한 마리가 소리 없이\n이쪽을 내려다보고 있다.\n…눈이 마주쳤다.", goto: 8 },
+      { id: 6, vbg: "look_left", vbgOnce: true, name: "", cls: "n-nar", text: "뒤틀린 나무들 사이로\n안개가… 기어 다닌다.", goto: 8 },
+      { id: 7, vbg: "look_right", vbgOnce: true, name: "", cls: "n-nar", text: "까마귀 한 마리가 소리 없이\n이쪽을 내려다보고 있다.\n…눈이 마주쳤다.", goto: 8 },
       { id: 8, name: "", cls: "n-nar", text: "…멀리, 불빛 하나가 흔들린다.", choices: [
         { label: "🕯 불빛을 향해 걷는다", goto: 9 }
       ]},
@@ -284,9 +284,10 @@ border-radius:12px;padding:12px;cursor:pointer;font-family:inherit;font-size:1re
       useA = !useA;
     }
     // 배경 동영상(무한 루프) — 없으면 조용히 정지 이미지로 폴백
-    function setBgVideo(key) {
+    function setBgVideo(key, once) {
       if (bgvKey === key) return;
       bgvKey = key;
+      bgv.loop = !once;   // once면 한 번 재생 후 마지막 프레임에서 정지
       bgA.classList.remove("on"); bgB.classList.remove("on");
       bgv.onerror = function () { if (bgvKey === key) { bgvKey = null; bgv.classList.remove("on"); setBg(key); } };
       bgv.muted = true;
@@ -424,7 +425,7 @@ border-radius:12px;padding:12px;cursor:pointer;font-family:inherit;font-size:1re
       if (!s) { end("enter"); return; }
       cur = s; canTap = false;
       chEl.innerHTML = ""; inpEl.style.display = "none"; inpEl.innerHTML = ""; nextEl.style.visibility = "hidden";
-      if (s.vbg) setBgVideo(s.vbg);
+      if (s.vbg) setBgVideo(s.vbg, s.vbgOnce);
       else if (s.bg) setBg(s.bg, s.walk);
       gob.style.display = (s.gob || s.fx === "swallow") ? "block" : "none";
       // 뒤를 돌아봤을 때 고블럽이 어둠 속에서 스르륵 드러나는 연출
