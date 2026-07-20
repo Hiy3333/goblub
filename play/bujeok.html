@@ -92,9 +92,13 @@
           BujeokArt.render($("bujeok-cv"), { birth: b, elemKo: elem, pillars: pillars });
         });
 
-        // 모바일: 공유 시트의 '이미지 저장'이 iOS에서 간헐 실패(웹킷 버그) →
-        // 항상 성공하는 '길게 눌러 저장' 화면으로 직행(dataURL이라 인앱 브라우저에서도 저장됨). 데스크톱: 다운로드.
-        var isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+        // 저장 전략(플랫폼별로 가장 확실한 경로):
+        //  - 안드로이드/데스크톱: a[download]+blob 직접 다운로드(크롬·삼성브라우저 확실) + 안 됐을 때용 '길게 눌러 저장' 보조 버튼
+        //  - iOS: 다운로드 UX가 어긋나므로 '길게 눌러 저장' 화면(사진 앱 저장)
+        //  - 카톡 등 인앱: download 무시되므로 바로 '길게 눌러 저장'
+        var UA = navigator.userAgent;
+        var isIOS = /iPhone|iPad|iPod/i.test(UA);
+        var isInApp = /KAKAOTALK|Instagram|FBAV|FBAN|Line\//i.test(UA);
         function longPressOverlay(url) {
           var ov = document.createElement("div");
           ov.style.cssText = "position:fixed;inset:0;z-index:99;background:rgba(5,4,10,.97);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;overflow:auto;";
@@ -108,13 +112,28 @@
         }
         $("btn-save").onclick = function () {
           var cv = $("bujeok-cv");
-          if (isMobile) { longPressOverlay(cv.toDataURL("image/png")); return; }
+          if (isIOS || isInApp) { longPressOverlay(cv.toDataURL("image/png")); return; }
+          // 안드로이드·데스크톱: 직접 다운로드
           cv.toBlob(function (blob) {
             var url = URL.createObjectURL(blob);
             var a = document.createElement("a");
             a.href = url; a.download = "gwigok-bujeok.png";
             document.body.appendChild(a); a.click(); a.remove();
-            setTimeout(function () { URL.revokeObjectURL(url); }, 8000);
+            setTimeout(function () { URL.revokeObjectURL(url); }, 15000);
+            // 다운로드가 안 된 경우를 위한 보조 안내(안드로이드만)
+            if (/Android/i.test(UA)) {
+              var tip = $("save-tip");
+              if (!tip) {
+                tip = document.createElement("p"); tip.id = "save-tip"; tip.className = "fine-print";
+                tip.style.marginTop = "10px";
+                tip.innerHTML = '📥 알림바 또는 갤러리·다운로드 폴더를 확인해라. 저장이 안 보이면 → <a href="#" id="lp-alt" style="color:var(--sky)">길게 눌러 저장하기</a>';
+                $("btn-save").parentElement.insertAdjacentElement("afterend", tip);
+                document.getElementById("lp-alt").onclick = function (e) {
+                  e.preventDefault();
+                  longPressOverlay(cv.toDataURL("image/png"));
+                };
+              }
+            }
           }, "image/png");
         };
       });
