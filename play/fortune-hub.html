@@ -9,6 +9,21 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../css/style.css?v=glass3" />
+  <style>
+    /* 귀곡의 오늘 한 마디 */
+    #gwi-today { display:none; max-width:640px; margin:0 auto 22px; text-align:left;
+      background: linear-gradient(180deg, #171020, #100b16);
+      border:1px solid rgba(150,60,70,.45); border-radius:14px; padding:16px 18px 14px;
+      box-shadow: 0 12px 36px rgba(0,0,0,.5), inset 0 0 40px rgba(80,10,20,.2); }
+    #gwi-today .gt-head { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+    #gwi-today .gt-title { font-family:'Nanum Myeongjo',serif; font-weight:800; color:#ffb08a; font-size:1rem; }
+    #gwi-today .gt-ganji { margin-left:auto; font-family:'Nanum Myeongjo',serif; color:#ff8a98; font-size:.9rem;
+      background:rgba(160,40,30,.22); border:1px solid rgba(220,110,80,.4); border-radius:999px; padding:3px 12px; }
+    #gwi-today .gt-line { font-family:'Nanum Myeongjo',serif; color:#e8dcc8; font-size:1.02rem; line-height:1.85; white-space:pre-wrap; }
+    #gwi-today .gt-sign { text-align:right; color:#8a7080; font-size:.82rem; margin-top:6px; font-family:'Nanum Myeongjo',serif; }
+    #gwi-today a { color:var(--sky); }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&display=swap" rel="stylesheet" />
 </head>
 <body>
   <div id="site-header"></div>
@@ -17,6 +32,16 @@
       <h1>🔮 운세</h1>
       <p>내 사주 프로필 하나로 전부 — 골라서 즐기세요</p>
     </section>
+
+    <div id="gwi-today">
+      <div class="gt-head">
+        <span style="font-size:1.2rem">🕯</span>
+        <span class="gt-title">귀곡의 오늘 한 마디</span>
+        <span class="gt-ganji" id="gt-ganji"></span>
+      </div>
+      <p class="gt-line" id="gt-line"></p>
+      <p class="gt-sign" id="gt-sign">— 귀곡 선생</p>
+    </div>
 
     <section class="card-grid">
       <a class="card tint-purple" href="fortune.html">
@@ -49,11 +74,44 @@
         <h2>전생 대환장 파티</h2>
         <p>사주 기운으로 발굴하는 선사시대·조선시대 두 전생 + 삽화</p>
       </a>
+      <a class="card tint-yellow" href="bujeok.html">
+        <span class="icon">🧧</span>
+        <h2>귀곡의 부적</h2>
+        <p>내 팔자의 용신을 봉한 개운부 — 저장해 지니고, 폰 배경으로</p>
+      </a>
+      <a class="card tint-coral" href="myeongbu.html">
+        <span class="icon">📜</span>
+        <h2>명부 대조</h2>
+        <p>부적 두 장을 겹치면 귀곡이 궁합을 대조한다 — 연인·친구·동료별</p>
+      </a>
     </section>
 
     <p class="fine-print" style="margin-top:24px">운세는 재미로 봐주세요 🙂</p>
   </main>
   <div id="site-footer"></div>
   <script src="../js/common.js?v=2" data-root=".."></script>
+  <script src="js/saju.js"></script>
+  <script src="js/today.js?v=1"></script>
+  <script>
+    (function () {
+      var b = null;
+      try { b = JSON.parse(localStorage.getItem("goblub_birth")); } catch (e) {}
+      var box = document.getElementById("gwi-today");
+      if (!b || !b.y) {
+        box.style.display = "block";
+        document.getElementById("gt-ganji").style.display = "none";
+        document.getElementById("gt-sign").style.display = "none";
+        document.getElementById("gt-line").innerHTML = "네 명부를 새기면, 매일 오늘의 운을 한 마디씩 들려주마.\n→ <a href='saju-premium.html'>🕯 귀곡에게 사주 보러 가기</a>";
+        return;
+      }
+      fetch("data/saju-terms.json").then(function (r) { return r.json(); }).then(function (data) {
+        var t = GwigokToday.line(data, b);
+        if (!t) return;
+        box.style.display = "block";
+        document.getElementById("gt-ganji").textContent = "오늘 " + t.ganji + "(" + t.hj + ")일 · " + t.group + "의 날";
+        document.getElementById("gt-line").textContent = t.text;
+      });
+    })();
+  </script>
 </body>
 </html>

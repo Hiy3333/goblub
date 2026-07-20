@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>명부 대조 — 귀곡의 궁합 · goblub</title>
+  <meta name="description" content="부적 두 장을 겹치면 귀곡이 두 사람의 명부를 대조한다 — 연인·부부·친구·동료 관계별 궁합" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Jua&family=Nanum+Myeongjo:wght@400;700;800&family=Gowun+Batang:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css?v=glass3" />
+  <style>
+    body.dark-mb { background:#0a0710 !important; }
+    body.dark-mb main > section.panel { background: linear-gradient(180deg,#151020,#0d0912) !important;
+      border:1px solid rgba(150,60,70,.4) !important; box-shadow: 0 18px 50px rgba(0,0,0,.6) !important; }
+    .mb-title { font-family:'Nanum Myeongjo',serif; font-weight:800; color:#ffb08a; font-size:1.5rem;
+      text-shadow:0 0 18px rgba(220,90,50,.4); margin-bottom:6px; }
+    .mb-sub { color:#9a8ba8; font-size:.95rem; line-height:1.7; }
+    .fine-print { color:#7a6f8a !important; }
+    .slots { display:flex; gap:14px; justify-content:center; flex-wrap:wrap; margin:18px 0 6px; }
+    .slot { width:min(44vw,220px); background:rgba(30,18,26,.6); border:1.5px dashed rgba(180,90,80,.5);
+      border-radius:14px; padding:14px 10px 16px; cursor:pointer; transition:border-color .2s; }
+    .slot:hover { border-color:#ff8a5a; }
+    .slot.ok { border-style:solid; border-color:rgba(120,200,120,.55); }
+    .slot .who { font-family:'Nanum Myeongjo',serif; color:#e8dcc8; font-size:1rem; margin-bottom:8px; }
+    .slot .st { color:#9a8ba8; font-size:.84rem; line-height:1.6; min-height:3.2em; }
+    .slot .st b { color:#ffb08a; }
+    .slot .st .gj { color:#ff8a98; font-family:'Nanum Myeongjo',serif; }
+    .slot input[type=file] { display:none; }
+    .slot .mini-btn { display:inline-block; margin-top:8px; background:rgba(40,26,40,.8); color:#cfc2dc;
+      border:1px solid rgba(150,80,90,.45); border-radius:8px; padding:6px 12px; font-size:.8rem; cursor:pointer; }
+    .rel-chips { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin:14px 0 4px; }
+    .rel-chips button { background:rgba(40,26,40,.7); color:#cfc2dc; border:1px solid rgba(150,80,90,.4);
+      border-radius:999px; padding:9px 16px; font-family:inherit; font-size:.92rem; cursor:pointer; }
+    .rel-chips button.on { background:rgba(170,45,35,.45); color:#ffd9c8; border-color:#ff8a5a;
+      box-shadow:0 0 12px rgba(220,90,50,.35); }
+    .name-row { display:flex; gap:10px; justify-content:center; margin:10px 0 2px; flex-wrap:wrap; }
+    .name-row input { background:rgba(28,18,26,.8); border:1px solid rgba(150,80,90,.4); color:#e8dcc8;
+      border-radius:10px; padding:10px 12px; width:150px; font-family:inherit; font-size:.95rem; }
+    .name-row input::placeholder { color:#7a6f8a; }
+    /* 결과 명부 */
+    #gh-frame { display:none; text-align:left; margin-top:20px; background:
+        radial-gradient(120% 100% at 50% 0%, rgba(60,20,26,.5), transparent 60%),
+        linear-gradient(180deg,#140d18,#0d0912);
+      border:1px solid rgba(150,60,70,.4); border-radius:12px; padding:20px 18px 24px;
+      box-shadow: 0 18px 50px rgba(0,0,0,.6), inset 0 0 60px rgba(80,10,20,.25); }
+    #gh-body { font-family:'Gowun Batang','Nanum Myeongjo',serif; color:#d9cfe4; font-size:1.02rem;
+      line-height:2.0; white-space:pre-wrap; }
+    #gh-body h3 { font-family:'Nanum Myeongjo',serif; color:#ff8a5a; font-size:1.15rem; margin:20px 0 8px;
+      text-shadow:0 0 14px rgba(220,90,50,.35); white-space:normal; }
+    #gh-body .hl { color:#ff2a2a; font-weight:700; text-shadow:0 0 8px rgba(210,0,0,.6); }
+    #gh-body .kv { display:block; background:rgba(30,20,26,.7); border:1px solid rgba(150,80,90,.35);
+      border-left:3px solid #b0384a; border-radius:8px; padding:7px 12px; margin:6px 0; line-height:1.75; font-size:.95rem; }
+    #gh-writing { text-align:center; color:#8a7f9a; font-size:.88rem; margin-top:10px; min-height:1.4em; }
+    #gh-writing.on::after { content:"🕯"; margin-left:4px; animation: mb-blink 1.2s infinite; }
+    @keyframes mb-blink { 50% { opacity:.2 } }
+  </style>
+</head>
+<body class="dark-mb">
+  <div id="site-header"></div>
+  <main>
+    <section class="panel" style="text-align:center">
+      <span style="font-size:2.6rem; display:block; filter:drop-shadow(0 0 14px rgba(220,90,50,.4))">📜</span>
+      <h1 class="mb-title">명부 대조 — 두 명(命)을 겹쳐본다</h1>
+      <p class="mb-sub">귀곡의 <b style="color:#ffb08a">부적 두 장</b>을 올려라.<br>부적 속 인장(印)에 새겨진 명을 읽어 두 사람의 궁합을 대조해주마.</p>
+      <p class="fine-print" style="margin-top:6px">부적이 없다면 → <a href="bujeok.html" style="color:var(--sky)">🧧 부적 받으러 가기</a> (각자 받아서 주고받으면 된다)</p>
+
+      <div class="slots">
+        <div class="slot" id="slot-a">
+          <div class="who">🩸 나의 부적</div>
+          <div class="st" id="st-a">부적 이미지를 올려라</div>
+          <input type="file" id="file-a" accept="image/*" />
+          <span class="mini-btn" id="btn-me">📓 내 명부 불러오기</span>
+        </div>
+        <div class="slot" id="slot-b">
+          <div class="who">🌒 상대의 부적</div>
+          <div class="st" id="st-b">부적 이미지를 올려라</div>
+          <input type="file" id="file-b" accept="image/*" />
+        </div>
+      </div>
+
+      <div class="name-row">
+        <input type="text" id="name-a" maxlength="12" placeholder="내 이름 (선택)" />
+        <input type="text" id="name-b" maxlength="12" placeholder="상대 이름 (선택)" />
+      </div>
+
+      <p class="mb-sub" style="margin-top:12px">…둘은 어떤 사이냐?</p>
+      <div class="rel-chips" id="rel-chips"></div>
+
+      <div class="result-actions" style="justify-content:center; margin-top:14px">
+        <button class="btn-primary" id="btn-go" disabled>🕯 명부를 겹쳐본다</button>
+      </div>
+      <p id="gh-writing"></p>
+
+      <div id="gh-frame"><div id="gh-body"></div></div>
+
+      <p class="fine-print" style="margin-top:14px">궁합은 재미로 봐주세요 🙂</p>
+    </section>
+  </main>
+  <div id="site-footer"></div>
+  <script src="../js/common.js?v=2" data-root=".."></script>
+  <script src="js/saju.js"></script>
+  <script src="js/saju-deep.js"></script>
+  <script src="js/dosa.js?v=2"></script>
+  <script src="js/bujeok.js?v=1"></script>
+  <script>
+    (function () {
+      var $ = function (id) { return document.getElementById(id); };
+      var RELS = ["연인", "썸·짝사랑", "부부", "친구", "가족", "회사 동료", "사업 파트너"];
+      var relation = "연인";
+      var data = null, A = null, B = null; // {birth}
+      var GAN = "갑을병정무기경신임계", JI = "자축인묘진사오미신유술해";
+      var OH = ["목", "화", "토", "금", "수"];
+      var HAP_HWA = { 0: "토", 1: "금", 2: "수", 3: "목", 4: "화" }; // min(간)%5 기준 갑기합토…
+      var YUKHAP = [[0,1],[2,11],[3,10],[4,9],[5,8],[6,7]];
+      var CHUNG = [[0,6],[1,7],[2,8],[3,9],[4,10],[5,11]];
+      var HYEONG = [[2,5],[5,8],[2,8],[1,10],[10,7],[1,7],[0,3]];
+      var WONJIN = [[0,7],[1,6],[2,9],[3,8],[4,11],[5,10]];
+      var SAMHAP = [[8,0,4],[5,9,1],[2,6,10],[11,3,7]];
+
+      function esc(s) { return (s || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+      function pairIn(list, a, b) { return list.some(function (p) { return (p[0]===a&&p[1]===b)||(p[0]===b&&p[1]===a); }); }
+
+      // 관계 칩
+      RELS.forEach(function (r2) {
+        var b2 = document.createElement("button");
+        b2.textContent = r2; if (r2 === relation) b2.className = "on";
+        b2.onclick = function () {
+          relation = r2;
+          [].slice.call($("rel-chips").children).forEach(function (c) { c.className = ""; });
+          b2.className = "on";
+        };
+        $("rel-chips").appendChild(b2);
+      });
+
+      function compute(b) {
+        var r = Saju.compute(data, { y: b.y, m: b.m, d: b.d, hour: b.hour, min: b.min || 0 }, { trueSolar: true, gender: b.gender || null });
+        return { r: r, base: Dosa.buildPayload(r, b, b.gender || null, true), deep: SajuDeep.facts(r, b, b.gender || null) };
+      }
+
+      function miniSummary(b) {
+        var c = compute(b);
+        var P = c.r.pillars;
+        var gj = ["year","month","day","hour"].filter(function (k) { return P[k]; })
+          .map(function (k) { return GAN[P[k][0]] + JI[P[k][1]]; }).join(" · ");
+        var hTxt = b.hour == null ? "시 모름" : b.hour + "시 " + (b.min || 0) + "분";
+        var gTxt = b.gender === "M" ? "남" : b.gender === "F" ? "여" : "";
+        return "✅ <b>" + b.y + "." + b.m + "." + b.d + "</b> " + hTxt + " " + gTxt +
+          '<br><span class="gj">' + gj + "</span>";
+      }
+
+      function refresh() {
+        $("btn-go").disabled = !(A && B && data);
+      }
+
+      function readSlot(file, stEl, slotEl, setter) {
+        stEl.innerHTML = "귀곡의 인장을 읽는 중…";
+        var url = URL.createObjectURL(file);
+        var img = new Image();
+        img.onload = function () {
+          BujeokSeal.decode(img, function (birth) {
+            URL.revokeObjectURL(url);
+            if (!birth) {
+              slotEl.classList.remove("ok");
+              setter(null);
+              stEl.innerHTML = "⚠️ 인장이 흐릿하다…<br>귀곡의 <b>원본 부적</b>을 올려라<br>(자르거나 필터 씌우면 못 읽는다)";
+            } else {
+              setter(birth);
+              slotEl.classList.add("ok");
+              stEl.innerHTML = miniSummary(birth);
+            }
+            refresh();
+          });
+        };
+        img.onerror = function () { URL.revokeObjectURL(url); stEl.innerHTML = "⚠️ 이미지를 열 수 없다."; };
+        img.src = url;
+      }
+
+      $("slot-a").onclick = function (e) { if (e.target.id !== "btn-me") $("file-a").click(); };
+      $("slot-b").onclick = function () { $("file-b").click(); };
+      $("file-a").onchange = function () { if (this.files[0]) readSlot(this.files[0], $("st-a"), $("slot-a"), function (v) { A = v; }); };
+      $("file-b").onchange = function () { if (this.files[0]) readSlot(this.files[0], $("st-b"), $("slot-b"), function (v) { B = v; }); };
+      $("btn-me").onclick = function (e) {
+        e.stopPropagation();
+        try {
+          var b = JSON.parse(localStorage.getItem("goblub_birth"));
+          if (b && b.y && data) { A = b; $("slot-a").classList.add("ok"); $("st-a").innerHTML = miniSummary(b); refresh(); }
+          else if (!b || !b.y) $("st-a").innerHTML = "저장된 명부가 없다.<br><a href='saju-premium.html' style='color:var(--sky)'>귀곡에게 사주 보러 가기</a>";
+        } catch (err) {}
+      };
+
+      // 두 명식 사이 페어 팩트(엔진 계산 — AI에 근거로 전달)
+      function pairFacts(ca, cb) {
+        var out = [];
+        var ia = ca.r.ilgan, ib = cb.r.ilgan;
+        if (Math.abs(ia - ib) === 5) out.push("천간합: 두 일간 " + GAN[ia] + "+" + GAN[ib] + "이 합을 이룸(" + HAP_HWA[Math.min(ia, ib) % 5] + "으로 화함) — 서로 강하게 끌어당기는 배합");
+        var ja = ca.r.pillars.day[1], jb = cb.r.pillars.day[1];
+        if (pairIn(YUKHAP, ja, jb)) out.push("일지 육합: " + JI[ja] + "+" + JI[jb] + " — 생활 리듬이 자연스럽게 맞물림");
+        if (pairIn(CHUNG, ja, jb)) out.push("일지 충: " + JI[ja] + "↔" + JI[jb] + " — 부딪히며 자극하는 배합, 권태는 없지만 충돌 관리 필요");
+        if (pairIn(HYEONG, ja, jb)) out.push("일지 형: " + JI[ja] + "·" + JI[jb] + " — 서로를 길들이려는 긴장");
+        if (pairIn(WONJIN, ja, jb)) out.push("일지 원진: " + JI[ja] + "·" + JI[jb] + " — 이유 없이 얄미워지는 순간이 있는 배합");
+        SAMHAP.forEach(function (g2) { if (g2.indexOf(ja) >= 0 && g2.indexOf(jb) >= 0 && ja !== jb) out.push("일지 삼합 반합: " + JI[ja] + "+" + JI[jb] + " — 같은 목표를 향해 힘을 합치는 배합"); });
+        var ya = ca.r.pillars.year[1], yb = cb.r.pillars.year[1];
+        if (pairIn(YUKHAP, ya, yb)) out.push("띠 육합: " + JI[ya] + "띠+" + JI[yb] + "띠 — 어른들 말로 '합이 좋은 띠'");
+        if (pairIn(CHUNG, ya, yb)) out.push("띠 충: " + JI[ya] + "띠↔" + JI[yb] + "띠 — 겉궁합에서 말 나오기 쉬운 배합이나 속궁합이 우선");
+        OH.forEach(function (k) {
+          if ((ca.base.oheng[k] || 0) === 0 && (cb.base.oheng[k] || 0) >= 1.5) out.push("오행 보완: A에게 없는 " + k + "을 B가 넉넉히 가짐 — B가 곁에 있으면 A의 결핍이 메워짐");
+          if ((cb.base.oheng[k] || 0) === 0 && (ca.base.oheng[k] || 0) >= 1.5) out.push("오행 보완: B에게 없는 " + k + "을 A가 넉넉히 가짐 — A가 곁에 있으면 B의 결핍이 메워짐");
+        });
+        var ua = ca.deep.yongshin && ca.deep.yongshin.use[0], ub = cb.deep.yongshin && cb.deep.yongshin.use[0];
+        if (ua && (cb.base.oheng[ua] || 0) >= 1) out.push("용신 교차: A의 용신 " + ua + "을 B가 품고 있음 — B는 A에게 귀인 배합");
+        if (ub && (ca.base.oheng[ub] || 0) >= 1) out.push("용신 교차: B의 용신 " + ub + "을 A가 품고 있음 — A는 B에게 귀인 배합");
+        return out.slice(0, 12);
+      }
+
+      function fmt(t) {
+        var html = "";
+        t.replace(/\s*—\s*귀곡 선생\s*$/, "").split("\n").forEach(function (ln) {
+          var s = ln.trim();
+          if (!s) { html += "\n"; return; }
+          var e = esc(s).replace(/『([^『』]{1,60})』/g, '<b class="hl">$1</b>');
+          if (s.charAt(0) === "◆") html += "<h3>" + e.replace(/^◆\s*/, "◆ ") + "</h3>";
+          else if (s.charAt(0) === "▸") html += '<span class="kv">' + e.replace(/^▸\s*/, "▸ ") + "</span>";
+          else html += e + "\n";
+        });
+        html += '\n<p style="text-align:right;color:#9a7f8a;font-family:\'Nanum Myeongjo\',serif">— 귀곡 선생</p>';
+        return html;
+      }
+
+      function signed(t) { return /(귀곡 선생|귀곡)\s*$/.test((t || "").trim()); }
+
+      $("btn-go").onclick = function () {
+        if (!(A && B && data)) return;
+        var ca = compute(A), cb = compute(B);
+        var body = {
+          part: "gh", relation: relation,
+          saju: ca.base, deep: ca.deep,
+          saju2: cb.base, deep2: cb.deep,
+          pair: pairFacts(ca, cb),
+          nameA: $("name-a").value.trim() || undefined,
+          nameB: $("name-b").value.trim() || undefined
+        };
+        var buffer = "";
+        $("btn-go").disabled = true;
+        $("gh-frame").style.display = "block";
+        $("gh-body").innerHTML = "";
+        $("gh-writing").textContent = "귀곡이 두 명부를 겹쳐 읽는 중"; $("gh-writing").classList.add("on");
+        Dosa.fetchAI("/api/saju-report", body, "goblub_gh_", {
+          accept: function (full) { return signed(full); },
+          cooldownMs: 5000, cooldownKey: "goblub_gh_cd",
+          onChunk: function (t) { buffer += t; $("gh-body").innerHTML = fmt(buffer); },
+          onDone: function () {
+            $("gh-body").innerHTML = fmt(buffer);
+            $("gh-writing").textContent = "🕯 대조가 끝났다."; $("gh-writing").classList.remove("on");
+            $("btn-go").disabled = false;
+          },
+          onError: function (code, sec) {
+            $("gh-writing").classList.remove("on");
+            $("gh-writing").textContent = code === "cooldown" ? "귀곡이 숨을 고른다… " + sec + "초 후 다시 눌러라." : "⚠️ 잠시 후 다시 시도해라.";
+            $("btn-go").disabled = false;
+          }
+        });
+      };
+
+      fetch("data/saju-terms.json").then(function (r) { return r.json(); })
+        .then(function (d) { data = d; refresh(); });
+    })();
+  </script>
+</body>
+</html>

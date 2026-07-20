@@ -92,6 +92,15 @@ const PARTS = {
 ◆ 위기 때 발동하는 생존 본능 — 일간 특성과 십성을 근거로, 막다른 골목에서 이 사람이 살아남는 방식(히든 카드)을 짚어 자기 확신을 심어라.
 ◆ 용신 처방전 — yongshin 데이터를 근거로 "▸ 색 · / ▸ 방향 · / ▸ 공간 · / ▸ 습관 ·" ▸ 줄 4개 + 각각 일상 적용법. 기신(avoid)이 발동하는 최악의 생활 패턴 1개 경고.
 ◆ 당장 해야 할 것 — 올해~2년 안 실행 액션 3가지를 문단으로. 마지막은 "네 판은 이미 깔려 있다, 이제 걷기만 해라" 톤의 마무리 + "사주는 재미로, 인생은 네 선택으로." 한 줄.`,
+  gh: `[이번 파트: 명부 대조 — 두 사람의 궁합]
+두 사람(A·B)의 명부를 나란히 펼쳐놓고 대조하는 자리다. 관계 유형(relation)에 맞는 관점으로만 풀어라 — 연인/썸이면 끌림과 연애 리듬, 부부면 살림과 세월, 친구/가족이면 정과 거리, 회사 동료/사업 파트너면 일 궁합과 돈 문제. 관계 유형과 안 맞는 이야기(동료인데 애정운 등)는 꺼내지 마라.
+[도입] 두 장의 명부를 나란히 펼치는 장면 1~2문장으로 시작. "…허, 이 두 명부가 한 상에 오르다니" 같은 톤.
+아래 4개 소제목으로 쓴다. 각 소제목은 ◆ 로 시작.
+◆ 두 명(命)의 첫 인상 — 두 사람의 일간·강약을 대조해 서로에게 어떤 존재로 보이는지. pair 데이터의 천간합·일지 관계가 있으면 그 근거로 끌림/긴장을 짚어라.
+◆ 맞물리는 톱니와 갈리는 톱니 — pair 데이터(합·충·형·원진, 오행 보완)를 근거로 잘 맞는 지점 2가지와 부딪히는 지점 1~2가지. 부딪힘은 "누가 나쁜 게 아니라 기운의 각도 차이"로 정리.
+◆ 이 관계의 운용법 — relation 유형에 맞춘 실전 조언. pair의 용신 교차(서로가 서로의 용신을 갖고 있는지)를 근거로 "곁에 있으면 득이 되는 방향"을 구체적으로.
+◆ 귀곡의 판정 — 100점 만점 점수 하나를 『점수』로 콕 집어 주고(예: 『78점』), 한 줄 총평. 마지막은 "궁합은 재미로, 관계는 두 사람의 선택으로." 한 줄 후 서명.
+[분량] 1,100~1,500자.`,
 };
 
 function validGanji(s) {
@@ -164,6 +173,21 @@ export default async function handler(req, res) {
   if (!PARTS[part]) return res.status(400).json({ error: "bad_part" });
   const deep = sanitizeDeep(req.body.deep);
 
+  // 명부 대조(궁합) — 두 번째 사주 + 관계 + 페어 팩트
+  const RELATIONS = ["연인", "썸·짝사랑", "부부", "친구", "가족", "회사 동료", "사업 파트너"];
+  let pairBlock = null;
+  if (part === "gh") {
+    const saju2 = req.body.saju2;
+    if (!validate(saju2)) return res.status(400).json({ error: "bad_payload2" });
+    const deep2 = sanitizeDeep(req.body.deep2);
+    const relation = RELATIONS.includes(req.body.relation) ? req.body.relation : "친구";
+    const pairArr = Array.isArray(req.body.pair)
+      ? req.body.pair.filter((x) => typeof x === "string" && x.length < 140).slice(0, 14) : [];
+    const nameA = typeof req.body.nameA === "string" ? req.body.nameA.slice(0, 12).replace(/[<>]/g, "") : "";
+    const nameB = typeof req.body.nameB === "string" ? req.body.nameB.slice(0, 12).replace(/[<>]/g, "") : "";
+    pairBlock = { saju2, deep2, relation, pair: pairArr, nameA, nameB };
+  }
+
   // 손님 정보(이름·특히 궁금한 것) — 있으면 집중 답변 유도
   const name = typeof req.body.name === "string" ? req.body.name.slice(0, 20).replace(/[<>]/g, "") : "";
   const focus = typeof req.body.focus === "string" ? req.body.focus.slice(0, 80).replace(/[<>]/g, "") : "";
@@ -177,9 +201,16 @@ export default async function handler(req, res) {
   try {
     const wrote = await streamGemini(res, {
       system: PERSONA + guestBlock + "\n\n" + PARTS[part],
-      user:
-        "다음은 만세력 엔진이 계산한 사주 팩트 데이터다. base는 원국, deep은 신살·합충·용신·대운·세운 팩트. 이 데이터만 근거로 이번 파트를 집필하라.\n" +
-        JSON.stringify({ base: saju, deep }),
+      user: pairBlock
+        ? "다음은 만세력 엔진이 계산한 두 사람의 사주 팩트 데이터다. A/B 각각 base(원국)·deep(신살·용신 등), pair는 두 명식 사이의 합충·보완 관계(엔진 계산), relation은 두 사람의 관계다. 이 데이터만 근거로 궁합을 집필하라. A를 '너', B를 '상대'(이름 있으면 이름)로 불러라.\n" +
+          JSON.stringify({
+            relation: pairBlock.relation,
+            A: { name: pairBlock.nameA || undefined, base: saju, deep },
+            B: { name: pairBlock.nameB || undefined, base: pairBlock.saju2, deep: pairBlock.deep2 },
+            pair: pairBlock.pair,
+          })
+        : "다음은 만세력 엔진이 계산한 사주 팩트 데이터다. base는 원국, deep은 신살·합충·용신·대운·세운 팩트. 이 데이터만 근거로 이번 파트를 집필하라.\n" +
+          JSON.stringify({ base: saju, deep }),
       maxTokens: 5500,
       temperature: 0.9,
       model: "gemini-2.5-pro",
