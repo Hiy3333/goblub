@@ -145,7 +145,8 @@
     #analyzing.on { display:flex; }
     #analyzing.fading { animation: an-fade .8s ease forwards; }
     @keyframes an-fade { to { opacity:0; visibility:hidden; } }
-    #an-vid { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:.78; filter:contrast(1.05) saturate(.95); pointer-events:none; }
+    #an-vid { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:.78; filter:contrast(1.05) saturate(.95); pointer-events:none; transition:opacity .3s ease; }
+    #an-vid.dip { opacity:0; }
     #an-vid::-webkit-media-controls-start-playback-button, #an-vid::-webkit-media-controls { display:none !important; -webkit-appearance:none; }
     #an-cap { transition: opacity .5s ease; }
     /* 귀곡이 명부를 훑고 쓰는 모습이 보이도록 가운데는 열고, 문구 뒤(아래)만 어둡게 */
@@ -157,6 +158,14 @@
     #an-sub { margin-top:18px; color:#c24040; font-size:.92rem; letter-spacing:.09em; font-family:"Nanum Myeongjo", serif; }
     #an-flame { margin-top:24px; font-size:1.5rem; animation: an-flick 1.4s ease-in-out infinite; }
     @keyframes an-flick { 0%,100%{opacity:1;transform:translateY(0) rotate(-2deg)} 45%{opacity:.55;transform:translateY(1px) rotate(3deg)} }
+    /* 완성 — 명부를 받아 드는 버튼 */
+    #an-take { display:none; margin-top:20px; background:linear-gradient(180deg,#8f1d12,#5f0f08);
+      color:#ffe9dc; border:1px solid rgba(255,120,90,.55); border-radius:12px; padding:15px 30px;
+      font-family:'Nanum Myeongjo',serif; font-weight:800; font-size:1.15rem; letter-spacing:.06em; cursor:pointer;
+      box-shadow:0 0 26px rgba(200,40,20,.5), inset 0 1px 0 rgba(255,255,255,.12);
+      animation: an-take-pulse 2s ease-in-out infinite; }
+    @keyframes an-take-pulse { 0%,100%{box-shadow:0 0 18px rgba(200,40,20,.4)} 50%{box-shadow:0 0 34px rgba(230,60,30,.7)} }
+    #an-take:active { transform:scale(.97); }
   </style>
 </head>
 <body>
@@ -227,6 +236,7 @@
       <p class="an-cap" id="an-cap">귀곡이 네 인생을 훑는 중…</p>
       <p class="an-sub" id="an-sub"></p>
       <div id="an-flame">🕯</div>
+      <button id="an-take">🩸 명부를 받아 든다</button>
     </div>
   </div>
   <div id="site-footer"></div>
@@ -362,12 +372,19 @@
         }, 6500);   // ~하는 중 문구가 충분히 오래 머물도록
       }
       function stopCaptions() { if (anTimer) { clearInterval(anTimer); anTimer = null; } }
+      var WRITE_VID = "img/tale/gwigok-write.mp4?v=2";
       function showAnalyzing() {
         analyzing = true; anIdx = 0;
         var ov = $("analyzing"); ov.classList.remove("fading"); ov.classList.add("on");
         $("an-cap").textContent = AN_CAPS[0];
         $("an-sub").textContent = "귀곡이 명부를 펼친다…";
-        var v = $("an-vid"); try { v.currentTime = 0; var pr = v.play(); if (pr && pr.catch) pr.catch(function () {}); } catch (e) {}
+        $("an-flame").style.display = "";
+        $("an-take").style.display = "none";
+        var v = $("an-vid");
+        v.onended = null; v.onerror = null; v.oncanplay = null; v.loop = true;
+        v.classList.remove("dip");
+        if (v.getAttribute("src") !== WRITE_VID) v.setAttribute("src", WRITE_VID); // 엔딩 후 재입장 시 복구
+        try { v.currentTime = 0; var pr = v.play(); if (pr && pr.catch) pr.catch(function () {}); } catch (e) {}
         startCaptions();
       }
       function hideAnalyzing() {
@@ -375,6 +392,54 @@
         var ov = $("analyzing"); ov.classList.add("fading");
         setTimeout(function () { ov.classList.remove("on", "fading"); try { $("an-vid").pause(); } catch (e) {} }, 820);
       }
+
+      // ===== 완성 연출: 붓을 놓고 명부를 덮는다 → 정면 클로즈업 → [받아 든다] =====
+      var ENDING_VID = "img/tale/gwigok-close.mp4?v=1";
+      function playEnding() {
+        stopCaptions();
+        $("an-cap").textContent = "";
+        $("an-sub").textContent = "";
+        $("an-flame").style.display = "none";
+        var v = $("an-vid"), shown = false;
+        function takeReady() {
+          if (shown) return; shown = true;
+          $("an-cap").textContent = "…다 새겼다.";
+          $("an-take").style.display = "inline-block";
+        }
+        v.loop = false;              // 한 번 재생 후 마지막 응시 프레임에서 정지
+        v.onended = takeReady;
+        v.onerror = takeReady;
+        // 루프가 어느 지점에 있든 컷이 튀지 않게 잠깐 어둡게 → 스왑 → 밝게
+        v.classList.add("dip");
+        setTimeout(function () {
+          v.setAttribute("src", ENDING_VID);
+          v.oncanplay = function () { var p2 = v.play(); if (p2 && p2.catch) p2.catch(function () {}); };
+          try { var p = v.play(); if (p && p.catch) p.catch(function () {}); } catch (e) {}
+          v.classList.remove("dip");
+        }, 320);
+        setTimeout(takeReady, 7000); // 이벤트 미발화·재생 차단 대비
+      }
+      function thud() { // 낮은 북소리 "쿵"
+        try {
+          var ac = new (window.AudioContext || window.webkitAudioContext)();
+          var o = ac.createOscillator(), g = ac.createGain();
+          o.type = "sine";
+          o.frequency.setValueAtTime(90, ac.currentTime);
+          o.frequency.exponentialRampToValueAtTime(38, ac.currentTime + 0.28);
+          g.gain.setValueAtTime(0.9, ac.currentTime);
+          g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.55);
+          o.connect(g); g.connect(ac.destination);
+          o.start(); o.stop(ac.currentTime + 0.6);
+          setTimeout(function () { try { ac.close(); } catch (e) {} }, 900);
+        } catch (e) {}
+      }
+      $("an-take").onclick = function () {
+        try { if (navigator.vibrate) navigator.vibrate([60, 40, 90]); } catch (e) {}
+        thud();
+        $("an-take").style.display = "none";
+        hideAnalyzing();
+        cur = 0; setTimeout(renderPage, 420);
+      };
 
       function partLabel(id) {
         return { p1: "1부 · 성격", p2: "1부 · 성격", l1: "2부 · 인연", l2: "2부 · 인연",
@@ -452,14 +517,8 @@
         if (done >= TOTAL) {
           allDone = true;
           $("pg-writing").textContent = "🕯 명부 완성. 페이지를 넘겨 끝까지 읽어라."; $("pg-writing").classList.remove("on");
-          if (analyzing) {
-            $("an-cap").textContent = "명부가 완성되었다."; stopCaptions();
-            $("an-sub").textContent = "네 팔자를 첫 장부터 넘겨라.";
-            hideAnalyzing();
-            cur = 0; setTimeout(renderPage, 860);
-          } else {
-            renderPage();
-          }
+          if (analyzing) playEnding();
+          else renderPage();
         } else {
           $("pg-writing").textContent = "귀곡이 " + (done) + "/" + TOTAL + "부를 새기는 중";
           $("pg-writing").classList.add("on");
