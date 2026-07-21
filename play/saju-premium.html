@@ -147,7 +147,8 @@
     @keyframes an-fade { to { opacity:0; visibility:hidden; } }
     #an-vid { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:.78; filter:contrast(1.05) saturate(.95); pointer-events:none; transition:opacity .3s ease; }
     #an-vid.dip { opacity:0; }
-    #an-vid::-webkit-media-controls-start-playback-button, #an-vid::-webkit-media-controls { display:none !important; -webkit-appearance:none; }
+    #an-vid::-webkit-media-controls-start-playback-button, #an-vid::-webkit-media-controls,
+    #an-vid::-webkit-media-controls-overlay-play-button { display:none !important; -webkit-appearance:none; opacity:0 !important; }
     #an-cap { transition: opacity .5s ease; }
     /* 귀곡이 명부를 훑고 쓰는 모습이 보이도록 가운데는 열고, 문구 뒤(아래)만 어둡게 */
     #analyzing .an-scrim { position:absolute; inset:0; background:
@@ -247,7 +248,7 @@
   <script src="js/feed.js?v=4"></script>
   <script src="js/goblub-art.js"></script>
   <script src="js/report-ui.js?v=4"></script>
-  <script src="js/tale.js?v=12"></script>
+  <script src="js/tale.js?v=13"></script>
   <script>
     (function () {
       var $ = function (id) { return document.getElementById(id); };
@@ -305,7 +306,7 @@
         document.body.classList.add("story-mode");   // 페이지 어둡게 — 진입 번쩍임 방지
         GoblubTale.start({
           base: base, deep: deep, hasBirth: !!b, initialBirth: b,
-          owned: !!(base && unlocked()), costText: costLabel(),
+          costText: costLabel(),
           compute: function (nb) {
             var merged = b ? { y: nb.y, m: nb.m, d: nb.d, hour: nb.hour, min: nb.min || 0, gender: nb.gender || b.gender || null } : nb;
             try { localStorage.setItem("goblub_birth", JSON.stringify(merged)); } catch (e) {}
@@ -382,7 +383,9 @@
         $("an-take").style.display = "none";
         var v = $("an-vid");
         v.onended = null; v.onerror = null; v.oncanplay = null; v.loop = true;
-        v.classList.remove("dip");
+        v.classList.add("dip"); // 재생 시작 전 네이티브 재생 마크 노출 방지
+        v.onplaying = function () { v.classList.remove("dip"); };
+        setTimeout(function () { v.classList.remove("dip"); }, 1100); // 자동재생 차단 폴백
         if (v.getAttribute("src") !== WRITE_VID) v.setAttribute("src", WRITE_VID); // 엔딩 후 재입장 시 복구
         try { v.currentTime = 0; var pr = v.play(); if (pr && pr.catch) pr.catch(function () {}); } catch (e) {}
         startCaptions();
@@ -414,8 +417,9 @@
         setTimeout(function () {
           v.setAttribute("src", ENDING_VID);
           v.oncanplay = function () { var p2 = v.play(); if (p2 && p2.catch) p2.catch(function () {}); };
+          v.onplaying = function () { v.classList.remove("dip"); }; // 실제 재생 시작 후 표시(재생 마크 방지)
           try { var p = v.play(); if (p && p.catch) p.catch(function () {}); } catch (e) {}
-          v.classList.remove("dip");
+          setTimeout(function () { v.classList.remove("dip"); }, 1300); // 폴백
         }, 320);
         setTimeout(takeReady, 7000); // 이벤트 미발화·재생 차단 대비
       }

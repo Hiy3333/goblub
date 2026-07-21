@@ -60,7 +60,8 @@ border-radius:12px;padding:12px;cursor:pointer;font-family:inherit;font-size:1re
 .tale.fadeout{opacity:0;transition:opacity .55s ease}\
 .tale-vid{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;opacity:0;transition:opacity .8s;z-index:6;pointer-events:none}\
 .tale-vid.on{opacity:1}\
-.tale-vid::-webkit-media-controls-start-playback-button,.tale-vid::-webkit-media-controls,.tale-bgv::-webkit-media-controls-start-playback-button,.tale-bgv::-webkit-media-controls{display:none!important;-webkit-appearance:none}\
+.tale-vid::-webkit-media-controls-start-playback-button,.tale-vid::-webkit-media-controls,.tale-bgv::-webkit-media-controls-start-playback-button,.tale-bgv::-webkit-media-controls,\
+.tale-vid::-webkit-media-controls-overlay-play-button,.tale-bgv::-webkit-media-controls-overlay-play-button{display:none!important;-webkit-appearance:none;opacity:0!important}\
 .tale-vcap{position:absolute;left:50%;bottom:12%;transform:translateX(-50%);z-index:7;color:#e9e2ff;font-family:'Jua','Malgun Gothic',sans-serif;font-size:1rem;letter-spacing:2px;text-shadow:0 0 14px rgba(0,0,0,.9);opacity:0;transition:opacity .6s;text-align:center;pointer-events:none}\
 .tale-vcap.on{opacity:1}\
 .tale-vcap .dot{animation:tale-blink 1.1s infinite}\
@@ -226,7 +227,7 @@ border-radius:12px;padding:12px;cursor:pointer;font-family:inherit;font-size:1re
         input: { kind: "text", key: "focusFree", placeholder: "궁금한 것을 적어라 (예: 그 사람과 이어질까)", maxlen: 40, submit: "🕯 마음을 아뢴다" }, goto: 24 },
       { id: 24, name: "귀곡", cls: "n-gwi",
         text: function () {
-          if (opts.owned) return "…또 왔구나.\n네 명부는 이미 내가 새겨두었다.\n다시 펼쳐 보겠나?";
+          // 같은 폰으로 여러 명이 볼 수 있으니 '또 왔구나' 같은 재방문 대사는 쓰지 않는다
           if (opts.costText) return "네 팔자를 뼛속까지 들춰주마.\n대신 [" + opts.costText + "]을 바쳐야 한다.\n…자세히 알고 싶으냐?";
           return "네 팔자를 뼛속까지 들춰주마.\n지금은 값을 받지 않으마.\n…자세히 알고 싶으냐?";
         },
@@ -291,10 +292,13 @@ border-radius:12px;padding:12px;cursor:pointer;font-family:inherit;font-size:1re
       bgA.classList.remove("on"); bgB.classList.remove("on");
       bgv.onerror = function () { if (bgvKey === key) { bgvKey = null; bgv.classList.remove("on"); setBg(key); } };
       bgv.muted = true;
+      bgv.classList.remove("on"); // 일시정지 상태의 네이티브 재생 마크가 안 보이게, 실제 재생 시작 후 표시
       bgv.src = IMG + "vid_" + key + ".mp4" + IMGV;
       function tryPlay() { var p = bgv.play(); if (p && p.catch) p.catch(function () {}); }
+      bgv.onplaying = function () { if (bgvKey === key) bgv.classList.add("on"); };
       bgv.oncanplay = tryPlay; tryPlay();
-      bgv.classList.add("on"); // 자동재생 안 되는 브라우저도 첫 프레임(정지 이미지처럼)은 보임
+      // 자동재생이 막힌 환경 폴백 — 첫 프레임이라도 보여준다
+      setTimeout(function () { if (bgvKey === key) bgv.classList.add("on"); }, 1100);
     }
     function hideBgVideo() {
       if (bgvKey == null) return;
@@ -398,9 +402,10 @@ border-radius:12px;padding:12px;cursor:pointer;font-family:inherit;font-size:1re
       function proceed() { if (go) return; go = true; end("enter"); }
       vid.src = RITUAL_VID; vid.onended = proceed;
       vid.onerror = function () { end("enter"); };
+      vid.onplaying = function () { vid.classList.add("on"); }; // 재생 시작 후 표시(재생 마크 노출 방지)
       var p = vid.play();
       if (p && p.catch) p.catch(function () { vid.muted = true; vid.play().catch(function () { end("enter"); }); });
-      setTimeout(function () { vid.classList.add("on"); }, 30);
+      setTimeout(function () { vid.classList.add("on"); }, 1300); // 폴백
       setTimeout(function () { vcap.innerHTML = '🕯 귀곡이 네 명부(冥府)를 펼친다<span class="dot">…</span>'; vcap.classList.add("on"); }, 900);
       setTimeout(proceed, 8000);
     }
