@@ -379,7 +379,10 @@
         stopCaptions();
         anTimer = setInterval(function () {
           var el = $("an-cap"); el.style.opacity = "0";
-          setTimeout(function () { anIdx = (anIdx + 1) % AN_CAPS.length; el.textContent = AN_CAPS[anIdx]; el.style.opacity = "1"; }, 500);
+          setTimeout(function () {
+            if (!anTimer) { el.style.opacity = "1"; return; } // 정지 후 잔여 타이머가 문구를 덮지 않게
+            anIdx = (anIdx + 1) % AN_CAPS.length; el.textContent = AN_CAPS[anIdx]; el.style.opacity = "1";
+          }, 500);
         }, 6500);   // ~하는 중 문구가 충분히 오래 머물도록
       }
       function stopCaptions() { if (anTimer) { clearInterval(anTimer); anTimer = null; } }
@@ -421,7 +424,8 @@
         }
         v.loop = false;              // 한 번 재생 후 마지막 응시 프레임에서 정지
         v.onended = takeReady;
-        v.onerror = takeReady;
+        // src 교체 순간 이전 로드가 중단되며 나는 가짜 error는 무시 — 엔딩 소스의 진짜 에러만 처리
+        v.onerror = function () { if (v.error && (v.getAttribute("src") || "").indexOf("gwigok-close") >= 0) takeReady(); };
         // 루프가 어느 지점에 있든 컷이 튀지 않게 잠깐 어둡게 → 스왑 → 밝게
         v.classList.add("dip");
         setTimeout(function () {
