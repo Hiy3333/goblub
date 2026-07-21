@@ -524,16 +524,3 @@ main, .site-header, .site-footer { position: relative; z-index: 1; }
   .app-card { flex-wrap: wrap; }
   .pillar .hanja { font-size: 1.3rem; }
 }
-
-/* ===== 데스크톱: 휴대폰 비율(9:16급) 컬럼 고정 — 넓은 화면에서 레이아웃 깨짐 방지 ===== */
-@media (min-width: 520px) {
-  html { background: #0b0812; }
-  body {
-    max-width: 480px;
-    margin-left: auto;
-    margin-right: auto;
-    background-attachment: scroll; /* fixed면 뷰포트 기준이라 컬럼 안에서 어긋남 */
-    box-shadow: 0 0 70px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.06);
-    min-height: 100vh;
-  }
-}

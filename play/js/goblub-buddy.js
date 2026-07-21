@@ -62,12 +62,7 @@
   document.body.appendChild(minBtn);
 
   // 기본값: 우하단에 가만히. 클릭했을 때만 폴짝 이동했다가 잠시 후 제자리로.
-  // 데스크톱은 사이트가 480px 휴대폰 컬럼으로 고정되므로, 컬럼 안쪽 기준으로 계산
-  function colBounds() {
-    var w = Math.min(window.innerWidth, 480);
-    var x0 = (window.innerWidth - w) / 2;
-    return { x0: x0, w: w };
-  }
+  function colBounds() { return { x0: 0, w: window.innerWidth }; } // 전체 화면 기준(사이트 컬럼 고정 롤백)
   function homePos() {
     var c = colBounds();
     return { x: c.x0 + c.w - SIZE - 22, y: window.innerHeight - SIZE - 22 };
