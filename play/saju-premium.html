@@ -175,6 +175,9 @@
       animation: an-take-pulse 2s ease-in-out infinite; }
     @keyframes an-take-pulse { 0%,100%{box-shadow:0 0 18px rgba(200,40,20,.4)} 50%{box-shadow:0 0 34px rgba(230,60,30,.7)} }
     #an-take:active { transform:scale(.97); }
+    #an-mute { position:absolute; top:calc(14px + env(safe-area-inset-top)); right:14px; z-index:3;
+      background:rgba(10,6,14,.55); border:1px solid rgba(200,120,100,.4); color:rgba(255,230,215,.85);
+      border-radius:999px; padding:8px 13px; font-size:.95rem; cursor:pointer; backdrop-filter:blur(4px); }
   </style>
 </head>
 <body>
@@ -223,6 +226,7 @@
           <div class="pg-bar">
             <button class="pg-btn" id="pg-prev">◀ 이전</button>
             <span class="pg-count" id="pg-count"></span>
+            <button class="pg-btn" id="pg-mute" style="padding:11px 13px" aria-label="소리 켜기/끄기">🔊</button>
             <button class="pg-btn" id="pg-next">다음 ▶</button>
           </div>
           <p class="pg-writing" id="pg-writing"></p>
@@ -239,6 +243,7 @@
     </section>
   </main>
   <div id="analyzing">
+    <button id="an-mute" aria-label="소리 켜기/끄기">🔊</button>
     <video id="an-vid" muted loop playsinline webkit-playsinline preload="auto" src="img/tale/gwigok-write.mp4?v=2"></video>
     <div class="an-scrim"></div>
     <div class="an-wrap">
@@ -256,6 +261,7 @@
   <script src="js/feed.js?v=4"></script>
   <script src="js/goblub-art.js"></script>
   <script src="js/report-ui.js?v=5"></script>
+  <script src="js/gwigok-audio.js?v=1"></script>
   <script src="js/tale.js?v=13"></script>
   <script>
     (function () {
@@ -396,12 +402,14 @@
         $("an-take").style.display = "none";
         var v = $("an-vid");
         v.onended = null; v.onerror = null; v.oncanplay = null; v.loop = true;
+        v.__endAudio = false;
         v.classList.add("dip"); // 재생 시작 전 네이티브 재생 마크 노출 방지
         v.onplaying = function () { v.classList.remove("dip"); };
         setTimeout(function () { v.classList.remove("dip"); }, 1100); // 자동재생 차단 폴백
         if (v.getAttribute("src") !== WRITE_VID) v.setAttribute("src", WRITE_VID); // 엔딩 후 재입장 시 복구
         try { v.currentTime = 0; var pr = v.play(); if (pr && pr.catch) pr.catch(function () {}); } catch (e) {}
         startCaptions();
+        GwigokAudio.startAnalyzing();   // 드론+심장박동+붓 소리
       }
       function hideAnalyzing() {
         analyzing = false; stopCaptions();
@@ -431,33 +439,32 @@
         setTimeout(function () {
           v.setAttribute("src", ENDING_VID);
           v.oncanplay = function () { var p2 = v.play(); if (p2 && p2.catch) p2.catch(function () {}); };
-          v.onplaying = function () { v.classList.remove("dip"); }; // 실제 재생 시작 후 표시(재생 마크 방지)
+          v.onplaying = function () { // 영상 시작과 동시에 엔딩 오디오(책 덮는 소리) — 버퍼링 재개로 중복 재생되지 않게 1회만
+            v.classList.remove("dip");
+            if (!v.__endAudio) { v.__endAudio = true; GwigokAudio.playEnding(); }
+          };
           try { var p = v.play(); if (p && p.catch) p.catch(function () {}); } catch (e) {}
           setTimeout(function () { v.classList.remove("dip"); }, 1300); // 폴백
         }, 320);
         setTimeout(takeReady, 7000); // 이벤트 미발화·재생 차단 대비
       }
-      function thud() { // 낮은 북소리 "쿵"
-        try {
-          var ac = new (window.AudioContext || window.webkitAudioContext)();
-          var o = ac.createOscillator(), g = ac.createGain();
-          o.type = "sine";
-          o.frequency.setValueAtTime(90, ac.currentTime);
-          o.frequency.exponentialRampToValueAtTime(38, ac.currentTime + 0.28);
-          g.gain.setValueAtTime(0.9, ac.currentTime);
-          g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.55);
-          o.connect(g); g.connect(ac.destination);
-          o.start(); o.stop(ac.currentTime + 0.6);
-          setTimeout(function () { try { ac.close(); } catch (e) {} }, 900);
-        } catch (e) {}
-      }
       $("an-take").onclick = function () {
         try { if (navigator.vibrate) navigator.vibrate([60, 40, 90]); } catch (e) {}
-        thud();
+        GwigokAudio.sfxThud();
+        GwigokAudio.startReading();   // 읽기 모드 — 아주 낮은 드론만 남김
         $("an-take").style.display = "none";
         hideAnalyzing();
         cur = 0; setTimeout(renderPage, 420);
       };
+
+      // 소리 토글(분석 오버레이·페이지 바 공용)
+      function syncMuteIcons() {
+        var ic = GwigokAudio.isMuted() ? "🔇" : "🔊";
+        $("an-mute").textContent = ic; $("pg-mute").textContent = ic;
+      }
+      $("an-mute").onclick = function (e) { e.stopPropagation(); GwigokAudio.toggleMute(); syncMuteIcons(); };
+      $("pg-mute").onclick = function () { GwigokAudio.toggleMute(); syncMuteIcons(); };
+      syncMuteIcons();
 
       function partLabel(id) {
         return { p1: "冥簿 · 魂 — 혼의 장", p2: "冥簿 · 魂 — 혼의 장",
@@ -519,6 +526,7 @@
           return;
         }
         cur = ni; renderPage();
+        GwigokAudio.sfxPage();   // 종이 넘기는 소리
       }
 
       function openReport() {
@@ -723,6 +731,7 @@
 
       // 귀곡이 "자세히 볼래?"에 응한 순간 — 이미 본 자는 무료, 아니면 가상재화 소비 후 진입
       function enterReport() {
+        GwigokAudio.begin();   // 유저 제스처 체인 안에서 오디오 언락+프리로드
         if (base && unlocked()) { openReport(); return; }   // 이미 새겨둔 명부는 무료 재열람
         if (!GoblubFeed.spend(COST)) { renderGate(); return; }  // 젬리 소비 (COST=0이면 통과)
         paid = COST > 0;
@@ -738,7 +747,7 @@
         openReport();
       }
       $("btn-unlock").onclick = enterReport;
-      function replay() { $("gate").style.display = "none"; $("report-panel").style.display = "none"; startTale(birth()); }
+      function replay() { GwigokAudio.stopAll(); $("gate").style.display = "none"; $("report-panel").style.display = "none"; startTale(birth()); }
       $("btn-tale").onclick = replay;
       $("btn-replay").onclick = replay;
 
