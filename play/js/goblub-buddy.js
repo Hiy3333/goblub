@@ -62,7 +62,16 @@
   document.body.appendChild(minBtn);
 
   // 기본값: 우하단에 가만히. 클릭했을 때만 폴짝 이동했다가 잠시 후 제자리로.
-  function homePos() { return { x: window.innerWidth - SIZE - 22, y: window.innerHeight - SIZE - 22 }; }
+  // 데스크톱은 사이트가 480px 휴대폰 컬럼으로 고정되므로, 컬럼 안쪽 기준으로 계산
+  function colBounds() {
+    var w = Math.min(window.innerWidth, 480);
+    var x0 = (window.innerWidth - w) / 2;
+    return { x0: x0, w: w };
+  }
+  function homePos() {
+    var c = colBounds();
+    return { x: c.x0 + c.w - SIZE - 22, y: window.innerHeight - SIZE - 22 };
+  }
   var pos = homePos(), atHome = true;
   function place() { wrap.style.transform = "translate(" + pos.x + "px," + pos.y + "px)"; }
   place();
@@ -74,10 +83,11 @@
 
   function moveRandom() {
     if (state !== "on" || reduce) return;
-    var margin = 14, top = 92;
-    var maxX = Math.max(margin, window.innerWidth - SIZE - margin);
+    var margin = 14, top = 92, c = colBounds();
+    var minX = c.x0 + margin;
+    var maxX = Math.max(minX, c.x0 + c.w - SIZE - margin);
     var maxY = Math.max(top, window.innerHeight - SIZE - margin);
-    var nx = margin + Math.random() * (maxX - margin);
+    var nx = minX + Math.random() * (maxX - minX);
     var ny = top + Math.random() * (maxY - top);
     if (svgEl) svgEl.style.transform = "scaleX(" + (nx < pos.x ? -1 : 1) + ")";
     pos = { x: nx, y: ny }; atHome = false;
@@ -127,12 +137,22 @@
   xBtn.addEventListener("click", function (e) { e.stopPropagation(); setState("min"); });
   minBtn.addEventListener("click", function () { setState("on"); });
 
+  // 최소화 버튼도 컬럼 우하단에
+  function placeMin() {
+    var c = colBounds();
+    minBtn.style.right = "auto";
+    minBtn.style.left = (c.x0 + c.w - 46 - 14) + "px";
+  }
+  placeMin();
+
   window.addEventListener("resize", function () {
     if (atHome) { pos = homePos(); }
     else {
-      pos.x = Math.min(pos.x, window.innerWidth - SIZE - 8);
+      var c = colBounds();
+      pos.x = Math.min(pos.x, c.x0 + c.w - SIZE - 8);
       pos.y = Math.min(pos.y, window.innerHeight - SIZE - 8);
     }
+    placeMin();
     place();
   });
 

@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Jua&family=Nanum+Myeongjo:wght@400;700;800&family=Gowun+Batang:wght@400;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../css/style.css?v=glass3" />
+  <link rel="stylesheet" href="../css/style.css?v=glass4" />
   <style>
     .prem-badge { display: inline-block; background: linear-gradient(90deg, var(--yellow), var(--orange));
       color: #2a2005; font-size: 0.8rem; font-weight: bold; padding: 5px 14px; border-radius: 999px;
@@ -150,6 +150,9 @@
 
     /* 분석 중 — 귀곡이 인생을 훑는 풀스크린 영상 */
     #analyzing { position:fixed; inset:0; z-index:80; display:none; align-items:flex-end; justify-content:center; background:#05040a; }
+    @media (min-width:520px) { /* 데스크톱: 휴대폰 컬럼 폭에 맞춤 */
+      #analyzing { left:50%; right:auto; width:480px; margin-left:-240px; box-shadow:0 0 70px rgba(0,0,0,.7); }
+    }
     #analyzing.on { display:flex; }
     #analyzing.fading { animation: an-fade .8s ease forwards; }
     @keyframes an-fade { to { opacity:0; visibility:hidden; } }
@@ -254,7 +257,7 @@
     </div>
   </div>
   <div id="site-footer"></div>
-  <script src="../js/common.js?v=3" data-root=".."></script>
+  <script src="../js/common.js?v=4" data-root=".."></script>
   <script src="js/saju.js"></script>
   <script src="js/saju-deep.js"></script>
   <script src="js/dosa.js?v=2"></script>
@@ -262,7 +265,7 @@
   <script src="js/goblub-art.js"></script>
   <script src="js/report-ui.js?v=5"></script>
   <script src="js/gwigok-audio.js?v=1"></script>
-  <script src="js/tale.js?v=13"></script>
+  <script src="js/tale.js?v=14"></script>
   <script>
     (function () {
       var $ = function (id) { return document.getElementById(id); };

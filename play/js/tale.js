@@ -65,7 +65,8 @@ border-radius:12px;padding:12px;cursor:pointer;font-family:inherit;font-size:1re
 .tale-vcap{position:absolute;left:50%;bottom:12%;transform:translateX(-50%);z-index:7;color:#e9e2ff;font-family:'Jua','Malgun Gothic',sans-serif;font-size:1rem;letter-spacing:2px;text-shadow:0 0 14px rgba(0,0,0,.9);opacity:0;transition:opacity .6s;text-align:center;pointer-events:none}\
 .tale-vcap.on{opacity:1}\
 .tale-vcap .dot{animation:tale-blink 1.1s infinite}\
-@media (prefers-reduced-motion:reduce){.tale-bg,.tale-gob,.tale-vortex{transition-duration:.01s!important;animation:none!important}}";
+@media (prefers-reduced-motion:reduce){.tale-bg,.tale-gob,.tale-vortex{transition-duration:.01s!important;animation:none!important}}\
+@media (min-width:520px){.tale{left:50%;right:auto;width:480px;margin-left:-240px;box-shadow:0 0 70px rgba(0,0,0,.7)}}";
   var st = document.createElement("style");
   st.textContent = css;
   document.head.appendChild(st);
