@@ -122,6 +122,14 @@
     .pg-body .kv { display:block; background: rgba(30,20,26,.7); border:1px solid rgba(150,80,90,.35);
       border-left: 3px solid #b0384a; border-radius: 8px; padding: 8px 13px; margin: 7px 0; line-height:1.75;
       font-size:.96rem; color:#cdbfd0; }
+    /* ◈ 낙인 — 장의 끝에 찍히는 붉은 도장 */
+    .pg-body .nak { display:block; width:fit-content; margin: 18px auto 6px; padding: 10px 20px;
+      font-family:'Nanum Myeongjo',serif; font-weight:800; font-size:1.08rem; color:#ff5a3a;
+      border: 2.5px solid rgba(220,70,45,.75); border-radius: 8px; transform: rotate(-3deg);
+      letter-spacing:.1em; text-shadow: 0 0 12px rgba(220,60,30,.5); line-height:1.5;
+      box-shadow: 0 0 22px rgba(180,40,20,.3), inset 0 0 18px rgba(180,40,20,.15); }
+    .pg-body .nak i { display:block; font-style:normal; font-size:.62rem; letter-spacing:.5em;
+      color:rgba(220,110,80,.75); margin-bottom:2px; text-align:center; }
     .pg-cover-name { text-align:center; color:#cdc2e0; font-family:'Nanum Myeongjo',serif; font-size:1.05rem; margin: 2px 0 14px; }
     .pg-img { text-align:center; }
     .pg-img img { width: 100%; border-radius: 10px; border:1px solid rgba(150,60,70,.4);
@@ -176,14 +184,14 @@
       <div id="prem-head">
       <span class="prem-badge">✨ PREMIUM</span>
       <span class="prem-emoji">📜</span>
-      <h1 style="font-size:1.5rem; margin-bottom:6px">프리미엄 심층 리포트</h1>
-      <p class="result-desc">어두운 숲의 저승사자, <b>귀곡(鬼哭)</b>이 직접 읽는 팔자.<br>신살·합충·용신·10년 세운까지 계산해 <b>성격·인연·재물·대운 8부</b>로 씁니다.</p>
+      <h1 style="font-size:1.5rem; margin-bottom:6px">귀곡의 명부(冥簿)</h1>
+      <p class="result-desc">저승엔 산 자마다 <b>한 권의 기록부</b>가 있다.<br>저승사자 <b>귀곡(鬼哭)</b>이 네 명부를 꺼내 여덟 장(章)을 읽어준다 — 신살·합충·용신·10년 세운까지 전부 계산해서.</p>
 
       <ul class="vol-list">
-        <li><b>📕 1부 성격</b> 진짜 본질 · 안 보여주는 얼굴 · 결국 이기는 이유<span>①남들은 죽어도 모르는 진짜 성격 ②결국 네가 이기게 되는 이유</span></li>
-        <li><b>📗 2부 인연</b> 내 앞에 나타날 진짜 인연 · 매력과 처방<span>①짝의 프로필·만나는 시기 ②홀리는 매력·연애운 처방</span></li>
-        <li><b>📒 3부 재물</b> 돈그릇 · 대박 타이밍 · 돈구멍<span>①돈그릇의 크기 ②대박 연도와 새는 돈구멍</span></li>
-        <li><b>📘 4부 대운</b> 억까 끝나는 시점 · 왕이 되는 처방<span>①억까가 끝나는 시점 ②역전의 해·용신 처방</span></li>
+        <li><b>魂 혼의 장</b> 네 혼의 재질 감정 · 등록된 가면들<span>①혼(魂)의 감정서 — 재질·성질·흠집 ②가면 대장 — 벗은 얼굴과 붓이 떨린 줄</span></li>
+        <li><b>緣 인연의 장</b> 붉은 실의 기록 · 붉은 먹의 경고<span>③인연부 — 실 끝에 묶인 혼, 실이 팽팽해지는 해 ④악연 경고장 — 명부가 떨리는 상대</span></li>
+        <li><b>財 곳간의 장</b> 곳간 실측 도면 · 미리 적힌 연대기<span>⑤곳간 문서 — 크기·재질·곳간의 쥐 ⑥돈의 연대기 — 차는 해와 붉은 밑줄의 해</span></li>
+        <li><b>命 흐름의 장</b> 이미 적혀 있던 과거 · 아직 젖은 미래<span>⑦이미 지나간 장들 — 과거가 적혀 있던 줄 ⑧아직 마르지 않은 먹물 — 역전의 해와 붓 쥐는 법</span></li>
       </ul>
       </div>
 
@@ -247,21 +255,21 @@
   <script src="js/dosa.js?v=2"></script>
   <script src="js/feed.js?v=4"></script>
   <script src="js/goblub-art.js"></script>
-  <script src="js/report-ui.js?v=4"></script>
+  <script src="js/report-ui.js?v=5"></script>
   <script src="js/tale.js?v=13"></script>
   <script>
     (function () {
       var $ = function (id) { return document.getElementById(id); };
       var COST = 0; // 런칭 기념 무료 — 추후 젬리 가격 부여 예정
       var PARTS = [
-        { id: "p1", title: "📕 1부 성격 ① 남들은 죽어도 모르는 네 진짜 성격" },
-        { id: "p2", title: "📕 1부 성격 ② 결국 네가 이기게 되는 이유" },
-        { id: "l1", title: "📗 2부 인연 ① 내 앞에 나타날 진짜 인연" },
-        { id: "l2", title: "📗 2부 인연 ② 홀리는 매력과 연애운 처방" },
-        { id: "m1", title: "📒 3부 재물 ① 네 팔자에 박힌 돈그릇의 크기" },
-        { id: "m2", title: "📒 3부 재물 ② 대박 타이밍과 줄줄 새는 돈구멍" },
-        { id: "d1", title: "📘 4부 대운 ① 지긋지긋한 억까가 끝나는 시점" },
-        { id: "d2", title: "📘 4부 대운 ② 왕이 되기 위한 맞춤 처방전" }
+        { id: "p1", title: "제1장 · 혼(魂)의 감정서" },
+        { id: "p2", title: "제2장 · 가면 대장(臺帳)" },
+        { id: "l1", title: "제3장 · 인연부(因緣簿) — 붉은 실" },
+        { id: "l2", title: "제4장 · 악연 경고장" },
+        { id: "m1", title: "제5장 · 곳간 문서" },
+        { id: "m2", title: "제6장 · 돈의 연대기" },
+        { id: "d1", title: "제7장 · 이미 지나간 장(章)들" },
+        { id: "d2", title: "마지막 장 · 아직 마르지 않은 먹물" }
       ];
       var TOTAL = PARTS.length;
       var data = null, base = null, deep = null, baseKey = null, paid = false;
@@ -348,10 +356,12 @@
 
       // ===== 페이지 넘김 뷰어 =====
       var GIMG = [
-        { src: "img/tale/gwigok.webp?v=5", cap: "…귀곡이 너를 바라본다" },
+        { src: "img/tale/myeongbu-book.webp?v=1", cap: "…네 명부다. 먹이 아직 마르지 않았다" },
         { src: "img/tale/gwigok-glare.webp?v=1", cap: "…눈을 피하지 마라" },
-        { src: "img/tale/gwigok-book.webp?v=1", cap: "…명부가 펼쳐진다" },
-        { src: "img/tale/gwigok-smile.webp?v=1", cap: "…귀곡이 네 팔자를 보고 웃는다" }
+        { src: "img/tale/red-thread.webp?v=1", cap: "…네 손가락의 붉은 실이 팽팽하다" },
+        { src: "img/tale/gwigok-smile.webp?v=1", cap: "…귀곡이 네 팔자를 보고 웃는다" },
+        { src: "img/tale/seal-press.webp?v=1", cap: "…낙인이 찍힌다. 지워지지 않는다" },
+        { src: "img/tale/gwigok.webp?v=5", cap: "…귀곡이 너를 바라본다" }
       ];
       var pages = [], cur = 0, imgTurn = 0, textSinceImg = 0, allDone = false, genFailed = false;
 
@@ -446,8 +456,10 @@
       };
 
       function partLabel(id) {
-        return { p1: "1부 · 성격", p2: "1부 · 성격", l1: "2부 · 인연", l2: "2부 · 인연",
-                 m1: "3부 · 재물", m2: "3부 · 재물", d1: "4부 · 대운", d2: "4부 · 대운" }[id] || "";
+        return { p1: "冥簿 · 魂 — 혼의 장", p2: "冥簿 · 魂 — 혼의 장",
+                 l1: "冥簿 · 緣 — 인연의 장", l2: "冥簿 · 緣 — 인연의 장",
+                 m1: "冥簿 · 財 — 곳간의 장", m2: "冥簿 · 財 — 곳간의 장",
+                 d1: "冥簿 · 命 — 흐름의 장", d2: "冥簿 · 命 — 흐름의 장" }[id] || "";
       }
       function pushImagePage() {
         var g = GIMG[imgTurn % GIMG.length]; imgTurn++;
@@ -477,8 +489,8 @@
         setTimeout(function () {
           if (!pg) { el.classList.remove("turning"); return; }
           if (pg.type === "cover") {
-            el.innerHTML = '<div class="pg-plabel">귀곡의 명부 · 序</div>' +
-              '<div class="pg-title">' + esc(userName || "이름 없는 자") + '의 팔자</div>' +
+            el.innerHTML = '<div class="pg-plabel">冥簿 · 序 — 저승의 기록부</div>' +
+              '<div class="pg-title">' + esc(userName || "이름 없는 자") + '의 명부</div>' +
               (userFocus ? '<p class="pg-cover-name">🕯 특히 궁금해한 것<br>' + esc(userFocus.length > 40 ? userFocus.slice(0, 40) + "…" : userFocus) + '</p>' : "") +
               '<div id="pg-dash"></div><div id="pg-tl"></div>';
             ReportUI.dashboard($("pg-dash"), base, deep);
@@ -543,7 +555,7 @@
           setTimeout(function () { genPart(i, 1); }, 3000);
           return true;
         }
-        Dosa.fetchAI("/api/saju-report", { saju: base, deep: deep, part: p.id, name: userName || undefined, focus: userFocus || undefined }, "goblub_rep_", {
+        Dosa.fetchAI("/api/saju-report", { saju: base, deep: deep, part: p.id, name: userName || undefined, focus: userFocus || undefined, edition: "myeongbu1" }, "goblub_rep2_", {
           accept: function (full) { return signed(full); },
           cooldownMs: 4000, cooldownKey: "goblub_rep_cd",
           onChunk: function (t) { buffer += t; },

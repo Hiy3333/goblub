@@ -160,6 +160,11 @@
 
   // ===== ③⑤⑥ 본문 렌더 =====
   function lineHtml(t) {
+    // ◈ 낙인 · 『인장명』 → 붉은 도장 스탬프
+    if (/^◈/.test(t)) {
+      var nk = t.replace(/^◈\s*/, "").replace(/^낙인\s*·?\s*/, "").replace(/[『』]/g, "").trim();
+      return { kv: true, html: '<span class="nak"><i>落印</i>' + nk + "</span>" };
+    }
     if (/^▸/.test(t)) {
       var body = t.replace(/^▸\s*/, "");
       var m = body.match(RX_RE);
