@@ -86,6 +86,8 @@
 
       <p class="mb-sub" style="margin-top:12px">…둘은 어떤 사이냐?</p>
       <div class="rel-chips" id="rel-chips"></div>
+      <p class="mb-sub" id="rel-sub-label" style="margin-top:10px; font-size:.88rem; display:none">…좀 더 자세히 말해 보아라</p>
+      <div class="rel-chips" id="rel-sub" style="display:none"></div>
 
       <div class="result-actions" style="justify-content:center; margin-top:14px">
         <button class="btn-primary" id="btn-go" disabled>🕯 명부를 겹쳐본다</button>
@@ -107,7 +109,17 @@
     (function () {
       var $ = function (id) { return document.getElementById(id); };
       var RELS = ["연인", "썸·짝사랑", "부부", "친구", "가족", "회사 동료", "사업 파트너"];
-      var relation = "연인";
+      // 관계별 세부 카테고리 — 선택에 따라 풀이 관점이 달라진다
+      var SUBS = {
+        "연인": ["1년 이하", "1~3년", "3~5년", "5년 이상", "장거리 연애", "재회한 사이"],
+        "썸·짝사랑": ["이제 막 썸", "오래된 짝사랑", "친구에서 발전 중", "소개로 만난 사이"],
+        "부부": ["신혼(3년 이하)", "3~10년 차", "10년 이상", "주말부부", "아이 키우는 중"],
+        "친구": ["동성 친구", "이성 친구", "그냥 지인", "평생지기", "최근 친해진 사이"],
+        "가족": ["부모와 자녀", "형제·자매", "조부모와 손주", "친척"],
+        "회사 동료": ["동기", "상사", "부하직원", "대표", "타 부서 동료"],
+        "사업 파트너": ["공동창업", "투자자와 창업자", "거래처", "스승과 제자"]
+      };
+      var relation = "연인", relationDetail = "";
       var data = null, A = null, B = null; // {birth}
       var GAN = "갑을병정무기경신임계", JI = "자축인묘진사오미신유술해";
       var OH = ["목", "화", "토", "금", "수"];
@@ -121,17 +133,39 @@
       function esc(s) { return (s || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
       function pairIn(list, a, b) { return list.some(function (p) { return (p[0]===a&&p[1]===b)||(p[0]===b&&p[1]===a); }); }
 
+      // 세부 카테고리 칩 렌더
+      function renderSubs() {
+        var subs = SUBS[relation] || [];
+        var box = $("rel-sub");
+        box.innerHTML = "";
+        if (!subs.length) { box.style.display = "none"; $("rel-sub-label").style.display = "none"; relationDetail = ""; return; }
+        box.style.display = "flex"; $("rel-sub-label").style.display = "block";
+        if (subs.indexOf(relationDetail) < 0) relationDetail = subs[0];
+        subs.forEach(function (s2) {
+          var c2 = document.createElement("button");
+          c2.textContent = s2; if (s2 === relationDetail) c2.className = "on";
+          c2.onclick = function () {
+            relationDetail = s2;
+            [].slice.call(box.children).forEach(function (c) { c.className = ""; });
+            c2.className = "on";
+          };
+          box.appendChild(c2);
+        });
+      }
+
       // 관계 칩
       RELS.forEach(function (r2) {
         var b2 = document.createElement("button");
         b2.textContent = r2; if (r2 === relation) b2.className = "on";
         b2.onclick = function () {
-          relation = r2;
+          relation = r2; relationDetail = "";
           [].slice.call($("rel-chips").children).forEach(function (c) { c.className = ""; });
           b2.className = "on";
+          renderSubs();
         };
         $("rel-chips").appendChild(b2);
       });
+      renderSubs();
 
       function compute(b) {
         var r = Saju.compute(data, { y: b.y, m: b.m, d: b.d, hour: b.hour, min: b.min || 0 }, { trueSolar: true, gender: b.gender || null });
@@ -233,7 +267,7 @@
         if (!(A && B && data)) return;
         var ca = compute(A), cb = compute(B);
         var body = {
-          part: "gh", relation: relation,
+          part: "gh", relation: relation, relationDetail: relationDetail || undefined,
           saju: ca.base, deep: ca.deep,
           saju2: cb.base, deep2: cb.deep,
           pair: pairFacts(ca, cb),

@@ -94,6 +94,7 @@ const PARTS = {
 ◆ 당장 해야 할 것 — 올해~2년 안 실행 액션 3가지를 문단으로. 마지막은 "네 판은 이미 깔려 있다, 이제 걷기만 해라" 톤의 마무리 + "사주는 재미로, 인생은 네 선택으로." 한 줄.`,
   gh: `[이번 파트: 명부 대조 — 두 사람의 궁합]
 두 사람(A·B)의 명부를 나란히 펼쳐놓고 대조하는 자리다. 관계 유형(relation)에 맞는 관점으로만 풀어라 — 연인/썸이면 끌림과 연애 리듬, 부부면 살림과 세월, 친구/가족이면 정과 거리, 회사 동료/사업 파트너면 일 궁합과 돈 문제. 관계 유형과 안 맞는 이야기(동료인데 애정운 등)는 꺼내지 마라.
+relationDetail(세부 맥락)이 있으면 반드시 반영하라 — 사귄 기간(권태기/신혼/장거리), 상하관계(상사/부하/대표면 존대 수위·처세 조언), 가족의 세대 차, 썸의 진도 등 그 맥락에 맞는 상황 예시와 조언을 써라. 예: '3~5년' 연인이면 권태·확신의 갈림길을, '상사'면 맞춰야 산다가 아니라 어떻게 다뤄야 내가 크는지를, '재회한 사이'면 같은 이유로 다시 부딪힐 지점을 짚어라.
 [도입] 두 장의 명부를 나란히 펼치는 장면 1~2문장으로 시작. "…허, 이 두 명부가 한 상에 오르다니" 같은 톤.
 아래 4개 소제목으로 쓴다. 각 소제목은 ◆ 로 시작.
 ◆ 두 명(命)의 첫 인상 — 두 사람의 일간·강약을 대조해 서로에게 어떤 존재로 보이는지. pair 데이터의 천간합·일지 관계가 있으면 그 근거로 끌림/긴장을 짚어라.
@@ -175,17 +176,27 @@ export default async function handler(req, res) {
 
   // 명부 대조(궁합) — 두 번째 사주 + 관계 + 페어 팩트
   const RELATIONS = ["연인", "썸·짝사랑", "부부", "친구", "가족", "회사 동료", "사업 파트너"];
+  const REL_SUBS = {
+    "연인": ["1년 이하", "1~3년", "3~5년", "5년 이상", "장거리 연애", "재회한 사이"],
+    "썸·짝사랑": ["이제 막 썸", "오래된 짝사랑", "친구에서 발전 중", "소개로 만난 사이"],
+    "부부": ["신혼(3년 이하)", "3~10년 차", "10년 이상", "주말부부", "아이 키우는 중"],
+    "친구": ["동성 친구", "이성 친구", "그냥 지인", "평생지기", "최근 친해진 사이"],
+    "가족": ["부모와 자녀", "형제·자매", "조부모와 손주", "친척"],
+    "회사 동료": ["동기", "상사", "부하직원", "대표", "타 부서 동료"],
+    "사업 파트너": ["공동창업", "투자자와 창업자", "거래처", "스승과 제자"]
+  };
   let pairBlock = null;
   if (part === "gh") {
     const saju2 = req.body.saju2;
     if (!validate(saju2)) return res.status(400).json({ error: "bad_payload2" });
     const deep2 = sanitizeDeep(req.body.deep2);
     const relation = RELATIONS.includes(req.body.relation) ? req.body.relation : "친구";
+    const relationDetail = (REL_SUBS[relation] || []).includes(req.body.relationDetail) ? req.body.relationDetail : "";
     const pairArr = Array.isArray(req.body.pair)
       ? req.body.pair.filter((x) => typeof x === "string" && x.length < 140).slice(0, 14) : [];
     const nameA = typeof req.body.nameA === "string" ? req.body.nameA.slice(0, 12).replace(/[<>]/g, "") : "";
     const nameB = typeof req.body.nameB === "string" ? req.body.nameB.slice(0, 12).replace(/[<>]/g, "") : "";
-    pairBlock = { saju2, deep2, relation, pair: pairArr, nameA, nameB };
+    pairBlock = { saju2, deep2, relation, relationDetail, pair: pairArr, nameA, nameB };
   }
 
   // 손님 정보(이름·특히 궁금한 것) — 있으면 집중 답변 유도
@@ -205,6 +216,7 @@ export default async function handler(req, res) {
         ? "다음은 만세력 엔진이 계산한 두 사람의 사주 팩트 데이터다. A/B 각각 base(원국)·deep(신살·용신 등), pair는 두 명식 사이의 합충·보완 관계(엔진 계산), relation은 두 사람의 관계다. 이 데이터만 근거로 궁합을 집필하라. A를 '너', B를 '상대'(이름 있으면 이름)로 불러라.\n" +
           JSON.stringify({
             relation: pairBlock.relation,
+            relationDetail: pairBlock.relationDetail || undefined,
             A: { name: pairBlock.nameA || undefined, base: saju, deep },
             B: { name: pairBlock.nameB || undefined, base: pairBlock.saju2, deep: pairBlock.deep2 },
             pair: pairBlock.pair,
