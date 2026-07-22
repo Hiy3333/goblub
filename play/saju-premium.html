@@ -94,13 +94,9 @@
     .pg-frame { position: relative; background:
         radial-gradient(120% 100% at 50% 0%, rgba(60,20,26,.5), transparent 60%),
         linear-gradient(180deg, #140d18, #0d0912);
-      border: 1px solid rgba(150,60,70,.4); border-radius: 12px; min-height: 58vh; max-height: 78vh;
+      border: 1px solid rgba(150,60,70,.4); border-radius: 12px; min-height: 58vh;
       box-shadow: 0 18px 50px rgba(0,0,0,.6), inset 0 0 60px rgba(80,10,20,.25);
-      padding: 22px 20px 26px; overflow-y: auto; overflow-x: hidden;
-      scroll-behavior: smooth; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
-    .pg-frame::-webkit-scrollbar { width: 6px; }
-    .pg-frame::-webkit-scrollbar-track { background: transparent; }
-    .pg-frame::-webkit-scrollbar-thumb { background: rgba(150,60,70,.45); border-radius: 3px; }
+      padding: 22px 20px 26px; overflow: hidden; } /* 내부 스크롤 없음 — 페이지 스크롤 하나만 사용 */
     .pg-vign { position: absolute; inset: 0; pointer-events: none; border-radius: 12px;
       box-shadow: inset 0 0 90px 20px rgba(0,0,0,.7); }
     .pg-page { position: relative; z-index: 1; opacity: 1; transition: opacity .35s ease, transform .35s ease; }
@@ -144,10 +140,6 @@
     .pg-count { color:#9a8ba8; font-size:.86rem; letter-spacing:1px; }
     .pg-writing { text-align:center; color:#8a7f9a; font-size:.85rem; min-height:1.4em; margin-top:8px; }
     .pg-writing.on::after { content:"🕯"; margin-left:4px; animation: blink 1.2s infinite; }
-    .pg-tap { position:absolute; inset:0; display:flex; justify-content:space-between; z-index:2; pointer-events:none; }
-    .pg-tap .l, .pg-tap .r { width:16%; pointer-events:auto; cursor:pointer; }
-    .pg-tap .r { background: linear-gradient(270deg, rgba(180,50,60,.06), transparent); }
-    .pg-tap .l { background: linear-gradient(90deg, rgba(180,50,60,.06), transparent); }
 
     /* 분석 중 — 귀곡이 인생을 훑는 풀스크린 영상 */
     #analyzing { position:fixed; inset:0; z-index:80; display:none; align-items:flex-end; justify-content:center; background:#05040a; }
@@ -226,7 +218,6 @@
           <div class="pg-frame">
             <div class="pg-vign"></div>
             <div class="pg-page" id="pg-page"></div>
-            <div class="pg-tap"><div class="l" id="pg-tap-l"></div><div class="r" id="pg-tap-r"></div></div>
           </div>
           <div class="pg-bar">
             <button class="pg-btn" id="pg-prev">◀ 이전</button>
@@ -515,8 +506,11 @@
               '<div class="pg-body">' + pg.html + '</div>';
           }
           el.classList.remove("turning");
-          // 새 장은 항상 맨 위부터 (프레임 내부 스크롤만 리셋 — 창 점프 없음)
-          var fr = el.parentElement; if (fr) fr.scrollTop = 0;
+          // 새 장은 항상 맨 위부터 — 스크롤이 하나뿐이므로 창을 명부 상단으로
+          try {
+            var top = $("pager").getBoundingClientRect().top + window.scrollY - 10;
+            window.scrollTo({ top: Math.max(0, top), behavior: "auto" });
+          } catch (e) {}
         }, 200);
       }
       function go(d) {
@@ -752,15 +746,9 @@
       $("btn-tale").onclick = replay;
       $("btn-replay").onclick = replay;
 
-      // 페이지 넘김 조작
+      // 페이지 넘김 조작 — 하단 이전/다음 버튼으로만
       $("pg-prev").onclick = function () { go(-1); };
       $("pg-next").onclick = function () { go(1); };
-      $("pg-tap-l").onclick = function () { go(-1); };
-      $("pg-tap-r").onclick = function () { go(1); };
-      document.addEventListener("keydown", function (e) {
-        if ($("report-panel").style.display !== "block") return;
-        if (e.key === "ArrowRight") go(1); else if (e.key === "ArrowLeft") go(-1);
-      });
 
       fetch("data/saju-terms.json").then(function (r) { return r.ok ? r.json() : null; })
         .then(function (d) { data = d; setup(); })
