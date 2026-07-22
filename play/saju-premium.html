@@ -131,10 +131,11 @@
     .pg-body .nak i { display:block; font-style:normal; font-size:.62rem; letter-spacing:.5em;
       color:rgba(220,110,80,.75); margin-bottom:2px; text-align:center; }
     .pg-cover-name { text-align:center; color:#cdc2e0; font-family:'Nanum Myeongjo',serif; font-size:1.05rem; margin: 2px 0 14px; }
-    .pg-img { text-align:center; }
-    .pg-img img { width: 100%; border-radius: 10px; border:1px solid rgba(150,60,70,.4);
-      box-shadow: 0 10px 34px rgba(0,0,0,.6), 0 0 40px rgba(120,20,30,.25); filter: contrast(1.05) saturate(.95); }
-    .pg-img .cap { color:#9a7f8a; font-family:'Nanum Myeongjo',serif; font-size:.9rem; letter-spacing:2px; margin-top:12px; }
+    /* 카테고리 헤더 이미지 — 프레임 상단 풀블리드, 아래로 어둡게 녹아들며 바로 본문 시작 */
+    .pg-himg { position:relative; margin:-22px -20px 14px; overflow:hidden; border-radius:12px 12px 0 0; }
+    .pg-himg img { width:100%; display:block; filter: contrast(1.05) saturate(.92); }
+    .pg-himg::after { content:""; position:absolute; inset:0;
+      background: linear-gradient(180deg, rgba(13,9,18,.15) 0%, transparent 30%, transparent 55%, rgba(16,11,20,.92) 100%); }
     .pg-bar { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:14px; }
     .pg-btn { flex:none; background: rgba(40,26,40,.7); color:#e0d4e8; border:1px solid rgba(150,80,90,.45);
       border-radius: 10px; padding: 11px 18px; font-family:inherit; font-size:.98rem; cursor:pointer; }
@@ -364,15 +365,14 @@
       }
 
       // ===== 페이지 넘김 뷰어 =====
-      var GIMG = [
-        { src: "img/tale/myeongbu-book.webp?v=1", cap: "…네 명부다. 먹이 아직 마르지 않았다" },
-        { src: "img/tale/gwigok-glare.webp?v=1", cap: "…눈을 피하지 마라" },
-        { src: "img/tale/red-thread.webp?v=1", cap: "…네 손가락의 붉은 실이 팽팽하다" },
-        { src: "img/tale/gwigok-smile.webp?v=1", cap: "…귀곡이 네 팔자를 보고 웃는다" },
-        { src: "img/tale/seal-press.webp?v=1", cap: "…낙인이 찍힌다. 지워지지 않는다" },
-        { src: "img/tale/gwigok.webp?v=5", cap: "…귀곡이 너를 바라본다" }
-      ];
-      var pages = [], cur = 0, imgTurn = 0, textSinceImg = 0, allDone = false, genFailed = false;
+      // 카테고리(장 그룹) 첫 페이지 상단에 깔리는 헤더 이미지 — 이미지 바로 아래에서 본문 시작
+      var HEAD_IMG = {
+        p1: "img/tale/head-hon.webp?v=1",      // 魂 — 저울에 올린 혼불
+        l1: "img/tale/red-thread.webp?v=1",    // 緣 — 홍연(붉은 실)
+        m1: "img/tale/head-jae.webp?v=1",      // 財 — 장부 위 엽전 꾸러미
+        d1: "img/tale/head-myeong.webp?v=1"    // 命 — 바람에 넘어가는 명부
+      };
+      var pages = [], cur = 0, allDone = false, genFailed = false;
 
       // ===== 분석 중 풀스크린 영상 (다 쓸 때까지 반복) =====
       var AN_CAPS = [
@@ -475,16 +475,13 @@
                  m1: "冥簿 · 財 — 곳간의 장", m2: "冥簿 · 財 — 곳간의 장",
                  d1: "冥簿 · 命 — 흐름의 장", d2: "冥簿 · 命 — 흐름의 장" }[id] || "";
       }
-      function pushImagePage() {
-        var g = GIMG[imgTurn % GIMG.length]; imgTurn++;
-        pages.push({ type: "image", src: g.src, cap: g.cap });
-      }
       function addPartPages(p) {
         var subs = ReportUI.pageify(p.text);
-        subs.forEach(function (s) {
-          pages.push({ type: "text", label: partLabel(p.id), title: s.title, html: s.html });
-          textSinceImg++;
-          if (textSinceImg >= 3) { pushImagePage(); textSinceImg = 0; }
+        subs.forEach(function (s, i) {
+          pages.push({
+            type: "text", label: partLabel(p.id), title: s.title, html: s.html,
+            img: (i === 0 && HEAD_IMG[p.id]) ? HEAD_IMG[p.id] : null   // 카테고리 첫 장만 헤더 이미지
+          });
         });
         if (!analyzing) renderPage();
       }
@@ -509,10 +506,10 @@
               '<div id="pg-dash"></div><div id="pg-tl"></div>';
             ReportUI.dashboard($("pg-dash"), base, deep);
             ReportUI.timeline($("pg-tl"), deep);
-          } else if (pg.type === "image") {
-            el.innerHTML = '<div class="pg-img"><img src="' + pg.src + '" alt="귀곡" onerror="this.style.display=\'none\'"><p class="cap">' + pg.cap + '</p></div>';
           } else {
-            el.innerHTML = '<div class="pg-plabel">' + esc(pg.label) + '</div>' +
+            el.innerHTML =
+              (pg.img ? '<div class="pg-himg"><img src="' + pg.img + '" alt="" onerror="this.parentElement.style.display=\'none\'"></div>' : "") +
+              '<div class="pg-plabel">' + esc(pg.label) + '</div>' +
               (pg.title ? '<div class="pg-title">◆ ' + esc(pg.title) + '</div>' : "") +
               '<div class="pg-body">' + pg.html + '</div>';
           }
@@ -536,7 +533,7 @@
         $("gate").style.display = "none";
         $("report-panel").style.display = "block";
         PARTS.forEach(function (p) { p.done = false; p.text = ""; });
-        pages = [{ type: "cover" }]; cur = 0; imgTurn = 0; textSinceImg = 0; allDone = false; genFailed = false;
+        pages = [{ type: "cover" }]; cur = 0; allDone = false; genFailed = false;
         $("pg-end").style.display = "none";
         showAnalyzing();   // 다 쓸 때까지 귀곡 분석 영상 반복
         renderPage();      // 뒤에서 커버/페이지 미리 구성 (영상에 가려짐)
