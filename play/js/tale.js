@@ -52,6 +52,9 @@ padding:12px 14px;font-family:inherit;font-size:.98rem;cursor:pointer;text-align
 .tale-inp input,.tale-inp select{background:rgba(20,14,44,.95);border:1px solid rgba(150,120,230,.5);border-radius:10px;color:#efeaff;\
 padding:11px 13px;font-family:inherit;font-size:1rem;width:100%}\
 .tale-inp input:focus,.tale-inp select:focus{outline:none;border-color:#b18cff}\
+.tale-inp input.err{border-color:#ff5a5a!important;animation:tale-shakex .35s ease}\
+.tale-inp input.err::placeholder{color:#ff8a8a}\
+@keyframes tale-shakex{20%{transform:translateX(-7px)}45%{transform:translateX(6px)}70%{transform:translateX(-4px)}90%{transform:translateX(3px)}}\
 .tale-inp .row{display:flex;gap:7px}\
 .tale-inp .row select{flex:1;padding:11px 6px}\
 .tale-inp .ok{background:linear-gradient(180deg,#7a3a52,#5a1f34);border:1px solid rgba(255,120,150,.5);color:#ffe;font-weight:bold;\
@@ -352,6 +355,11 @@ box-shadow:0 0 0 100vmax #040308,0 0 70px rgba(0,0,0,.8)}}";
         function done() {
           var v = (i.value || "").trim();
           kickBGM();
+          if (inp.key === "name" && !v) { // 이름은 반드시 남겨야 한다
+            i.classList.remove("err"); void i.offsetWidth; i.classList.add("err");
+            i.placeholder = "…이름을 남기지 않으면 명부를 펼 수 없다";
+            return;
+          }
           if (inp.key === "name") collected.name = v.slice(0, inp.maxlen || 20);
           else if (inp.key === "focusFree" && v) { collected.focus = v.slice(0, inp.maxlen || 40); collected.focusLabel = "✍️ " + collected.focus; }
           advance();
@@ -415,12 +423,14 @@ box-shadow:0 0 0 100vmax #040308,0 0 70px rgba(0,0,0,.8)}}";
     function end(kind) {
       if (ended) return; ended = true;
       if (bgm) bgm.stop();
+      var payload = { name: collected.name, focus: collected.focus, focusLabel: collected.focusLabel, birth: collected.birth, base: base, deep: deep };
+      // 입장: 분석 화면(z-index 낮음)을 먼저 밑에 깔고 → 스토리를 페이드아웃
+      // (사라진 뒤에 띄우면 그 틈에 뒤 페이지가 번쩍 보인다)
+      if (kind === "enter" && opts.onEnter) { try { opts.onEnter(payload); } catch (e) {} }
       root.classList.add("fadeout");
       setTimeout(function () {
         root.remove(); document.body.style.overflow = "";
-        var payload = { name: collected.name, focus: collected.focus, focusLabel: collected.focusLabel, birth: collected.birth, base: base, deep: deep };
-        if (kind === "enter") { if (opts.onEnter) opts.onEnter(payload); }
-        else { if (opts.onExit) opts.onExit(payload); }
+        if (kind !== "enter") { if (opts.onExit) opts.onExit(payload); }
       }, 1000);
     }
 
