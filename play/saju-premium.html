@@ -151,8 +151,9 @@
 
     /* 분석 중 — 귀곡이 인생을 훑는 풀스크린 영상 */
     #analyzing { position:fixed; inset:0; z-index:80; display:none; align-items:flex-end; justify-content:center; background:#05040a; }
-    @media (min-width:520px) { /* 데스크톱: 휴대폰 컬럼 폭에 맞춤 */
-      #analyzing { left:50%; right:auto; width:480px; margin-left:-240px; box-shadow:0 0 70px rgba(0,0,0,.7); }
+    @media (min-width:520px) { /* 데스크톱: 휴대폰 컬럼 폭 + 양옆은 완전 암전(뒤 페이지 가림) */
+      #analyzing { left:50%; right:auto; width:480px; margin-left:-240px;
+        box-shadow: 0 0 0 100vmax #040308, 0 0 70px rgba(0,0,0,.8); }
     }
     #analyzing.on { display:flex; }
     #analyzing.fading { animation: an-fade .8s ease forwards; }
@@ -266,7 +267,7 @@
   <script src="js/goblub-art.js"></script>
   <script src="js/report-ui.js?v=5"></script>
   <script src="js/gwigok-audio.js?v=1"></script>
-  <script src="js/tale.js?v=14"></script>
+  <script src="js/tale.js?v=15"></script>
   <script>
     (function () {
       var $ = function (id) { return document.getElementById(id); };

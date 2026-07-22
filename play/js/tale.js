@@ -35,7 +35,7 @@ opacity:0;transition:transform 2.1s cubic-bezier(.5,0,.8,.4),opacity .5s}\
 .tale-top{position:absolute;top:12px;right:12px;z-index:9;display:flex;gap:8px}\
 .tale-top button{background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.28);color:rgba(255,255,255,.75);\
 border-radius:999px;padding:7px 13px;font-family:inherit;font-size:.82rem;cursor:pointer;backdrop-filter:blur(4px)}\
-.tale-box{position:absolute;left:50%;bottom:max(20px,env(safe-area-inset-bottom));transform:translateX(-50%);width:min(92vw,560px);z-index:4;\
+.tale-box{position:absolute;left:50%;bottom:max(20px,env(safe-area-inset-bottom));transform:translateX(-50%);width:min(92%,560px);z-index:4;\
 background:rgba(8,6,18,.82);border:1px solid rgba(140,110,220,.35);border-radius:16px;padding:16px 18px 14px;backdrop-filter:blur(6px);\
 box-shadow:0 10px 40px rgba(0,0,0,.6)}\
 .tale-name{font-size:.82rem;margin-bottom:6px;letter-spacing:1px;min-height:1em}\
@@ -66,7 +66,8 @@ border-radius:12px;padding:12px;cursor:pointer;font-family:inherit;font-size:1re
 .tale-vcap.on{opacity:1}\
 .tale-vcap .dot{animation:tale-blink 1.1s infinite}\
 @media (prefers-reduced-motion:reduce){.tale-bg,.tale-gob,.tale-vortex{transition-duration:.01s!important;animation:none!important}}\
-@media (min-width:520px){.tale{left:50%;right:auto;width:480px;margin-left:-240px;box-shadow:0 0 70px rgba(0,0,0,.7)}}";
+@media (min-width:520px){.tale{left:50%;right:auto;width:480px;margin-left:-240px;\
+box-shadow:0 0 0 100vmax #040308,0 0 70px rgba(0,0,0,.8)}}";
   var st = document.createElement("style");
   st.textContent = css;
   document.head.appendChild(st);
