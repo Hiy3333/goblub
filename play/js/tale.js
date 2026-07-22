@@ -63,8 +63,8 @@ border-radius:12px;padding:12px;cursor:pointer;font-family:inherit;font-size:1re
 .tale.fadeout{opacity:0;transition:opacity .55s ease}\
 .tale-vid{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;opacity:0;transition:opacity .8s;z-index:6;pointer-events:none}\
 .tale-vid.on{opacity:1}\
-.tale-vid::-webkit-media-controls-start-playback-button,.tale-vid::-webkit-media-controls,.tale-bgv::-webkit-media-controls-start-playback-button,.tale-bgv::-webkit-media-controls,\
-.tale-vid::-webkit-media-controls-overlay-play-button,.tale-bgv::-webkit-media-controls-overlay-play-button{display:none!important;-webkit-appearance:none;opacity:0!important}\
+video::-webkit-media-controls,video::-webkit-media-controls-start-playback-button,video::-webkit-media-controls-overlay-play-button,\
+video::-webkit-media-controls-panel,video::-webkit-media-controls-play-button{display:none!important;-webkit-appearance:none!important;opacity:0!important;pointer-events:none!important}\
 .tale-vcap{position:absolute;left:50%;bottom:12%;transform:translateX(-50%);z-index:7;color:#e9e2ff;font-family:'Jua','Malgun Gothic',sans-serif;font-size:1rem;letter-spacing:2px;text-shadow:0 0 14px rgba(0,0,0,.9);opacity:0;transition:opacity .6s;text-align:center;pointer-events:none}\
 .tale-vcap.on{opacity:1}\
 .tale-vcap .dot{animation:tale-blink 1.1s infinite}\
@@ -302,8 +302,10 @@ box-shadow:0 0 0 100vmax #040308,0 0 70px rgba(0,0,0,.8)}}";
       function tryPlay() { var p = bgv.play(); if (p && p.catch) p.catch(function () {}); }
       bgv.onplaying = function () { if (bgvKey === key) bgv.classList.add("on"); };
       bgv.oncanplay = tryPlay; tryPlay();
-      // 자동재생이 막힌 환경 폴백 — 첫 프레임이라도 보여준다
-      setTimeout(function () { if (bgvKey === key) bgv.classList.add("on"); }, 1100);
+      // 폴백: 로딩이 늦어도 '재생 중일 때만' 표시 — 일시정지 화면(재생 마크)은 절대 안 보이게
+      [1200, 2600, 4500].forEach(function (ms) {
+        setTimeout(function () { if (bgvKey === key) { if (!bgv.paused) bgv.classList.add("on"); else tryPlay(); } }, ms);
+      });
     }
     function hideBgVideo() {
       if (bgvKey == null) return;
@@ -415,7 +417,10 @@ box-shadow:0 0 0 100vmax #040308,0 0 70px rgba(0,0,0,.8)}}";
       vid.onplaying = function () { vid.classList.add("on"); }; // 재생 시작 후 표시(재생 마크 노출 방지)
       var p = vid.play();
       if (p && p.catch) p.catch(function () { vid.muted = true; vid.play().catch(function () { end("enter"); }); });
-      setTimeout(function () { vid.classList.add("on"); }, 1300); // 폴백
+      // 폴백도 '재생 중일 때만' 표시 — 일시정지 프레임(재생 마크)은 노출하지 않음
+      [1300, 3000].forEach(function (ms) {
+        setTimeout(function () { if (!vid.paused) vid.classList.add("on"); else { var p2 = vid.play(); if (p2 && p2.catch) p2.catch(function () {}); } }, ms);
+      });
       setTimeout(function () { vcap.innerHTML = '🕯 귀곡이 네 명부(冥府)를 펼친다<span class="dot">…</span>'; vcap.classList.add("on"); }, 900);
       setTimeout(proceed, 8000);
     }
