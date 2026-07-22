@@ -278,7 +278,7 @@
   <script src="js/goblub-art.js"></script>
   <script src="js/report-ui.js?v=5"></script>
   <script src="js/gwigok-audio.js?v=1"></script>
-  <script src="js/tale.js?v=17"></script>
+  <script src="js/tale.js?v=18"></script>
   <script>
     (function () {
       var $ = function (id) { return document.getElementById(id); };
@@ -466,6 +466,10 @@
         v.__endAudio = false;
         v.classList.add("dip"); // 재생 시작 전 네이티브 재생 마크 노출 방지
         v.onplaying = function () { v.classList.remove("dip"); };
+        // 재생 도중 버퍼링으로 멈추면 숨기고 재개 (엔딩 영상이 끝나 정지한 상태는 유지)
+        v.onpause = function () {
+          if (analyzing && !v.ended) { v.classList.add("dip"); try { var rp = v.play(); if (rp && rp.catch) rp.catch(function () {}); } catch (e) {} }
+        };
         // 폴백: '재생 중일 때만' 표시 — 일시정지 프레임(재생 마크)은 절대 노출하지 않음
         [1200, 2600, 4500].forEach(function (ms) {
           setTimeout(function () { if (!v.paused) v.classList.remove("dip"); else { try { var pp = v.play(); if (pp && pp.catch) pp.catch(function () {}); } catch (e) {} } }, ms);

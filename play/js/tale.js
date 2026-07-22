@@ -301,6 +301,10 @@ box-shadow:0 0 0 100vmax #040308,0 0 70px rgba(0,0,0,.8)}}";
       bgv.src = IMG + "vid_" + key + ".mp4" + IMGV;
       function tryPlay() { var p = bgv.play(); if (p && p.catch) p.catch(function () {}); }
       bgv.onplaying = function () { if (bgvKey === key) bgv.classList.add("on"); };
+      // 재생 도중 버퍼링 등으로 웹뷰가 멈추면(일시정지=재생 마크) 즉시 숨기고 재개 시도
+      bgv.onpause = function () {
+        if (bgvKey === key && !bgv.ended) { bgv.classList.remove("on"); tryPlay(); }
+      };
       bgv.oncanplay = tryPlay; tryPlay();
       // 폴백: 로딩이 늦어도 '재생 중일 때만' 표시 — 일시정지 화면(재생 마크)은 절대 안 보이게
       [1200, 2600, 4500].forEach(function (ms) {
@@ -415,6 +419,10 @@ box-shadow:0 0 0 100vmax #040308,0 0 70px rgba(0,0,0,.8)}}";
       vid.src = RITUAL_VID; vid.onended = proceed;
       vid.onerror = function () { end("enter"); };
       vid.onplaying = function () { vid.classList.add("on"); }; // 재생 시작 후 표시(재생 마크 노출 방지)
+      // 재생 도중 멈추면(버퍼링 일시정지) 숨기고 재개 — 끝난 뒤(ended)의 정지는 그대로 둠
+      vid.onpause = function () {
+        if (!vid.ended && !go) { vid.classList.remove("on"); var pr = vid.play(); if (pr && pr.catch) pr.catch(function () {}); }
+      };
       var p = vid.play();
       if (p && p.catch) p.catch(function () { vid.muted = true; vid.play().catch(function () { end("enter"); }); });
       // 폴백도 '재생 중일 때만' 표시 — 일시정지 프레임(재생 마크)은 노출하지 않음
@@ -499,6 +507,19 @@ box-shadow:0 0 0 100vmax #040308,0 0 70px rgba(0,0,0,.8)}}";
     };
 
     show(0);
+
+    // 초반 대사 나가는 동안 영상들을 미리 내려받아 캐시 예열 — 첫 재생 버퍼링(재생 마크의 원인) 최소화
+    setTimeout(function () {
+      var list = [IMG + "vid_forest.mp4" + IMGV, IMG + "vid_path.mp4" + IMGV,
+                  IMG + "vid_look_left.mp4" + IMGV, IMG + "vid_look_right.mp4" + IMGV, RITUAL_VID];
+      (function next(i) {
+        if (i >= list.length || ended) return;
+        fetch(list[i], { cache: "force-cache" })
+          .then(function (r) { return r.blob(); })
+          .catch(function () {})
+          .then(function () { next(i + 1); });
+      })(0);
+    }, 1200);
   }
 
   window.GoblubTale = { start: start };
