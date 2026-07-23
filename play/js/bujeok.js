@@ -276,135 +276,160 @@
     hs(g, cx, y + h, w, t);
   }
 
-  // ── 관(冠): 일간 오행이 머리를 정한다 (전부 한자 부수 꼴) ──
+  // ── 실제 무속 부적의 구조를 그대로 따른다 ──
+  //  · 敕令(칙령)이 머리에 오고
+  //  · 파자(破字)한 한자 부속(口·日·田·三·⊙)이 세로로 쌓이며
+  //  · 굵은 척추가 관통해 아래로 길게 내려와 큰 갈고리로 말리고
+  //  · 긴 대각선이 문양 전체를 꿰뚫고 바깥까지 뻗는다  ← 부적다움의 핵심
+  var _rng = Math.random;   // drawSigil 에서 시드 난수로 교체(손맛 흔들림용)
+
+  // 붓획 — 끝으로 갈수록 가늘어지고, 가장자리가 미세하게 흔들린다
+  function bs(g, x1, y1, x2, y2, w1, w2) {
+    var dx = x2 - x1, dy = y2 - y1, L = Math.hypot(dx, dy) || 1;
+    var nx = -dy / L, ny = dx / L;
+    var j = (L > 60 ? 1.6 : 0.7);                       // 획이 길수록 흔들림 폭↑
+    var mx = (x1 + x2) / 2 + (_rng() - 0.5) * j, my = (y1 + y2) / 2 + (_rng() - 0.5) * j;
+    var mw = (w1 + w2) / 2 * (0.9 + _rng() * 0.2);
+    function path(k) {
+      g.beginPath();
+      g.moveTo(x1 + nx * w1 * k / 2, y1 + ny * w1 * k / 2);
+      g.quadraticCurveTo(mx + nx * mw * k / 2, my + ny * mw * k / 2,
+                         x2 + nx * w2 * k / 2, y2 + ny * w2 * k / 2);
+      g.lineTo(x2 - nx * w2 * k / 2, y2 - ny * w2 * k / 2);
+      g.quadraticCurveTo(mx - nx * mw * k / 2, my - ny * mw * k / 2,
+                         x1 - nx * w1 * k / 2, y1 - ny * w1 * k / 2);
+      g.closePath();
+    }
+    g.save(); g.fillStyle = "rgba(150,26,14,.18)"; path(1.5); g.fill(); g.restore();  // 번짐
+    g.fillStyle = "#9d1710"; path(1); g.fill();
+    g.beginPath(); g.arc(x1, y1, w1 * 0.5, 0, Math.PI * 2); g.fill();                 // 입필
+  }
+  function hs(g, cx, y, w, t) { bs(g, cx - w / 2, y + t * 0.2, cx + w / 2, y - t * 0.2, t, t * 0.85); }
+  function vs(g, x, y1, y2, t) { bs(g, x, y1, x, y2, t, t * 0.88); }
+  function dot(g, x, y, t, dir) { bs(g, x, y, x + (dir || 1) * t * 0.7, y + t * 1.1, t * 0.4, t * 0.9); }
+  function boxG(g, cx, y, w, h, t) {
+    vs(g, cx - w / 2, y, y + h, t);
+    hs(g, cx, y + t * 0.3, w, t);
+    vs(g, cx + w / 2, y, y + h, t);
+    hs(g, cx, y + h, w, t);
+  }
+  function ringG(g, cx, cy, r, t) {          // ⊙ — 해·달
+    var n = 14, pts = [];
+    for (var i = 0; i <= n; i++) {
+      var a = i / n * Math.PI * 2;
+      pts.push([cx + Math.cos(a) * r, cy + Math.sin(a) * r * 0.92]);
+    }
+    for (var k = 0; k < n; k++) bs(g, pts[k][0], pts[k][1], pts[k + 1][0], pts[k + 1][1], t, t);
+  }
+  // 척추 끝의 큰 갈고리 — 실제 부적에서 가장 눈에 띄는 마무리
+  function bigHook(g, x, yTop, yBot, t) {
+    vs(g, x, yTop, yBot, t);
+    var r = t * 1.9;
+    var n = 10;
+    for (var i = 0; i < n; i++) {
+      var a1 = i / n * Math.PI * 1.25, a2 = (i + 1) / n * Math.PI * 1.25;
+      bs(g, x - Math.sin(a1) * r, yBot + r - Math.cos(a1) * r,
+            x - Math.sin(a2) * r, yBot + r - Math.cos(a2) * r,
+            t * (1 - i / n * 0.45), t * (1 - (i + 1) / n * 0.45));
+    }
+  }
+  // 관통선 — 문양을 꿰뚫고 바깥까지 뻗는 긴 사선
+  function slash(g, cx, y, len, ang, t) {
+    var dx = Math.cos(ang) * len / 2, dy = Math.sin(ang) * len / 2;
+    bs(g, cx - dx, y - dy, cx + dx, y + dy, t, t * 0.35);
+  }
+
+  // ── 관(冠): 일간 오행이 머리를 정한다 ──
   function crown(g, cx, y, w, oh) {
-    var t = 13, hw = w / 2;
-    if (oh === "목") {                       // 艹 — 풀 머리
-      hs(g, cx, y + 48, w * 0.86, t);
-      vs(g, cx - hw * 0.42, y + 16, y + 74, t);
-      vs(g, cx + hw * 0.42, y + 16, y + 74, t);
+    var t = 14, hw = w / 2;
+    if (oh === "목") {                       // 쌍 口 (吅)
+      boxG(g, cx - hw * 0.34, y + 8, w * 0.34, 58, t);
+      boxG(g, cx + hw * 0.34, y + 8, w * 0.34, 58, t);
     } else if (oh === "화") {                // 亠 + 두 점
-      hs(g, cx, y + 52, w * 0.8, t);
-      dot(g, cx - hw * 0.3, y + 12, t, -1);
-      dot(g, cx + hw * 0.3, y + 12, t, 1);
-      vs(g, cx, y + 52, y + 82, t);
-    } else if (oh === "토") {                // 三 — 겹친 땅
-      hs(g, cx, y + 18, w * 0.6, t);
-      hs(g, cx, y + 48, w * 0.78, t);
-      hs(g, cx, y + 78, w * 0.94, t * 1.15);
+      dot(g, cx - hw * 0.28, y + 4, t, -1);
+      dot(g, cx + hw * 0.28, y + 4, t, 1);
+      hs(g, cx, y + 48, w * 0.82, t);
+    } else if (oh === "토") {                // 三 겹침
+      hs(g, cx, y + 14, w * 0.56, t);
+      hs(g, cx, y + 42, w * 0.74, t);
+      hs(g, cx, y + 70, w * 0.9, t * 1.1);
     } else if (oh === "금") {                // 人 지붕
-      bs(g, cx, y + 10, cx - hw * 0.86, y + 82, t * 0.5, t * 1.2);
-      bs(g, cx, y + 10, cx + hw * 0.86, y + 82, t * 0.5, t * 1.2);
-    } else {                                  // 冖 + 삼수변 점
-      hs(g, cx, y + 56, w * 0.86, t);
-      vs(g, cx - hw * 0.43, y + 56, y + 84, t * 0.9);
-      vs(g, cx + hw * 0.43, y + 56, y + 84, t * 0.9);
-      dot(g, cx - hw * 0.2, y + 14, t, 1);
-      dot(g, cx + hw * 0.06, y + 14, t, 1);
-      dot(g, cx + hw * 0.32, y + 14, t, 1);
+      bs(g, cx, y + 6, cx - hw * 0.84, y + 72, t * 0.55, t * 1.2);
+      bs(g, cx, y + 6, cx + hw * 0.84, y + 72, t * 0.55, t * 1.2);
+    } else {                                  // 冖 + 삼수변
+      hs(g, cx, y + 50, w * 0.84, t);
+      dot(g, cx - hw * 0.22, y + 8, t, 1);
+      dot(g, cx + hw * 0.04, y + 8, t, 1);
+      dot(g, cx + hw * 0.3, y + 8, t, 1);
     }
   }
 
-  // ── 몸통 마디 — 전부 한자처럼 보이는 조합 ──
+  // ── 몸통 마디 — 파자한 한자 부속들 ──
   var SEGS = [
-    function kou(g, cx, y, w, h) {            // 口
-      boxG(g, cx, y + h * 0.12, w * 0.52, h * 0.6, 12);
+    function pairKou(g, cx, y, w, h) {                 // 吅 — 쌍 입
+      var bw = w * 0.33, bh = h * 0.52;
+      boxG(g, cx - w * 0.25, y + h * 0.1, bw, bh, 12);
+      boxG(g, cx + w * 0.25, y + h * 0.1, bw, bh, 12);
     },
-    function ri(g, cx, y, w, h) {             // 日
-      var bw = w * 0.46, bh = h * 0.62, ty = y + h * 0.12;
+    function bars(g, cx, y, w, h) {                    // 三 — 척추를 꿰는 가로 세 획
+      hs(g, cx, y + h * 0.18, w * 0.9, 13);
+      hs(g, cx, y + h * 0.44, w * 0.7, 12);
+      hs(g, cx, y + h * 0.7, w * 0.98, 14);
+    },
+    function rings(g, cx, y, w, h) {                   // ⊙⊙ — 해와 달
+      ringG(g, cx - w * 0.22, y + h * 0.42, h * 0.2, 11);
+      ringG(g, cx + w * 0.22, y + h * 0.42, h * 0.2, 11);
+    },
+    function ri(g, cx, y, w, h) {                      // 日
+      var bw = w * 0.44, bh = h * 0.58, ty = y + h * 0.1;
       boxG(g, cx, ty, bw, bh, 12);
       hs(g, cx, ty + bh * 0.5, bw, 11);
     },
-    function tian(g, cx, y, w, h) {           // 田
-      var bw = w * 0.52, bh = h * 0.62, ty = y + h * 0.12;
+    function tian(g, cx, y, w, h) {                    // 田
+      var bw = w * 0.5, bh = h * 0.58, ty = y + h * 0.1;
       boxG(g, cx, ty, bw, bh, 12);
       hs(g, cx, ty + bh * 0.5, bw, 10);
       vs(g, cx, ty, ty + bh, 10);
     },
-    function wang(g, cx, y, w, h) {           // 王 — 가로 세 획이 척추를 관통
-      hs(g, cx, y + h * 0.16, w * 0.74, 12);
-      hs(g, cx, y + h * 0.44, w * 0.56, 11);
-      hs(g, cx, y + h * 0.72, w * 0.86, 13);
+    function ringBars(g, cx, y, w, h) {                // ⊙ 하나 + 가로획
+      ringG(g, cx, y + h * 0.36, h * 0.22, 12);
+      hs(g, cx, y + h * 0.76, w * 0.92, 13);
     },
-    function shi(g, cx, y, w, h) {            // 十 + 좌우 점
-      hs(g, cx, y + h * 0.42, w * 0.82, 13);
-      dot(g, cx - w * 0.44, y + h * 0.66, 12, -1);
-      dot(g, cx + w * 0.38, y + h * 0.66, 12, 1);
+    function crescents(g, cx, y, w, h) {               // 반달 셋
+      for (var i = -1; i <= 1; i++) {
+        var bx = cx + i * w * 0.26, by = y + h * 0.42, r = h * 0.17;
+        for (var k = 0; k < 7; k++) {
+          var a1 = Math.PI * (0.15 + k / 7 * 0.7), a2 = Math.PI * (0.15 + (k + 1) / 7 * 0.7);
+          bs(g, bx - Math.cos(a1) * r, by - Math.sin(a1) * r,
+                bx - Math.cos(a2) * r, by - Math.sin(a2) * r, 10, 10);
+        }
+      }
+      hs(g, cx, y + h * 0.78, w * 0.8, 12);
     },
-    function pin(g, cx, y, w, h) {            // 品 — 세 입
-      boxG(g, cx, y + h * 0.04, w * 0.34, h * 0.32, 10);
-      boxG(g, cx - w * 0.28, y + h * 0.46, w * 0.32, h * 0.32, 10);
-      boxG(g, cx + w * 0.28, y + h * 0.46, w * 0.32, h * 0.32, 10);
+    function gong(g, cx, y, w, h) {                    // 工
+      hs(g, cx, y + h * 0.16, w * 0.66, 13);
+      hs(g, cx, y + h * 0.72, w * 0.88, 14);
     },
-    function mi(g, cx, y, w, h) {             // 冖 — 덮개 + 아래 가로
-      hs(g, cx, y + h * 0.2, w * 0.86, 13);
-      vs(g, cx - w * 0.43, y + h * 0.2, y + h * 0.44, 11);
-      vs(g, cx + w * 0.43, y + h * 0.2, y + h * 0.44, 11);
-      hs(g, cx, y + h * 0.72, w * 0.6, 12);
+    function fang(g, cx, y, w, h) {                    // 匚
+      hs(g, cx - w * 0.04, y + h * 0.14, w * 0.7, 13);
+      vs(g, cx - w * 0.39, y + h * 0.14, y + h * 0.76, 13);
+      hs(g, cx - w * 0.04, y + h * 0.76, w * 0.7, 13);
     },
-    function er(g, cx, y, w, h) {             // 儿 — 두 다리
-      bs(g, cx - w * 0.1, y + h * 0.1, cx - w * 0.42, y + h * 0.8, 12, 7);
-      bs(g, cx + w * 0.1, y + h * 0.1, cx + w * 0.42, y + h * 0.78, 12, 9);
-      hs(g, cx, y + h * 0.08, w * 0.5, 11);
-    },
-    function fang(g, cx, y, w, h) {           // 匚 — 감싸 담음
-      hs(g, cx - w * 0.06, y + h * 0.14, w * 0.72, 13);
-      vs(g, cx - w * 0.42, y + h * 0.14, y + h * 0.78, 13);
-      hs(g, cx - w * 0.06, y + h * 0.78, w * 0.72, 13);
-    },
-    function gong(g, cx, y, w, h) {           // 工 — 버팀
-      hs(g, cx, y + h * 0.16, w * 0.72, 13);
-      vs(g, cx, y + h * 0.16, y + h * 0.7, 13);
-      hs(g, cx, y + h * 0.7, w * 0.86, 14);
+    function er(g, cx, y, w, h) {                      // 儿
+      hs(g, cx, y + h * 0.12, w * 0.56, 12);
+      bs(g, cx - w * 0.12, y + h * 0.14, cx - w * 0.4, y + h * 0.78, 12, 7);
+      bs(g, cx + w * 0.12, y + h * 0.14, cx + w * 0.4, y + h * 0.76, 12, 9);
     }
   ];
 
-  // ── 족(足): 용신이 딛는 자리 ──
-  function base(g, cx, y, w, oh) {
-    var t = 14, hw = w / 2;
-    if (oh === "목") {                        // 뿌리 — 좌우 삐침
-      bs(g, cx, y, cx - hw * 0.86, y + 78, t, 7);
-      bs(g, cx, y, cx + hw * 0.86, y + 78, t, 7);
-      hs(g, cx, y + 8, w * 0.5, t);
-    } else if (oh === "화") {                 // 灬 — 네 점
-      for (var i = 0; i < 4; i++) dot(g, cx - hw * 0.6 + i * (hw * 0.4), y + 24, 13, i < 2 ? -1 : 1);
-      hs(g, cx, y + 4, w * 0.72, t);
-    } else if (oh === "토") {                 // 土 받침
-      vs(g, cx, y, y + 52, t);
-      hs(g, cx, y + 26, w * 0.5, t);
-      hs(g, cx, y + 66, w * 0.94, t * 1.2);
-    } else if (oh === "금") {                 // 亼 — 모아 딛음
-      bs(g, cx, y + 4, cx - hw * 0.8, y + 62, t * 0.5, t);
-      bs(g, cx, y + 4, cx + hw * 0.8, y + 62, t * 0.5, t);
-      hs(g, cx, y + 74, w * 0.9, t * 1.15);
-    } else {                                   // 수 — 이수변 + 받침
-      hs(g, cx, y + 20, w * 0.86, t);
-      dot(g, cx - hw * 0.5, y + 40, 13, -1);
-      dot(g, cx, y + 44, 13, 1);
-      dot(g, cx + hw * 0.5, y + 40, 13, 1);
-    }
-  }
-
-  // ── 살(殺): 신살이 붙이는 곁획 — 이것도 한자 획으로 ──
+  // ── 살(殺): 신살이 붙이는 곁획 ──
   function sideMark(g, kind, x, y, s, dir) {
-    if (kind === "도화") {                      // 밖으로 뻗는 삐침 + 점
-      bs(g, x, y, x + dir * s * 1.5, y - s * 0.7, 9, 3);
-      dot(g, x + dir * s * 1.5, y - s * 0.5, 9, dir);
-    } else if (kind === "역마") {               // 갈고리 획
-      hook(g, x, y - s, y + s, 9);
-    } else if (kind === "화개") {               // 덮개 획
-      hs(g, x, y, s * 1.9, 10);
-      vs(g, x, y, y + s * 0.9, 9);
-    } else if (kind === "천을귀인") {           // 점 세 개(귀인의 별)
-      dot(g, x, y - s * 0.7, 10, dir);
-      dot(g, x, y, 10, dir);
-      dot(g, x, y + s * 0.7, 10, dir);
-    } else if (kind === "양인") {               // 날카로운 삐침
-      bs(g, x + dir * s * 0.7, y - s, x - dir * s * 0.5, y + s, 11, 2);
-    } else {                                     // 괴강·백호 — 겹친 가로획
-      hs(g, x, y - s * 0.5, s * 1.7, 11);
-      hs(g, x, y + s * 0.5, s * 1.4, 10);
-    }
+    if (kind === "도화") { bs(g, x, y, x + dir * s * 1.5, y - s * 0.7, 9, 3); dot(g, x + dir * s * 1.4, y - s * 0.5, 9, dir); }
+    else if (kind === "역마") { bs(g, x, y - s, x, y + s, 9, 6); bs(g, x, y + s, x - dir * s * 0.8, y + s * 0.4, 8, 2); }
+    else if (kind === "화개") { hs(g, x, y, s * 1.8, 10); vs(g, x, y, y + s * 0.85, 9); }
+    else if (kind === "천을귀인") { dot(g, x, y - s * 0.7, 10, dir); dot(g, x, y, 10, dir); dot(g, x, y + s * 0.7, 10, dir); }
+    else if (kind === "양인") { bs(g, x + dir * s * 0.7, y - s, x - dir * s * 0.5, y + s, 11, 2); }
+    else { hs(g, x, y - s * 0.45, s * 1.6, 11); hs(g, x, y + s * 0.45, s * 1.3, 10); }
   }
 
   // ── 부적 이름 — 사주에서 뽑은다(도표가 아니라 이름으로 성격을 말한다) ──
@@ -419,53 +444,51 @@
   // ── 부문 전체 ──
   function drawSigil(g, o, cx, top, w, h) {
     var rng = rngFrom(seedOf(o));
+    _rng = rng;                                  // 붓 흔들림도 사주로 고정(같은 사주=같은 그림)
     var ilOh = GAN_OH2[o.ilgan] || "토";
     var need = (o.use && o.use[0]) || ilOh;
     var oheng = o.oheng || {};
 
     g.save();
-    // 관 — 일간 오행이 머리를 정한다
+    // 관
     crown(g, cx, top, w, ilOh);
 
-    // 몸통 — 마디 수는 부족한 기운이 많을수록 늘어난다(3~5)
+    // 몸통 — 부족한 기운이 많을수록 마디가 늘어난다(3~5)
     var lack = 0;
     OH_KEYS.forEach(function (k) { if ((oheng[k] || 0) < 1) lack++; });
     var nSeg = Math.max(3, Math.min(5, 3 + Math.round(lack / 2)));
-    var segTop = top + 118, segBot = top + h - 116, segH = (segBot - segTop) / nSeg;
+    var segTop = top + 108, segBot = top + h - 250, segH = (segBot - segTop) / nSeg;
 
-    // 척추 — 부적의 기둥. 관 아래부터 족 위까지 관통하고 끝은 갈고리로 채올린다
-    hook(g, cx, top + 86, segBot + 26, 17);
+    // 척추 — 관 아래부터 문양을 관통해 아래로 길게 내려가 큰 갈고리로 말린다
+    bigHook(g, cx, top + 74, top + h - 96, 17);
 
-    // 마디 종류 — 용신 계열에 가중치
-    var favor = { 목: [7, 3], 화: [4, 5], 토: [9, 2], 금: [8, 0], 수: [6, 1] }[need] || [0, 1];
+    var favor = { 목: [0, 4], 화: [6, 2], 토: [1, 7], 금: [8, 9], 수: [5, 3] }[need] || [1, 3];
     for (var i = 0; i < nSeg; i++) {
-      var idx = (rng() < 0.6) ? favor[Math.floor(rng() * favor.length)] : Math.floor(rng() * SEGS.length);
-      var yy = segTop + i * segH;
-      SEGS[idx](g, cx, yy, w * (0.66 + rng() * 0.26), segH);
-      // 마디 사이 좌우 대칭 곁획(짧은 가로) — 부적 특유의 리듬
-      if (rng() < 0.45 && i < nSeg - 1) {
-        var y2 = yy + segH * 0.92, sw = w * (0.3 + rng() * 0.14);
-        bs(g, cx - w * 0.16, y2, cx - w * 0.16 - sw, y2 - 6, 10, 4);
-        bs(g, cx + w * 0.16, y2, cx + w * 0.16 + sw, y2 - 6, 10, 4);
-      }
+      var idx = (rng() < 0.62) ? favor[Math.floor(rng() * favor.length)] : Math.floor(rng() * SEGS.length);
+      SEGS[idx](g, cx, segTop + i * segH, w * (0.64 + rng() * 0.28), segH);
     }
 
-    // 족 — 용신이 딛는 자리
-    base(g, cx, segBot + 6, w, need);
+    // 관통선 — 문양 전체를 꿰뚫고 바깥까지 뻗는다(부적다움의 핵심)
+    var nSlash = 2 + Math.floor(rng() * 2);
+    for (var s2 = 0; s2 < nSlash; s2++) {
+      var yy = segTop + segH * (0.5 + rng() * (nSeg - 1));
+      var ang = (rng() < 0.5 ? 1 : -1) * (0.17 + rng() * 0.16);   // 완만한 사선
+      slash(g, cx, yy, w * (1.5 + rng() * 0.5), ang, 11);
+    }
 
-    // 살 — 신살이 붙이는 곁획
+    // 살 — 신살 곁획
     var kinds = [];
-    (o.sinsal || []).forEach(function (s2) {
+    (o.sinsal || []).forEach(function (s3) {
       ["도화", "역마", "화개", "천을귀인", "양인", "괴강", "백호"].forEach(function (k) {
-        if (s2.indexOf(k) >= 0 && kinds.indexOf(k) < 0) kinds.push(k);
+        if (s3.indexOf(k) >= 0 && kinds.indexOf(k) < 0) kinds.push(k);
       });
     });
-    kinds.slice(0, 4).forEach(function (k, i) {
+    kinds.slice(0, 3).forEach(function (k, i) {
       var side = i % 2 ? 1 : -1;
-      var y2 = segTop + 60 + Math.floor(i / 2) * (segH * 1.7) + rng() * 30;
-      sideMark(g, k, cx + side * (w * 0.62), y2, 16, side);
+      sideMark(g, k, cx + side * (w * 0.66), segTop + 70 + i * (segH * 1.25), 16, side);
     });
     g.restore();
+    _rng = Math.random;
   }
 
   window.BujeokSeal = { encode: encode, decode: decode };

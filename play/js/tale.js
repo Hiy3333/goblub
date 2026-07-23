@@ -305,15 +305,39 @@ box-shadow:0 0 0 100vmax #040308,0 0 70px rgba(0,0,0,.8)}}";
       bgv.onpause = function () {
         if (bgvKey === key && !bgv.ended) { bgv.classList.remove("on"); tryPlay(); }
       };
+      // 1회 재생 영상은 끝나는 순간 '마지막 프레임을 이미지로 굳히고' 영상 요소를 치운다.
+      // (정지된 video 가 화면에 남아 있으면 폰이 그 위에 재생 버튼을 그린다)
+      bgv.onended = function () {
+        if (bgvKey !== key || !once) return;
+        var frozen = false;
+        try {
+          var c = document.createElement("canvas");
+          c.width = bgv.videoWidth || 720; c.height = bgv.videoHeight || 1280;
+          c.getContext("2d").drawImage(bgv, 0, 0, c.width, c.height);
+          var el2 = useA ? bgA : bgB, other2 = useA ? bgB : bgA;
+          el2.style.backgroundImage = "url('" + c.toDataURL("image/jpeg", 0.92) + "')";
+          el2.classList.remove("walk");
+          el2.style.transition = "none"; el2.classList.add("on");
+          void el2.offsetWidth; el2.style.transition = "";
+          other2.classList.remove("on");
+          useA = !useA;
+          frozen = true;
+        } catch (e) {}
+        if (frozen) { bgv.classList.remove("on"); try { bgv.removeAttribute("src"); bgv.load(); } catch (e) {} }
+      };
       bgv.oncanplay = tryPlay; tryPlay();
       // 폴백: 로딩이 늦어도 '재생 중일 때만' 표시 — 일시정지 화면(재생 마크)은 절대 안 보이게
       [1200, 2600, 4500].forEach(function (ms) {
-        setTimeout(function () { if (bgvKey === key) { if (!bgv.paused) bgv.classList.add("on"); else tryPlay(); } }, ms);
+        setTimeout(function () {
+          if (bgvKey !== key || bgv.ended) return;
+          if (!bgv.paused) bgv.classList.add("on"); else tryPlay();
+        }, ms);
       });
     }
     function hideBgVideo() {
       if (bgvKey == null) return;
       bgvKey = null; bgv.classList.remove("on");
+      bgv.onended = null; bgv.onpause = null; bgv.onplaying = null; bgv.oncanplay = null;
       try { bgv.pause(); } catch (e) {}
     }
     function fmt(t) {
