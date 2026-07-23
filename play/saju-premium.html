@@ -88,6 +88,8 @@
     body.story-mode main > section.panel { background: linear-gradient(180deg,#140d18,#0d0912) !important;
       border-color: rgba(150,60,70,.4) !important; box-shadow: 0 18px 50px rgba(0,0,0,.6) !important; }
     body.story-mode .fine-print { color:#7a6f8a !important; }
+    /* 이계에 들어가면 고블럽 버디(떠다니는 마스코트·최소화 버튼) 완전 숨김 */
+    body.story-mode .gbd-wrap, body.story-mode .gbd-min { display:none !important; }
 
     /* ===== 명부 보관함(다시 보기) ===== */
     .arch-title { font-family:'Nanum Myeongjo',serif; font-weight:800; color:#ffb08a; font-size:1.1rem;
@@ -142,12 +144,18 @@
     .pg-himg img { width:100%; display:block; filter: contrast(1.05) saturate(.92); }
     .pg-himg::after { content:""; position:absolute; inset:0;
       background: linear-gradient(180deg, rgba(13,9,18,.15) 0%, transparent 30%, transparent 55%, rgba(16,11,20,.92) 100%); }
-    .pg-bar { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:14px; }
+    .pg-bar { display:flex; align-items:center; justify-content:center; gap:6px; margin-top:14px; }
     .pg-btn { flex:none; background: rgba(40,26,40,.7); color:#e0d4e8; border:1px solid rgba(150,80,90,.45);
-      border-radius: 10px; padding: 11px 18px; font-family:inherit; font-size:.98rem; cursor:pointer; }
+      border-radius: 10px; padding: 11px 12px; font-family:inherit; font-size:.95rem; cursor:pointer; }
     .pg-btn:hover:not(:disabled) { color:#ff8a98; border-color: rgba(220,80,100,.6); }
     .pg-btn:disabled { opacity:.3; cursor:default; }
-    .pg-count { color:#9a8ba8; font-size:.86rem; letter-spacing:1px; }
+    .pg-count { display:flex; align-items:center; gap:4px; color:#9a8ba8; font-size:.9rem; }
+    .pg-count i { font-style:normal; }
+    #pg-jump { width:3em; text-align:center; background:rgba(28,18,26,.85); color:#e8dcc8;
+      border:1px solid rgba(150,80,90,.45); border-radius:8px; padding:9px 2px; font-family:inherit; font-size:.95rem;
+      -moz-appearance:textfield; appearance:textfield; }
+    #pg-jump::-webkit-outer-spin-button, #pg-jump::-webkit-inner-spin-button { -webkit-appearance:none; margin:0; }
+    #pg-jump:focus { outline:none; border-color:#ff8a5a; }
     .pg-writing { text-align:center; color:#8a7f9a; font-size:.85rem; min-height:1.4em; margin-top:8px; }
     .pg-writing.on::after { content:"🕯"; margin-left:4px; animation: blink 1.2s infinite; }
 
@@ -240,10 +248,12 @@
             <div class="pg-page" id="pg-page"></div>
           </div>
           <div class="pg-bar">
-            <button class="pg-btn" id="pg-prev">◀ 이전</button>
-            <span class="pg-count" id="pg-count"></span>
-            <button class="pg-btn" id="pg-mute" style="padding:11px 13px" aria-label="소리 켜기/끄기">🔊</button>
-            <button class="pg-btn" id="pg-next">다음 ▶</button>
+            <button class="pg-btn" id="pg-first" aria-label="처음으로">⏮</button>
+            <button class="pg-btn" id="pg-prev" aria-label="이전">◀</button>
+            <span class="pg-count"><input id="pg-jump" type="number" min="1" inputmode="numeric" aria-label="페이지 번호" /><i>/</i><span id="pg-total"></span></span>
+            <button class="pg-btn" id="pg-next" aria-label="다음">▶</button>
+            <button class="pg-btn" id="pg-last" aria-label="끝으로">⏭</button>
+            <button class="pg-btn" id="pg-mute" aria-label="소리 켜기/끄기">🔊</button>
           </div>
           <p class="pg-writing" id="pg-writing"></p>
           <div class="result-actions" id="pg-end" style="justify-content:center; display:none">
@@ -346,6 +356,7 @@
         if (!snap || !snap.parts || !snap.birth) { return; }
         computeFrom(snap.birth);
         userName = snap.name || ""; userFocus = snap.focus || "";
+        document.body.classList.add("story-mode");   // 명부 열람도 이계 — 배경 어둡게 + 고블럽 버디 숨김
         $("archive").style.display = "none"; $("gate").style.display = "none";
         $("report-panel").style.display = "block";
         pages = [{ type: "cover" }]; cur = 0; genFailed = false; allDone = false;
@@ -556,10 +567,13 @@
       function renderPage() {
         var el = $("pg-page");
         var pg = pages[cur];
-        $("pg-count").textContent = (cur + 1) + " / " + pages.length + (allDone ? "" : " …");
+        $("pg-jump").value = cur + 1;
+        $("pg-total").textContent = pages.length + (allDone ? "" : "…");
         $("pg-prev").disabled = (cur === 0);
+        $("pg-first").disabled = (cur === 0);
         var atEnd = (cur >= pages.length - 1);
         $("pg-next").disabled = atEnd && allDone;
+        $("pg-last").disabled = atEnd;
         // 상단 소개 헤더는 첫 장에서만, 하단 액션(요약짤·다시보기)은 마지막 장에서만
         $("prem-head").style.display = (cur === 0) ? "" : "none";
         $("pg-end").style.display = (allDone && atEnd) ? "flex" : "none";
@@ -638,7 +652,7 @@
           setTimeout(function () { genPart(i, 1); }, 3000);
           return true;
         }
-        Dosa.fetchAI("/api/saju-report", { saju: base, deep: deep, part: p.id, name: userName || undefined, focus: userFocus || undefined, edition: "myeongbu1" }, "goblub_rep2_", {
+        Dosa.fetchAI("/api/saju-report", { saju: base, deep: deep, part: p.id, name: userName || undefined, focus: userFocus || undefined, edition: "myeongbu2" }, "goblub_rep3_", {
           accept: function (full) { return signed(full); },
           cooldownMs: 4000, cooldownKey: "goblub_rep_cd",
           onChunk: function (t) { buffer += t; },
@@ -828,9 +842,24 @@
       $("btn-tale").onclick = replay;
       $("btn-replay").onclick = replay;
 
-      // 페이지 넘김 조작 — 하단 이전/다음 버튼으로만
+      // 페이지 넘김 조작 — 하단 버튼·번호 입력으로만
       $("pg-prev").onclick = function () { go(-1); };
       $("pg-next").onclick = function () { go(1); };
+      function jumpAbs(idx) { // 절대 이동(처음/끝/번호)
+        idx = Math.max(0, Math.min(pages.length - 1, idx));
+        if (idx === cur) { $("pg-jump").value = cur + 1; return; }
+        cur = idx; renderPage(); GwigokAudio.sfxPage();
+      }
+      $("pg-first").onclick = function () { jumpAbs(0); };
+      $("pg-last").onclick = function () { jumpAbs(pages.length - 1); };
+      $("pg-jump").addEventListener("change", function () {
+        var v = parseInt(this.value, 10);
+        if (isNaN(v)) { this.value = cur + 1; return; }
+        jumpAbs(v - 1);
+      });
+      $("pg-jump").addEventListener("keydown", function (e) {
+        if (e.key === "Enter") { e.preventDefault(); this.blur(); }  // blur → change 발화
+      });
 
       fetch("data/saju-terms.json").then(function (r) { return r.ok ? r.json() : null; })
         .then(function (d) { data = d; setup(); })
