@@ -162,7 +162,7 @@
     var bg = new Image();
     bg.onload = function () { paint(); };
     bg.onerror = function () { paint(true); };
-    bg.src = "img/bujeok/bg_" + el.bg + ".webp";
+    bg.src = opts.bgSrc || ("img/bujeok/bg_" + el.bg + ".webp");   // bgSrc: 배경 후보 비교용
 
     function paint(noBg) {
       if (noBg) { g.fillStyle = "#d9c184"; g.fillRect(0, 0, W, H); }

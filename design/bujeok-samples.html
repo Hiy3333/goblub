@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>부적 배경 후보 — 실제 내용 얹어 비교</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background:#0b0812; color:#e6dff5; font-family:"Malgun Gothic",sans-serif; padding:26px 14px 60px; }
+    h1 { text-align:center; font-size:1.3rem; margin-bottom:6px; }
+    .sub { text-align:center; color:#8a7fb0; font-size:.9rem; margin-bottom:8px; line-height:1.7; }
+    .note { max-width:1180px; margin:0 auto 24px; background:#140f24; border:1px solid #2c2450;
+      border-radius:12px; padding:14px 18px; color:#b3a8d8; font-size:.88rem; line-height:1.75; }
+    .note b { color:#ffb08a; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(290px,1fr)); gap:20px; max-width:1180px; margin:0 auto; }
+    .m { background:#120e22; border:1px solid #2c2450; border-radius:14px; overflow:hidden; }
+    .m canvas { width:100%; display:block; background:#000; }
+    .m .info { padding:12px 15px 15px; }
+    .m h2 { font-size:1rem; margin-bottom:4px; color:#ffd9c8; }
+    .m .badge { display:inline-block; background:#2a2258; border-radius:999px; padding:2px 10px;
+      font-size:.72rem; color:#cabfef; margin-bottom:6px; }
+    .m p { color:#9a8fc4; font-size:.82rem; line-height:1.6; }
+    .m .verdict { color:#7fd0a8; font-size:.8rem; margin-top:6px; }
+    .m .verdict.warn { color:#e0956a; }
+  </style>
+</head>
+<body>
+  <h1>🧧 부적 배경 후보 8종 — 실제 내용을 얹어 비교</h1>
+  <p class="sub">모두 같은 사주(계수 일간·신약·용신 금수)로 렌더링했습니다</p>
+  <div class="note">
+    현재 부적이 별로였던 이유는 <b>배경 문양이 너무 번잡해서</b> 위에 얹은 오행 원환·글자와 서로 싸웠기 때문입니다.
+    그래서 이번엔 <b>가운데가 완전히 비어 있고 테두리만 정갈한</b> 방향으로 뽑았습니다.<br>
+    아래는 각 배경에 <b>실제 부적 내용을 그대로 합성</b>한 결과입니다 — 마음에 드는 번호를 알려주세요.
+  </div>
+  <div class="grid" id="grid"></div>
+
+  <script src="../play/js/saju.js"></script>
+  <script src="../play/js/saju-deep.js"></script>
+  <script src="../play/js/bujeok.js?v=3"></script>
+  <script>
+    var SAMPLES = [
+      ["s1-hanji",     "① 정통 괴황지",   "nano banana pro", "낡은 한지 + 붉은 이중 괘선 테두리. 가장 전통적."],
+      ["s2-dark",      "② 어둠 속 잿빛",  "nano banana pro", "그을린 종이에 붉게 타오르는 테두리. 귀곡 세계관과 가장 잘 맞음."],
+      ["s3-gold",      "③ 감청 + 금박",   "nano banana pro", "먹빛 남색 종이에 금박 격자. 고급스러운 방향."],
+      ["s4-brush",     "④ 주사 붓질",     "nano banana pro", "굵은 붉은 붓질 테두리. 무당의 손맛이 살아있음."],
+      ["s5-aged",      "⑤ 고문서",       "seedream 5 pro",  "심하게 낡은 양피지, 얼룩과 찢긴 가장자리."],
+      ["s6-woodblock", "⑥ 목판 인쇄",     "seedream 5 pro",  "구름·불꽃 목판 문양 테두리. 가장 깔끔하고 여백이 넓음."],
+      ["s7-minimal",   "⑦ 미니멀 프리미엄","gpt image 2",     "상아색 종이에 얇은 이중선만. 절제된 고급."],
+      ["s8-red",       "⑧ 주칠 + 금박",   "nano banana pro", "붉은 옻칠에 금박 불꽃·구름. 가장 강렬함."]
+    ];
+
+    // 비교용 표본 사주 (계수 일간 · 신약 · 용신 금수)
+    var DEMO = {
+      birth: { y:1995, m:4, d:2, hour:13, min:45, gender:"M" },
+      name: "테스트",
+      pillars: { year:{gan:1,ji:11}, month:{gan:5,ji:3}, day:{gan:9,ji:1}, hour:{gan:5,ji:7} },
+      ilgan: 9, strength: "신약",
+      oheng: { 목:3.8, 화:0.3, 토:3.6, 금:0, 수:3 },
+      use: ["금","수"], avoid: ["토","화"],
+      sinsal: ["일지 축 — 도화살(매력·인기)", "년지 해 — 역마살(이동·변화)", "시지 미 — 화개살(고독한 재능)"]
+    };
+
+    var grid = document.getElementById("grid");
+    document.fonts.ready.then(function () {
+      SAMPLES.forEach(function (s, i) {
+        var card = document.createElement("div"); card.className = "m";
+        var cv = document.createElement("canvas");
+        card.appendChild(cv);
+        card.insertAdjacentHTML("beforeend",
+          '<div class="info"><span class="badge">' + s[2] + '</span>' +
+          "<h2>" + s[1] + "</h2><p>" + s[3] + "</p>" +
+          '<p class="verdict" id="v' + i + '">…분석 중</p></div>');
+        grid.appendChild(card);
+
+        // 배경 후보만 바꿔 동일 내용으로 렌더
+        var o = Object.assign({ elemKo: "금", bgSrc: "img/bujeok/" + s[0] + ".webp" }, DEMO);
+        BujeokArt.render(cv, o, (function (n) { return function () { judge(cv, n); }; })(i));
+      });
+    });
+
+    // 가독성 자동 판정 — 글자 영역의 명암 대비
+    function judge(cv, idx) {
+      var g = cv.getContext("2d");
+      function rng(x, y, w, h) {
+        var d = g.getImageData(x, y, w, h).data, mn = 999, mx = -1;
+        for (var i = 0; i < d.length; i += 4) { var l = (d[i]+d[i+1]+d[i+2])/3; if (l<mn) mn=l; if (l>mx) mx=l; }
+        return mx - mn;
+      }
+      var a = rng(240,115,240,45), b = rng(140,800,440,110), c = rng(285,1090,150,110);
+      var lo = Math.min(a, b, c);
+      var el = document.getElementById("v" + idx);
+      if (lo > 110) { el.textContent = "✅ 가독성 좋음 (대비 " + Math.round(lo) + ")"; }
+      else { el.textContent = "⚠️ 글자가 묻힘 (대비 " + Math.round(lo) + ") — 보정 필요"; el.className = "verdict warn"; }
+    }
+  </script>
+</body>
+</html>
