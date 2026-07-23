@@ -118,6 +118,11 @@
       text-align: center; margin: 2px 0 16px; text-shadow: 0 0 16px rgba(220,90,50,.4); line-height: 1.4; }
     .pg-body { font-family: 'Gowun Batang', 'Nanum Myeongjo', serif; color: #d9cfe4;
       font-size: 1.03rem; line-height: 2.05; white-space: pre-wrap; letter-spacing: .2px; }
+    /* 장 안의 소제목 — 넘기지 않고 이어서 읽는다 */
+    .pg-sec { font-family:'Nanum Myeongjo',serif; font-weight:800; color:#ff8a5a; font-size:1.1rem;
+      margin:26px 0 10px; padding-top:16px; line-height:1.5; white-space:normal;
+      border-top:1px solid rgba(150,60,70,.28); text-shadow:0 0 14px rgba(220,90,50,.32); }
+    .pg-sec:first-of-type { margin-top:6px; padding-top:0; border-top:none; }
     .pg-body .lead { color: #b9a8c8; font-style: italic; font-size: .98rem; margin-bottom: 14px;
       padding-left: 12px; border-left: 2px solid rgba(180,60,70,.5); }
     /* 피 흘리는 강조 */
@@ -553,13 +558,21 @@
                  m1: "冥簿 · 財 — 곳간의 장", m2: "冥簿 · 財 — 곳간의 장",
                  d1: "冥簿 · 命 — 흐름의 장", d2: "冥簿 · 命 — 흐름의 장" }[id] || "";
       }
+      // 한 장(章) = 한 페이지. 소제목마다 넘기지 않고 스크롤로 읽는다.
       function addPartPages(p) {
         var subs = ReportUI.pageify(p.text);
-        subs.forEach(function (s, i) {
-          pages.push({
-            type: "text", label: partLabel(p.id), title: s.title, html: s.html,
-            img: (i === 0 && HEAD_IMG[p.id]) ? HEAD_IMG[p.id] : null   // 카테고리 첫 장만 헤더 이미지
-          });
+        if (!subs.length) return;
+        // 도입부(<p class="lead">)는 pageify 가 첫 소제목 본문 앞에 붙여둔다 → 소제목보다 위로 끌어올린다
+        var lead = "";
+        var m = /^(<p class="lead">[\s\S]*?<\/p>)/.exec(subs[0].html);
+        if (m) { lead = m[1]; subs[0] = { title: subs[0].title, html: subs[0].html.slice(m[1].length) }; }
+        var html = lead + subs.map(function (s) {
+          // pageify 가 이미 이스케이프한 문자열이라 다시 이스케이프하지 않는다
+          return (s.title ? '<h3 class="pg-sec">◆ ' + s.title + "</h3>" : "") + s.html;
+        }).join("");
+        pages.push({
+          type: "text", label: partLabel(p.id), title: p.title, html: html,
+          img: HEAD_IMG[p.id] || null   // 카테고리 시작 장에만 헤더 이미지
         });
         if (!analyzing) renderPage();
       }
@@ -591,7 +604,7 @@
             el.innerHTML =
               (pg.img ? '<div class="pg-himg"><img src="' + pg.img + '" alt="" onerror="this.parentElement.style.display=\'none\'"></div>' : "") +
               '<div class="pg-plabel">' + esc(pg.label) + '</div>' +
-              (pg.title ? '<div class="pg-title">◆ ' + esc(pg.title) + '</div>' : "") +
+              (pg.title ? '<div class="pg-title">' + esc(pg.title) + '</div>' : "") +
               '<div class="pg-body">' + pg.html + '</div>';
           }
           el.classList.remove("turning");
