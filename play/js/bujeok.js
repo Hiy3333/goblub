@@ -17,7 +17,7 @@
   };
   var W = 720, H = 1280;
   // 인장 격자 위치(비율 고정 — 업로드 이미지를 720×1280으로 늘려 읽는다)
-  var SEAL = { cx: 0.5, cy: 0.852, frac: 0.27 }; // 한 변 = W*frac
+  var SEAL = { cx: 0.5, cy: 0.888, frac: 0.21 }; // 한 변 = W*frac
   var MAGIC = 0xB2, MAGIC_INV = 0x4D;
 
   function crc8(bytes) {
@@ -74,27 +74,37 @@
     return { y: y, m: m, d: d, hour: h === 0 ? null : h - 1, min: h === 0 ? 0 : mi, gender: g === 1 ? "M" : g === 2 ? "F" : "" };
   }
 
-  function sealRect(w, h) {
-    var size = w * SEAL.frac;
-    return { x: w * SEAL.cx - size / 2, y: h * SEAL.cy - size / 2, size: size };
+  // 구버전 부적(인장 위치가 달랐음)도 계속 읽히도록 후보로 보관
+  var SEAL_LEGACY = [{ cx: 0.5, cy: 0.852, frac: 0.27 }];
+  function sealRect(w, h, sp) {
+    sp = sp || SEAL;
+    var size = w * sp.frac;
+    return { x: w * sp.cx - size / 2, y: h * sp.cy - size / 2, size: size };
   }
 
   function drawSeal(g, w, h, bits) {
     var r = sealRect(w, h), s = r.size, cell = s / 8;
-    // 도장 몸체(테두리 + 여백)
-    var pad = cell * 0.55;
+    // 전각(篆刻) 인장 — 붉은 인주 테두리 + 안쪽에 새겨진 문양(실은 명(命) 데이터)
+    var pad = cell * 0.95;
     g.save();
-    g.shadowColor = "rgba(120,10,10,.5)"; g.shadowBlur = 18;
-    g.fillStyle = "#8f1d12";
-    rr(g, r.x - pad, r.y - pad, s + pad * 2, s + pad * 2, cell * 0.5); g.fill();
+    g.shadowColor = "rgba(140,20,10,.5)"; g.shadowBlur = 20;
+    g.fillStyle = "#a81f14";
+    rr(g, r.x - pad, r.y - pad, s + pad * 2, s + pad * 2, cell * 0.6); g.fill();
     g.shadowBlur = 0;
-    g.fillStyle = "#240a06";
-    rr(g, r.x - pad * 0.45, r.y - pad * 0.45, s + pad * 0.9, s + pad * 0.9, cell * 0.35); g.fill();
-    // 데이터 셀
+    // 인장 안쪽 테두리선(전각 특유의 굵은 변)
+    g.strokeStyle = "rgba(255,215,190,.35)"; g.lineWidth = Math.max(1, cell * 0.13);
+    rr(g, r.x - pad * 0.5, r.y - pad * 0.5, s + pad, s + pad, cell * 0.45); g.stroke();
+    // 새김 바탕
+    g.fillStyle = "#2e0a06";
+    rr(g, r.x - pad * 0.22, r.y - pad * 0.22, s + pad * 0.44, s + pad * 0.44, cell * 0.32); g.fill();
+    // 문양 셀(둥근 획 — 격자 느낌을 줄인다)
     for (var i = 0; i < 64; i++) {
       var cx = i % 8, cy = Math.floor(i / 8);
-      g.fillStyle = bits[i] ? "#ef4f2b" : "#240a06";
-      g.fillRect(r.x + cx * cell + 0.6, r.y + cy * cell + 0.6, cell - 1.2, cell - 1.2);
+      if (!bits[i]) continue;
+      g.fillStyle = "#ff5f33";
+      rr(g, r.x + cx * cell + cell * 0.11, r.y + cy * cell + cell * 0.11,
+         cell * 0.78, cell * 0.78, cell * 0.24);
+      g.fill();
     }
     g.restore();
   }
@@ -106,29 +116,45 @@
   }
 
   // 업로드 이미지에서 인장 읽기 — 720×1280으로 늘려 셀 중심 샘플링
+  // 현재 인장 위치를 먼저 시도하고, 실패하면 구버전 위치도 시도(예전 부적 호환)
   function decode(img, cb) {
     try {
       var c = document.createElement("canvas"); c.width = W; c.height = H;
       var g = c.getContext("2d", { willReadFrequently: true });
       g.drawImage(img, 0, 0, W, H);
-      var r = sealRect(W, H), cell = r.size / 8;
-      var vals = [];
-      for (var i = 0; i < 64; i++) {
-        var cx = r.x + (i % 8) * cell + cell / 2, cy = r.y + Math.floor(i / 8) * cell + cell / 2;
-        var d = g.getImageData(Math.round(cx - 2), Math.round(cy - 2), 5, 5).data;
-        var sum = 0;
-        for (var p = 0; p < d.length; p += 4) sum += d[p] * 2 + d[p + 1] + d[p + 2]; // 붉은 강조 가중
-        vals.push(sum / (d.length / 4));
+      var cands = [SEAL].concat(SEAL_LEGACY);
+      for (var s = 0; s < cands.length; s++) {
+        var r = sealRect(W, H, cands[s]), cell = r.size / 8, vals = [];
+        for (var i = 0; i < 64; i++) {
+          var cx = r.x + (i % 8) * cell + cell / 2, cy = r.y + Math.floor(i / 8) * cell + cell / 2;
+          var d = g.getImageData(Math.round(cx - 2), Math.round(cy - 2), 5, 5).data;
+          var sum = 0;
+          for (var p = 0; p < d.length; p += 4) sum += d[p] * 2 + d[p + 1] + d[p + 2]; // 붉은 강조 가중
+          vals.push(sum / (d.length / 4));
+        }
+        var mn = Math.min.apply(null, vals), mx = Math.max.apply(null, vals);
+        if (mx - mn < 60) continue;                       // 대비 부족 = 인장 아님
+        var th = (mn + mx) / 2;
+        var got = bitsToBirth(vals.map(function (v) { return v > th ? 1 : 0; }));
+        if (got) { cb(got); return; }
       }
-      var mn = Math.min.apply(null, vals), mx = Math.max.apply(null, vals), th = (mn + mx) / 2;
-      if (mx - mn < 60) { cb(null); return; } // 대비 부족 = 인장 아님
-      var bits = vals.map(function (v) { return v > th ? 1 : 0; });
-      cb(bitsToBirth(bits));
+      cb(null);
     } catch (e) { cb(null); }
   }
 
   // ===== 부적 본체 렌더 =====
-  // opts = { birth, elemKo("목"...), pillars [{gan,ji}] year..hour 순, genderLabel }
+  // opts = { birth, name, elemKo, use[], avoid[], oheng{}, pillars{year..hour:{gan,ji}}, ilgan, strength, sinsal[] }
+  var OH_KEYS = ["목", "화", "토", "금", "수"];
+  var OH_HJ2 = { 목: "木", 화: "火", 토: "土", 금: "金", 수: "水" };
+  var OH_RGB = { 목: [74, 140, 96], 화: [178, 45, 45], 토: [166, 122, 52], 금: [110, 118, 140], 수: [56, 92, 150] };
+  // 괴황지 위 글자용 — 배경과 대비가 서도록 더 진한 먹색 계열
+  var OH_INK = { 목: [26, 84, 46], 화: [146, 22, 22], 토: [104, 66, 14], 금: [56, 64, 88], 수: [22, 52, 104] };
+  var GAN_OH2 = "목목화화토토금금수수";   // 갑을병정무기경신임계
+  var SS_MARK = [
+    [/도화/, "桃花", "끄는 힘"], [/역마/, "驛馬", "움직임"], [/화개/, "華蓋", "홀로 깊음"],
+    [/천을귀인/, "天乙", "귀인"], [/양인/, "羊刃", "칼날"], [/괴강/, "魁罡", "우두머리"], [/백호/, "白虎", "맹렬함"]
+  ];
+
   function render(canvas, opts, onDone) {
     var el = ELEM[opts.elemKo] || ELEM["토"];
     canvas.width = W; canvas.height = H;
@@ -142,59 +168,154 @@
       if (noBg) { g.fillStyle = "#d9c184"; g.fillRect(0, 0, W, H); }
       else g.drawImage(bg, 0, 0, W, H);
       var SERIF = "'Nanum Myeongjo','Batang','AppleMyungjo',serif";
+      var INK = "#7a1010", INK_S = "rgba(110,26,14,.78)";
       g.textAlign = "center";
 
-      // 제목
-      g.fillStyle = "#8f1d12";
-      g.font = "700 44px " + SERIF;
-      g.fillText("開 運 符", W / 2, 218);
-      g.font = "24px " + SERIF;
-      g.fillStyle = "rgba(120,30,18,.85)";
-      g.fillText("귀 곡 개 운 부", W / 2, 258);
+      // ── 상단: 敕令(칙령) — 전통 부적의 머리 ──
+      g.fillStyle = "#8f1d12"; g.font = "700 46px " + SERIF;
+      g.fillText("敕  令", W / 2, 150);
+      g.strokeStyle = "rgba(140,30,18,.55)"; g.lineWidth = 2.5;
+      g.beginPath(); g.moveTo(150, 172); g.lineTo(W - 150, 172); g.stroke();
 
-      // 중앙 대형 오행 한자
+      // 이름 + 부적 이름(일간 기준)
+      var ilOh = GAN_OH2[opts.ilgan] || "토";
+      var ilTxt = GAN_HJ[opts.ilgan] + OH_HJ2[ilOh];
+      g.font = "27px " + SERIF; g.fillStyle = INK_S;
+      g.fillText((opts.name ? opts.name + " 의 " : "") + "開 運 符", W / 2, 213);
+      g.font = "22px " + SERIF; g.fillStyle = "rgba(110,26,14,.62)";
+      g.fillText(ilTxt + "(" + GAN_KO[opts.ilgan] + ilOh + ") 일간 · " + (opts.strength || ""), W / 2, 248);
+
+      // ── 중앙: 오행 상생상극 원환 (사람마다 모양이 달라진다) ──
+      var cx = W / 2, cy = 500, R = 168;
+      var oh = opts.oheng || {}, maxV = 0.001;
+      OH_KEYS.forEach(function (k) { if ((oh[k] || 0) > maxV) maxV = oh[k]; });
+      var pos = OH_KEYS.map(function (k, i) {
+        var a = -Math.PI / 2 + i * (Math.PI * 2 / 5);
+        return { k: k, x: cx + R * Math.cos(a), y: cy + R * Math.sin(a) };
+      });
+      // 상극(내부 오각별) — 옅은 파선
       g.save();
-      g.shadowColor = "rgba(140,20,10,.35)"; g.shadowBlur = 26;
-      g.fillStyle = "#a11616";
-      g.font = "700 235px " + SERIF;
-      g.fillText(el.hj, W / 2, 585);
+      g.strokeStyle = "rgba(120,30,18,.28)"; g.lineWidth = 1.6; g.setLineDash([7, 6]);
+      for (var i2 = 0; i2 < 5; i2++) {
+        g.beginPath(); g.moveTo(pos[i2].x, pos[i2].y);
+        g.lineTo(pos[(i2 + 2) % 5].x, pos[(i2 + 2) % 5].y); g.stroke();
+      }
       g.restore();
-      g.font = "28px " + SERIF; g.fillStyle = "#6d1a10";
-      g.fillText("너의 운을 여는 기운 · " + el.ko + "(" + el.hj + ") — " + el.desc, W / 2, 650);
+      // 상생(외곽 오각형) — 실선
+      g.strokeStyle = "rgba(140,30,18,.5)"; g.lineWidth = 2.2;
+      g.beginPath();
+      pos.forEach(function (p, i) { i ? g.lineTo(p.x, p.y) : g.moveTo(p.x, p.y); });
+      g.closePath(); g.stroke();
 
-      // 사주 4주 세로 한자 (전통식 우→좌: 년월일시)
-      var cols = [];
-      var order = ["year", "month", "day", "hour"];
-      var labels = { year: "年", month: "月", day: "日", hour: "時" };
-      order.forEach(function (k) { if (opts.pillars[k]) cols.push({ k: k, p: opts.pillars[k] }); });
-      var span = 118, x0 = W / 2 + ((cols.length - 1) * span) / 2;
-      cols.forEach(function (c, i) {
-        var x = x0 - i * span;
-        g.fillStyle = "rgba(110,26,14,.75)"; g.font = "26px " + SERIF;
-        g.fillText(labels[c.k], x, 742);
-        g.fillStyle = "#7a1010"; g.font = "700 62px " + SERIF;
-        g.fillText(GAN_HJ[c.p.gan], x, 816);
-        g.fillText(JI_HJ[c.p.ji], x, 886);
-        g.font = "20px " + SERIF; g.fillStyle = "rgba(110,26,14,.7)";
-        g.fillText(GAN_KO[c.p.gan] + JI_KO[c.p.ji], x, 916);
+      // 각 오행 마디 — 크기 = 그 기운의 양(사람마다 다름)
+      var use = opts.use || [], avoid = opts.avoid || [];
+      pos.forEach(function (p) {
+        var v = oh[p.k] || 0;
+        var rad = v === 0 ? 20 : 24 + (v / maxV) * 26;
+        var c = OH_RGB[p.k];
+        var isUse = use.indexOf(p.k) >= 0, isAvoid = avoid.indexOf(p.k) >= 0;
+        g.save();
+        if (isUse) { g.shadowColor = "rgba(" + c.join(",") + ",.95)"; g.shadowBlur = 26; }
+        g.beginPath(); g.arc(p.x, p.y, rad, 0, Math.PI * 2);
+        if (v === 0) {                        // 없는 기운 — 비어 있는 자리
+          g.setLineDash([5, 5]); g.strokeStyle = "rgba(110,26,14,.5)"; g.lineWidth = 2; g.stroke();
+        } else {
+          g.fillStyle = "rgba(" + c.join(",") + ",.9)"; g.fill();
+          g.setLineDash([]); g.strokeStyle = "rgba(255,240,225,.5)"; g.lineWidth = 2; g.stroke();
+        }
+        g.restore();
+        // 용신은 이중 원, 기신은 가로줄
+        if (isUse) {
+          g.strokeStyle = "rgba(" + c.join(",") + ",.75)"; g.lineWidth = 2;
+          g.beginPath(); g.arc(p.x, p.y, rad + 9, 0, Math.PI * 2); g.stroke();
+        }
+        if (isAvoid) {
+          g.strokeStyle = "rgba(120,20,10,.8)"; g.lineWidth = 3;
+          g.beginPath(); g.moveTo(p.x - rad * .62, p.y); g.lineTo(p.x + rad * .62, p.y); g.stroke();
+        }
+        g.fillStyle = v === 0 ? "rgba(110,26,14,.65)" : "#fff6ee";
+        g.font = "700 " + Math.round(rad * 0.92) + "px " + SERIF;
+        g.fillText(OH_HJ2[p.k], p.x, p.y + rad * 0.33);
+        g.font = "700 17px " + SERIF;
+        g.fillStyle = "rgb(" + OH_INK[p.k].join(",") + ")";
+        g.fillText(p.k + " " + (Math.round(v * 10) / 10), p.x, p.y + rad + 24);
       });
 
-      // 생년 정보 한 줄
+      // 원환 중심 — 나 자신(일간)
+      g.save();
+      g.shadowColor = "rgba(140,20,10,.45)"; g.shadowBlur = 30;
+      g.fillStyle = "#a11616"; g.font = "700 128px " + SERIF;
+      g.fillText(GAN_HJ[opts.ilgan], cx, cy + 34);
+      g.restore();
+      g.font = "19px " + SERIF; g.fillStyle = INK_S;
+      g.fillText("我", cx, cy - 62);
+
+      // ── 사주 원국 (전통 우→좌: 時日月年) ──
+      var order = ["hour", "day", "month", "year"];
+      var labels = { year: "年", month: "月", day: "日", hour: "時" };
+      var cols = order.filter(function (k) { return opts.pillars[k]; });
+      var span = 116, x0 = W / 2 - ((cols.length - 1) * span) / 2, yTop = 762;
+      g.strokeStyle = "rgba(140,30,18,.3)"; g.lineWidth = 1.5;
+      g.beginPath(); g.moveTo(110, yTop - 34); g.lineTo(W - 110, yTop - 34); g.stroke();
+      cols.forEach(function (k, i) {
+        var p = opts.pillars[k], x = x0 + i * span, isDay = (k === "day");
+        g.fillStyle = "rgba(110,26,14,.7)"; g.font = "23px " + SERIF;
+        g.fillText(labels[k], x, yTop);
+        if (isDay) {  // 일주는 붉은 테를 둘러 강조
+          g.strokeStyle = "rgba(160,25,20,.55)"; g.lineWidth = 2;
+          rr(g, x - 47, yTop + 12, 94, 132, 12); g.stroke();
+        }
+        var go = GAN_OH2[p.gan], jo = jiOh(p.ji);
+        g.font = "700 58px " + SERIF;
+        g.lineWidth = 3; g.strokeStyle = "rgba(255,244,225,.55)";   // 괴황지 위에서 획이 또렷하게
+        g.strokeText(GAN_HJ[p.gan], x, yTop + 66);
+        g.fillStyle = "rgb(" + OH_INK[go].join(",") + ")"; g.fillText(GAN_HJ[p.gan], x, yTop + 66);
+        g.strokeText(JI_HJ[p.ji], x, yTop + 130);
+        g.fillStyle = "rgb(" + OH_INK[jo].join(",") + ")"; g.fillText(JI_HJ[p.ji], x, yTop + 130);
+        g.font = "18px " + SERIF; g.fillStyle = INK_S;
+        g.fillText(GAN_KO[p.gan] + JI_KO[p.ji], x, yTop + 158);
+      });
+
+      // ── 신살 — 이 사람에게만 붙은 기운 ──
+      var marks = [];
+      (opts.sinsal || []).forEach(function (s2) {
+        SS_MARK.forEach(function (m) {
+          if (m[0].test(s2) && marks.length < 4 && !marks.some(function (x) { return x[0] === m[1]; })) marks.push([m[1], m[2]]);
+        });
+      });
+      if (marks.length) {
+        var mw = 150, mx = W / 2 - ((marks.length - 1) * mw) / 2, my = 985;
+        marks.forEach(function (m, i) {
+          var x = mx + i * mw;
+          g.strokeStyle = "rgba(150,30,20,.5)"; g.lineWidth = 1.8;
+          rr(g, x - 62, my - 30, 124, 62, 10); g.stroke();
+          g.font = "700 27px " + SERIF; g.fillStyle = "#8f1d12";
+          g.fillText(m[0], x, my - 2);
+          g.font = "16px " + SERIF; g.fillStyle = INK_S;
+          g.fillText(m[1], x, my + 22);
+        });
+      }
+
+      // ── 용신 처방 한 줄 ──
+      g.font = "23px " + SERIF; g.fillStyle = "rgba(100,24,14,.9)";
+      g.fillText("用神 " + (use.join("·") || "—") + "   ·   忌神 " + (avoid.join("·") || "—"), W / 2, 1062);
+
+      // ── 생년 + 인장 ──
       var b = opts.birth;
       var gTxt = b.gender === "M" ? " 乾命" : b.gender === "F" ? " 坤命" : "";
       var hTxt = b.hour == null ? "" : " " + b.hour + "時 " + (b.min || 0) + "分";
-      g.font = "24px " + SERIF; g.fillStyle = "rgba(100,24,14,.8)";
-      g.fillText(b.y + "年 " + b.m + "月 " + b.d + "日" + hTxt + gTxt, W / 2, 972);
+      g.font = "21px " + SERIF; g.fillStyle = "rgba(100,24,14,.75)";
+      g.fillText(b.y + "年 " + b.m + "月 " + b.d + "日" + hTxt + gTxt, W / 2, 1100);
 
-      // 인장(데이터 격자)
       drawSeal(g, W, H, encode(b));
-      g.font = "22px " + SERIF; g.fillStyle = "rgba(110,26,14,.85)";
-      g.fillText("鬼 哭 之 印", W / 2, H - 46);
+      g.font = "19px " + SERIF; g.fillStyle = "rgba(110,26,14,.8)";
+      g.fillText("鬼 哭 之 印", W / 2, H - 26);
 
       if (onDone) onDone();
     }
   }
+  function jiOh(ji) { return "수토목목토화화토금금토수"[ji] || "토"; }  // 자축인묘진사오미신유술해
 
   window.BujeokSeal = { encode: encode, decode: decode };
-  window.BujeokArt = { render: render, ELEM: ELEM };
+  window.BujeokArt = { render: render, ELEM: ELEM, GAN_HJ: GAN_HJ, JI_HJ: JI_HJ };
 })();

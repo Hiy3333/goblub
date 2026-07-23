@@ -60,7 +60,7 @@
   <script src="../js/common.js?v=5" data-root=".."></script>
   <script src="js/saju.js"></script>
   <script src="js/saju-deep.js"></script>
-  <script src="js/bujeok.js?v=1"></script>
+  <script src="js/bujeok.js?v=2"></script>
   <script>
     (function () {
       var $ = function (id) { return document.getElementById(id); };
@@ -76,19 +76,39 @@
         var elem = (deep.yongshin && deep.yongshin.use[0]) || ["목","화","토","금","수"][Math.floor(r.ilgan / 2)];
         var el = BujeokArt.ELEM[elem];
 
-        $("gwi-msg").innerHTML = "네 명(命)에 <b>" + elem + "(" + el.hj + ")</b> 기운이 목마르더군.<br>" +
-          "이 부적에 봉해두었다. …잃어버리지 마라.";
+        // 보관된 명부에서 이 사주의 이름을 찾아 부적에 새긴다
+        var myName = "";
+        try {
+          var idx = JSON.parse(localStorage.getItem("goblub_mb_idx") || "[]");
+          var hit = idx.filter(function (e2) { return e2.y === b.y && e2.m === b.m && e2.d === b.d; })[0];
+          if (hit && hit.name && hit.name !== "이름 없는 자") myName = hit.name;
+        } catch (e) {}
+
+        var ilganKo = Saju.GAN[r.ilgan];
+        var missing = (deep.missing || []).join("·");
+        $("gwi-msg").innerHTML =
+          "<b>" + ilganKo + "(" + BujeokArt.GAN_HJ[r.ilgan] + ")</b> 일간, " + r.strength.label + "한 명(命)이군.<br>" +
+          "네게 <b>" + elem + "(" + el.hj + ")</b>이 목마르니 그 기운을 부적 한가운데 봉했다." +
+          (missing ? "<br><span style='opacity:.8'>…네 팔자에 없는 " + missing + "은 빈자리로 새겨두었다.</span>" : "");
         $("elem-info").innerHTML =
-          '<span class="elem-chip">용신 · ' + elem + "(" + el.hj + ')</span>' +
-          (deep.yongshin && deep.yongshin.use[1] ? '<span class="elem-chip">보조 · ' + deep.yongshin.use[1] + '</span>' : "") +
-          '<span class="elem-chip">' + r.strength.label + " " + Saju.GAN[r.ilgan] + "일간</span>";
+          '<span class="elem-chip">' + ilganKo + " 일간 · " + r.strength.label + "</span>" +
+          '<span class="elem-chip">용신 ' + ((deep.yongshin && deep.yongshin.use.join("·")) || "—") + "</span>" +
+          (deep.yongshin && deep.yongshin.avoid.length ? '<span class="elem-chip">기신 ' + deep.yongshin.avoid.join("·") + "</span>" : "");
 
         var pillars = {};
         ["year","month","day","hour"].forEach(function (k) {
           if (r.pillars[k]) pillars[k] = { gan: r.pillars[k][0], ji: r.pillars[k][1] };
         });
+        var oheng = {};
+        ["목","화","토","금","수"].forEach(function (k) { oheng[k] = Math.round((r.oheng[k] || 0) * 10) / 10; });
         document.fonts.ready.then(function () {
-          BujeokArt.render($("bujeok-cv"), { birth: b, elemKo: elem, pillars: pillars });
+          BujeokArt.render($("bujeok-cv"), {
+            birth: b, name: myName, elemKo: elem, pillars: pillars,
+            ilgan: r.ilgan, strength: r.strength.label, oheng: oheng,
+            use: (deep.yongshin && deep.yongshin.use) || [],
+            avoid: (deep.yongshin && deep.yongshin.avoid) || [],
+            sinsal: deep.sinsal || []
+          });
         });
 
         // 저장 전략(플랫폼별로 가장 확실한 경로):
