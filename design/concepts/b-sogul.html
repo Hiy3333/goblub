@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" /><meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="robots" content="noindex,nofollow" />
+<title>컨셉 B — 고블럽 소굴</title>
+<link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#ffe9c9;color:#1a1224;font-family:'Jua','Malgun Gothic',sans-serif;overflow-x:hidden;
+ background-image:radial-gradient(circle at 12% 18%,rgba(157,107,255,.14),transparent 42%),
+ radial-gradient(circle at 88% 8%,rgba(255,110,199,.14),transparent 40%)}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1180px;margin:0 auto;padding:0 18px 80px}
+/* 헤더 */
+header{display:flex;align-items:center;gap:14px;padding:20px 0 8px}
+.logo{font-size:1.8rem;letter-spacing:-1px}
+.logo b{color:#8a3ffc}.logo i{font-style:normal;color:#ff4d94}.logo u{text-decoration:none;color:#ffb01f}
+nav{margin-left:auto;display:flex;gap:8px}
+nav a{background:#fff;border:3px solid #1a1224;border-radius:999px;padding:7px 16px;font-size:.9rem;
+ box-shadow:3px 3px 0 #1a1224;transition:.12s}
+nav a:hover{transform:translate(-2px,-2px);box-shadow:5px 5px 0 #1a1224}
+/* 히어로 — 캐릭터가 주인공 */
+.hero{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:28px;align-items:center;
+ background:#fff;border:5px solid #1a1224;border-radius:30px;box-shadow:10px 10px 0 #1a1224;
+ padding:34px 34px 30px;margin:14px 0 34px;position:relative;overflow:hidden}
+.hero::before{content:"";position:absolute;inset:0;background:
+ repeating-linear-gradient(45deg,rgba(157,107,255,.05) 0 14px,transparent 14px 28px);pointer-events:none}
+.hero h1{font-size:clamp(2rem,5.2vw,3.3rem);line-height:1.25;position:relative}
+.hero h1 mark{background:#ffe14d;padding:0 8px;border-radius:6px;box-decoration-break:clone}
+.hero p{margin-top:14px;font-size:1.05rem;color:#5a4a6a;line-height:1.75;position:relative}
+.feed{display:inline-flex;align-items:center;gap:10px;margin-top:22px;background:#8a3ffc;color:#fff;
+ border:4px solid #1a1224;border-radius:16px;padding:14px 26px;font-size:1.1rem;
+ box-shadow:6px 6px 0 #1a1224;transition:.12s;position:relative}
+.feed:hover{transform:translate(-3px,-3px);box-shadow:9px 9px 0 #1a1224}
+.mascot{position:relative;display:flex;justify-content:center}
+.mascot .bub{position:absolute;top:-6px;left:50%;transform:translateX(-50%);background:#fff;
+ border:3px solid #1a1224;border-radius:14px;padding:7px 14px;font-size:.85rem;white-space:nowrap;
+ box-shadow:3px 3px 0 #1a1224;z-index:2}
+.mascot .bub::after{content:"";position:absolute;bottom:-9px;left:50%;transform:translateX(-50%);
+ width:0;height:0;border:7px solid transparent;border-top-color:#1a1224}
+.blob{width:210px;height:210px;margin-top:26px;border-radius:50% 50% 46% 54%/54% 50% 50% 46%;
+ background:radial-gradient(circle at 36% 32%,#c7a4ff,#8a3ffc 70%);border:5px solid #1a1224;
+ position:relative;animation:bob 2.6s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-14px) rotate(2deg)}}
+.blob .eye{position:absolute;top:34%;width:44px;height:44px;background:#fff;border:4px solid #1a1224;border-radius:50%}
+.blob .eye.l{left:22%}.blob .eye.r{right:22%}
+.blob .eye::after{content:"";position:absolute;top:26%;left:26%;width:18px;height:18px;background:#1a1224;border-radius:50%}
+.blob .mouth{position:absolute;bottom:24%;left:50%;transform:translateX(-50%);width:64px;height:30px;
+ background:#1a1224;border-radius:0 0 40px 40px}
+/* 섹션 */
+h2.sec{font-size:1.5rem;margin:34px 0 16px;display:flex;align-items:center;gap:12px}
+h2.sec span{background:#1a1224;color:#ffe14d;border-radius:10px;padding:4px 12px;font-size:1rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:18px}
+.card{background:#fff;border:4px solid #1a1224;border-radius:22px;padding:20px 18px 18px;
+ box-shadow:6px 6px 0 #1a1224;transition:.13s;position:relative;overflow:hidden}
+.card:hover{transform:translate(-4px,-4px) rotate(-1deg);box-shadow:11px 11px 0 #1a1224}
+.card .ic{font-size:2.5rem;display:block;line-height:1}
+.card h3{font-size:1.15rem;margin:10px 0 5px}
+.card p{font-size:.86rem;color:#6a5a78;line-height:1.6}
+.card.big{grid-column:span 2}
+.card.p{background:#e9dcff}.card.y{background:#fff3c4}.card.k{background:#ffdfe9}.card.b{background:#d9edff}
+.card .rib{position:absolute;top:12px;right:-30px;background:#ff4d94;color:#fff;font-size:.72rem;
+ padding:4px 34px;transform:rotate(38deg);border-top:2px solid #1a1224;border-bottom:2px solid #1a1224}
+@media(max-width:760px){.hero{grid-template-columns:1fr}.mascot{order:-1}.card.big{grid-column:span 1}}
+footer{text-align:center;color:#7a6a88;font-size:.85rem;padding:40px 0 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo"><b>go</b><i>bl</i><u>ub</u></div>
+    <nav><a href="#">운세</a><a href="#">테스트</a><a href="#">놀이터</a><a href="#">내 카드</a></nav>
+  </header>
+
+  <section class="hero">
+    <div>
+      <h1>나쁜 기분,<br><mark>여기다 버리고 가</mark></h1>
+      <p>고블럽이 다 먹어치워 줄게. 대신 재밌는 거 잔뜩 주고 갈 거야 —<br>사주도 보고, 테스트도 하고, 심심하면 같이 놀고.</p>
+      <a class="feed" href="#">🍬 고블럽에게 기분 먹이기</a>
+    </div>
+    <div class="mascot">
+      <div class="bub">배고파… 뭐 안 좋은 일 없었어?</div>
+      <div class="blob"><i class="eye l"></i><i class="eye r"></i><i class="mouth"></i></div>
+    </div>
+  </section>
+
+  <h2 class="sec"><span>01</span>오늘 뭐 볼래?</h2>
+  <div class="grid">
+    <a class="card big p" href="#"><span class="rib">본편</span>
+      <span class="ic">🕯</span><h3>귀곡의 명부</h3>
+      <p>어두운 숲의 저승사자가 여덟 장으로 읽어주는 심층 사주. 좀 무서울 수 있음.</p></a>
+    <a class="card y" href="#"><span class="ic">🔮</span><h3>사주팔자</h3><p>만세력으로 보는 내 원국</p></a>
+    <a class="card k" href="#"><span class="ic">🧧</span><h3>나만의 부적</h3><p>내 팔자로 그려지는 부적</p></a>
+    <a class="card b" href="#"><span class="ic">💑</span><h3>궁합</h3><p>둘의 케미 점수</p></a>
+    <a class="card"><span class="ic">🃏</span><h3>타로</h3><p>오늘의 한 장</p></a>
+    <a class="card"><span class="ic">🥠</span><h3>포춘쿠키</h3><p>하루 한 번 깨기</p></a>
+  </div>
+
+  <h2 class="sec"><span>02</span>나 이런 사람이래</h2>
+  <div class="grid">
+    <a class="card y"><span class="ic">🍞</span><h3>대환장 MBTI</h3><p>16개로는 부족하지</p></a>
+    <a class="card k"><span class="ic">💘</span><h3>연애세포</h3><p>지금 내 연애 온도</p></a>
+    <a class="card p"><span class="ic">🌋</span><h3>스트레스 몬스터</h3><p>내 안에 뭐가 살까</p></a>
+    <a class="card b"><span class="ic">🧟</span><h3>좀비 생존 유형</h3><p>나는 몇 화에 죽을까</p></a>
+    <a class="card"><span class="ic">💬</span><h3>단톡방 캐릭터</h3><p>내 포지션 확인</p></a>
+    <a class="card"><span class="ic">🍜</span><h3>음식형 인간</h3><p>나는 무슨 맛</p></a>
+  </div>
+
+  <h2 class="sec"><span>03</span>심심할 때 툭</h2>
+  <div class="grid">
+    <a class="card big k"><span class="ic">💌</span><h3>마음 배달</h3>
+      <p>데이트 신청·사과·술 한잔을 링크로 보내고 답장까지 받기. NO 버튼은 도망감.</p></a>
+    <a class="card b"><span class="ic">⚡</span><h3>결정의 신</h3><p>짜장 vs 짬뽕</p></a>
+    <a class="card y"><span class="ic">⚖️</span><h3>밸런스 게임</h3><p>극한 양자택일</p></a>
+    <a class="card p"><span class="ic">🎡</span><h3>복불복 룰렛</h3><p>돌려돌려</p></a>
+    <a class="card"><span class="ic">🕳️</span><h3>몬스터 팡팡</h3><p>두더지 잡기</p></a>
+    <a class="card"><span class="ic">🎫</span><h3>내 프로필 카드</h3><p>결과 한 장으로</p></a>
+  </div>
+
+  <footer>© 2026 goblub</footer>
+</div>
+</body>
+</html>

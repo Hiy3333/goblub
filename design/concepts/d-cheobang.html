@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" /><meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="robots" content="noindex,nofollow" />
+<title>컨셉 D — 오늘의 처방</title>
+<link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&family=Gowun+Batang:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#f6f2ea;color:#221d18;font-family:'Gowun Batang',serif;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1080px;margin:0 auto;padding:0 26px 90px}
+/* 헤더 — 신문 제호처럼 */
+header{border-bottom:2px solid #221d18;padding:26px 0 14px;margin-bottom:6px;
+ display:flex;align-items:flex-end;gap:18px}
+.paper{font-family:'Nanum Myeongjo',serif;font-weight:800;font-size:2.1rem;letter-spacing:-.02em}
+.paper i{font-style:normal;color:#b03a2e}
+.meta{margin-left:auto;text-align:right;font-size:.76rem;color:#7a7167;line-height:1.7;letter-spacing:.04em}
+.rule{height:1px;background:#221d18;opacity:.25;margin-bottom:34px}
+/* 오늘의 처방 — 대문 기사 */
+.lead{display:grid;grid-template-columns:1.15fr .85fr;gap:38px;align-items:start;margin-bottom:16px}
+.tag{display:inline-block;font-family:'Nanum Myeongjo',serif;font-size:.72rem;letter-spacing:.28em;
+ color:#b03a2e;border:1px solid #b03a2e;padding:5px 12px;margin-bottom:18px}
+.lead h1{font-family:'Nanum Myeongjo',serif;font-weight:800;font-size:clamp(2rem,4.6vw,3.1rem);
+ line-height:1.34;letter-spacing:-.01em}
+.lead .sub{margin-top:18px;font-size:1.02rem;line-height:2;color:#4c443c}
+.lead .sub b{color:#b03a2e;font-weight:700}
+.cta{display:inline-block;margin-top:26px;border-bottom:2px solid #221d18;padding-bottom:3px;
+ font-family:'Nanum Myeongjo',serif;font-size:1rem;letter-spacing:.06em;transition:.18s}
+.cta:hover{color:#b03a2e;border-color:#b03a2e}
+.figure{border:1px solid rgba(34,29,24,.2);background:#fff;padding:10px}
+.figure img{width:100%;display:block;filter:grayscale(.15) contrast(1.05)}
+.figure figcaption{font-size:.76rem;color:#7a7167;padding:10px 4px 2px;line-height:1.6;
+ border-top:1px solid rgba(34,29,24,.12);margin-top:10px}
+/* 목차 리스트 */
+.sect{margin-top:58px}
+.sect h2{font-family:'Nanum Myeongjo',serif;font-size:1.06rem;letter-spacing:.2em;color:#8a7f72;
+ padding-bottom:10px;border-bottom:1px solid rgba(34,29,24,.2);margin-bottom:4px}
+.item{display:grid;grid-template-columns:38px 1fr auto;gap:18px;align-items:baseline;
+ padding:19px 4px;border-bottom:1px solid rgba(34,29,24,.1);transition:.16s}
+.item:hover{background:#fffdf8;padding-left:14px}
+.item .n{font-family:'Nanum Myeongjo',serif;color:#b8ada0;font-size:.9rem}
+.item .t{font-family:'Nanum Myeongjo',serif;font-size:1.16rem;font-weight:700}
+.item .t small{display:block;font-family:'Gowun Batang',serif;font-weight:400;font-size:.87rem;
+ color:#6d645b;margin-top:5px;line-height:1.7}
+.item .a{font-size:.78rem;color:#a8998a;letter-spacing:.1em;white-space:nowrap}
+.item:hover .a{color:#b03a2e}
+.item .t em{font-style:normal;font-size:.68rem;border:1px solid #b03a2e;color:#b03a2e;
+ padding:2px 7px;margin-left:9px;letter-spacing:.1em;vertical-align:middle}
+/* 2단 */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:0 44px}
+@media(max-width:800px){.lead{grid-template-columns:1fr}.two{grid-template-columns:1fr}
+ .figure{order:-1}header{flex-wrap:wrap;gap:8px}.meta{margin-left:0;text-align:left}}
+footer{margin-top:70px;padding-top:20px;border-top:2px solid #221d18;
+ font-size:.78rem;color:#8a7f72;display:flex;justify-content:space-between;letter-spacing:.06em}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="paper">고블럽 <i>처방전</i></div>
+    <div class="meta">제 <b>412</b>호 · 2026년 7월 23일<br>오늘의 일진 · 을미(乙未)</div>
+  </header>
+  <div class="rule"></div>
+
+  <section class="lead">
+    <div>
+      <span class="tag">오 늘 의 처 방</span>
+      <h1>말과 재주가<br>술술 풀리는 날이다.<br>미뤄둔 말, 오늘 꺼내라.</h1>
+      <p class="sub">오늘은 <b>식상(食傷)의 날</b>. 표현이 먹히는 날이라 부탁·제안·고백처럼 말로 하는 일에 운이 붙는다.
+        다만 입이 가벼워지기 쉬우니, 남의 이야기는 오늘만 삼켜라.</p>
+      <a class="cta" href="#">귀곡에게 더 자세히 묻기 &nbsp;⟶</a>
+    </div>
+    <figure class="figure">
+      <img src="../../design/img/bujeok/ref-real-bujeok.webp" alt="" />
+      <figcaption>이번 주의 부적 — 팔자에서 태어난 문양은 사람마다 다르게 그려진다.</figcaption>
+    </figure>
+  </section>
+
+  <section class="sect">
+    <h2>命 — 타고난 것</h2>
+    <div class="item"><span class="n">01</span>
+      <span class="t">귀곡의 명부<em>본편</em><small>저승사자가 여덟 장으로 읽어주는 심층 사주. 혼·인연·곳간·흐름.</small></span>
+      <span class="a">읽기 ⟶</span></div>
+    <div class="item"><span class="n">02</span>
+      <span class="t">사주팔자<small>만세력 절입시각까지 계산한 내 원국 풀이.</small></span><span class="a">보기 ⟶</span></div>
+    <div class="item"><span class="n">03</span>
+      <span class="t">나만의 부적<small>팔자에서 생성되는 단 하나의 문양. 저장해 지닌다.</small></span><span class="a">받기 ⟶</span></div>
+    <div class="item"><span class="n">04</span>
+      <span class="t">명부 대조<small>부적 두 장을 겹쳐 두 사람의 명을 맞춰본다.</small></span><span class="a">대조 ⟶</span></div>
+  </section>
+
+  <div class="two">
+    <section class="sect">
+      <h2>心 — 나를 아는 법</h2>
+      <div class="item"><span class="n">05</span><span class="t">대환장 MBTI<small>16개로는 부족한 유형</small></span><span class="a">⟶</span></div>
+      <div class="item"><span class="n">06</span><span class="t">연애세포<small>지금 내 연애 온도</small></span><span class="a">⟶</span></div>
+      <div class="item"><span class="n">07</span><span class="t">스트레스 몬스터<small>내 안에 사는 것</small></span><span class="a">⟶</span></div>
+      <div class="item"><span class="n">08</span><span class="t">프로필 카드<small>흩어진 결과 한 장으로</small></span><span class="a">⟶</span></div>
+    </section>
+
+    <section class="sect">
+      <h2>戲 — 심심할 때</h2>
+      <div class="item"><span class="n">09</span><span class="t">마음 배달<small>못 한 말을 링크로</small></span><span class="a">⟶</span></div>
+      <div class="item"><span class="n">10</span><span class="t">고블럽 키우기<small>기분 먹고 자라는 것</small></span><span class="a">⟶</span></div>
+      <div class="item"><span class="n">11</span><span class="t">결정의 신<small>못 정하겠거든</small></span><span class="a">⟶</span></div>
+      <div class="item"><span class="n">12</span><span class="t">미니 놀이터<small>룰렛·질문카드·팡팡</small></span><span class="a">⟶</span></div>
+    </section>
+  </div>
+
+  <footer><span>goblub</span><span>매일 아침, 오늘의 처방이 갱신됩니다</span></footer>
+</div>
+</body>
+</html>
