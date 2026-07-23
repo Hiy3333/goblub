@@ -20,7 +20,7 @@
     "</header>";
 
   var footerHTML =
-    '<footer class="site-footer">© 2026 goblub · 재미로 즐겨주세요!</footer>';
+    '<footer class="site-footer">© 2026 goblub</footer>';
 
   function loadScript(src, cb) {
     var s = document.createElement("script");

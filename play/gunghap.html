@@ -75,7 +75,6 @@
       </div>
     </section>
 
-    <p class="fine-print">궁합은 재미로 봐주세요 🙂</p>
   </main>
   <div id="site-footer"></div>
   <script src="../js/common.js?v=5" data-root=".."></script>
@@ -278,7 +277,7 @@
         Dosa.fetchGunghap(payload, {
           onChunk: function (t) { txt.textContent += t; },
           onDone: function (fromCache) {
-            st.textContent = fromCache ? "🧙 (지난번에 봐드린 리포트예요)" : "🧙 리포트 끝! 재미로 봐주세요.";
+            st.textContent = fromCache ? "🧙 (지난번에 봐드린 리포트예요)" : "🧙 리포트 끝!";
           },
           onError: function (code, sec) {
             txt.style.display = "none";

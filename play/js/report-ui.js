@@ -10,36 +10,57 @@
 
   // ---- 스타일 주입(1회) · 어두운 명부(冥府) 테마 ----
   var css = "\
-.rdash{background:rgba(16,12,24,.72);border:1px solid rgba(150,60,70,.35);border-radius:14px;padding:14px;margin-bottom:14px;box-shadow:inset 0 1px 0 rgba(255,180,150,.06),0 0 26px rgba(120,30,40,.12)}\
-.rdash h4{color:#9a8ba8;font-size:.82rem;font-weight:normal;margin:0 0 8px;text-align:center;letter-spacing:1px}\
-.rd-pillars{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:12px}\
-.rd-p{background:rgba(30,22,38,.75);border:1px solid rgba(120,100,130,.28);border-radius:11px;padding:8px 4px;text-align:center}\
-.rd-p .r{display:block;font-size:.68rem;color:#8a7f9a}\
-.rd-p .hj{display:block;font-size:1.25rem;color:#e8dff2;line-height:1.25}\
-.rd-p .hg{display:block;font-size:.72rem;color:#8a7f9a}\
-.rd-p .ss{display:block;font-size:.66rem;color:#8a7f9a}\
-.rd-p.me{border-color:rgba(220,70,90,.6);box-shadow:0 0 12px rgba(200,50,70,.28)}\
-.rd-p.me .hj{color:#ff5a6e;text-shadow:0 0 10px rgba(255,60,80,.5)}\
-.rd-row{display:flex;align-items:center;gap:8px;margin-bottom:7px;font-size:.82rem;color:#9a8ba8}\
-.rd-row .lb{flex:none;width:56px}\
-.rd-meter{flex:1;height:10px;border-radius:999px;background:rgba(120,90,110,.2);overflow:hidden;box-shadow:inset 0 1px 2px rgba(0,0,0,.4)}\
-.rd-meter i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#5a3a8a,#c0455a)}\
-.rd-row b{flex:none;color:#e8dff2;font-weight:normal;font-size:.85rem}\
-.rd-oh{display:flex;gap:5px;flex:1}\
-.rd-oh .o{flex:1;text-align:center;font-size:.72rem;color:#8a7f9a}\
-.rd-oh .o i{display:block;height:8px;border-radius:6px;margin-bottom:3px;opacity:.85}\
-.rd-badges{text-align:center;margin-top:4px}\
-.rd-bd{display:inline-block;border-radius:999px;padding:3px 11px;font-size:.78rem;margin:2px 3px;border:1px solid}\
-.rd-bd.use{color:#7fd0a8;border-color:rgba(80,180,130,.45);background:rgba(60,140,100,.12)}\
-.rd-bd.avoid{color:#e0956a;border-color:rgba(220,130,70,.45);background:rgba(180,90,50,.12)}\
-.rd-bd.miss{color:#9a8ba8;border-color:rgba(140,110,150,.4);background:rgba(90,70,110,.14)}\
-.rtl{background:rgba(16,12,24,.72);border:1px solid rgba(150,60,70,.35);border-radius:14px;padding:12px 10px 8px;margin-bottom:16px;box-shadow:inset 0 1px 0 rgba(255,180,150,.06)}\
-.rtl svg{width:100%;height:auto;display:block}\
-.rtl .tip{min-height:1.4em;text-align:center;font-size:.82rem;color:#ff6b7e;margin-top:2px}\
-.rtl .lg{text-align:center;font-size:.76rem;color:#8a7f9a}\
-.st-star{cursor:pointer;transform-box:fill-box;transform-origin:center}\
-.st-star.pulse{animation:rpulse .9s ease 3}\
-@keyframes rpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.7)}}\
+.rdash,.rtl{background:linear-gradient(180deg,rgba(23,16,29,.92),rgba(13,9,18,.92));border:1px solid rgba(150,60,70,.38);border-radius:14px;padding:15px 13px 13px;margin-bottom:13px;box-shadow:inset 0 1px 0 rgba(255,180,150,.07),0 10px 30px rgba(0,0,0,.45)}\
+.rdash h4,.rtl h4{color:#c9a08c;font-family:'Nanum Myeongjo',serif;font-size:.9rem;font-weight:700;margin:0 0 11px;text-align:center;letter-spacing:.22em}\
+.rdash h4 em,.rtl h4 em{font-style:normal;color:#7d7089;font-size:.76rem;letter-spacing:0;display:block;margin-top:3px;font-family:inherit;font-weight:400}\
+.ms{display:grid;grid-template-columns:2.1em repeat(4,1fr);border:1px solid rgba(160,95,100,.3);border-radius:10px;overflow:hidden;background:rgba(10,7,14,.5)}\
+.ms>div{text-align:center;padding:5px 1px;border-right:1px solid rgba(160,95,100,.14);border-bottom:1px solid rgba(160,95,100,.14);display:flex;align-items:center;justify-content:center}\
+.ms>div:nth-child(5n){border-right:none}\
+.ms .hd{background:rgba(150,60,70,.16);color:#d8bdae;font-size:.76rem;font-family:'Nanum Myeongjo',serif;letter-spacing:.05em;padding:6px 1px}\
+.ms .lb{background:rgba(255,255,255,.025);color:#6f6479;font-size:.6rem;line-height:1.25;writing-mode:horizontal-tb}\
+.ms .ss{color:#9a8ba8;font-size:.7rem}\
+.ms .gz{font-family:'Nanum Myeongjo',serif;font-size:1.62rem;font-weight:700;line-height:1.15;padding:3px 1px;text-shadow:0 0 14px currentColor}\
+.ms .gz u{display:block;font-size:.56rem;text-decoration:none;opacity:.62;letter-spacing:0;margin-top:-1px}\
+.ms .me{background:rgba(200,50,70,.14)}\
+.ms .hd.me{background:rgba(200,50,70,.3);color:#ffd0d6}\
+.ms-ilgan{text-align:center;margin:11px 0 9px;color:#e8dcc8;font-family:'Nanum Myeongjo',serif;font-size:.95rem}\
+.ms-ilgan b{color:#ff8a5a;font-size:1.08rem}\
+.ms-ilgan span{color:#8a7f9a;font-size:.82rem}\
+.gau{margin:0 0 13px}\
+.gau .tr{position:relative;height:7px;border-radius:999px;background:linear-gradient(90deg,#3d5a8c 0%,#4a4a72 38%,#6b4560 62%,#a8394a 100%);box-shadow:inset 0 1px 3px rgba(0,0,0,.55)}\
+.gau .pin{position:absolute;top:50%;width:13px;height:13px;margin:-6.5px 0 0 -6.5px;border-radius:50%;background:#fff3ea;border:2.5px solid #ff5a3a;box-shadow:0 0 12px rgba(255,90,50,.85)}\
+.gau .sc{display:flex;justify-content:space-between;margin-top:5px;font-size:.66rem;color:#6f6479}\
+.oh-list{display:flex;flex-direction:column;gap:5px}\
+.oh-r{display:flex;align-items:center;gap:7px;font-size:.76rem}\
+.oh-r .k{flex:none;width:3.4em;font-family:'Nanum Myeongjo',serif;font-size:.86rem;letter-spacing:.04em}\
+.oh-r .bar{flex:1;height:9px;border-radius:999px;background:rgba(255,255,255,.05);overflow:hidden}\
+.oh-r .bar i{display:block;height:100%;border-radius:999px;box-shadow:0 0 10px currentColor}\
+.oh-r .n{flex:none;width:2.1em;text-align:right;color:#c4b8d0;font-size:.75rem}\
+.oh-r .tg{flex:none;font-size:.63rem;border-radius:999px;padding:1.5px 7px;border:1px solid;white-space:nowrap}\
+.tg.use{color:#7fd0a8;border-color:rgba(80,180,130,.5);background:rgba(60,140,100,.14)}\
+.tg.avd{color:#e0956a;border-color:rgba(220,130,70,.5);background:rgba(180,90,50,.14)}\
+.tg.non{color:#8a7f9a;border-color:rgba(140,110,150,.42);background:rgba(90,70,110,.16)}\
+.tg.gap{visibility:hidden}\
+.du-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:5px;scrollbar-width:thin}\
+.du-wrap::-webkit-scrollbar{height:4px}.du-wrap::-webkit-scrollbar-thumb{background:rgba(150,60,70,.5);border-radius:2px}\
+.du{display:flex;gap:5px;min-width:min-content;padding:2px 1px}\
+.du .c{flex:none;width:56px;border-radius:9px;border:1px solid rgba(140,110,150,.3);background:rgba(30,22,38,.6);padding:7px 2px 5px;text-align:center}\
+.du .c .hj{display:block;font-family:'Nanum Myeongjo',serif;font-size:1.02rem;color:#cdc0d8;line-height:1.2}\
+.du .c .ko{display:block;font-size:.6rem;color:#7d7089;margin-top:1px}\
+.du .c .ag{display:block;font-size:.63rem;color:#8a7f9a;margin-top:3px;border-top:1px solid rgba(140,110,150,.2);padding-top:3px}\
+.du .c.past{opacity:.45}\
+.du .c.now{border-color:#ff5a3a;background:rgba(160,40,30,.26);box-shadow:0 0 16px rgba(220,70,40,.4)}\
+.du .c.now .hj{color:#ffb08a}.du .c.now .ag{color:#ff8a5a}\
+.du .c.now .nowtag{display:block;font-size:.58rem;color:#ff5a3a;margin-top:2px}\
+.ys{display:flex;flex-wrap:wrap;gap:6px;margin-top:11px;justify-content:center}\
+.ys .y{background:rgba(30,20,26,.8);border:1px solid rgba(200,80,60,.4);border-radius:9px;padding:6px 11px;cursor:pointer;font-family:inherit;text-align:center;transition:border-color .15s,background .15s}\
+.ys .y:hover{border-color:#ff8a5a;background:rgba(60,26,26,.9)}\
+.ys .y b{display:block;color:#ffb08a;font-size:.82rem;font-family:'Nanum Myeongjo',serif}\
+.ys .y em{display:block;font-style:normal;color:#8a7f9a;font-size:.63rem;margin-top:1px}\
+.ys .y.pulse{animation:rpulse .8s ease 3}\
+@keyframes rpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.13);border-color:#ff5a3a}}\
+.rtl .tip{min-height:1.3em;text-align:center;font-size:.79rem;color:#ff8a5a;margin:7px 0 0}\
+.rtl .lg{text-align:center;font-size:.7rem;color:#6f6479;margin-top:4px}\
 .dosa-line{display:flex;gap:10px;align-items:flex-start;margin:2px 0 14px}\
 .dosa-line .av{flex:none;width:48px;height:48px;line-height:0;border-radius:8px;overflow:hidden;border:1px solid rgba(200,60,70,.4);box-shadow:0 0 14px rgba(150,30,40,.35)}\
 .dosa-line .av img{width:100%;height:100%;object-fit:cover;object-position:center 22%}\
@@ -65,96 +86,125 @@
   function esc(s) { return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
   function hanja(gj) { return (GAN_H[gj[0]] || gj[0]) + (JI_H[gj[1]] || gj[1]); }
 
-  // ===== ② 명식 대시보드 =====
+  // ===== ② 명식(命式) — 만세력 정식 배치 =====
+  var GAN_OH = { 갑: "목", 을: "목", 병: "화", 정: "화", 무: "토", 기: "토", 경: "금", 신: "금", 임: "수", 계: "수" };
+  var JI_OH = { 자: "수", 축: "토", 인: "목", 묘: "목", 진: "토", 사: "화", 오: "화", 미: "토", 신: "금", 유: "금", 술: "토", 해: "수" };
+  var OH_HJ = { 목: "木", 화: "火", 토: "土", 금: "金", 수: "水" };
+
   function dashboard(el, base, deep) {
-    var order = [["year", "년주"], ["month", "월주"], ["day", "일주(나)"], ["hour", "시주"]];
-    var ph = order.map(function (o) {
-      var p = base.pillars[o[0]];
-      if (!p) return '<div class="rd-p"><span class="r">' + o[1] + '</span><span class="hj">?</span><span class="hg">시간 모름</span><span class="ss"></span></div>';
-      return '<div class="rd-p' + (o[0] === "day" ? " me" : "") + '"><span class="r">' + o[1] + "</span>" +
-        '<span class="hj">' + hanja(p.ganji) + '</span><span class="hg">' + p.ganji + "</span>" +
-        '<span class="ss">' + p.jiSipseong + "</span></div>";
+    var cols = [["year", "년"], ["month", "월"], ["day", "일"], ["hour", "시"]];
+    var use = (deep && deep.yongshin && deep.yongshin.use) || [];
+    var avoid = (deep && deep.yongshin && deep.yongshin.avoid) || [];
+
+    // 1행 머리 / 2행 천간십성 / 3행 천간 / 4행 지지 / 5행 지지십성
+    var rowHd = '<div class="hd"></div>', rowGS = '<div class="lb">십성</div>',
+        rowG = '<div class="lb">천간</div>', rowJ = '<div class="lb">지지</div>',
+        rowJS = '<div class="lb">십성</div>';
+    cols.forEach(function (c) {
+      var p = base.pillars[c[0]], me = (c[0] === "day") ? " me" : "";
+      rowHd += '<div class="hd' + me + '">' + c[1] + (c[0] === "day" ? " (我)" : "") + "</div>";
+      if (!p) {
+        rowGS += '<div class="ss">—</div>'; rowG += '<div class="gz" style="color:#5a5266">·</div>';
+        rowJ += '<div class="gz" style="color:#5a5266">·</div>'; rowJS += '<div class="ss">시 모름</div>';
+        return;
+      }
+      var gOh = GAN_OH[p.gan] || "토", jOh = JI_OH[p.ji] || "토";
+      rowGS += '<div class="ss' + me + '">' + (c[0] === "day" ? "일간(我)" : p.ganSipseong) + "</div>";
+      rowG += '<div class="gz' + me + '" style="color:' + OH_COLOR[gOh] + '">' + (GAN_H[p.gan] || p.gan) +
+        "<u>" + p.gan + gOh + "</u></div>";
+      rowJ += '<div class="gz' + me + '" style="color:' + OH_COLOR[jOh] + '">' + (JI_H[p.ji] || p.ji) +
+        "<u>" + p.ji + jOh + "</u></div>";
+      rowJS += '<div class="ss' + me + '">' + p.jiSipseong + "</div>";
+    });
+
+    // 일간 요약 + 신강/신약 게이지
+    var dayP = base.pillars.day;
+    var ilOh = dayP ? (GAN_OH[dayP.gan] || "토") : "토";
+    var pct = Math.max(4, Math.min(96, Math.round((base.strength.ratio || 0.5) * 100)));
+
+    // 오행 분포
+    var keys = ["목", "화", "토", "금", "수"];
+    var maxOh = 0.001, sum = 0;
+    keys.forEach(function (k) { var v = base.oheng[k] || 0; if (v > maxOh) maxOh = v; sum += v; });
+    var ohHtml = keys.map(function (k) {
+      var v = base.oheng[k] || 0;
+      var w = Math.max(3, Math.round(v / maxOh * 100));
+      var tag = use.indexOf(k) >= 0 ? '<span class="tg use">용신</span>'
+              : avoid.indexOf(k) >= 0 ? '<span class="tg avd">기신</span>'
+              : v === 0 ? '<span class="tg non">없음</span>' : '<span class="tg gap">·</span>';
+      return '<div class="oh-r"><span class="k" style="color:' + OH_COLOR[k] + '">' + OH_HJ[k] + " " + k + "</span>" +
+        '<div class="bar"><i style="width:' + w + "%;background:" + OH_COLOR[k] + ";color:" + OH_COLOR[k] + '"></i></div>' +
+        '<span class="n">' + (Math.round(v * 10) / 10) + "</span>" + tag + "</div>";
     }).join("");
-    var ratio = Math.round((base.strength.ratio || 0.5) * 100);
-    var maxOh = 0.001;
-    ["목", "화", "토", "금", "수"].forEach(function (k) { if (base.oheng[k] > maxOh) maxOh = base.oheng[k]; });
-    var oh = ["목", "화", "토", "금", "수"].map(function (k) {
-      var h = Math.max(8, Math.round(base.oheng[k] / maxOh * 100));
-      return '<div class="o"><i style="background:' + OH_COLOR[k] + ';width:' + h + '%;margin:0 auto 3px"></i>' + k + " " + base.oheng[k] + "</div>";
-    }).join("");
-    var badges = "";
-    if (deep && deep.yongshin) {
-      badges += deep.yongshin.use.map(function (u) { return '<span class="rd-bd use">용신 ' + u + "</span>"; }).join("");
-      badges += deep.yongshin.avoid.map(function (a) { return '<span class="rd-bd avoid">조심 ' + a + "</span>"; }).join("");
-    }
-    if (deep && deep.missing && deep.missing.length) badges += deep.missing.map(function (m) { return '<span class="rd-bd miss">결핍 ' + m + "</span>"; }).join("");
+
     el.className = "rdash";
     el.innerHTML =
-      "<h4>🕯 귀곡이 읽어낸 네 명식(命式)</h4>" +
-      '<div class="rd-pillars">' + ph + "</div>" +
-      '<div class="rd-row"><span class="lb">기운 세기</span><div class="rd-meter"><i style="width:' + ratio + '%"></i></div><b>' + base.strength.label + "</b></div>" +
-      '<div class="rd-row"><span class="lb">오행</span><div class="rd-oh">' + oh + "</div></div>" +
-      (badges ? '<div class="rd-badges">' + badges + "</div>" : "");
+      "<h4>命 式<em>귀곡이 읽어낸 네 여덟 글자</em></h4>" +
+      '<div class="ms">' + rowHd + rowGS + rowG + rowJ + rowJS + "</div>" +
+      (dayP ? '<p class="ms-ilgan"><b>' + (GAN_H[dayP.gan] || "") + OH_HJ[ilOh] + " " + dayP.gan + ilOh +
+        '</b> 일간 · <span>' + base.strength.label + " (" + pct + "%)</span></p>" : "") +
+      '<div class="gau"><div class="tr"><span class="pin" style="left:' + pct + '%"></span></div>' +
+      '<div class="sc"><span>← 신약 (도움이 필요)</span><span>중화</span><span>(스스로 밀어붙임) 신강 →</span></div></div>' +
+      '<div class="oh-list">' + ohHtml + "</div>";
   }
 
-  // ===== ① 인생 대운 타임라인 =====
+  // ===== ① 대운(大運) 흐름 + 주목할 해 =====
   var tlEl = null;
   function timeline(el, deep) {
     if (!deep || !deep.daeun || !deep.daeun.length) { el.style.display = "none"; return; }
     tlEl = el;
-    var list = deep.daeun;
-    var start = list[0].age, end = list[list.length - 1].age + 10;
-    var W = 720, H = 178, pad = 26;
-    function x(age) { return pad + (age - start) / (end - start) * (W - pad * 2); }
-    var cols = ["#2a1c30", "#1c2436", "#2e2418", "#1c2a22", "#241a30", "#182a2c", "#2e2018", "#20202e"];
-    var s = "";
-    list.forEach(function (d, i) {
-      var x0 = x(d.age), w = x(d.age + 10) - x0;
-      s += '<rect x="' + x0 + '" y="52" width="' + (w - 2) + '" height="46" rx="9" fill="' + cols[i % cols.length] + '"' +
-        (d.current ? ' stroke="#ff5a6e" stroke-width="2.5"' : ' stroke="rgba(140,110,150,.35)" stroke-width="1"') + "/>";
-      s += '<text x="' + (x0 + w / 2 - 1) + '" y="80" text-anchor="middle" font-size="15" fill="' + (d.current ? "#ffd0d6" : "#c8bcd8") + '" font-family="Jua,sans-serif">' + d.ganji + "</text>";
-      s += '<text x="' + (x0 + w / 2 - 1) + '" y="115" text-anchor="middle" font-size="11" fill="#8a7f9a" font-family="Jua,sans-serif">' + d.age + "세</text>";
-    });
-    // 지금 위치
-    if (deep.koreanAge >= start && deep.koreanAge <= end) {
-      var cx = x(deep.koreanAge);
-      s += '<line x1="' + cx + '" y1="30" x2="' + cx + '" y2="104" stroke="#ff5a6e" stroke-width="2" stroke-dasharray="4 3"/>';
-      s += '<text x="' + cx + '" y="22" text-anchor="middle" font-size="13" fill="#ff6b7e" font-family="Jua,sans-serif">📍 지금 ' + deep.koreanAge + "세</text>";
-    }
-    // 큰 기운의 해(세운 노트) — 붉은 인장
-    (deep.seun || []).forEach(function (se) {
-      if (!se.notes || !se.notes.length) return;
-      var sx = x(Math.min(Math.max(se.age, start), end));
-      s += '<text class="st-star" data-year="' + se.year + '" x="' + sx + '" y="147" text-anchor="middle" font-size="16">🔴' +
-        "<title>" + se.year + "년 " + se.ganji + " — " + se.notes.join(", ") + "</title></text>";
-      s += '<text x="' + sx + '" y="164" text-anchor="middle" font-size="10" fill="#8a7f9a" font-family="Jua,sans-serif">' + String(se.year).slice(2) + "</text>";
-    });
+    var age = deep.koreanAge || 0;
+
+    var cards = deep.daeun.map(function (d, i) {
+      var cls = d.current ? " now" : (d.age + 10 <= age ? " past" : "");
+      var hj = hanja(d.ganji);
+      return '<div class="c' + cls + '" data-i="' + i + '">' +
+        '<span class="hj">' + hj + "</span>" +
+        '<span class="ko">' + d.ganji + "</span>" +
+        '<span class="ag">' + d.age + "세</span>" +
+        (d.current ? '<span class="nowtag">지금 ' + age + "세</span>" : "") + "</div>";
+    }).join("");
+
+    // 주목할 해 — 합충 등 기운이 겹치는 해만, 올해 이후 우선
+    var notable = (deep.seun || []).filter(function (s2) { return s2.notes && s2.notes.length; });
+    var now = deep.nowYear || 0;
+    var upcoming = notable.filter(function (s2) { return s2.year >= now; });
+    var pick = (upcoming.length ? upcoming : notable).slice(0, 5);
+    var chips = pick.map(function (s2) {
+      return '<button class="y" data-year="' + s2.year + '" data-note="' + esc(s2.notes.join(" · ")) + '">' +
+        "<b>" + s2.year + " " + s2.ganji + "</b><em>" + esc(s2.notes[0]) + "</em></button>";
+    }).join("");
+
     el.className = "rtl";
-    el.innerHTML = "<h4 style='color:#9a8ba8;font-size:.82rem;font-weight:normal;text-align:center;margin-bottom:6px'>🗺 명부에 새겨진 네 대운 지도</h4>" +
-      '<svg viewBox="0 0 ' + W + " " + H + '" xmlns="http://www.w3.org/2000/svg">' + s + "</svg>" +
-      '<p class="tip" id="tl-tip"></p><p class="lg">🔴 = 큰 기운이 모이는 해 — 눌러보라 · 본문의 <u>붉은 연도</u>를 눌러도 이곳으로 온다</p>';
+    el.innerHTML =
+      "<h4>大 運<em>10년마다 판이 바뀐다 · 지금 서 있는 자리</em></h4>" +
+      '<div class="du-wrap"><div class="du">' + cards + "</div></div>" +
+      (chips ? '<p class="lg" style="margin:10px 0 0">주목할 해 — 눌러서 무엇이 겹치는지 보라</p><div class="ys">' + chips + "</div>" : "") +
+      '<p class="tip" id="tl-tip"></p>';
+
     el.addEventListener("click", function (e) {
-      var t = e.target.closest ? e.target.closest(".st-star") : null;
-      if (!t) return;
-      showStar(t);
+      var t = e.target.closest ? e.target.closest(".y") : null;
+      if (t) showYear(t);
     });
+    // 현재 대운이 보이도록 가로 스크롤 위치 조정
+    setTimeout(function () {
+      var wrap = el.querySelector(".du-wrap"), cur = el.querySelector(".du .c.now");
+      if (wrap && cur) wrap.scrollLeft = cur.offsetLeft - wrap.clientWidth / 2 + cur.offsetWidth / 2;
+    }, 60);
   }
-  function showStar(t) {
+  function showYear(t) {
     var tip = document.getElementById("tl-tip");
-    var title = t.querySelector("title");
-    if (tip && title) tip.textContent = "⭐ " + title.textContent;
-    t.classList.remove("pulse");
-    void t.getBBox && t.getBBox();
-    t.classList.add("pulse");
+    if (tip) tip.textContent = "🕯 " + t.getAttribute("data-year") + "년 — " + t.getAttribute("data-note");
+    t.classList.remove("pulse"); void t.offsetWidth; t.classList.add("pulse");
   }
   function flashYear(y) {
     if (!tlEl) return;
-    var t = tlEl.querySelector('.st-star[data-year="' + y + '"]');
+    var t = tlEl.querySelector('.y[data-year="' + y + '"]');
     tlEl.scrollIntoView({ behavior: "smooth", block: "center" });
-    if (t) setTimeout(function () { showStar(t); }, 350);
+    if (t) setTimeout(function () { showYear(t); }, 350);
     else {
       var tip = document.getElementById("tl-tip");
-      if (tip) tip.textContent = y + "년 — 지도에서 위치를 가늠해보세요";
+      if (tip) tip.textContent = y + "년 — 대운 흐름에서 위치를 가늠해보라";
     }
   }
 

@@ -62,7 +62,7 @@
       </div>
     </section>
 
-    <p class="fine-print">사주는 재미로 봐주세요 🙂 절입시각 데이터: 만세력(KASI 검증) 기반</p>
+    <p class="fine-print">절입시각 데이터: 만세력(KASI 검증) 기반</p>
   </main>
 
   <div id="site-footer"></div>
@@ -195,7 +195,7 @@
         Dosa.fetchReading(payload, {
           onChunk: function (t) { txt.textContent += t; },
           onDone: function (fromCache) {
-            st.textContent = fromCache ? "🧙 (지난번에 봐드린 풀이예요)" : "🧙 풀이 끝! 재미로 봐주세요.";
+            st.textContent = fromCache ? "🧙 (지난번에 봐드린 풀이예요)" : "🧙 풀이 끝!";
           },
           onError: function (code, sec) {
             txt.style.display = "none";
