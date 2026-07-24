@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>고양이 타로 — 점술사 복장 시안 (A2 기반)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Jua&family=Nanum+Myeongjo:wght@700;800&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #14101a; color: #e8ded6; font-family: 'Jua', sans-serif; padding: 30px 16px 70px; }
+    .top { max-width: 1080px; margin: 0 auto 22px; text-align: center; }
+    .top h1 { font-family: 'Nanum Myeongjo', serif; font-weight: 800; font-size: 1.55rem; color: #ffe0b0; }
+    .top p { color: #ab9f96; margin-top: 8px; line-height: 1.7; font-size: .95rem; }
+    .ref { max-width: 1080px; margin: 14px auto 0; display: flex; align-items: center; gap: 14px;
+      background: #1e1826; border: 1px solid #322842; border-radius: 12px; padding: 12px 14px; }
+    .ref img { width: 74px; height: 74px; object-fit: cover; border-radius: 10px; }
+    .ref span { color: #b7aba0; font-size: .88rem; line-height: 1.5; }
+    .ref b { color: #ffd9a8; }
+    .sect { max-width: 1080px; margin: 30px auto 6px; font-family: 'Nanum Myeongjo', serif;
+      font-weight: 800; color: #ffcf8a; font-size: 1.12rem; border-bottom: 2px solid rgba(255,180,120,.3);
+      padding-bottom: 6px; }
+    .grid { max-width: 1080px; margin: 14px auto 0; display: grid; gap: 16px;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+    figure { background: #1e1826; border: 1px solid #322842; border-radius: 14px; overflow: hidden; }
+    figure img { display: block; width: 100%; aspect-ratio: 1/1; object-fit: cover; cursor: zoom-in; background:#000; }
+    figcaption { padding: 9px 12px 12px; font-size: .84rem; color: #b7aba0; line-height: 1.5; }
+    figcaption b { color: #ffd9a8; font-family: 'Nanum Myeongjo', serif; }
+    #lb { position: fixed; inset: 0; background: rgba(4,3,8,.95); display: none; align-items: center;
+      justify-content: center; z-index: 99; cursor: zoom-out; padding: 20px; }
+    #lb.on { display: flex; } #lb img { max-width: 100%; max-height: 100%; border-radius: 10px; }
+  </style>
+</head>
+<body>
+  <div class="top">
+    <h1>🔮🐱 고양이 점술사 — 복장·아이템 시안</h1>
+    <p>A2 고양이를 레퍼런스로 더 귀엽게(눈 크게·볼 통통) + 점술사 모자/터번·망토 + 수정구·타로·촛불·주문서.</p>
+  </div>
+  <div class="ref">
+    <img src="img/cat/cat-a2.webp" alt="기준 A2" />
+    <span><b>기준:</b> A2 (흰 털 · 파란 눈 + 호박색 눈 오드아이). 이 얼굴을 유지한 채 복장만 입혔습니다.</span>
+  </div>
+
+  <div class="sect">🎩 마법사 모자 + 별망토 (수정구·타로·촛불)</div>
+  <div class="grid">
+    <figure><img src="img/cat/dressed-hat1.webp" alt="모자1"><figcaption><b>모자 1</b> 동화풍 · 볼터치 · 제일 아기자기</figcaption></figure>
+    <figure><img src="img/cat/dressed-hat2.webp" alt="모자2"><figcaption><b>모자 2</b> 실사풍 · 카드 부채꼴 · 정면 균형 👍</figcaption></figure>
+    <figure><img src="img/cat/dressed-hat3.webp" alt="모자3"><figcaption><b>모자 3</b> 실사풍 · 별자리 배경 · 통통한 볼</figcaption></figure>
+  </div>
+
+  <div class="sect">👳 터번 + 페이즐리 숄 (수정구·랜턴·향)</div>
+  <div class="grid">
+    <figure><img src="img/cat/dressed-turban1.webp" alt="터번1"><figcaption><b>터번 1</b> 앞발로 수정구 감싼 자세 · 달밤</figcaption></figure>
+    <figure><img src="img/cat/dressed-turban2.webp" alt="터번2"><figcaption><b>터번 2</b> 정면 · 향 연기 · 보석 터번 👍</figcaption></figure>
+    <figure><img src="img/cat/dressed-turban3.webp" alt="터번3"><figcaption><b>터번 3</b> 숄 넉넉 · 랜턴 양옆 · 아늑함</figcaption></figure>
+  </div>
+
+  <div id="lb"><img id="lbi" alt=""></div>
+  <script>
+    var lb=document.getElementById("lb"),lbi=document.getElementById("lbi");
+    document.querySelectorAll("figure img").forEach(function(im){
+      im.addEventListener("click",function(){lbi.src=im.src;lb.classList.add("on");});
+    });
+    lb.addEventListener("click",function(){lb.classList.remove("on");lbi.src="";});
+  </script>
+</body>
+</html>
