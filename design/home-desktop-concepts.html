@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>고브럽 데스크톱 홈 개선 시안 (마스코트 유지)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Jua&family=Nanum+Myeongjo:wght@700;800&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0c0a10; color: #ddd4e6; font-family: 'Jua', sans-serif; padding: 30px 18px 70px; }
+    .top { max-width: 1080px; margin: 0 auto 26px; text-align: center; }
+    .top h1 { font-family: 'Nanum Myeongjo', serif; font-weight: 800; font-size: 1.55rem; color: #ffd9a0; }
+    .top p { color: #9a8ba8; font-size: .95rem; margin-top: 9px; line-height: 1.7; }
+    .item { max-width: 1080px; margin: 0 auto 22px; background: #16121e; border: 1px solid #2e2438;
+      border-radius: 16px; overflow: hidden; }
+    .item img { display: block; width: 100%; cursor: zoom-in; background: #000; }
+    .meta { padding: 14px 18px 18px; }
+    .meta .name { font-family: 'Nanum Myeongjo', serif; font-weight: 800; font-size: 1.08rem; color: #f0e6d2; }
+    .meta .desc { color: #a99cbb; font-size: .88rem; line-height: 1.65; margin-top: 5px; }
+    .meta .desc b { color: #ffd9a8; }
+    #lb { position: fixed; inset: 0; background: rgba(4,3,8,.95); display: none; align-items: center;
+      justify-content: center; z-index: 99; cursor: zoom-out; padding: 16px; }
+    #lb.on { display: flex; } #lb img { max-width: 100%; max-height: 100%; border-radius: 10px; }
+  </style>
+</head>
+<body>
+  <div class="top">
+    <h1>데스크톱 홈 개선 시안 — 마스코트·색은 유지</h1>
+    <p>모바일은 그대로 두고, PC 화면에서 가로 공간을 제대로 쓰는 3가지 방향입니다. 눌러서 크게 보세요.<br />
+      (시안 속 오타·중복 글자는 AI 생성 흔적 — 실제 구현 시엔 정확한 문구로 들어갑니다)</p>
+  </div>
+
+  <div class="item">
+    <img src="img/home/dt-d1.webp" alt="1안 벤토 그리드" />
+    <div class="meta">
+      <span class="name">1안 · 벤토 그리드</span>
+      <p class="desc">왼쪽 큰 타일에 마스코트+워드마크, 오른쪽은 크기가 다른 벤토 타일들. <b>한 화면에 전부 들어와서 스크롤이 거의 없고</b>, 정돈된 느낌이 가장 강합니다. 구현 난이도도 낮습니다.</p>
+    </div>
+  </div>
+
+  <div class="item">
+    <img src="img/home/dt-d2.webp" alt="2안 브랜드 사이드바" />
+    <div class="meta">
+      <span class="name">2안 · 브랜드 사이드바</span>
+      <p class="desc">왼쪽 노랑 브랜드 패널(마스코트+세로 워드마크+나브) 고정, 오른쪽 3열 카드 그리드. <b>서비스 많아져도 오른쪽만 늘어나면 되는 확장형.</b> 데스크톱 앱 같은 인상.</p>
+    </div>
+  </div>
+
+  <div class="item">
+    <img src="img/home/dt-d3.webp" alt="3안 센터 스테이지" />
+    <div class="meta">
+      <span class="name">3안 · 센터 스테이지</span>
+      <p class="desc">마스코트+워드마크를 무대 중앙에 크게, 좌우로 스티커 카드 3장씩, 하단에 띠배너. <b>첫인상·브랜드 임팩트 최강.</b> 포스터 같은 홈이 필요하면 이쪽.</p>
+    </div>
+  </div>
+
+  <div id="lb"><img id="lbi" alt=""></div>
+  <script>
+    var lb=document.getElementById("lb"),lbi=document.getElementById("lbi");
+    document.querySelectorAll(".item img").forEach(function(im){
+      im.addEventListener("click",function(){lbi.src=im.src;lb.classList.add("on");});
+    });
+    lb.addEventListener("click",function(){lb.classList.remove("on");lbi.src="";});
+  </script>
+</body>
+</html>
