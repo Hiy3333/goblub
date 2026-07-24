@@ -71,7 +71,7 @@
   <script>
     (function () {
       var $ = function (id) { return document.getElementById(id); };
-      var API = "https://goblub.vercel.app/api/balance-vote";
+      var API = (/\.vercel\.app$/.test(location.hostname) ? location.origin : "https://goblub-2.vercel.app") + "/api/balance-vote";
 
       var QUESTIONS = [
         { id: 1, a: "평생 라면 금지 🍜🚫", b: "평생 치킨 금지 🍗🚫" },

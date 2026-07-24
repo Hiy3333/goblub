@@ -2,12 +2,12 @@
 // GOOGLE_CLIENT_ID 는 Google Cloud Console(APIs & Services > Credentials)에서 발급한
 // OAuth 2.0 클라이언트 ID(웹 애플리케이션). 공개값이라 클라이언트 코드에 둬도 안전.
 // ★발급 시 '승인된 JavaScript 원본'에 반드시 등록:
-//   https://goblub.vercel.app / https://hiy3333.github.io / http://localhost:8777
+//   https://goblub-2.vercel.app / https://hiy3333.github.io / http://localhost:8777
 // 발급한 ID를 아래 상수에 넣으면 로그인 버튼이 활성화된다.
 (function () {
   var CLIENT_ID = ""; // TODO: 구글 OAuth 클라이언트 ID 입력 (예: "1234567890-abc.apps.googleusercontent.com")
   var KEY = "goblub_user";
-  var API_BASE = "https://goblub.vercel.app";
+  var API_BASE = (/\.vercel\.app$/.test(location.hostname) ? location.origin : "https://goblub-2.vercel.app");   // vercel 배포본은 자기 도메인, 그 외(GitHub Pages)는 고정 주소
 
   function user() {
     try { var u = JSON.parse(localStorage.getItem(KEY)); return (u && u.sub) ? u : null; } catch (e) { return null; }

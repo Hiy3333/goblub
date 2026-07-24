@@ -813,7 +813,7 @@
         g.fillText("— 귀곡(鬼哭)", W / 2, 1062);
         // CTA
         g.fillStyle = "#cdc2e0"; g.font = "28px 'Jua','Malgun Gothic',sans-serif";
-        g.fillText("네 팔자도 보러 오라 ▶ goblub.vercel.app", W / 2, 1176);
+        g.fillText("네 팔자도 보러 오라 ▶ goblub-2.vercel.app", W / 2, 1176);
         g.fillStyle = "#ffb84a"; g.font = "24px 'Jua','Malgun Gothic',sans-serif";
         g.fillText("지금은 오픈 기념 무료 🕯", W / 2, 1216);
         c.toBlob(function (blob2) {
@@ -837,7 +837,7 @@
         // 발급 이벤트 기록(관리자 현황용) — 실패해도 무시
         try {
           var u = JSON.parse(localStorage.getItem("goblub_user") || "null");
-          fetch("https://goblub.vercel.app/api/track", {
+          fetch((/\.vercel\.app$/.test(location.hostname) ? location.origin : "https://goblub-2.vercel.app") + "/api/track", {
             method: "POST", headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ item: "premium_report", id_token: (u && u.tok) || undefined })
           }).catch(function () {});

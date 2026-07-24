@@ -200,7 +200,7 @@
         c.fillText("🌃 goblub · 종합 프로필 카드", W / 2, H - 116);
         c.font = "28px 'Jua','Malgun Gothic',sans-serif"; c.fillStyle = "#4deeea";
         c.save(); c.shadowColor = "#4deeea"; c.shadowBlur = 12;
-        c.fillText("나도 해보기 ▶ goblub.vercel.app", W / 2, H - 72);
+        c.fillText("나도 해보기 ▶ goblub-2.vercel.app", W / 2, H - 72);
         c.restore();
         var dl = function (url) { var a = document.createElement("a"); a.href = url; a.download = "goblub-profile.png"; document.body.appendChild(a); a.click(); a.remove(); };
         if (g.toBlob) g.toBlob(function (b) { if (!b) { dl(g.toDataURL("image/png")); return; } var u = URL.createObjectURL(b); dl(u); setTimeout(function () { URL.revokeObjectURL(u); }, 5000); }, "image/png");

@@ -1,7 +1,7 @@
 // 고블럽 도사 심층 풀이 클라이언트.
 // window.Dosa = { buildPayload, fetchReading, fetchGunghap }
 (function () {
-  var API_BASE = "https://goblub.vercel.app";
+  var API_BASE = (/\.vercel\.app$/.test(location.hostname) ? location.origin : "https://goblub-2.vercel.app");   // vercel 배포본은 자기 도메인, 그 외(GitHub Pages)는 고정 주소
   var COOLDOWN_KEY = "goblub_dosa_last";
   var COOLDOWN_MS = 60000;
 

@@ -100,7 +100,7 @@
     c.fillText(spec.footer || "🌃 goblub · 대환장 놀이터", W / 2, H - 116);
     c.font = "28px Jua, sans-serif"; c.fillStyle = "#4deeea";
     c.save(); c.shadowColor = "#4deeea"; c.shadowBlur = 12;
-    c.fillText("나도 해보기 ▶ goblub.vercel.app", W / 2, H - 72);
+    c.fillText("나도 해보기 ▶ goblub-2.vercel.app", W / 2, H - 72);
     c.restore();
     c.textAlign = "center";
   }

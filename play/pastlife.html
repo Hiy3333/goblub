@@ -267,7 +267,7 @@
           g.fillText("🔮 goblub · 전생 대환장 파티", W / 2, H - 116);
           g.font = "28px 'Jua','Malgun Gothic',sans-serif"; g.fillStyle = "#4deeea";
           g.save(); g.shadowColor = "#4deeea"; g.shadowBlur = 12;
-          g.fillText("나도 해보기 ▶ goblub.vercel.app", W / 2, H - 72);
+          g.fillText("나도 해보기 ▶ goblub-2.vercel.app", W / 2, H - 72);
           g.restore();
           var dl = function (url) { var a = document.createElement("a"); a.href = url; a.download = "goblub-jeonsaeng-" + (n + 1) + ".png"; document.body.appendChild(a); a.click(); a.remove(); };
           if (canvas.toBlob) canvas.toBlob(function (b) { if (!b) { dl(canvas.toDataURL("image/png")); return; } var u = URL.createObjectURL(b); dl(u); setTimeout(function () { URL.revokeObjectURL(u); }, 5000); }, "image/png");
