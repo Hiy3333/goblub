@@ -524,3 +524,144 @@ main, .site-header, .site-footer { position: relative; z-index: 1; }
   .app-card { flex-wrap: wrap; }
   .pillar .hanja { font-size: 1.3rem; }
 }
+
+/* ============================================================
+   네오브루탈리즘 테마 (body.nb) — 홈 '고블럽 소굴'과 통일.
+   귀곡 라인(사주팔자·명부·부적·명부대조)에는 nb 클래스를 붙이지 않아 제외됨.
+   ============================================================ */
+body.nb {
+  --nb-paper: #f2ecdd;
+  --nb-ink: #16131d;
+  --nb-yellow: #d6f23e;
+  --nb-pink: #ff5aa8;
+  --nb-cyan: #45d6e6;
+  --nb-lime: #a6e63e;
+  --nb-cream: #efe8d6;
+  --nb-purple: #b6a4e8;
+  background: var(--nb-paper) !important;
+  background-image: radial-gradient(rgba(0,0,0,.045) 1px, transparent 1px) !important;
+  background-size: 5px 5px !important;
+  color: var(--nb-ink);
+  font-family: "Jua", "Malgun Gothic", sans-serif;
+}
+
+/* 헤더/푸터 */
+body.nb .site-header {
+  max-width: 1120px; background: var(--nb-paper);
+  border-bottom: 4px solid var(--nb-ink);
+}
+body.nb .logo span { text-shadow: none; -webkit-text-stroke: 1.5px var(--nb-ink); }
+body.nb .site-nav a {
+  color: var(--nb-ink); font-family: "Jua", sans-serif; font-size: .95rem;
+  border: 2.5px solid var(--nb-ink); border-radius: 10px; padding: 4px 12px;
+  background: #fff; box-shadow: 3px 3px 0 var(--nb-ink); margin-left: 10px;
+  transition: transform .08s, box-shadow .08s;
+}
+body.nb .site-nav a:hover {
+  color: var(--nb-ink); background: var(--nb-yellow);
+  transform: translate(-1px,-1px); box-shadow: 4px 4px 0 var(--nb-ink);
+}
+body.nb .site-footer {
+  max-width: 1120px; margin: 0 auto; border-top: 4px solid var(--nb-ink);
+  background: var(--nb-paper); color: var(--nb-ink); font-family: "Jua", sans-serif;
+}
+
+/* 히어로(페이지 타이틀) */
+body.nb .hero h1 {
+  color: var(--nb-ink); text-shadow: 3px 3px 0 var(--nb-yellow), 5px 5px 0 var(--nb-ink);
+}
+body.nb .hero p { color: rgba(22,19,29,.72); }
+
+/* 카드·패널·앱카드: 유리 제거 → 검정 테두리 + 하드 그림자 */
+body.nb .card, body.nb .panel, body.nb .app-card {
+  border: 3.5px solid var(--nb-ink) !important;
+  border-radius: 16px;
+  background: #fff !important;
+  backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+  box-shadow: 6px 6px 0 var(--nb-ink) !important;
+}
+body.nb .card::after, body.nb .panel::after, body.nb .app-card::after { display: none !important; }
+body.nb .card { transition: transform .1s ease, box-shadow .1s ease; }
+body.nb a.card:hover, body.nb .card[data-href]:hover {
+  transform: translate(-2px,-3px); box-shadow: 9px 10px 0 var(--nb-ink) !important;
+}
+body.nb .card h2, body.nb .panel h2, body.nb .app-card h2 {
+  font-family: "Black Han Sans","Jua",sans-serif; color: var(--nb-ink); letter-spacing: -.01em;
+}
+body.nb .card p, body.nb .app-card p { color: rgba(22,19,29,.72); }
+body.nb .card .icon { filter: none; }
+
+/* 카드 틴트 → 솔리드 파스텔 */
+body.nb .card.tint-coral  { background: var(--nb-pink) !important; }
+body.nb .card.tint-yellow { background: var(--nb-yellow) !important; }
+body.nb .card.tint-mint   { background: var(--nb-lime) !important; }
+body.nb .card.tint-sky    { background: var(--nb-cyan) !important; }
+body.nb .card.tint-purple { background: var(--nb-purple) !important; }
+body.nb .card.tint-coral p, body.nb .card.tint-yellow p,
+body.nb .card.tint-mint p, body.nb .card.tint-sky p,
+body.nb .card.tint-purple p { color: rgba(22,19,29,.78); }
+
+/* 허브 카드 구분선 */
+body.nb .card.hub .sub { border-left: 2.5px dashed var(--nb-ink); }
+body.nb .card.hub .sub a { color: rgba(22,19,29,.75); }
+body.nb .card.hub .sub a:hover { color: var(--nb-ink); }
+@media (max-width: 420px) {
+  body.nb .card.hub .sub { border-left: none; border-top: 2.5px dashed var(--nb-ink); }
+}
+
+/* 준비중/빈슬롯/배지 */
+body.nb .card.empty-slot { background: #fff !important; border: 3px dashed var(--nb-ink) !important;
+  box-shadow: none !important; color: rgba(22,19,29,.6); }
+body.nb .badge-soon {
+  background: var(--nb-ink); color: #fff; box-shadow: none;
+  border-radius: 999px; font-family: "Jua",sans-serif;
+}
+
+/* 버튼 */
+body.nb .btn-primary, body.nb .btn-ghost, body.nb .btn-download, body.nb .choice-btn {
+  border: 3px solid var(--nb-ink) !important; border-radius: 12px !important;
+  box-shadow: 4px 4px 0 var(--nb-ink) !important; text-shadow: none !important;
+  backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+  font-family: "Jua",sans-serif; transition: transform .08s, box-shadow .08s;
+}
+body.nb .btn-primary { background: var(--nb-pink) !important; color: var(--nb-ink) !important; }
+body.nb .btn-download { background: var(--nb-cyan) !important; color: var(--nb-ink) !important; }
+body.nb .btn-ghost { background: #fff !important; color: var(--nb-ink) !important; }
+body.nb .btn-primary:hover, body.nb .btn-ghost:hover, body.nb .btn-download:hover {
+  filter: none; transform: translate(-1px,-2px); box-shadow: 6px 7px 0 var(--nb-ink) !important;
+  color: var(--nb-ink) !important;
+}
+body.nb .btn-primary:active, body.nb .btn-ghost:active, body.nb .btn-download:active,
+body.nb .choice-btn:active { transform: translate(2px,2px); box-shadow: 1px 1px 0 var(--nb-ink) !important; }
+body.nb .btn-download:disabled { background: #d9d3c4 !important; color: #8b8677 !important;
+  box-shadow: 3px 3px 0 rgba(22,19,29,.35) !important; }
+
+/* 폼 */
+body.nb select, body.nb input[type="number"], body.nb input[type="text"],
+body.nb input[type="date"], body.nb textarea {
+  border: 2.5px solid var(--nb-ink); border-radius: 10px; background: #fff;
+  color: var(--nb-ink); box-shadow: inset 0 0 0 rgba(0,0,0,0);
+}
+body.nb select:focus, body.nb input:focus, body.nb textarea:focus {
+  border-color: var(--nb-ink); box-shadow: 3px 3px 0 var(--nb-cyan);
+}
+body.nb .field-row label, body.nb .opt-row { color: var(--nb-ink); }
+
+/* 퀴즈 */
+body.nb .choice-btn { background: var(--nb-cream) !important; color: var(--nb-ink); }
+body.nb .choice-btn:hover { background: var(--nb-yellow) !important;
+  transform: translate(-1px,-2px); box-shadow: 6px 7px 0 var(--nb-ink) !important; }
+body.nb .progress-track { background: #fff; border: 2.5px solid var(--nb-ink); box-shadow: none;
+  height: 14px; padding: 0; overflow: hidden; }
+body.nb .progress-fill { background: var(--nb-lime); box-shadow: none; border-radius: 0; height: 100%; }
+
+/* 결과·태그·기둥·대운 */
+body.nb .result-emoji { filter: none; }
+body.nb .result-name { color: var(--nb-ink); font-family: "Black Han Sans","Jua",sans-serif; }
+body.nb .result-desc { color: rgba(22,19,29,.78); }
+body.nb .pillar, body.nb .daeun-item, body.nb .tag-list li {
+  background: var(--nb-cream); border: 2.5px solid var(--nb-ink); box-shadow: 3px 3px 0 var(--nb-ink);
+}
+body.nb .pillar .hanja, body.nb .pillar .hangul { color: var(--nb-ink); }
+body.nb .stars { color: var(--nb-ink); }
+body.nb .fine-print { color: rgba(22,19,29,.55); }
