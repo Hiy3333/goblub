@@ -1,4 +1,4 @@
-// 고블럽 다마고치 — 코너 버디를 누르면 펼쳐지는 레트로 케어 기계.
+// 고브럽 다마고치 — 코너 버디를 누르면 펼쳐지는 레트로 케어 기계.
 // 매운맛: 배부름·행복·기력·청결이 실시간으로 줄고, 오래 방치하면 아프고 → 삐져서 가출(리셋).
 // 성장/레벨은 feed.js(GoblubFeed)를 그대로 사용. 케어 상태는 localStorage "goblub_tama".
 // window.GoblubTama = { open }
@@ -63,7 +63,7 @@
     return { face: pick(["😊", "💕", "😄", "✨"]), txt: "기분 최고예요!", cls: "happy" };
   }
 
-  function feedState() { return (window.GoblubFeed && GoblubFeed.state()) || { name: "고블럽", level: 0, levelInfo: { art: false, emoji: "🥚", deco: "" } }; }
+  function feedState() { return (window.GoblubFeed && GoblubFeed.state()) || { name: "고브럽", level: 0, levelInfo: { art: false, emoji: "🥚", deco: "" } }; }
 
   // ---- UI ----
   var el = {}, iv = null, s = null;
@@ -122,7 +122,7 @@
     injectCss();
     var back = document.createElement("div"); back.className = "gt-back";
     back.innerHTML =
-      '<div class="gt-dev" role="dialog" aria-label="고블럽 다마고치">' +
+      '<div class="gt-dev" role="dialog" aria-label="고브럽 다마고치">' +
       '<div class="gt-top"><div><div class="gt-name" id="gt-name"></div><div class="gt-lv" id="gt-lv"></div></div>' +
       '<button class="gt-x" id="gt-x" type="button" aria-label="닫기">×</button></div>' +
       '<div class="gt-screen" id="gt-screen"><div class="gt-scan"></div>' +
@@ -131,7 +131,7 @@
       '<div class="gt-status" id="gt-status"></div>' +
       '<div class="gt-meters" id="gt-meters"></div></div>' +
       '<div id="gt-controls"></div>' +
-      '<div class="gt-hint">매운맛 모드 · 오래 방치하면 고블럽이 떠날 수도 있어요</div>' +
+      '<div class="gt-hint">매운맛 모드 · 오래 방치하면 고브럽이 떠날 수도 있어요</div>' +
       '</div>';
     document.body.appendChild(back);
     el.back = back;
@@ -162,7 +162,7 @@
 
     if (s.gone) {
       el.stage.innerHTML = '<span class="gt-egg">💨</span>';
-      el.status.textContent = "고블럽이 삐져서 여행을 떠났어요…";
+      el.status.textContent = "고브럽이 삐져서 여행을 떠났어요…";
       el.warn.style.display = "none";
       el.meters.innerHTML = "";
       el.controls.innerHTML = '<button class="gt-hatch" id="gt-hatch" type="button">🥚 새 알 받아 다시 키우기</button>';
@@ -220,7 +220,7 @@
       s.hunger = clamp(s.hunger + 30); s.lastFeed = now(); anim("nom"); fx("🍬");
       if (window.GoblubFeed && GoblubFeed.state().pending > 0) {
         var r = GoblubFeed.feedOne();
-        if (r && r.levelUp) { msg = "냠냠! 🎉 레벨 업 — 고블럽이 자랐어요!"; celebrate(); }
+        if (r && r.levelUp) { msg = "냠냠! 🎉 레벨 업 — 고브럽이 자랐어요!"; celebrate(); }
         else msg = "냠냠! 쑥쑥 자라는 중 🌱";
       } else msg = "냠냠! (콘텐츠 즐겨 먹이를 모으면 레벨업해요)";
     } else if (a === "play") {
@@ -241,7 +241,7 @@
       s.lastEmotion = now(); s.happy = clamp(s.happy + 26); s.energy = clamp(s.energy + 8);
       if (!s.lastFeed) s.lastFeed = now();
       anim("chomp"); fx(pick(["😤", "😩", "😖", "💢"]), 40);
-      msg = "나쁜 기분을 고블럽 입에 쏙!";
+      msg = "나쁜 기분을 고브럽 입에 쏙!";
       setTimeout(function () { say("우걱우걱… 꺼억! 나쁜 기분 냠 — 개운하지? 😎"); }, 700);
     }
     if (window.GoblubFeed && GoblubFeed.earnCare) GoblubFeed.earnCare(); // 케어 → 젬리 +1 (하루 최대 5)

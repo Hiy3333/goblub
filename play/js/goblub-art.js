@@ -1,4 +1,4 @@
-// 고블럽 캐릭터 SVG (외눈·소용돌이 입·초록 점박이·에너지 구슬).
+// 고브럽 캐릭터 SVG (외눈·소용돌이 입·초록 점박이·에너지 구슬).
 // GoblubArt.svg(px) → 지정 크기의 인라인 SVG 문자열.
 // [data-goblub="<px>"] 요소는 로드 시 자동으로 채워집니다.
 (function () {
@@ -9,7 +9,7 @@
     var w = px, h = Math.round(px * 196 / 240 * 100) / 100;
     var id = "gorb" + (++seq);
     return '<svg class="goblub-svg" viewBox="0 0 240 196" width="' + w + '" height="' + h +
-      '" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;overflow:visible;vertical-align:middle" aria-label="고블럽" role="img">' +
+      '" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;overflow:visible;vertical-align:middle" aria-label="고브럽" role="img">' +
       '<defs><radialGradient id="' + id + '" cx="38%" cy="34%" r="70%">' +
       '<stop offset="0%" stop-color="#ffffff"/><stop offset="55%" stop-color="#d4e9fb"/>' +
       '<stop offset="100%" stop-color="#8fbfe8"/></radialGradient></defs>' +

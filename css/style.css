@@ -568,7 +568,7 @@ body.nb .site-footer {
 
 /* 히어로(페이지 타이틀) */
 body.nb .hero h1 {
-  color: var(--nb-ink); text-shadow: 3px 3px 0 var(--nb-yellow), 5px 5px 0 var(--nb-ink);
+  color: var(--nb-ink); text-shadow: 3px 3px 0 var(--nb-yellow); letter-spacing: .01em;
 }
 body.nb .hero p { color: rgba(22,19,29,.72); }
 

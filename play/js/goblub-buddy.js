@@ -1,4 +1,4 @@
-// 고블럽 마스코트 — 화면을 둥둥 떠다니다 가끔 쓱 이동, 클릭하면 말풍선 리액션.
+// 고브럽 마스코트 — 화면을 둥둥 떠다니다 가끔 쓱 이동, 클릭하면 말풍선 리액션.
 // common.js가 모든 페이지에서 로드. GoblubArt(goblub-art.js) 필요.
 // 상태: localStorage "goblub_buddy" = "on"(기본) | "min"(최소화)
 (function () {
@@ -51,13 +51,13 @@
   var svgEl = bodyEl.querySelector(".goblub-svg");
   var bubble = document.createElement("div"); bubble.className = "gbd-bubble";
   var xBtn = document.createElement("button"); xBtn.className = "gbd-x"; xBtn.type = "button";
-  xBtn.textContent = "×"; xBtn.setAttribute("aria-label", "고블럽 접기");
+  xBtn.textContent = "×"; xBtn.setAttribute("aria-label", "고브럽 접기");
   bodyEl.appendChild(bubble); bodyEl.appendChild(xBtn);
   wrap.appendChild(bodyEl);
   document.body.appendChild(wrap);
 
   var minBtn = document.createElement("button"); minBtn.className = "gbd-min"; minBtn.type = "button";
-  minBtn.setAttribute("aria-label", "고블럽 부르기");
+  minBtn.setAttribute("aria-label", "고브럽 부르기");
   minBtn.innerHTML = GoblubArt.svg(38);
   document.body.appendChild(minBtn);
 

@@ -1,15 +1,15 @@
-// 고블럽 먹이 시스템. 콘텐츠 결과를 볼 때 GoblubFeed.grant(src) 호출 → 소스당 하루 1개 먹이 적립.
+// 고브럽 먹이 시스템. 콘텐츠 결과를 볼 때 GoblubFeed.grant(src) 호출 → 소스당 하루 1개 먹이 적립.
 // 데이터: localStorage "goblub_pet" = { name, xp, pending, log: {"src_YYYYMMDD": 1} }
 (function () {
   var KEY = "goblub_pet";
 
   var LEVELS = [
     { need: 0, name: "알", emoji: "🥚", size: 4.2, art: false, deco: "" },
-    { need: 3, name: "아기 고블럽", emoji: "👾", size: 4.6, art: true, deco: "" },
-    { need: 8, name: "청소년 고블럽", emoji: "👾", size: 5.2, art: true, deco: "✨" },
-    { need: 15, name: "어른 고블럽", emoji: "👾", size: 5.8, art: true, deco: "🎩" },
-    { need: 25, name: "대왕 고블럽", emoji: "👾", size: 6.6, art: true, deco: "👑" },
-    { need: 40, name: "전설의 고블럽", emoji: "👾", size: 7.4, art: true, deco: "🌟" }
+    { need: 3, name: "아기 고브럽", emoji: "👾", size: 4.6, art: true, deco: "" },
+    { need: 8, name: "청소년 고브럽", emoji: "👾", size: 5.2, art: true, deco: "✨" },
+    { need: 15, name: "어른 고브럽", emoji: "👾", size: 5.8, art: true, deco: "🎩" },
+    { need: 25, name: "대왕 고브럽", emoji: "👾", size: 6.6, art: true, deco: "👑" },
+    { need: 40, name: "전설의 고브럽", emoji: "👾", size: 7.4, art: true, deco: "🌟" }
   ];
 
   var SOURCES = {
@@ -33,8 +33,8 @@
     questions: { label: "🎴 질문 카드", url: "questions.html" },
     naming: { label: "📛 네이밍 생성기", url: "naming.html" },
     whack: { label: "🕳️ 감정 몬스터 팡팡", url: "whack.html" },
-    reflex: { label: "⚡ 고블럽 반응속도", url: "reflex.html" },
-    lotto: { label: "🎱 고블럽 로또 번호", url: "lotto.html" }
+    reflex: { label: "⚡ 고브럽 반응속도", url: "reflex.html" },
+    lotto: { label: "🎱 고브럽 로또 번호", url: "lotto.html" }
   };
 
   function load() {
@@ -42,7 +42,7 @@
       var p = JSON.parse(localStorage.getItem(KEY));
       if (p && typeof p.xp === "number") return p;
     } catch (e) {}
-    return { name: "이름 없는 고블럽", xp: 0, pending: 0, log: {} };
+    return { name: "이름 없는 고브럽", xp: 0, pending: 0, log: {} };
   }
 
   function save(p) { try { localStorage.setItem(KEY, JSON.stringify(p)); } catch (e) {} }

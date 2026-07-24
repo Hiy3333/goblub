@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../css/style.css?v=nb3" />
+  <link rel="stylesheet" href="../css/style.css?v=nb4" />
   <style>
     .life-card { background: var(--surface); border: 2px solid var(--line); border-radius: 16px; padding: 16px 18px; margin-bottom: 14px; }
     .life-era { display: inline-block; background: var(--cream); border-radius: 999px; padding: 4px 12px; font-size: 0.82rem; color: var(--ink-soft); margin-bottom: 8px; }
@@ -153,7 +153,7 @@
         } catch (e) { return null; }
       }
 
-      // ---- 고블럽 씹어먹기 모션 ----
+      // ---- 고브럽 씹어먹기 모션 ----
       function summonGoblub(card, bodyEl, fixText, btn) {
         btn.disabled = true;
         var muncher = document.createElement("span");
@@ -311,7 +311,7 @@
           if (life.fix) {
             var btn = document.createElement("button");
             btn.className = "summon";
-            btn.textContent = "🌀 고블럽 소환 — 이 업보 씹어먹기";
+            btn.textContent = "🌀 고브럽 소환 — 이 업보 씹어먹기";
             btn.onclick = function () { summonGoblub(card, card.querySelector(".life-body"), life.fix, btn); };
             card.appendChild(btn);
           }

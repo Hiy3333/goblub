@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../css/style.css?v=nb3" />
+  <link rel="stylesheet" href="../css/style.css?v=nb4" />
   <style>
     .nick-row { display: flex; gap: 8px; justify-content: center; margin-bottom: 14px; }
     .nick-row input { font-family: inherit; font-size: 1rem; padding: 9px 14px; border: 2px solid var(--line); border-radius: 12px; width: 200px; text-align: center; }
@@ -97,13 +97,13 @@
         return out;
       }
 
-      function pet() { return (window.GoblubFeed && GoblubFeed.state()) || { name: "고블럽", level: 0, levelInfo: { name: "알" } }; }
+      function pet() { return (window.GoblubFeed && GoblubFeed.state()) || { name: "고브럽", level: 0, levelInfo: { name: "알" } }; }
       function nick() { try { return localStorage.getItem("goblub_card_nick") || ""; } catch (e) { return ""; } }
 
       function render() {
         var items = collect(), p = pet();
         var doneCount = items.filter(function (i) { return i.done; }).length;
-        var nm = nick() || (p.name && p.name !== "이름 없는 고블럽" ? p.name : "이름 모를 goblub");
+        var nm = nick() || (p.name && p.name !== "이름 없는 고브럽" ? p.name : "이름 모를 goblub");
         var tags = [];
         items.forEach(function (i) { (i.tags || []).forEach(function (t) { if (tags.indexOf(t) < 0 && tags.length < 8) tags.push(t); }); });
 
@@ -188,7 +188,7 @@
           c.fillText("# " + s.tags.slice(0, 6).join("  # "), W / 2, afterTiles + 32);
           c.restore();
         }
-        // 하단 고블럽 레벨 존 — 글로우
+        // 하단 고브럽 레벨 존 — 글로우
         c.font = "110px 'Segoe UI Emoji',sans-serif"; c.fillStyle = "#fff";
         c.save(); c.shadowColor = NEON; c.shadowBlur = 30;
         c.fillText(s.p.levelInfo.emoji + (s.p.levelInfo.deco || ""), W / 2, afterTiles + 200);

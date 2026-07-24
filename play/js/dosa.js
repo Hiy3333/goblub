@@ -1,4 +1,4 @@
-// 고블럽 도사 심층 풀이 클라이언트.
+// 고브럽 도사 심층 풀이 클라이언트.
 // window.Dosa = { buildPayload, fetchReading, fetchGunghap }
 (function () {
   var API_BASE = (/\.vercel\.app$/.test(location.hostname) ? location.origin : "https://goblub-2.vercel.app");   // vercel 배포본은 자기 도메인, 그 외(GitHub Pages)는 고정 주소
@@ -108,7 +108,7 @@
     // 마지막 도사 서명이 있어야(=잘리지 않은 완결 응답) 캐시. 잘린 풀이가 고착되는 것 방지.
     var wrapped = {};
     for (var k in cb) wrapped[k] = cb[k];
-    wrapped.accept = function (full) { return /고블럽 도사\s*$/.test((full || "").trim()); };
+    wrapped.accept = function (full) { return /고브럽 도사\s*$/.test((full || "").trim()); };
     fetchStream("/api/saju-reading", { saju: payload }, "goblub_dosa2_", wrapped);
   }
 

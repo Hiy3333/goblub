@@ -4,11 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>스트레스 몬스터 변신 — goblub</title>
-  <meta name="description" content="스트레스 받으면 튀어나오는 내 안의 몬스터 — 고블럽이 냠 먹어드립니다" />
+  <meta name="description" content="스트레스 받으면 튀어나오는 내 안의 몬스터 — 고브럽이 냠 먹어드립니다" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../css/style.css?v=nb3" />
+  <link rel="stylesheet" href="../css/style.css?v=nb4" />
   <style>
     .mon-stage { text-align:center; min-height:120px; margin:10px 0; }
     .mon-emoji { font-size:4.5rem; display:inline-block; }
@@ -33,12 +33,12 @@
   <script src="js/goblub-art.js"></script>
   <script>
     var MONS = {
-      pokbal:{emoji:"🌋",name:"폭발몬",desc:"참을 인 세 번은커녕 한 번도 못 참고 그대로 터지는 타입. 화끈하게 분출하고 나면 뒤끝은 없지만, 터지는 순간 옆 사람이 파편에 맞을 수 있어요. 화산도 분화구가 필요하듯, 터지기 전에 미리 빼는 안전밸브 하나쯤은 마련해두세요.",cure:"고블럽이 화를 냠— 이제 심호흡 세 번, 물 한 잔."},
-      jamsu:{emoji:"🌊",name:"잠수몬",desc:"힘들면 일단 연락부터 끊고 물속으로 숨어버리는 타입. 혼자만의 시간이 회복에 도움되는 건 맞지만, 너무 오래 잠수 타면 걱정하던 사람들도 지쳐서 물 밖으로 안 나오게 됩니다. 가끔은 숨만 쉬러라도 수면 위로 올라와 주세요.",cure:"고블럽이 잠수를 냠— 한 사람에게만 '나 힘들어' 한마디."},
-      nunmul:{emoji:"💧",name:"눈물몬",desc:"감정이 차오르면 말보다 눈물이 먼저 나오는 타입. 참는 것보다 훨씬 건강한 배출법이지만, 정작 왜 우는지는 본인도 정리가 안 될 때가 많아요. 실컷 울고 난 뒤엔 꼭 원인 한 줄 정리해보는 습관을 들여보세요.",cure:"고블럽이 눈물을 냠— 실컷 울었으면 따뜻한 거 먹기."},
-      meokbo:{emoji:"🍔",name:"먹보몬",desc:"스트레스는 입으로 푸는 게 국룰인 타입. 먹는 순간엔 세상 행복하지만 배부름이 가시면 스트레스는 고스란히 그대로 남아있는 경우가 많죠. 먹는 즐거움은 지키되, 배달앱 켜기 전에 노래 한 곡만 먼저 틀어보길.",cure:"고블럽이 폭식을 냠— 대신 좋아하는 노래 한 곡."},
-      yemin:{emoji:"🌵",name:"예민몬",desc:"스트레스 받으면 온몸에 가시부터 돋는 타입. 별거 아닌 말에도 발끈하고, 정작 본인도 왜 이렇게 날카로운지 몰라 당황하죠. 가시가 돋았다는 건 위험 신호니, 사람 만나기 전에 혼자 쿨다운할 시간을 꼭 확보하세요.",cure:"고블럽이 가시를 냠— 30분만 알림 끄고 혼자."},
-      eoreum:{emoji:"🧊",name:"얼음몬",desc:"버거워지면 그대로 얼어붙어 아무것도 못 하는 타입. 게으른 게 아니라 뇌가 잠시 정지 버튼을 누른 것뿐인데, 자책까지 더해지면 얼음이 더 두꺼워져요. 완벽하게 녹이려 하지 말고 딱 손톱만큼만 움직여보세요.",cure:"고블럽이 무기력을 냠— 딱 5분, 제일 작은 일 하나만."}
+      pokbal:{emoji:"🌋",name:"폭발몬",desc:"참을 인 세 번은커녕 한 번도 못 참고 그대로 터지는 타입. 화끈하게 분출하고 나면 뒤끝은 없지만, 터지는 순간 옆 사람이 파편에 맞을 수 있어요. 화산도 분화구가 필요하듯, 터지기 전에 미리 빼는 안전밸브 하나쯤은 마련해두세요.",cure:"고브럽이 화를 냠— 이제 심호흡 세 번, 물 한 잔."},
+      jamsu:{emoji:"🌊",name:"잠수몬",desc:"힘들면 일단 연락부터 끊고 물속으로 숨어버리는 타입. 혼자만의 시간이 회복에 도움되는 건 맞지만, 너무 오래 잠수 타면 걱정하던 사람들도 지쳐서 물 밖으로 안 나오게 됩니다. 가끔은 숨만 쉬러라도 수면 위로 올라와 주세요.",cure:"고브럽이 잠수를 냠— 한 사람에게만 '나 힘들어' 한마디."},
+      nunmul:{emoji:"💧",name:"눈물몬",desc:"감정이 차오르면 말보다 눈물이 먼저 나오는 타입. 참는 것보다 훨씬 건강한 배출법이지만, 정작 왜 우는지는 본인도 정리가 안 될 때가 많아요. 실컷 울고 난 뒤엔 꼭 원인 한 줄 정리해보는 습관을 들여보세요.",cure:"고브럽이 눈물을 냠— 실컷 울었으면 따뜻한 거 먹기."},
+      meokbo:{emoji:"🍔",name:"먹보몬",desc:"스트레스는 입으로 푸는 게 국룰인 타입. 먹는 순간엔 세상 행복하지만 배부름이 가시면 스트레스는 고스란히 그대로 남아있는 경우가 많죠. 먹는 즐거움은 지키되, 배달앱 켜기 전에 노래 한 곡만 먼저 틀어보길.",cure:"고브럽이 폭식을 냠— 대신 좋아하는 노래 한 곡."},
+      yemin:{emoji:"🌵",name:"예민몬",desc:"스트레스 받으면 온몸에 가시부터 돋는 타입. 별거 아닌 말에도 발끈하고, 정작 본인도 왜 이렇게 날카로운지 몰라 당황하죠. 가시가 돋았다는 건 위험 신호니, 사람 만나기 전에 혼자 쿨다운할 시간을 꼭 확보하세요.",cure:"고브럽이 가시를 냠— 30분만 알림 끄고 혼자."},
+      eoreum:{emoji:"🧊",name:"얼음몬",desc:"버거워지면 그대로 얼어붙어 아무것도 못 하는 타입. 게으른 게 아니라 뇌가 잠시 정지 버튼을 누른 것뿐인데, 자책까지 더해지면 얼음이 더 두꺼워져요. 완벽하게 녹이려 하지 말고 딱 손톱만큼만 움직여보세요.",cure:"고브럽이 무기력을 냠— 딱 5분, 제일 작은 일 하나만."}
     };
     var MORDER = ["pokbal","jamsu","nunmul","meokbo","yemin","eoreum"];
 
@@ -88,7 +88,7 @@
         { text:"위장이 블랙홀로 진화 — 냉장고가 위험하다", scores:{ meokbo:2 } },
         { text:"온몸이 서서히 석상화 — 침대에서 화석 발굴 예정", scores:{ eoreum:2 } },
         { text:"다리에 잠수함 엔진 장착 — 연락 두절 카운트다운", scores:{ jamsu:2 } } ] },
-      { q:"고블럽이 다가와 묻는다. '네 스트레스, 어떻게 요리해 줄까?'", choices:[
+      { q:"고브럽이 다가와 묻는다. '네 스트레스, 어떻게 요리해 줄까?'", choices:[
         { text:"'터지기 전에 통째로 삼켜줘. 지금 3초 남았어'", scores:{ pokbal:2 } },
         { text:"'당분간 나 대신 세상이랑 연락 좀 해줘'", scores:{ jamsu:2 } },
         { text:"'가시부터 좀 뽑아줘… 나도 나한테 찔려'", scores:{ yemin:2 } },
@@ -103,7 +103,7 @@
         '<p class="result-name">스트레스 받으면… '+r.name+' 변신!</p>'+
         '<p class="result-desc">'+r.desc+'</p>'+
         '<div class="mon-stage"><span class="mon-emoji" id="mon">'+r.emoji+'</span></div>'+
-        '<div class="result-actions"><button class="btn-primary" id="summon">🌀 고블럽 소환 — 이 몬스터 먹어치우기</button></div>'+
+        '<div class="result-actions"><button class="btn-primary" id="summon">🌀 고브럽 소환 — 이 몬스터 먹어치우기</button></div>'+
         '<div id="after" style="display:none">'+
           '<p class="cure-line" id="cure"></p>'+
           '<div id="card-slot"></div>'+
@@ -136,7 +136,7 @@
 
     Quiz.init(document.getElementById("quiz"), {
       emoji: "🌋", title: "스트레스 몬스터 변신",
-      intro: "스트레스 받으면 내 안에서 튀어나오는 몬스터가 있다. 10문항으로 정체를 밝히고, 고블럽이 냠 먹어드립니다.",
+      intro: "스트레스 받으면 내 안에서 튀어나오는 몬스터가 있다. 10문항으로 정체를 밝히고, 고브럽이 냠 먹어드립니다.",
       feedSrc: "stress", questions: QUESTIONS, renderResult: renderResult
     });
   </script>

@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>고블럽 로또 번호 뱉기 — goblub</title>
-  <meta name="description" content="고블럽이 행운의 로또 번호를 하나씩 뱉어드려요 — 재미로 뽑는 랜덤 번호(당첨 보장 X)" />
+  <title>고브럽 로또 번호 뱉기 — goblub</title>
+  <meta name="description" content="고브럽이 행운의 로또 번호를 하나씩 뱉어드려요 — 재미로 뽑는 랜덤 번호(당첨 보장 X)" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../css/style.css?v=nb3" />
+  <link rel="stylesheet" href="../css/style.css?v=nb4" />
   <style>
     .gob-stage { position: relative; text-align: center; min-height: 96px; }
     .gob-stage .goblub-svg { display: inline-block; }
@@ -57,8 +57,8 @@
   <div id="site-header"></div>
   <main>
     <section class="hero">
-      <h1>🎱 고블럽 로또 번호 뱉기</h1>
-      <p>고블럽이 오늘의 행운 번호를 하나씩 뱉어드려요 — 재미로!</p>
+      <h1>🎱 고브럽 로또 번호 뱉기</h1>
+      <p>고브럽이 오늘의 행운 번호를 하나씩 뱉어드려요 — 재미로!</p>
     </section>
 
     <section class="panel">
@@ -92,7 +92,7 @@
     </section>
 
     <section class="panel">
-      <h2>🧙 고블럽 도사 AI 분석</h2>
+      <h2>🧙 고브럽 도사 AI 분석</h2>
       <p class="result-desc" style="margin-bottom:10px">역대 전 회차 당첨 통계를 도사님이 통째로 읽고 기운이 뜨거운 조합을 점지해드려요.</p>
       <div class="result-actions"><button class="btn-primary" id="btn-dosa">🔮 도사님, 분석해주세요</button></div>
       <p class="fine-print" id="dosa-status" style="display:none"></p>
@@ -148,7 +148,7 @@
         $("lines").innerHTML = ""; $("card-slot").innerHTML = "";
         var balls = $("balls"); balls.innerHTML = "";
         $("btn-spit").disabled = true; $("btn-auto").disabled = true;
-        $("status").textContent = "고블럽이 우물우물… 🥁";
+        $("status").textContent = "고브럽이 우물우물… 🥁";
         var g = pick6();
         var i = 0;
         function next() {
@@ -160,7 +160,7 @@
           } else {
             $("status").textContent = "🍀 오늘의 행운 번호! (재미로 봐주세요)";
             $("card-slot").appendChild(ShareCard.render({
-              palette: "sky", emoji: "🎱", badge: "고블럽 로또 번호",
+              palette: "sky", emoji: "🎱", badge: "고브럽 로또 번호",
               title: g.nums.join("  "), lines: ["🍀 재미로 뽑은 랜덤 번호예요"]
             }));
             if (window.GoblubFeed) GoblubFeed.grant("lotto");
@@ -172,7 +172,7 @@
 
       function auto5() {
         if (busy) return;
-        $("balls").innerHTML = ""; $("card-slot").innerHTML = ""; $("status").textContent = "🎰 고블럽이 5줄 몰아서 뱉었어요!";
+        $("balls").innerHTML = ""; $("card-slot").innerHTML = ""; $("status").textContent = "🎰 고브럽이 5줄 몰아서 뱉었어요!";
         gobSpit();
         var lines = $("lines"); lines.innerHTML = "";
         var tags = ["A", "B", "C", "D", "E"];
@@ -273,7 +273,7 @@
         }).catch(function () { $("check-out").innerHTML = '<p class="fine-print">데이터를 불러오지 못했어요. 새로고침 해주세요.</p>'; });
       };
 
-      // ================= ② 고블럽 도사 AI 분석 =================
+      // ================= ② 고브럽 도사 AI 분석 =================
       $("btn-dosa").onclick = function () {
         loadHist().then(function (d) {
           var freqArr = [], n;

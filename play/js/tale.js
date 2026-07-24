@@ -1,5 +1,5 @@
 // 이계 인트로 스토리 엔진 — 프리미엄 리포트 진입 연출
-// (고블럽 → 흡입 → 숲 → 천막 → 얼굴 없는 저승사자 → 정보 입력 → 점사 영상)
+// (고브럽 → 흡입 → 숲 → 천막 → 얼굴 없는 저승사자 → 정보 입력 → 점사 영상)
 // window.GoblubTale = { start({ base, deep, hasBirth, compute, onEnter, onExit }) }
 //   compute(birth) → { base, deep }  (생년월일 입력 시 재계산용)
 //   onEnter(collected) → { name, focus, focusLabel, birth?, base, deep }
@@ -178,9 +178,9 @@ box-shadow:0 0 0 100vmax #040308,0 0 70px rgba(0,0,0,.8)}}";
 
     // ===== 시나리오 =====
     var script = [
-      { id: 0, bg: "black", gob: true, name: "고블럽", cls: "n-gob", text: "……너, 진짜 사주가 보고 싶은 거야?" },
-      { id: 1, name: "고블럽", cls: "n-gob", text: "내가 아는 분이 있어.\n훨씬… 깊게 보셔. 대신—" },
-      { id: 2, name: "고블럽", cls: "n-gob", text: "[아주 무서운 곳]으로 가야 해.\n…각오됐어?", choices: [
+      { id: 0, bg: "black", gob: true, name: "고브럽", cls: "n-gob", text: "……너, 진짜 사주가 보고 싶은 거야?" },
+      { id: 1, name: "고브럽", cls: "n-gob", text: "내가 아는 분이 있어.\n훨씬… 깊게 보셔. 대신—" },
+      { id: 2, name: "고브럽", cls: "n-gob", text: "[아주 무서운 곳]으로 가야 해.\n…각오됐어?", choices: [
         { label: "🌀 보러 간다", goto: 3 },
         { label: "🫣 아직은… 무서워", exit: true }
       ]},
@@ -200,7 +200,7 @@ box-shadow:0 0 0 100vmax #040308,0 0 70px rgba(0,0,0,.8)}}";
         { label: "👀 뒤를 돌아본다", goto: 11 },
         { label: "🏃 무시하고 걷는다", goto: 12 }
       ]},
-      { id: 11, bg: "black", gob: true, gobPeek: true, name: "고블럽", cls: "n-gob",
+      { id: 11, bg: "black", gob: true, gobPeek: true, name: "고브럽", cls: "n-gob",
         text: "…나야.\n혼자 보내면 안 될 것 같아서.\n\n(낯익은 보라색 눈이 어둠 속에서 껌뻑인다)", goto: 13 },
       { id: 12, name: "", cls: "n-nar", text: "숨을 죽이고 발걸음을 서두른다.", goto: 13 },
       { id: 13, bg: "tent", name: "", cls: "n-nar", text: "낡은 천막.\n틈새로 촛불이 새어 나온다." },
@@ -482,7 +482,7 @@ box-shadow:0 0 0 100vmax #040308,0 0 70px rgba(0,0,0,.8)}}";
       if (s.vbg) setBgVideo(s.vbg, s.vbgOnce);
       else if (s.bg) setBg(s.bg, s.walk);
       gob.style.display = (s.gob || s.fx === "swallow") ? "block" : "none";
-      // 뒤를 돌아봤을 때 고블럽이 어둠 속에서 스르륵 드러나는 연출
+      // 뒤를 돌아봤을 때 고브럽이 어둠 속에서 스르륵 드러나는 연출
       if (s.gobPeek) {
         gob.classList.remove("swallow");   // 삼킴 연출 잔여 상태(opacity:0) 해제
         gob.classList.add("peek");         // 보라색 발광만 담당

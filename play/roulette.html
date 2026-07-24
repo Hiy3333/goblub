@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../css/style.css?v=nb3" />
+  <link rel="stylesheet" href="../css/style.css?v=nb4" />
   <style>
     .item-row { display:flex; gap:8px; margin-bottom:8px; }
     .item-row .idx { width:26px; flex:none; display:flex; align-items:center; justify-content:center; color:var(--ink-soft); font-size:0.9rem; }
@@ -185,7 +185,7 @@
         return items;
       }
 
-      var LINES = ["고블럽의 선택은…!", "운명은 이미 정해졌습니다.", "이의 제기는 받지 않습니다!", "짜잔, 이걸로 결정!"];
+      var LINES = ["고브럽의 선택은…!", "운명은 이미 정해졌습니다.", "이의 제기는 받지 않습니다!", "짜잔, 이걸로 결정!"];
       function showResult(text) {
         $("result-name").textContent = "🎯 " + text;
         $("result-line").textContent = LINES[Math.floor(Math.random() * LINES.length)];

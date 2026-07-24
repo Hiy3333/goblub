@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>고블럽 반응속도 — goblub</title>
+  <title>고브럽 반응속도 — goblub</title>
   <meta name="description" content="초록불이 뜨면 최대한 빨리 탭! 페이크·부정출발 함정까지 — 5라운드 평균 기록 도전" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../css/style.css?v=nb3" />
+  <link rel="stylesheet" href="../css/style.css?v=nb4" />
   <style>
     .rf-hud { display: flex; justify-content: space-around; margin: 6px 0 12px; font-size: 1.05rem; }
     .rf-hud b { color: var(--coral); font-size: 1.3rem; }
@@ -33,7 +33,7 @@
   <div id="site-header"></div>
   <main>
     <section class="hero">
-      <h1>⚡ 고블럽 반응속도</h1>
+      <h1>⚡ 고브럽 반응속도</h1>
       <p>🟢 초록불이 뜨면 0.001초라도 빨리 탭! 근데… 함정이 있어요 😈</p>
     </section>
 
@@ -124,7 +124,7 @@
         if (avg < 270) return { e: "🔥", n: "상위 1% 순발력" };
         if (avg < 320) return { e: "😎", n: "제법 빠른 손" };
         if (avg < 400) return { e: "🙂", n: "평범한 인간계" };
-        return { e: "🐢", n: "느긋한 고블럽" };
+        return { e: "🐢", n: "느긋한 고브럽" };
       }
 
       function finish() {
@@ -137,7 +137,7 @@
         $("round").textContent = "0";
         state = "idle";
         $("card-slot").appendChild(ShareCard.render({
-          palette: "purple", emoji: g.e, badge: "고블럽 반응속도", title: "평균 " + avg + "ms",
+          palette: "purple", emoji: g.e, badge: "고브럽 반응속도", title: "평균 " + avg + "ms",
           lines: [g.n, "5라운드 " + results.join(" / ") + "ms"]
         }));
       }

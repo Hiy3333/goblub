@@ -88,7 +88,7 @@
     body.story-mode main > section.panel { background: linear-gradient(180deg,#140d18,#0d0912) !important;
       border-color: rgba(150,60,70,.4) !important; box-shadow: 0 18px 50px rgba(0,0,0,.6) !important; }
     body.story-mode .fine-print { color:#7a6f8a !important; }
-    /* 이계에 들어가면 고블럽 버디(떠다니는 마스코트·최소화 버튼) 완전 숨김 */
+    /* 이계에 들어가면 고브럽 버디(떠다니는 마스코트·최소화 버튼) 완전 숨김 */
     body.story-mode .gbd-wrap, body.story-mode .gbd-min { display:none !important; }
 
     /* ===== 명부 보관함(다시 보기) ===== */
@@ -241,7 +241,7 @@
           <button class="btn-ghost" id="btn-tale">🎬 이계 스토리 다시 체험하기</button>
           <a class="btn-ghost" href="saju.html">🔮 무료 사주팔자 심층 먼저 보기</a>
         </div>
-        <p class="need-more" id="need-more" style="display:none">젬리가 <b id="need-gap">0</b> 개 더 필요해요 — <a href="goblub.html" style="color:var(--sky)">고블럽 키우기</a>에서 출석·케어로 모아보세요!</p>
+        <p class="need-more" id="need-more" style="display:none">젬리가 <b id="need-gap">0</b> 개 더 필요해요 — <a href="goblub.html" style="color:var(--sky)">고브럽 키우기</a>에서 출석·케어로 모아보세요!</p>
         <p class="fine-print" id="gender-hint" style="display:none">💡 사주 프로필에 성별까지 저장하면 시기(대운) 분석이 훨씬 깊어져요.</p>
         <p class="fine-print" id="hour-hint" style="display:none">💡 태어난 시(時)까지 저장하면 시주 분석이 더해져 한층 깊어져요.</p>
       </div>
@@ -315,7 +315,7 @@
 
       function djb2(s) { var h = 5381; for (var i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0; return (h >>> 0).toString(36); }
       function birth() { try { var b = JSON.parse(localStorage.getItem("goblub_birth")); return (b && b.y) ? b : null; } catch (e) { return null; } }
-      function signed(t) { return /(고블럽 도사|귀곡 선생|귀곡)\s*$/.test((t || "").trim()); }
+      function signed(t) { return /(고브럽 도사|귀곡 선생|귀곡)\s*$/.test((t || "").trim()); }
       function esc(s) { return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
       function paidKey() { return "goblub_prem2_paid_" + baseKey; }
       var curBirth = null;
@@ -361,7 +361,7 @@
         if (!snap || !snap.parts || !snap.birth) { return; }
         computeFrom(snap.birth);
         userName = snap.name || ""; userFocus = snap.focus || "";
-        document.body.classList.add("story-mode");   // 명부 열람도 이계 — 배경 어둡게 + 고블럽 버디 숨김
+        document.body.classList.add("story-mode");   // 명부 열람도 이계 — 배경 어둡게 + 고브럽 버디 숨김
         $("archive").style.display = "none"; $("gate").style.display = "none";
         $("report-panel").style.display = "block";
         pages = [{ type: "cover" }]; cur = 0; genFailed = false; allDone = false;

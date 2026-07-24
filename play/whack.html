@@ -4,11 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>감정 몬스터 팡팡 — goblub</title>
-  <meta name="description" content="구멍에서 튀어나오는 감정 몬스터를 팡팡! 30초 극악 난이도 점수전 — 고블럽이 냠냠" />
+  <meta name="description" content="구멍에서 튀어나오는 감정 몬스터를 팡팡! 30초 극악 난이도 점수전 — 고브럽이 냠냠" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../css/style.css?v=nb3" />
+  <link rel="stylesheet" href="../css/style.css?v=nb4" />
   <style>
     .hud { display: flex; justify-content: space-around; align-items: center; margin: 6px 0 12px; font-size: 1.05rem; }
     .hud b { font-size: 1.4rem; color: var(--coral); }
@@ -143,12 +143,12 @@
       function fx(c, em) { c.fx.textContent = em; c.fx.classList.remove("go"); void c.fx.offsetWidth; c.fx.classList.add("go"); }
 
       function gradeOf(s) {
-        if (s >= 1300) return { e: "👑", n: "전설의 대식가 고블럽" };
-        if (s >= 950) return { e: "🔥", n: "고블럽 마스터" };
+        if (s >= 1300) return { e: "👑", n: "전설의 대식가 고브럽" };
+        if (s >= 950) return { e: "🔥", n: "고브럽 마스터" };
         if (s >= 650) return { e: "💪", n: "프로 감정 사냥꾼" };
         if (s >= 400) return { e: "😎", n: "제법인데? 견습 사냥꾼" };
-        if (s >= 200) return { e: "🌱", n: "새내기 고블럽" };
-        return { e: "🍼", n: "아직 배고픈 아기 고블럽" };
+        if (s >= 200) return { e: "🌱", n: "새내기 고브럽" };
+        return { e: "🍼", n: "아직 배고픈 아기 고브럽" };
       }
 
       function start() {

@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>오늘의 고블럽 포춘쿠키 — goblub</title>
-  <meta name="description" content="하루 한 번, 쿠키를 톡 깨서 받는 고블럽의 응원 한 줄과 오늘의 럭키" />
+  <title>오늘의 고브럽 포춘쿠키 — goblub</title>
+  <meta name="description" content="하루 한 번, 쿠키를 톡 깨서 받는 고브럽의 응원 한 줄과 오늘의 럭키" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../css/style.css?v=nb3" />
+  <link rel="stylesheet" href="../css/style.css?v=nb4" />
   <style>
     .cookie-stage { text-align: center; padding: 10px 0 4px; }
     .cookie { font-size: 6.4rem; line-height: 1.1; cursor: pointer; display: inline-block; transition: transform 0.18s; }
@@ -34,7 +34,7 @@
   <div id="site-header"></div>
   <main>
     <section class="hero">
-      <h1>🥠 오늘의 고블럽 포춘쿠키</h1>
+      <h1>🥠 오늘의 고브럽 포춘쿠키</h1>
       <p>하루 한 번, 쿠키를 톡 깨서 오늘의 한 줄을 받아가세요</p>
     </section>
 
@@ -67,7 +67,7 @@
         "오늘 당신에게 좋은 일이 슬금슬금 다가오고 있어요. 뒤돌아보지 말고 그냥 받으세요.",
         "참았던 한숨은 나한테 주고, 대신 이 말 가져가요 — 당신 생각보다 훨씬 잘하고 있어.",
         "오늘의 실수는 내일의 안주거리. 크게 웃고 넘겨버려요.",
-        "미뤄둔 그거, 딱 5분만 손대보세요. 시작이 반이고 나머지 반은 고블럽이 응원할게요.",
+        "미뤄둔 그거, 딱 5분만 손대보세요. 시작이 반이고 나머지 반은 고브럽이 응원할게요.",
         "지나가던 행운이 당신 어깨를 톡 쳤어요. 오늘은 용기 내도 되는 날.",
         "별거 아닌 하루 같아도, 당신이 버텨줘서 세상이 굴러가요. 진짜로.",
         "오늘 만나는 사람 중 한 명이 당신을 웃게 할 거예요. 안테나 세워두기!",
@@ -83,7 +83,7 @@
         "준비한 만큼 딱 그만큼 티가 나는 하루. 자신감 장착!",
         "오늘의 귀찮음을 내일의 나에게 미루지 마세요. 미래의 당신이 고마워할 거예요.",
         "좋아하는 노래 한 곡이 오늘의 부적. 이어폰 챙기기.",
-        "누군가 당신을 몰래 응원하고 있어요. (사실 그거 나 고블럽임)",
+        "누군가 당신을 몰래 응원하고 있어요. (사실 그거 나 고브럽임)",
         "안 될 것 같던 일이 슬쩍 풀리는 날. 한 번 더 시도해봐요.",
         "배고프면 판단력 떨어져요. 일단 뭐라도 드세요. 그게 오늘의 운세.",
         "당신의 다정함은 낭비가 아니에요. 언젠가 다 돌아옵니다.",
@@ -139,7 +139,7 @@
         "메모장에 아무 목표나 한 줄 적기 — 적으면 이루어질 확률 +7%",
         "거울 앞에서 어깨 펴고 3초 — 오늘의 주인공 자세 등록"
       ];
-      // 🍜 오늘의 소울푸드 처방 — 고블럽 영양사(?)의 하루 식단 지령
+      // 🍜 오늘의 소울푸드 처방 — 고브럽 영양사(?)의 하루 식단 지령
       var SOULFOODS = [
         "오늘은 국물이 답이다. 뜨끈한 것에 영혼을 데워라",
         "탄수화물을 믿어라. 빵이든 밥이든 면이든 배신하지 않는다",
@@ -208,7 +208,7 @@
         $("again").style.display = "block";
         if (!$("card-slot").childNodes.length) {
           $("card-slot").appendChild(ShareCard.render({
-            palette: "yellow", emoji: "🥠", badge: "오늘의 고블럽 포춘쿠키",
+            palette: "yellow", emoji: "🥠", badge: "오늘의 고브럽 포춘쿠키",
             title: "오늘의 한 줄", lines: [fortune, "🛡️ " + charm, "🍜 " + soul]
           }));
         }

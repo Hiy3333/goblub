@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>고블럽 작명소 — goblub</title>
-  <meta name="description" content="게임 닉네임·펫 이름·가게 이름·태명까지 — 고블럽이 센스있게 지어드려요" />
+  <title>고브럽 작명소 — goblub</title>
+  <meta name="description" content="게임 닉네임·펫 이름·가게 이름·태명까지 — 고브럽이 센스있게 지어드려요" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../css/style.css?v=nb3" />
+  <link rel="stylesheet" href="../css/style.css?v=nb4" />
   <style>
     .cat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
     .cat-tile { background: var(--cream); border: 2px solid transparent; border-radius: 14px;
@@ -25,8 +25,8 @@
   <div id="site-header"></div>
   <main>
     <section class="hero">
-      <h1>📛 고블럽 작명소</h1>
-      <p>이름 짓기 어렵죠? 고블럽이 센스있게 여러 개 뽑아드려요</p>
+      <h1>📛 고브럽 작명소</h1>
+      <p>이름 짓기 어렵죠? 고브럽이 센스있게 여러 개 뽑아드려요</p>
     </section>
 
     <section class="panel">
@@ -74,7 +74,7 @@
         var btn = $("btn-go"), out = $("name-out"), st = $("status");
         btn.disabled = true;
         st.style.display = "block";
-        st.textContent = "🐙 고블럽이 이름을 궁리하는 중…";
+        st.textContent = "🐙 고브럽이 이름을 궁리하는 중…";
         out.style.display = "block";
         out.textContent = "";
         Dosa.fetchAI("/api/naming", { naming: { category: chosen, keywords: $("kw").value.trim() } }, "goblub_name_", {
@@ -89,7 +89,7 @@
             out.style.display = "none";
             st.textContent =
               code === "not_configured" ? "작명가가 아직 수련 중이에요. 곧 찾아옵니다!" :
-              code === "cooldown" ? "고블럽이 숨 고르는 중… " + sec + "초 후에 다시 눌러주세요!" :
+              code === "cooldown" ? "고브럽이 숨 고르는 중… " + sec + "초 후에 다시 눌러주세요!" :
               "지금 손님이 많아요. 잠시 후 다시 시도해 주세요.";
             btn.disabled = false;
           }
