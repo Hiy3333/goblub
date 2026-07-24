@@ -3,152 +3,222 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>goblub — 즐길거리 놀이터</title>
-  <meta name="description" content="사주, 심리테스트, 앱까지 — 와서 놀다 가는 곳 goblub" />
+  <title>goblub — 와서 놀다 가세요</title>
+  <meta name="description" content="사주, 심리테스트, 미니게임, 마음 배달까지 — 와서 놀다 가는 곳 goblub" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Jua&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/style.css?v=glass5" />
+  <style>
+    /* ===== 홈 전면 개편: 고블럽 소굴 (네오브루탈리즘) ===== */
+    :root {
+      --nb-paper: #f2ecdd;
+      --nb-ink: #16131d;
+      --nb-yellow: #d6f23e;
+      --nb-pink: #ff5aa8;
+      --nb-cyan: #45d6e6;
+      --nb-lime: #a6e63e;
+      --nb-cream: #efe8d6;
+      --nb-purple: #b6a4e8;
+    }
+    body.home-nb {
+      background: var(--nb-paper) !important;
+      background-image:
+        radial-gradient(rgba(0,0,0,.045) 1px, transparent 1px) !important;
+      background-size: 5px 5px !important;
+      color: var(--nb-ink);
+    }
+
+    /* 헤더를 네오브루탈로 스킨 */
+    body.home-nb .site-header {
+      max-width: 1120px; background: var(--nb-paper);
+      border-bottom: 4px solid var(--nb-ink); margin-bottom: 0;
+    }
+    body.home-nb .logo { text-shadow: none; }
+    body.home-nb .logo span { text-shadow: none; -webkit-text-stroke: 1.5px var(--nb-ink); }
+    body.home-nb .site-nav a {
+      color: var(--nb-ink); font-family: "Jua", sans-serif; font-size: .95rem;
+      border: 2.5px solid var(--nb-ink); border-radius: 10px; padding: 4px 12px;
+      background: #fff; box-shadow: 3px 3px 0 var(--nb-ink); margin-left: 10px;
+      transition: transform .08s, box-shadow .08s;
+    }
+    body.home-nb .site-nav a:hover {
+      color: var(--nb-ink); background: var(--nb-yellow);
+      transform: translate(-1px,-1px); box-shadow: 4px 4px 0 var(--nb-ink);
+    }
+
+    body.home-nb main { max-width: 1120px; padding: 22px 22px 60px; }
+
+    /* ── 히어로: 좌 마스코트 / 우 워드마크 ── */
+    .nb-hero {
+      display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1.1fr);
+      align-items: center; gap: 18px; position: relative;
+      padding: 22px 6px 30px;
+    }
+    .nb-word { text-align: right; }
+    /* 홈에서는 떠다니는 버디 숨김(히어로 마스코트와 중복) */
+    body.home-nb .gbd-wrap, body.home-nb .gbd-min { display: none !important; }
+    .nb-mascot { position: relative; text-align: center; }
+    .nb-mascot img {
+      width: 100%; max-width: 380px; height: auto;
+      filter: drop-shadow(8px 8px 0 rgba(22,19,29,.18));
+      animation: nb-bob 4.5s ease-in-out infinite;
+    }
+    @keyframes nb-bob { 0%,100%{transform:translateY(0) rotate(-1deg);} 50%{transform:translateY(-12px) rotate(1deg);} }
+
+    .nb-word h1 {
+      font-family: "Black Han Sans", "Jua", sans-serif;
+      font-size: clamp(3.4rem, 11vw, 7rem); line-height: .92; color: var(--nb-ink);
+      letter-spacing: -.02em; margin: 0;
+      text-shadow: 6px 6px 0 var(--nb-yellow), 9px 9px 0 var(--nb-ink);
+    }
+    .nb-word .tag {
+      font-family: "Jua", sans-serif;
+      font-size: clamp(1.15rem, 3.6vw, 2.1rem); color: var(--nb-ink);
+      margin-top: 20px; display: inline-block;
+      background: var(--nb-cyan); border: 3px solid var(--nb-ink); border-radius: 14px;
+      padding: 7px 20px; box-shadow: 5px 5px 0 var(--nb-ink); transform: rotate(-2deg);
+    }
+    /* 낙서 별/화살표 */
+    .nb-doodle { position: absolute; font-family: "Black Han Sans", sans-serif; pointer-events: none;
+      color: var(--nb-ink); opacity: .9; }
+    .nb-d1 { top: 2px; right: 30%; font-size: 1.6rem; transform: rotate(-12deg); }
+    .nb-d2 { bottom: 30px; right: 1%; font-size: 1.4rem; transform: rotate(14deg); color: var(--nb-pink); }
+    .nb-d3 { top: 24%; left: 44%; font-size: 1.2rem; transform: rotate(8deg); color: var(--nb-cyan); }
+
+    /* ── 스티커 카드 그리드 ── */
+    .nb-grid {
+      display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-top: 8px;
+    }
+    .nb-sub { grid-template-columns: repeat(4, 1fr); margin-top: 16px; }
+
+    .nb-card {
+      display: flex; flex-direction: column; justify-content: space-between;
+      min-height: 158px; padding: 15px 15px 14px; cursor: pointer;
+      border: 3.5px solid var(--nb-ink); border-radius: 16px;
+      box-shadow: 6px 6px 0 var(--nb-ink); background: #fff; color: var(--nb-ink);
+      transition: transform .1s ease, box-shadow .1s ease;
+    }
+    .nb-card:hover { transform: translate(-2px,-3px); box-shadow: 9px 10px 0 var(--nb-ink); }
+    .nb-card:active { transform: translate(2px,2px); box-shadow: 3px 3px 0 var(--nb-ink); }
+    .nb-card .ic { font-size: 2.2rem; line-height: 1; }
+    .nb-card .ic .goblub-svg { width: 46px; height: auto; }
+    .nb-card h2 {
+      font-family: "Black Han Sans", "Jua", sans-serif; font-size: 1.32rem;
+      margin: 10px 0 3px; line-height: 1.15; letter-spacing: -.01em;
+    }
+    .nb-card p { font-family: "Jua", sans-serif; font-size: .82rem; line-height: 1.4;
+      color: rgba(22,19,29,.72); }
+    /* 살짝씩 기울여 스티커 느낌 */
+    .nb-grid .nb-card:nth-child(1){ background: var(--nb-yellow); transform: rotate(-1.4deg); }
+    .nb-grid .nb-card:nth-child(2){ background: var(--nb-pink); transform: rotate(1.2deg); }
+    .nb-grid .nb-card:nth-child(3){ background: var(--nb-cyan); transform: rotate(-1deg); }
+    .nb-grid .nb-card:nth-child(4){ background: var(--nb-cream); transform: rotate(1.5deg); }
+    .nb-grid .nb-card:nth-child(5){ background: var(--nb-lime); transform: rotate(-1.2deg); }
+    .nb-grid .nb-card:hover { transform: translate(-2px,-3px) rotate(0deg); }
+
+    .nb-sub .nb-card { min-height: 120px; box-shadow: 5px 5px 0 var(--nb-ink); background: #fff; }
+    .nb-sub .nb-card h2 { font-size: 1.1rem; }
+    .nb-sub .nb-card:nth-child(2){ background: var(--nb-purple); }
+    .nb-sub .nb-card .badge-soon {
+      align-self: flex-start; font-family: "Jua", sans-serif; font-size: .68rem;
+      background: var(--nb-ink); color: #fff; padding: 2px 8px; border-radius: 999px; margin-bottom: 6px;
+    }
+    .nb-sub .nb-card.soon { opacity: .92; }
+
+    .nb-sectlabel {
+      font-family: "Black Han Sans","Jua",sans-serif; font-size: 1.05rem; color: var(--nb-ink);
+      margin: 30px 2px 2px; display: inline-block;
+      border-bottom: 4px solid var(--nb-pink); padding-bottom: 2px;
+    }
+
+    body.home-nb .site-footer {
+      max-width: 1120px; margin: 0 auto; border-top: 4px solid var(--nb-ink);
+      background: var(--nb-paper); color: var(--nb-ink); font-family: "Jua", sans-serif;
+    }
+
+    /* 반응형 */
+    @media (max-width: 860px) {
+      .nb-hero { grid-template-columns: 1fr; text-align: center; gap: 4px; padding-top: 10px; }
+      .nb-mascot { order: -1; }
+      .nb-mascot img { max-width: 230px; }
+      .nb-word { text-align: center; }
+      .nb-word .tag { transform: rotate(-1deg); }
+      .nb-d3 { display: none; }
+      .nb-grid { grid-template-columns: repeat(2, 1fr); gap: 13px; }
+      .nb-grid .nb-card:nth-child(5){ grid-column: span 2; min-height: 120px; }
+      .nb-sub { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 340px) {
+      .nb-grid, .nb-sub { grid-template-columns: 1fr; }
+      .nb-grid .nb-card:nth-child(5){ grid-column: auto; }
+    }
+  </style>
 </head>
-<body>
+<body class="home-nb">
   <div id="site-header"></div>
 
   <main>
-    <section class="hero-band">
-      <div class="retro-sun"></div>
-      <p class="hero-sub">사주도 보고, 심리테스트도 하고, 쓸만한 앱도 받아 가는 곳</p>
+    <section class="nb-hero">
+      <span class="nb-doodle nb-d1">✦</span>
+      <span class="nb-doodle nb-d2">↘</span>
+      <span class="nb-doodle nb-d3">★</span>
+      <div class="nb-mascot">
+        <img src="design/img/home/goblub-hero.webp" alt="고블럽 마스코트" width="380" height="326" />
+      </div>
+      <div class="nb-word">
+        <h1>고블럽</h1>
+        <span class="tag">와서 놀다 가세요</span>
+      </div>
     </section>
 
-    <section class="card-grid">
-      <div class="card hub tint-purple" data-href="play/fortune-hub.html">
-        <div class="left">
-          <span class="icon">🔮</span>
-          <h2>운세</h2>
-          <p>사주 프로필 하나로 전부</p>
-        </div>
-        <div class="sub">
-          <a href="play/fortune.html">🕯 귀곡의 사주팔자</a>
-          <a href="play/today.html">📅 오늘의 사주</a>
-          <a href="play/gunghap.html">💑 궁합</a>
-          <a href="play/tarot.html">🃏 타로</a>
-          <a href="play/cookie.html">🥠 포춘쿠키</a>
-          <a href="play/pastlife.html">🌀 전생 파티</a>
-        </div>
-      </div>
-
-      <div class="card hub tint-mint" data-href="play/tests.html">
-        <div class="left">
-          <span class="icon">🧪</span>
-          <h2>대환장 테스트</h2>
-          <p>내 유형 다 털리는 테스트</p>
-        </div>
-        <div class="sub">
-          <a href="play/mbti.html">🍞 대환장 MBTI</a>
-          <a href="play/love-test.html">💘 연애세포</a>
-          <a href="play/stress-test.html">🌋 스트레스 몬스터</a>
-          <a href="play/zombie.html">🧟 좀비 생존 유형</a>
-          <a href="play/chatroom.html">💬 단톡방 캐릭터</a>
-          <a href="play/foodtype.html">🍜 음식형 인간</a>
-        </div>
-      </div>
-
-      <div class="card hub tint-yellow" data-href="play/mini.html">
-        <div class="left">
-          <span class="icon">🎲</span>
-          <h2>미니 놀이터</h2>
-          <p>심심할 때 툭!</p>
-        </div>
-        <div class="sub">
-          <a href="play/roulette.html">🎡 복불복 룰렛</a>
-          <a href="play/questions.html">🎴 질문 카드</a>
-          <a href="play/naming.html">📛 고블럽 작명소</a>
-          <a href="play/whack.html">🕳️ 몬스터 팡팡</a>
-          <a href="play/reflex.html">⚡ 반응속도</a>
-          <a href="play/lotto.html">🎱 로또 번호</a>
-        </div>
-      </div>
-
-      <a class="card tint-mint" href="play/profile-card.html">
-        <span class="icon">🎫</span>
-        <h2>나의 프로필 카드</h2>
-        <p>사주·MBTI·연애세포까지 — 흩어진 내 결과를 한 장으로</p>
+    <section class="nb-grid">
+      <a class="nb-card" href="play/fortune-hub.html">
+        <span class="ic">🔮</span>
+        <div><h2>운세</h2><p>사주·궁합·타로·전생·부적까지</p></div>
       </a>
-
-      <a class="card tint-yellow" href="play/decide.html">
-        <span class="icon">⚡</span>
-        <h2>결정의 신</h2>
-        <p>짜장 vs 짬뽕부터 인생 고민까지, 신이 대신 정해드림</p>
+      <a class="nb-card" href="play/tests.html">
+        <span class="ic">🧪</span>
+        <div><h2>대환장 테스트</h2><p>내 유형 다 털리는 심리테스트</p></div>
       </a>
-
-      <a class="card tint-sky" href="play/balance.html">
-        <span class="icon">⚖️</span>
-        <h2>대환장 밸런스 게임</h2>
-        <p>극한의 양자택일 12연속 — 전국 통계와 비교!</p>
+      <a class="nb-card" href="play/mini.html">
+        <span class="ic">🎲</span>
+        <div><h2>미니 놀이터</h2><p>심심할 때 툭! 룰렛·작명·로또</p></div>
       </a>
-
-      <a class="card tint-coral" href="play/letter.html">
-        <span class="icon">💌</span>
-        <h2>마음 배달</h2>
-        <p>데이트 신청·사과·술 한잔을 링크로, 답장까지 받기</p>
+      <a class="nb-card" href="play/letter.html">
+        <span class="ic">💌</span>
+        <div><h2>마음 배달</h2><p>고백·사과·한잔을 링크로</p></div>
       </a>
-
-      <a class="card tint-coral" href="play/goblub.html">
-        <span class="icon" data-goblub="52"></span>
-        <h2>고블럽 키우기</h2>
-        <p>즐길수록 자라는 나의 고블럽 — 먹이 주고 진화까지</p>
+      <a class="nb-card" href="play/goblub.html">
+        <span class="ic" data-goblub="46"></span>
+        <div><h2>고블럽 키우기</h2><p>놀수록 자라는 나의 고블럽</p></div>
       </a>
+    </section>
 
-      <a class="card tint-sky soon" href="apps.html">
+    <span class="nb-sectlabel">이런 것도 있어요</span>
+    <section class="nb-grid nb-sub">
+      <a class="nb-card" href="play/profile-card.html">
+        <span class="ic">🎫</span>
+        <div><h2>프로필 카드</h2><p>흩어진 내 결과를 한 장으로</p></div>
+      </a>
+      <a class="nb-card" href="play/decide.html">
+        <span class="ic">⚡</span>
+        <div><h2>결정의 신</h2><p>짜장 vs 짬뽕, 신이 정해줌</p></div>
+      </a>
+      <a class="nb-card" href="play/balance.html">
+        <span class="ic">⚖️</span>
+        <div><h2>밸런스 게임</h2><p>극한의 양자택일 12연속</p></div>
+      </a>
+      <a class="nb-card soon" href="apps.html">
         <span class="badge-soon">오픈 준비 중</span>
-        <span class="icon">📱</span>
-        <h2>앱 다운로드</h2>
-        <p>직접 만든 모바일 앱들을 소개하고 다운로드 링크를 모아둔 곳</p>
+        <span class="ic">📱</span>
+        <div><h2>앱 다운로드</h2><p>직접 만든 앱들을 모아둔 곳</p></div>
       </a>
     </section>
   </main>
 
-  <svg class="city-skyline" viewBox="0 0 1440 130" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <rect x="0" y="70" width="90" height="60" fill="#0a0620"/><rect x="60" y="40" width="70" height="90" fill="#120a33"/>
-    <rect x="150" y="60" width="80" height="70" fill="#0a0620"/><rect x="240" y="25" width="60" height="105" fill="#120a33"/>
-    <rect x="320" y="55" width="100" height="75" fill="#0a0620"/><rect x="440" y="35" width="70" height="95" fill="#120a33"/>
-    <rect x="530" y="65" width="90" height="65" fill="#0a0620"/><rect x="640" y="20" width="65" height="110" fill="#120a33"/>
-    <rect x="720" y="50" width="85" height="80" fill="#0a0620"/><rect x="830" y="30" width="75" height="100" fill="#120a33"/>
-    <rect x="930" y="60" width="90" height="70" fill="#0a0620"/><rect x="1040" y="22" width="60" height="108" fill="#120a33"/>
-    <rect x="1120" y="52" width="95" height="78" fill="#0a0620"/><rect x="1240" y="38" width="70" height="92" fill="#120a33"/>
-    <rect x="1330" y="62" width="110" height="68" fill="#0a0620"/>
-    <g fill="#ffd93d" opacity="0.7">
-      <rect x="75" y="55" width="6" height="6"/><rect x="255" y="45" width="6" height="6"/><rect x="455" y="55" width="6" height="6"/>
-      <rect x="655" y="40" width="6" height="6"/><rect x="845" y="50" width="6" height="6"/><rect x="1055" y="42" width="6" height="6"/>
-      <rect x="1255" y="58" width="6" height="6"/><rect x="90" y="80" width="6" height="6"/><rect x="470" y="85" width="6" height="6"/>
-      <rect x="860" y="82" width="6" height="6"/><rect x="1270" y="86" width="6" height="6"/>
-    </g>
-    <g fill="#ff6ec7" opacity="0.65">
-      <rect x="270" y="70" width="6" height="6"/><rect x="670" y="70" width="6" height="6"/><rect x="1070" y="72" width="6" height="6"/>
-    </g>
-  </svg>
-
   <div id="site-footer"></div>
   <script src="play/js/goblub-art.js"></script>
   <script src="js/common.js?v=5" data-root="."></script>
-  <script>
-    // 허브 카드: 몸통 클릭은 허브로, 리스트(a) 클릭은 해당 콘텐츠로
-    document.querySelectorAll(".card[data-href]").forEach(function (c) {
-      c.addEventListener("click", function (e) {
-        if (e.target.closest("a")) return;
-        location.href = c.getAttribute("data-href");
-      });
-    });
-    // 헤더 goblub 로고 줄에 히어로 문구 삽입(common.js가 헤더 주입 후 실행)
-    document.addEventListener("DOMContentLoaded", function () {
-      var header = document.querySelector(".site-header");
-      var nav = header && header.querySelector(".site-nav");
-      if (header && nav) {
-        var span = document.createElement("span");
-        span.className = "hero-inline";
-        span.textContent = "와서 놀다 가세요!";
-        header.insertBefore(span, nav);
-      }
-    });
-  </script>
 </body>
 </html>
