@@ -22,6 +22,7 @@ body{background:
   color:var(--ink);font-family:'Gowun Batang','Nanum Myeongjo',serif;
   min-height:100dvh;display:flex;flex-direction:column;align-items:center;
   justify-content:center;padding:14px 14px 20px}
+body.top{justify-content:flex-start}
 .app{width:min(94vw,400px);display:flex;flex-direction:column;align-items:center}
 .topbar{width:100%;display:flex;align-items:center;gap:8px;margin-bottom:12px}
 .topbar a{color:var(--ink-soft);font-size:.88rem;text-decoration:none;font-family:'Gowun Batang',serif}
@@ -89,15 +90,10 @@ video::-webkit-media-controls-overlay-play-button{display:none!important;-webkit
 
 /* ── 결과 ── */
 #scResult{background:linear-gradient(180deg,#14102a,#0a0714);padding:20px 18px 22px;min-height:60vh}
-#scResult .rcard{width:118px;height:186px;margin:2px auto 14px;border-radius:12px;position:relative;
-  background:linear-gradient(165deg,#241a4e,#120d2c);border:2px solid var(--gold);
-  box-shadow:0 0 42px rgba(233,200,119,.34),inset 0 0 22px rgba(90,70,170,.5);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;animation:flip .7s}
+#scResult .rcard{width:138px;height:207px;margin:2px auto 14px;border-radius:11px;display:block;
+  object-fit:cover;box-shadow:0 0 46px rgba(233,200,119,.4),0 14px 34px rgba(0,0,0,.55);
+  animation:flip .7s;background:#120d2c}
 @keyframes flip{from{transform:rotateY(90deg);opacity:.2}to{transform:rotateY(0);opacity:1}}
-#scResult .rcard::after{content:"";position:absolute;inset:6px;border-radius:8px;border:1px solid rgba(233,200,119,.4)}
-#scResult .rcard .em{font-size:2.7rem;line-height:1;filter:drop-shadow(0 2px 8px rgba(0,0,0,.5))}
-#scResult .rcard .rn{font-family:'Cormorant Garamond',serif;color:var(--gold);font-size:.82rem;
-  letter-spacing:.08em;margin-top:8px}
 #scResult .rname{font-family:'Nanum Myeongjo',serif;color:var(--ink);font-size:1.22rem;text-align:center}
 #scResult .rorient{display:block;color:var(--violet);font-size:.82rem;margin-top:3px;text-align:center;letter-spacing:.04em}
 #scResult .rkw{color:var(--gold-soft);font-size:.82rem;text-align:center;margin:4px 0 14px;letter-spacing:.03em}
@@ -154,7 +150,7 @@ video::-webkit-media-controls-overlay-play-button{display:none!important;-webkit
   <!-- ④ 결과 -->
   <div class="screen" id="scResult">
     <div class="worry-echo" id="worryEcho"></div>
-    <div class="rcard" id="rcard"><span class="em" id="rem">🌙</span><span class="rn" id="rn"></span></div>
+    <img class="rcard" id="rimg" alt="" />
     <div class="rname" id="rname"></div>
     <span class="rorient" id="rorient"></span>
     <div class="rkw" id="rkw"></div>
@@ -169,7 +165,7 @@ video::-webkit-media-controls-overlay-play-button{display:none!important;-webkit
 <script src="js/dosa.js?v=ct2"></script>
 <script>
 var SPREAD="img/cat/cat2-spread.mp4", CAT_IDLE="img/cat/cat2-start.webp",
-    BACK="img/cat/cat2-back.webp", LOCK_KEY="goblub_cattarot_v2";
+    BACK="img/cat/cat2-back.webp?v=2", LOCK_KEY="goblub_cattarot_v2";
 
 // 메이저 아르카나 22 [로마숫자, 이름, 키워드, 이모지]
 var MAJOR=[
@@ -211,7 +207,8 @@ function seedFromStr(s){ var h=2166136261; for(var i=0;i<s.length;i++){h^=s.char
 function rng(seed){ return function(){ seed|=0; seed=seed+0x6D2B79F5|0; var t=Math.imul(seed^seed>>>15,1|seed);
   t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
 
-function show(sc){ [scIntro,scSpread,scPick,scResult].forEach(function(s){s.classList.remove("on");}); sc.classList.add("on"); }
+function show(sc){ [scIntro,scSpread,scPick,scResult].forEach(function(s){s.classList.remove("on");}); sc.classList.add("on");
+  document.body.classList.toggle("top", sc===scResult); if(sc===scResult) window.scrollTo(0,0); }
 
 // 이미 오늘 뽑았으면 결과로 직행
 (function initLock(){
@@ -288,9 +285,9 @@ function pick(pickIdx){
 function revealResult(cardIdx, orient, fromLock){
   phase="result"; show(scResult);
   var c=MAJOR[cardIdx];
-  $("rem").textContent=c[3];
-  $("rn").textContent=c[0];
-  $("rname").textContent=c[1];
+  var pad=(cardIdx<10?"0":"")+cardIdx;
+  $("rimg").src="img/cat/arcana/"+pad+".webp?v=2";
+  $("rname").textContent=c[0]+" · "+c[1];
   $("rorient").textContent="— "+orient+" —";
   $("rkw").textContent=c[2];
   $("worryEcho").textContent=myWorry ? "“"+myWorry+"”" : "오늘 하루의 운을 물었다옹";
