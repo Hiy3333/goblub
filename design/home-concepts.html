@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>고블럽 홈 전면 개편 시안 5종</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Jua&family=Nanum+Myeongjo:wght@400;700;800&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0c0a10; color: #ddd4e6; font-family: 'Jua', system-ui, sans-serif;
+      padding: 28px 16px 60px; }
+    .top { max-width: 1240px; margin: 0 auto 26px; text-align: center; }
+    .top h1 { font-family: 'Nanum Myeongjo', serif; font-weight: 800; font-size: 1.7rem;
+      color: #ffd9a0; letter-spacing: -.02em; }
+    .top p { color: #9a8ba8; font-size: .95rem; margin-top: 8px; line-height: 1.7; }
+
+    .grid { max-width: 1240px; margin: 0 auto; display: grid; gap: 22px;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); align-items: start; }
+
+    .item { background: #16121e; border: 1px solid #2e2438; border-radius: 16px;
+      overflow: hidden; display: flex; flex-direction: column; }
+    .item .shot { display: block; width: 100%; aspect-ratio: 768/1376; object-fit: cover;
+      background: #000; cursor: zoom-in; }
+    .meta { padding: 14px 15px 17px; }
+    .tag { display: inline-block; font-size: .72rem; letter-spacing: .1em; padding: 3px 9px;
+      border-radius: 999px; margin-bottom: 8px; }
+    .meta h2 { font-family: 'Nanum Myeongjo', serif; font-weight: 800; font-size: 1.12rem;
+      color: #f0e6d2; margin-bottom: 3px; }
+    .meta .en { color: #6f6382; font-size: .75rem; letter-spacing: .06em; margin-bottom: 9px; }
+    .meta ul { list-style: none; }
+    .meta li { color: #a99cbb; font-size: .84rem; line-height: 1.65; padding-left: 12px;
+      position: relative; }
+    .meta li::before { content: "·"; position: absolute; left: 2px; color: #6f6382; }
+    .meta li b { color: #e0d4ef; font-weight: normal; }
+    .verdict { margin-top: 10px; padding-top: 10px; border-top: 1px dashed #322842;
+      font-size: .82rem; line-height: 1.6; color: #8fd6a8; }
+    .verdict.warn { color: #e8a878; }
+
+    .a1 { background: rgba(200,110,40,.16); color: #ffb877; border: 1px solid rgba(200,110,40,.4); }
+    .a2 { background: rgba(160,220,60,.14); color: #cdf05f; border: 1px solid rgba(160,220,60,.35); }
+    .a3 { background: rgba(220,220,220,.1); color: #ddd4c8; border: 1px solid rgba(220,220,220,.28); }
+    .a4 { background: rgba(60,220,200,.13); color: #6fe8d4; border: 1px solid rgba(60,220,200,.35); }
+    .a5 { background: rgba(230,60,50,.16); color: #ff9080; border: 1px solid rgba(230,60,50,.4); }
+
+    /* 확대 보기 */
+    #lb { position: fixed; inset: 0; background: rgba(4,3,8,.94); display: none;
+      align-items: center; justify-content: center; z-index: 99; cursor: zoom-out; padding: 20px; }
+    #lb.on { display: flex; }
+    #lb img { max-width: 100%; max-height: 100%; border-radius: 10px;
+      box-shadow: 0 30px 90px rgba(0,0,0,.8); }
+  </style>
+</head>
+<body>
+  <div class="top">
+    <h1>고블럽 홈 — 전면 개편 시안 5종</h1>
+    <p>기존 홈(동그란 레트로 태양 + 유리 카드 그리드)을 전제 없이 뒤엎은 다섯 방향입니다.<br />
+      레이아웃·타이포·컬러·내비게이션이 서로 겹치지 않게 잡았습니다. 눌러서 크게 볼 수 있습니다.</p>
+  </div>
+
+  <div class="grid">
+    <div class="item">
+      <img class="shot" src="img/home/h1-pojangmacha.webp" alt="시안 1 심야 포장마차" />
+      <div class="meta">
+        <span class="tag a1">A · 시네마틱</span>
+        <h2>심야 포장마차</h2>
+        <p class="en">CINEMATIC IMMERSION</p>
+        <ul>
+          <li><b>레이아웃</b> — 상단 60% 실사 풀블리드, 하단은 매달린 나무 메뉴판</li>
+          <li><b>타이포</b> — 세로 명조 워드마크, 본문은 한글+한자 병기</li>
+          <li><b>컬러</b> — 먹색 · 등불 주황 · 뼛빛</li>
+          <li><b>내비</b> — 카드 없음. 메뉴판 6줄이 전부</li>
+        </ul>
+        <p class="verdict">귀곡 세계관을 홈부터 밀어붙이는 안. 첫인상이 가장 강하고 프리미엄 라인과 톤이 완전히 붙습니다.</p>
+      </div>
+    </div>
+
+    <div class="item">
+      <img class="shot" src="img/home/h2-sogul.webp" alt="시안 2 고블럽 소굴" />
+      <div class="meta">
+        <span class="tag a2">B · 캐릭터</span>
+        <h2>고블럽 소굴</h2>
+        <p class="en">NEO-BRUTALIST</p>
+        <ul>
+          <li><b>레이아웃</b> — 마스코트가 상단 45%를 먹고, 스티커가 흩뿌려진 구성</li>
+          <li><b>타이포</b> — 두껍고 둥근 디스플레이, 크기 대비 극단적</li>
+          <li><b>컬러</b> — 애시드 옐로 · 핫핑크 · 시안 (검정 5px 테두리)</li>
+          <li><b>내비</b> — 기울어진 스티커 태그</li>
+        </ul>
+        <p class="verdict">캐릭터 IP를 키울 거면 이 방향. 공유·스크린샷 반응이 제일 좋을 타입입니다.</p>
+      </div>
+    </div>
+
+    <div class="item">
+      <img class="shot" src="img/home/h3-meok.webp" alt="시안 3 먹과 종이" />
+      <div class="meta">
+        <span class="tag a3">C · 미니멀</span>
+        <h2>먹과 종이</h2>
+        <p class="en">INK EDITORIAL</p>
+        <ul>
+          <li><b>레이아웃</b> — 여백이 주인공. 붓질 하나 + 워드마크 + 번호 목록</li>
+          <li><b>타이포</b> — 초대형 명조, 자간 넓게</li>
+          <li><b>컬러</b> — 한지 크림 · 먹 검정 · 주홍 딱 하나</li>
+          <li><b>내비</b> — 01~06 장부식 행, 아이콘 0개</li>
+        </ul>
+        <p class="verdict">가장 조용하고 가장 비싸 보입니다. 유일하게 밝은 배경이라 기존 사이트와 충돌 없이 얹기도 쉽습니다.</p>
+      </div>
+    </div>
+
+    <div class="item">
+      <img class="shot" src="img/home/h4-japangi.webp" alt="시안 4 심야 자판기" />
+      <div class="meta">
+        <span class="tag a4">D · 오브젝트</span>
+        <h2>심야 자판기</h2>
+        <p class="en">VENDING MACHINE</p>
+        <ul>
+          <li><b>레이아웃</b> — 화면 전체가 자판기 한 대. 콘텐츠는 진열된 상품</li>
+          <li><b>타이포</b> — 레트로 네온 간판체 + 상품 라벨</li>
+          <li><b>컬러</b> — 청록 형광 · 마젠타 · 심야 네이비</li>
+          <li><b>내비</b> — A1·B2 같은 번호 + 키패드</li>
+        </ul>
+        <p class="verdict warn">가장 독특하고 젬리(재화) 구조와 은유가 딱 맞습니다. 다만 구현 난이도와 유지비가 5개 중 제일 높습니다.</p>
+      </div>
+    </div>
+
+    <div class="item">
+      <img class="shot" src="img/home/h5-bujeok.webp" alt="시안 5 부적" />
+      <div class="meta">
+        <span class="tag a5">E · 그래픽</span>
+        <h2>부적</h2>
+        <p class="en">OCCULT POSTER</p>
+        <ul>
+          <li><b>레이아웃</b> — 괴황지 한 장이 곧 화면. 부적 띠지가 쌓인 형태</li>
+          <li><b>타이포</b> — 초헤비 장체 + 붓 한자를 배경 텍스처로</li>
+          <li><b>컬러</b> — 괴황 · 주사 빨강 · 먹 검정</li>
+          <li><b>내비</b> — 띠지 6줄, 하나만 반전시켜 강조</li>
+        </ul>
+        <p class="verdict">이미 만들어 둔 부적 기능과 시각 언어가 그대로 이어집니다. 사진 한 장 없이 강해서 로딩도 제일 가볍습니다.</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="lb"><img id="lbi" alt="" /></div>
+  <script>
+    var lb = document.getElementById("lb"), lbi = document.getElementById("lbi");
+    document.querySelectorAll(".shot").forEach(function (im) {
+      im.addEventListener("click", function () { lbi.src = im.src; lb.classList.add("on"); });
+    });
+    lb.addEventListener("click", function () { lb.classList.remove("on"); lbi.src = ""; });
+  </script>
+</body>
+</html>
