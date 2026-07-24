@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>귀곡 → 무당 컨셉 시안 (진행 전 검토용)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Jua&family=Nanum+Myeongjo:wght@700;800&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0c0a10; color: #ddd4e6; font-family: 'Jua', sans-serif; padding: 30px 16px 70px; }
+    .top { max-width: 1080px; margin: 0 auto 24px; text-align: center; }
+    .top h1 { font-family: 'Nanum Myeongjo', serif; font-weight: 800; font-size: 1.5rem; color: #ffd9a0; }
+    .top p { color: #9a8ba8; font-size: .94rem; margin-top: 8px; line-height: 1.7; }
+    .grid { max-width: 1080px; margin: 0 auto; display: grid; gap: 16px;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
+    figure { background: #16121e; border: 1px solid #2e2438; border-radius: 14px; overflow: hidden; }
+    figure img { display: block; width: 100%; aspect-ratio: 9/16; object-fit: cover; cursor: zoom-in; background:#000; }
+    figcaption { padding: 10px 13px 13px; font-size: .85rem; color: #b7aba0; line-height: 1.55; }
+    figcaption b { color: #ffd9a8; font-family: 'Nanum Myeongjo', serif; }
+    .ref { max-width: 1080px; margin: 0 auto 18px; display: flex; align-items: center; gap: 14px;
+      background: #1e1826; border: 1px solid #322842; border-radius: 12px; padding: 12px 14px; }
+    .ref img { width: 64px; height: 88px; object-fit: cover; border-radius: 8px; }
+    .ref span { color: #b7aba0; font-size: .87rem; line-height: 1.5; }
+    #lb { position: fixed; inset: 0; background: rgba(4,3,8,.95); display: none; align-items: center;
+      justify-content: center; z-index: 99; cursor: zoom-out; padding: 16px; }
+    #lb.on { display: flex; } #lb img { max-width: 100%; max-height: 100%; border-radius: 10px; }
+  </style>
+</head>
+<body>
+  <div class="top">
+    <h1>귀곡 → 무당(박수) 컨셉 시안</h1>
+    <p>얼굴은 지금 귀곡 그대로, 분장·소품·무대만 무당으로. 눌러서 크게 보세요. (아직 미적용 — 검토용)</p>
+  </div>
+  <div class="ref">
+    <img src="../play/img/tale/gwigok.webp" alt="현재 귀곡" />
+    <span><b>기준:</b> 현재 귀곡(갓+검은 도포). 이 얼굴을 레퍼런스로 고정하고 복장만 바꿨습니다.</span>
+  </div>
+  <div class="grid">
+    <figure><img src="img/gwigok-mudang-1.webp" alt="신당 홍무복"><figcaption><b>1 · 신당의 박수</b> 홍무복+색동소매+전립, 무령(방울)과 부채, 뒤로 신단·오방기. 지금 히어로를 그대로 대체할 수 있는 정면 컷.</figcaption></figure>
+    <figure><img src="img/gwigok-mudang-2.webp" alt="굿판 트랜스"><figcaption><b>2 · 굿판의 트랜스</b> 흰 무복+고깔, 방울과 산신 부채를 들고 도는 굿 장면. 인트로 영상·분석 화면용 모션 소스로 딱.</figcaption></figure>
+    <figure><img src="img/gwigok-mudang-3.webp" alt="쌀점 동전점"><figcaption><b>3 · 쌀 위의 동전점</b> 염주+붉은 머리끈, 쌀그릇에 던진 엽전을 짚는 클로즈업. 점사(리포트) 장면·카테고리 이미지용.</figcaption></figure>
+  </div>
+  <div id="lb"><img id="lbi" alt=""></div>
+  <script>
+    var lb=document.getElementById("lb"),lbi=document.getElementById("lbi");
+    document.querySelectorAll(".grid img").forEach(function(im){
+      im.addEventListener("click",function(){lbi.src=im.src;lb.classList.add("on");});
+    });
+    lb.addEventListener("click",function(){lb.classList.remove("on");lbi.src="";});
+  </script>
+</body>
+</html>
