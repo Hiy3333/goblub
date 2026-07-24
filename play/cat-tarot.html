@@ -67,26 +67,22 @@ video::-webkit-media-controls-overlay-play-button{display:none!important;-webkit
 #scSpread .cap{position:absolute;left:0;right:0;bottom:14px;text-align:center;z-index:3;
   font-family:'Nanum Myeongjo',serif;color:#fff3e2;font-size:.98rem;text-shadow:0 2px 14px rgba(0,0,0,.9)}
 
-/* ── 클로즈업 카드 선택 ── */
-#scPick{aspect-ratio:1/1.14;background:
-  radial-gradient(440px 320px at 50% 22%, rgba(120,80,190,.28), transparent 66%),
-  radial-gradient(460px 340px at 50% 122%, rgba(70,30,110,.5), transparent 60%),
-  linear-gradient(180deg,#181031,#0b0716)}
-#scPick .cusay{position:absolute;left:0;right:0;top:15px;text-align:center;z-index:7;
-  font-family:'Nanum Myeongjo',serif;font-size:1.04rem;color:var(--gold);
-  text-shadow:0 2px 14px rgba(0,0,0,.9)}
-#scPick .paws{position:absolute;left:0;right:0;bottom:-5%;width:100%;z-index:4;pointer-events:none;
-  filter:drop-shadow(0 -4px 16px rgba(0,0,0,.4));animation:pawbob 3.6s ease-in-out infinite}
-@keyframes pawbob{0%,100%{transform:translateY(0) rotate(0deg)}
-  30%{transform:translateY(-9px) rotate(-1deg)}70%{transform:translateY(-4px) rotate(1deg)}}
+/* ── 클로즈업 카드 선택 (테이블 장면) ── */
+#scPick{aspect-ratio:1/1;background:#0b0716}
+#scPick .tbg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;display:block}
+#scPick .tveil{position:absolute;left:0;right:0;bottom:0;height:46%;z-index:2;pointer-events:none;
+  background:linear-gradient(180deg,transparent,rgba(8,5,14,.35) 60%,rgba(8,5,14,.62))}
+#scPick .cusay{position:absolute;left:0;right:0;top:13px;text-align:center;z-index:7;
+  font-family:'Nanum Myeongjo',serif;font-size:1.02rem;color:var(--gold);
+  text-shadow:0 2px 14px rgba(0,0,0,.95)}
 .fan{position:absolute;left:50%;top:0;width:0;height:0;z-index:5}
-.fan b{position:absolute;left:0;top:0;width:58px;height:92px;margin-left:-29px;border-radius:8px;
-  cursor:pointer;transform-origin:50% 190%;transition:transform .18s ease, box-shadow .18s ease, filter .18s;
+.fan b{position:absolute;left:0;top:0;width:52px;height:83px;margin-left:-26px;border-radius:7px;
+  cursor:pointer;transform-origin:50% 210%;transition:transform .18s ease, box-shadow .18s ease, filter .18s;
   background-image:var(--back);background-size:cover;background-position:center;
-  border:1.5px solid rgba(233,200,119,.55);
-  box-shadow:0 6px 14px rgba(0,0,0,.5);filter:brightness(.86)}
-.fan b:hover{box-shadow:0 0 22px rgba(233,200,119,.9),0 10px 22px rgba(0,0,0,.55);
-  border-color:var(--gold);filter:brightness(1.12);z-index:9}
+  border:1.5px solid rgba(233,200,119,.6);
+  box-shadow:0 7px 15px rgba(0,0,0,.6);filter:brightness(.9)}
+.fan b:hover{box-shadow:0 0 22px rgba(233,200,119,.95),0 10px 22px rgba(0,0,0,.55);
+  border-color:var(--gold);filter:brightness(1.14);z-index:9}
 
 /* ── 결과 ── */
 #scResult{background:linear-gradient(180deg,#14102a,#0a0714);padding:20px 18px 22px;min-height:60vh}
@@ -140,11 +136,13 @@ video::-webkit-media-controls-overlay-play-button{display:none!important;-webkit
     <p class="cap" id="cap">고양이가 카드를 펼치는 중…</p>
   </div>
 
-  <!-- ③ 클로즈업 카드 선택 -->
+  <!-- ③ 클로즈업 카드 선택 (테이블 장면) -->
   <div class="screen" id="scPick">
+    <video class="tbg" id="tvid" muted loop autoplay playsinline webkit-playsinline preload="auto"
+           poster="img/cat/cat2-table.webp"></video>
+    <div class="tveil"></div>
     <p class="cusay">…끌리는 카드를 하나 골라보라옹</p>
     <div class="fan" id="fan"></div>
-    <img class="paws" src="img/cat/cat2-paws.webp" alt="" />
   </div>
 
   <!-- ④ 결과 -->
@@ -165,6 +163,7 @@ video::-webkit-media-controls-overlay-play-button{display:none!important;-webkit
 <script src="js/dosa.js?v=ct2"></script>
 <script>
 var SPREAD="img/cat/cat2-spread.mp4", CAT_IDLE="img/cat/cat2-start.webp",
+    TABLE="img/cat/cat2-tablecat.mp4",
     BACK="img/cat/cat2-back.webp?v=2", LOCK_KEY="goblub_cattarot_v2";
 
 // 메이저 아르카나 22 [로마숫자, 이름, 키워드, 이모지]
@@ -238,14 +237,18 @@ function toPick(){
   phase="pick";
   try{ vid.pause(); vid.removeAttribute("src"); vid.load(); }catch(e){}
   buildFan(); show(scPick);
-  hintbar.textContent="펼쳐진 카드 중 끌리는 한 장을 톡 눌러보라옹.";
+  // 테이블 위 고양이 idle 영상 재생(무한 루프)
+  var tvid=$("tvid");
+  if(tvid && !tvid.src){ tvid.src=TABLE; }
+  if(tvid){ var pp=tvid.play(); if(pp&&pp.catch) pp.catch(function(){}); }
+  hintbar.textContent="테이블 위 카드 중 끌리는 한 장을 톡 눌러보라옹.";
 }
 
-// 14장(두 줄 아크)
+// 14장(두 줄 아크) — 테이블 앞쪽에 펼쳐 놓기
 function buildFan(){
   fan.innerHTML="";
-  var rows=[{n:7, y:150, spreadX:150, curve:26, ang:34, z:2},
-            {n:7, y:236, spreadX:172, curve:22, ang:30, z:1}];
+  var rows=[{n:7, y:196, spreadX:150, curve:18, ang:28, z:2},
+            {n:7, y:256, spreadX:172, curve:16, ang:25, z:1}];
   rows.forEach(function(row,ri){
     for(var i=0;i<row.n;i++){
       var t=(i/(row.n-1))-0.5;
