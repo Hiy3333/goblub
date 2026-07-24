@@ -14,7 +14,7 @@
 
   var SOURCES = {
     saju: { label: "🔮 사주 보기", url: "saju.html" },
-    fortune: { label: "🌞 오늘의 운세", url: "fortune.html" },
+    fortune: { label: "🌞 오늘의 운세", url: "today.html" },
     today: { label: "📅 오늘의 사주", url: "today.html" },
     gunghap: { label: "💑 우리 궁합", url: "gunghap.html" },
     mbti: { label: "🍞 대환장 MBTI", url: "mbti.html" },

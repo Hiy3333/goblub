@@ -3,199 +3,181 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>사주팔자 — goblub</title>
-  <meta name="description" content="내 사주 하나로 전부 — 오늘의 운세·연애운·재물운·궁합·타로·전생까지" />
+  <title>귀곡의 사주팔자 — 冥簿館</title>
+  <meta name="description" content="저승엔 산 자마다 한 권의 기록부가 있다 — 귀곡(鬼哭)이 읽는 명부·부적·명부 대조" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../css/style.css?v=glass5" />
+  <link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&family=Gowun+Batang:wght@400;700&family=Jua&display=swap" rel="stylesheet" />
   <style>
-    .profile-badge { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
-    .profile-badge .who { font-size: 1.15rem; }
-    .profile-badge .sub { color: var(--ink-soft); font-size: 0.9rem; }
-    .premium-panel { border: 2px solid var(--yellow); text-align: center;
-      box-shadow: 0 0 22px rgba(255,217,61,.22), inset 0 0 22px rgba(255,217,61,.05); }
-    .prem-badge { display: inline-block; background: linear-gradient(90deg, var(--yellow), var(--orange));
-      color: #2a2005; font-size: 0.76rem; font-weight: bold; padding: 4px 12px; border-radius: 999px;
-      box-shadow: 0 0 12px rgba(255,217,61,.5); }
-    .prem-btn { background: linear-gradient(90deg, var(--yellow), var(--orange)); color: #2a1a05;
-      box-shadow: 0 0 16px rgba(255,217,61,.5); }
-    .prem-btn:hover { filter: brightness(1.08); box-shadow: 0 0 24px rgba(255,217,61,.7); }
-    .luck-cta { margin-top: 12px; }
-    .luck-cta a { display: inline-block; background: var(--cream); border: 1.5px solid var(--sky);
-      border-radius: 999px; padding: 9px 18px; font-size: 0.95rem; color: var(--ink);
-      box-shadow: 0 0 10px color-mix(in srgb, var(--sky) 30%, transparent); }
-    .luck-cta a:hover { box-shadow: 0 0 18px var(--sky); }
-    .luck-cta a.hot { border-color: var(--coral); box-shadow: 0 0 10px color-mix(in srgb, var(--coral) 35%, transparent); }
-    .luck-cta a.hot:hover { box-shadow: 0 0 18px var(--coral); }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:#0a0709;color:#d9cdbb;font-family:'Gowun Batang',serif;overflow-x:hidden}
+    a{color:inherit;text-decoration:none}
+    /* 오른쪽 세로 한자 네비 */
+    .vnav{position:fixed;right:0;top:0;bottom:0;width:58px;background:linear-gradient(180deg,#140b0d,#0a0709);
+      border-left:1px solid rgba(160,60,50,.3);display:flex;flex-direction:column;align-items:center;
+      justify-content:center;gap:26px;z-index:30}
+    .vnav a{font-family:'Nanum Myeongjo',serif;font-size:1rem;letter-spacing:.3em;writing-mode:vertical-rl;
+      color:#8a7565;padding:8px 0;transition:color .2s}
+    .vnav a:hover,.vnav a.on{color:#ff6a3a;text-shadow:0 0 16px rgba(255,80,40,.6)}
+    .vnav .back{position:absolute;top:16px;font-size:1.3rem;letter-spacing:0;writing-mode:horizontal-tb;color:#7d685c}
+    .vnav .back:hover{color:#ff6a3a}
+    main{margin-right:58px}
+    /* 히어로 */
+    .hero{position:relative;height:94vh;min-height:560px;display:flex;align-items:flex-end;overflow:hidden}
+    .hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 22%;
+      filter:grayscale(.25) contrast(1.12) brightness(.62)}
+    .hero::after{content:"";position:absolute;inset:0;
+      background:radial-gradient(ellipse 70% 50% at 50% 30%,transparent,rgba(10,7,9,.92) 78%),
+      linear-gradient(180deg,rgba(10,7,9,.85),transparent 30%,rgba(10,7,9,.98))}
+    .hero .in{position:relative;z-index:2;padding:0 8vw 8vh;width:100%}
+    .hero .kicker{font-family:'Nanum Myeongjo',serif;color:#a8563c;letter-spacing:.5em;font-size:.76rem;margin-bottom:16px}
+    .hero h1{font-family:'Nanum Myeongjo',serif;font-weight:800;font-size:clamp(2.2rem,7vw,4.4rem);
+      color:#f0e4d2;line-height:1.26;text-shadow:0 4px 40px rgba(0,0,0,.9)}
+    .hero h1 em{font-style:normal;color:#ff5a2a;text-shadow:0 0 34px rgba(255,70,30,.55)}
+    .hero p{margin-top:18px;color:#a89887;font-size:1rem;line-height:1.9;max-width:32em}
+    .enter{display:inline-flex;align-items:center;gap:12px;margin-top:28px;padding:16px 32px;
+      border:1px solid rgba(220,90,50,.55);background:rgba(150,40,20,.16);color:#ffc4a8;
+      font-family:'Nanum Myeongjo',serif;font-size:1.04rem;letter-spacing:.14em;transition:.22s}
+    .enter:hover{background:rgba(190,55,25,.36);border-color:#ff6a3a;box-shadow:0 0 34px rgba(220,70,40,.4)}
+    /* 오늘 한 마디 띠 */
+    .today{border-top:1px solid rgba(150,70,55,.2);border-bottom:1px solid rgba(150,70,55,.2);
+      padding:22px 8vw;background:rgba(20,11,13,.6);display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+    .today .lb{font-family:'Nanum Myeongjo',serif;color:#a8563c;letter-spacing:.3em;font-size:.74rem;flex:none}
+    .today .tx{font-family:'Nanum Myeongjo',serif;color:#e0d2bd;font-size:1rem;line-height:1.8;flex:1;min-width:14em}
+    .today .gj{font-family:'Nanum Myeongjo',serif;color:#ff8a5a;font-size:.86rem;
+      border:1px solid rgba(200,80,50,.4);padding:4px 12px;flex:none}
+    .today a{color:#c98060;border-bottom:1px solid rgba(200,100,70,.5)}
+    /* 관(館) 섹션 */
+    .gwan{padding:78px 8vw;border-top:1px solid rgba(150,70,55,.16)}
+    .gwan-h{display:flex;align-items:baseline;gap:18px;margin-bottom:34px}
+    .gwan-h .hj{font-family:'Nanum Myeongjo',serif;font-size:3rem;font-weight:800;color:#7d2a18;line-height:1}
+    .gwan-h .ko{font-family:'Nanum Myeongjo',serif;font-size:1.2rem;color:#e0cdb6;letter-spacing:.1em}
+    .gwan-h .desc{margin-left:auto;color:#6f6157;font-size:.84rem;text-align:right;line-height:1.7}
+    /* 명부 행 */
+    .ledger{border-top:1px solid rgba(150,70,55,.22)}
+    .row{display:flex;align-items:center;gap:22px;padding:22px 8px;border-bottom:1px solid rgba(150,70,55,.16);
+      transition:background .2s,padding-left .2s;cursor:pointer}
+    .row:hover{background:linear-gradient(90deg,rgba(140,40,25,.16),transparent);padding-left:20px}
+    .row .no{font-family:'Nanum Myeongjo',serif;color:#6b4a3c;font-size:.88rem;width:2.2em;flex:none;letter-spacing:.1em}
+    .row .nm{font-family:'Nanum Myeongjo',serif;font-size:1.18rem;color:#ecdcc6;flex:none;min-width:8.6em}
+    .row .ds{color:#7e7065;font-size:.89rem;flex:1;line-height:1.6}
+    .row .go{color:#8a3a24;font-size:1.1rem;transition:.2s}
+    .row:hover .go{color:#ff6a3a;transform:translateX(5px)}
+    .row.big .nm{color:#ffb08a}
+    .row .tag{font-size:.68rem;border:1px solid rgba(200,80,50,.5);color:#e08a60;padding:2px 9px;
+      letter-spacing:.08em;flex:none;font-family:'Nanum Myeongjo',serif}
+    .row .tag.free{border-color:rgba(120,180,120,.5);color:#8ec98e}
+    @media(max-width:720px){
+      .vnav{width:44px;gap:20px}.vnav a{font-size:.9rem;letter-spacing:.22em}main{margin-right:44px}
+      .row{flex-wrap:wrap;gap:6px 12px}.row .ds{width:100%;order:3;font-size:.83rem}
+      .row .nm{min-width:0}.gwan{padding:58px 6vw}.gwan-h .desc{display:none}
+      .today{padding:18px 6vw;gap:12px}
+    }
+    .foot{padding:60px 8vw;text-align:center;color:#5d5148;font-size:.8rem;letter-spacing:.2em;
+      font-family:'Nanum Myeongjo',serif;border-top:1px solid rgba(150,70,55,.16)}
+    .foot a{color:#7d685c;border-bottom:1px solid rgba(125,104,92,.4)}
   </style>
 </head>
 <body>
-  <div id="site-header"></div>
+  <nav class="vnav">
+    <a class="back" href="fortune-hub.html" title="운세로 돌아가기">←</a>
+    <a href="#myeong" class="on">冥 簿</a><a href="#bu">符</a><a href="#il">日</a>
+  </nav>
+
   <main>
     <section class="hero">
-      <h1>🔮 사주팔자</h1>
-      <p>사주 프로필 한 번이면 — 오늘의 운세부터 심층 풀이까지</p>
-    </section>
-
-    <section class="panel" id="input-panel">
-      <h2>내 사주 프로필 (한 번만!)</h2>
-      <div class="field-row">
-        <select id="in-year"></select>
-        <select id="in-month"></select>
-        <select id="in-day"></select>
-        <select id="in-hour"><option value="">태어난 시 몰라요</option></select>
-        <input type="number" id="in-min" min="0" max="59" value="0" aria-label="분" title="분(0~59)" style="width:62px" />
-      </div>
-      <div class="opt-row">
-        <label><input type="radio" name="gender" value="" checked />성별 안 함</label>
-        <label><input type="radio" name="gender" value="M" />남</label>
-        <label><input type="radio" name="gender" value="F" />여</label>
-        <span style="font-size:0.85rem">(성별은 대운·궁합 풀이에만 쓰여요)</span>
-      </div>
-      <button class="btn-primary" id="btn-go">프로필 저장하고 운세 보기</button>
-      <p class="error-msg" id="err"></p>
-      <p class="fine-print" style="text-align:left">프로필은 이 브라우저에만 저장돼요. 서버로 전송되지 않아요.</p>
-    </section>
-
-    <section class="panel" id="profile-panel" style="display:none">
-      <div class="profile-badge">
-        <div>
-          <p class="who" id="p-who"></p>
-          <p class="sub" id="p-sub"></p>
-        </div>
-        <button class="btn-ghost" id="btn-edit">수정</button>
+      <img src="img/tale/gwigok.webp?v=5" alt="귀곡" />
+      <div class="in">
+        <p class="kicker">冥 簿 館 · 저승의 기록보관소</p>
+        <h1>네 이름은 이미<br><em>적혀 있다</em></h1>
+        <p>저승엔 산 자마다 한 권의 기록부가 있다. 귀곡(鬼哭)이 그 명부를 꺼내 여덟 장을 읽어준다 — 신살·합충·용신·10년 세운까지 전부 계산해서.</p>
+        <a class="enter" href="saju-premium.html">명부를 펼친다 &nbsp;⟶</a>
       </div>
     </section>
 
-    <div id="result-area" style="display:none">
-      <section class="panel">
-        <h2 id="r-head"></h2>
-        <p id="r-iljin" style="color:var(--ink-soft)"></p>
-        <p id="r-mod" style="margin-top:8px; line-height:1.6"></p>
-      </section>
-      <section class="panel"><h2>🍀 오늘의 총운 <span class="stars" id="s-total"></span></h2><p class="result-desc" id="t-total"></p></section>
-      <section class="panel"><h2>💘 오늘의 연애운 <span class="stars" id="s-love"></span></h2><p class="result-desc" id="t-love"></p><div class="luck-cta" id="cta-love"></div></section>
-      <section class="panel"><h2>💰 오늘의 재물운 <span class="stars" id="s-money"></span></h2><p class="result-desc" id="t-money"></p><div class="luck-cta" id="cta-money"></div></section>
-      <section class="panel"><h2>📚 오늘의 시험·집중운 <span class="stars" id="s-study"></span></h2><p class="result-desc" id="t-study"></p><div class="luck-cta" id="cta-study"></div></section>
-      <section class="panel"><h2>📆 이번 달의 운세 <span class="stars" id="s-month"></span></h2><p class="result-desc" id="t-month"></p></section>
+    <div class="today" id="today-band" style="display:none">
+      <span class="lb">오 늘 의 한 마 디</span>
+      <span class="gj" id="tb-gj"></span>
+      <span class="tx" id="tb-tx"></span>
     </div>
 
-    <section class="panel premium-panel">
-      <span class="prem-badge">✨ PREMIUM · 오픈 기념 무료</span>
-      <h2 style="margin-top:10px">📜 프리미엄 심층 리포트</h2>
-      <p class="result-desc" style="margin:8px 0 16px">어두운 숲의 저승사자 <b>귀곡</b>이 읽는 팔자 — 신살·합충·용신·10년 세운까지 계산해<br><b>성격·인연·재물·대운 8부, 2만 자급</b>으로 파고드는 심층 리포트. 지금은 무료!</p>
-      <div class="result-actions">
-        <a class="btn-primary prem-btn" href="saju-premium.html">🌲 이계로 들어가 팔자 보기</a>
-        <a class="btn-ghost" href="saju.html">🔮 무료 사주팔자 심층 먼저 보기</a>
+    <section class="gwan" id="myeong">
+      <div class="gwan-h"><span class="hj">冥</span><span class="ko">명부</span>
+        <span class="desc">태어난 순간 정해진 것들<br>여덟 글자가 말하는 네 일생</span></div>
+      <div class="ledger">
+        <div class="row big" data-go="saju-premium.html"><span class="no">一</span><span class="nm">귀곡의 명부</span>
+          <span class="tag">본편</span><span class="ds">여덟 장으로 읽는 심층 사주 — 혼·인연·곳간·흐름</span><span class="go">⟶</span></div>
+        <div class="row" data-go="saju.html"><span class="no">二</span><span class="nm">사주팔자 원국</span>
+          <span class="tag free">무료</span><span class="ds">만세력 절입시각까지 계산한 내 여덟 글자</span><span class="go">⟶</span></div>
+        <div class="row" data-go="pastlife.html"><span class="no">三</span><span class="nm">전생</span>
+          <span class="ds">지나온 생의 기록을 되짚는다</span><span class="go">⟶</span></div>
       </div>
     </section>
 
+    <section class="gwan" id="bu">
+      <div class="gwan-h"><span class="hj">符</span><span class="ko">부적</span>
+        <span class="desc">기운을 붙들어 두는 것<br>팔자에서 태어난 문양</span></div>
+      <div class="ledger">
+        <div class="row big" data-go="bujeok.html"><span class="no">一</span><span class="nm">귀곡의 부적</span>
+          <span class="ds">네 팔자에서 그려지는 단 하나의 부문(符文) — 저장해 지닌다</span><span class="go">⟶</span></div>
+        <div class="row" data-go="myeongbu.html"><span class="no">二</span><span class="nm">명부 대조</span>
+          <span class="ds">부적 두 장을 겹쳐 두 사람의 명을 맞춰본다</span><span class="go">⟶</span></div>
+        <div class="row" data-go="gunghap.html"><span class="no">三</span><span class="nm">궁합</span>
+          <span class="tag free">무료</span><span class="ds">생년월일로 보는 두 사람의 케미</span><span class="go">⟶</span></div>
+      </div>
+    </section>
+
+    <section class="gwan" id="il">
+      <div class="gwan-h"><span class="hj">日</span><span class="ko">오늘</span>
+        <span class="desc">매일 바뀌는 것들</span></div>
+      <div class="ledger">
+        <div class="row big" data-go="today.html"><span class="no">一</span><span class="nm">오늘의 사주</span>
+          <span class="tag free">무료</span><span class="ds">오늘의 일진과 총운·연애·재물·시험운</span><span class="go">⟶</span></div>
+        <div class="row" data-go="tarot.html"><span class="no">二</span><span class="nm">타로</span>
+          <span class="ds">오늘의 한 장</span><span class="go">⟶</span></div>
+        <div class="row" data-go="cookie.html"><span class="no">三</span><span class="nm">포춘쿠키</span>
+          <span class="ds">하루 한 번 깨는 응원 한 줄</span><span class="go">⟶</span></div>
+      </div>
+    </section>
+
+    <p class="foot">goblub · 冥 簿 館 &nbsp;·&nbsp; <a href="fortune-hub.html">운세로 돌아가기</a></p>
   </main>
-  <div id="site-footer"></div>
-  <script src="../js/common.js?v=5" data-root=".."></script>
+
   <script src="js/saju.js"></script>
-  <script src="js/fortune.js"></script>
-  <script src="js/profile.js"></script>
-  <script src="js/feed.js?v=4"></script>
+  <script src="js/today.js?v=1"></script>
   <script>
     (function () {
-      var $ = function (id) { return document.getElementById(id); };
-      var data = null;
+      // 행 전체를 클릭 영역으로
+      document.querySelectorAll(".row[data-go]").forEach(function (r) {
+        r.addEventListener("click", function () { location.href = r.getAttribute("data-go"); });
+      });
+      // 스크롤에 따라 세로 네비 활성 표시
+      var links = [].slice.call(document.querySelectorAll('.vnav a[href^="#"]'));
+      var secs = links.map(function (a) { return document.querySelector(a.getAttribute("href")); });
+      window.addEventListener("scroll", function () {
+        var y = window.scrollY + window.innerHeight * 0.4, cur = 0;
+        secs.forEach(function (s, i) { if (s && s.offsetTop <= y) cur = i; });
+        links.forEach(function (a, i) { a.classList.toggle("on", i === cur); });
+      }, { passive: true });
 
-      var y = $("in-year"), m = $("in-month"), d = $("in-day"), h = $("in-hour");
-      for (var i = 2100; i >= 1900; i--) y.add(new Option(i + "년", i));
-      y.value = 1995;
-      for (i = 1; i <= 12; i++) m.add(new Option(i + "월", i));
-      for (i = 1; i <= 31; i++) d.add(new Option(i + "일", i));
-      for (i = 0; i <= 23; i++) h.add(new Option(i + "시", i));
-
-      function showErr(msg) { var e = $("err"); e.textContent = msg; e.style.display = "block"; }
-      function stars(n) { return "★★★★★".slice(0, n) + "☆☆☆☆☆".slice(0, 5 - n); }
-
-      function fillForm(p) {
-        y.value = p.y; m.value = p.m; d.value = p.d;
-        h.value = p.hour == null ? "" : p.hour;
-        if (p.min) $("in-min").value = p.min;
-        var g = document.querySelector('input[name="gender"][value="' + (p.gender || "") + '"]');
-        if (g) g.checked = true;
+      // 오늘 한 마디 띠 — 프로필이 있으면 채운다
+      var b = null;
+      try { b = JSON.parse(localStorage.getItem("goblub_birth")); } catch (e) {}
+      var band = document.getElementById("today-band");
+      if (b && b.y) {
+        fetch("data/saju-terms.json").then(function (r) { return r.json(); }).then(function (data) {
+          var t = GwigokToday.line(data, b);
+          if (!t) return;
+          document.getElementById("tb-gj").textContent = t.ganji + "(" + t.hj + ")일 · " + t.group;
+          document.getElementById("tb-tx").textContent = t.text.split("\n")[0];
+          band.style.display = "flex";
+        }).catch(function () {});
+      } else {
+        document.getElementById("tb-gj").style.display = "none";
+        document.getElementById("tb-tx").innerHTML =
+          '네 명부를 새기면, 매일 오늘의 운을 한 마디씩 들려주마. <a href="saju-premium.html">명부 새기러 가기 ⟶</a>';
+        band.style.display = "flex";
       }
-
-      function show(birth) {
-        var f = Fortune.get(data, birth, new Date());
-        var tt = Saju.pillarText(f.today.pillars.day);
-        var meT = Saju.pillarText(f.me.pillars.day);
-        var now = new Date();
-
-        // 프로필 요약 배지
-        $("p-who").textContent = meT.hanja + " " + meT.hangul + "일주 · " + f.me.zodiac + "띠";
-        $("p-sub").textContent = birth.y + "년 " + birth.m + "월 " + birth.d + "일" +
-          (birth.hour != null ? " " + birth.hour + "시" : "") +
-          (birth.gender === "M" ? " · 남" : birth.gender === "F" ? " · 여" : "") +
-          " · " + f.me.strength.label;
-
-        $("r-head").textContent = (now.getMonth() + 1) + "월 " + now.getDate() + "일, " +
-          birth.y + "년생 " + f.me.zodiac + "띠님의 운세";
-        $("r-iljin").textContent = "오늘의 일진: " + tt.hanja + " (" + tt.hangul + ")";
-        $("r-mod").textContent = f.modMsg || "";
-        $("r-mod").style.display = f.modMsg ? "block" : "none";
-        $("s-total").textContent = stars(f.total.score); $("t-total").textContent = f.total.text;
-        $("s-love").textContent = stars(f.love.score); $("t-love").textContent = f.love.text;
-        $("s-money").textContent = stars(f.money.score); $("t-money").textContent = f.money.text;
-        $("s-study").textContent = stars(f.study.score); $("t-study").textContent = f.study.text;
-        $("s-month").textContent = stars(f.month.score); $("t-month").textContent = f.month.text;
-
-        // 운세 → 어울리는 콘텐츠로 연결 (점수 좋으면 "이 기세로!", 아니면 "환기하러!")
-        function luckCta(id, score, hotLabel, mildLabel, url) {
-          var hot = score >= 4;
-          $(id).innerHTML = '<a href="' + url + '"' + (hot ? ' class="hot"' : "") + ">" +
-            (hot ? hotLabel : mildLabel) + " →</a>";
-        }
-        luckCta("cta-money", f.money.score,
-          "💰 재물운 만렙! 이 기세로 고블럽 로또 번호 뽑으러 가기",
-          "🎱 재물운은 워밍업 중 — 재미로 로또 번호나 미리 찜해두기", "lotto.html");
-        luckCta("cta-love", f.love.score,
-          "💌 설렘 폭발! 마음 배달로 데이트 신청 보내기",
-          "💌 오늘은 표현이 서툰 날 — 마음 배달로 슬쩍 진심 전하기", "letter.html");
-        luckCta("cta-study", f.study.score,
-          "🕳️ 집중력 만렙! 감정 몬스터 팡팡으로 컨디션 확인하러 가기",
-          "🕳️ 집중이 흐트러진 날 — 팡팡 한 판으로 머리 환기하기", "whack.html");
-
-        $("input-panel").style.display = "none";
-        $("profile-panel").style.display = "block";
-        $("result-area").style.display = "block";
-        if (window.GoblubFeed) GoblubFeed.grant("fortune");
-      }
-
-      fetch("data/saju-terms.json")
-        .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
-        .then(function (dd) {
-          data = dd;
-          var p = GoblubProfile.get();
-          if (p) { fillForm(p); show(p); }
-        })
-        .catch(function () { showErr("데이터를 불러오지 못했어요. 새로고침 해주세요."); });
-
-      $("btn-go").onclick = function () {
-        $("err").style.display = "none";
-        if (!data) { showErr("데이터를 불러오지 못했어요. 새로고침 해주세요."); return; }
-        var yy = +y.value, mm = +m.value, dd2 = +d.value;
-        var date = new Date(yy, mm - 1, dd2);
-        if (date.getFullYear() !== yy || date.getMonth() !== mm - 1 || date.getDate() !== dd2) {
-          showErr("없는 날짜예요. 다시 확인해주세요!"); return;
-        }
-        var gender = document.querySelector('input[name="gender"]:checked').value;
-        var min = h.value === "" ? 0 : Math.min(59, Math.max(0, +($("in-min").value || 0)));
-        var birth = { y: yy, m: mm, d: dd2, hour: h.value === "" ? null : +h.value, min: min, gender: gender };
-        GoblubProfile.set(birth);
-        show(birth);
-      };
-
-      $("btn-edit").onclick = function () {
-        $("result-area").style.display = "none";
-        $("profile-panel").style.display = "none";
-        $("input-panel").style.display = "block";
-      };
     })();
   </script>
 </body>
