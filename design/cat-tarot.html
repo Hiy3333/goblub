@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" /><meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="robots" content="noindex,nofollow" />
+<title>고양이 타로 — 동작 예시</title>
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Nanum+Myeongjo:wght@700;800&display=swap" rel="stylesheet" />
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0e0a18;color:#eee6ff;font-family:'Jua','Malgun Gothic',sans-serif;
+ min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:20px 14px 50px}
+h1{font-size:1.2rem;margin-bottom:4px}
+.sub{color:#9a8fc4;font-size:.86rem;margin-bottom:16px;text-align:center;line-height:1.7}
+/* 무대 — 9:16 */
+.stage{position:relative;width:min(94vw,360px);aspect-ratio:9/16;border-radius:18px;overflow:hidden;
+ background:#000;box-shadow:0 20px 60px rgba(0,0,0,.7),0 0 40px rgba(120,60,220,.2)}
+.stage video,.stage .still{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.stage .still{background-size:cover;background-position:center;opacity:0;transition:opacity .3s}
+.stage .still.on{opacity:1}
+video::-webkit-media-controls,video::-webkit-media-controls-start-playback-button,
+video::-webkit-media-controls-overlay-play-button{display:none!important;-webkit-appearance:none!important}
+/* 상단 문구 */
+.say{position:absolute;left:0;right:0;top:14px;text-align:center;z-index:5;
+ font-family:'Nanum Myeongjo',serif;font-size:1rem;color:#fff;padding:0 18px;line-height:1.6;
+ text-shadow:0 2px 14px rgba(0,0,0,.95);transition:opacity .3s}
+/* 펼쳐진 카드 위에 얹는 실제 클릭 카드 */
+.cards{position:absolute;left:0;right:0;bottom:0;height:34%;z-index:6;opacity:0;
+ pointer-events:none;transition:opacity .4s}
+.cards.on{opacity:1;pointer-events:auto}
+.cards i{position:absolute;bottom:9%;left:50%;width:15%;height:52%;border-radius:4px;cursor:pointer;
+ transform-origin:bottom center;transition:transform .18s;background:rgba(255,255,255,0)}
+.cards i:hover{transform:translateY(-14px) var(--rot)!important;
+ box-shadow:0 0 22px rgba(255,225,120,.85);background:rgba(255,235,150,.16)}
+/* 결과 */
+.result{position:absolute;inset:0;z-index:8;background:rgba(10,7,20,.93);display:none;
+ flex-direction:column;align-items:center;justify-content:center;padding:26px;text-align:center}
+.result.on{display:flex;animation:fade .4s}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.result .card{width:44%;aspect-ratio:2/3.4;border-radius:10px;border:2px solid rgba(255,210,120,.6);
+ background:linear-gradient(160deg,#1b2560,#0d1130);display:flex;align-items:center;justify-content:center;
+ font-size:2.6rem;box-shadow:0 0 40px rgba(255,200,90,.35);animation:flip .6s}
+@keyframes flip{from{transform:rotateY(90deg)}to{transform:rotateY(0)}}
+.result h2{font-family:'Nanum Myeongjo',serif;color:#ffd98a;margin:18px 0 8px;font-size:1.3rem}
+.result p{color:#c7bde6;font-size:.92rem;line-height:1.8}
+.result button{margin-top:20px;background:rgba(60,40,110,.9);color:#efe7ff;border:1px solid rgba(160,120,255,.5);
+ border-radius:10px;padding:11px 22px;font-family:inherit;font-size:.95rem;cursor:pointer}
+/* 컨트롤 */
+.ctl{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap;justify-content:center}
+.ctl button{background:#241b45;color:#e6dcff;border:1px solid #4a3a80;border-radius:10px;
+ padding:11px 20px;font-family:inherit;font-size:.92rem;cursor:pointer;transition:.15s}
+.ctl button:hover{background:#33276b;border-color:#8a6bff}
+.ctl button:disabled{opacity:.35;cursor:default}
+.note{max-width:560px;margin-top:22px;background:#171227;border:1px solid #2e2748;border-radius:12px;
+ padding:14px 18px;color:#a99fc6;font-size:.83rem;line-height:1.85}
+.note b{color:#ffb08a}
+.step{display:inline-block;background:#2e2454;border-radius:999px;padding:2px 10px;font-size:.75rem;
+ color:#c3b6f0;margin-right:6px}
+</style>
+</head>
+<body>
+<h1>🐈‍⬛ 고양이 타로 — 실제 동작 예시</h1>
+<p class="sub">아래 순서대로 눌러보세요. 실사 영상 → 카드 선택까지 그대로 이어집니다.</p>
+
+<div class="stage" id="stage">
+  <video id="vid" muted playsinline webkit-playsinline preload="auto"></video>
+  <div class="still" id="still"></div>
+  <p class="say" id="say">…무엇이 궁금하냐옹</p>
+  <div class="cards" id="cards"></div>
+  <div class="result" id="result">
+    <div class="card" id="rcard">🌙</div>
+    <h2 id="rname">달 (The Moon)</h2>
+    <p id="rdesc">지금 보이는 게 전부가 아니다냥.<br>흐릿한 건 흐릿한 채로 두고, 조금 더 기다려보라옹.</p>
+    <button onclick="reset()">다시 보기</button>
+  </div>
+</div>
+
+<div class="ctl">
+  <button id="b1" onclick="shuffle()">① 카드 섞기</button>
+  <button id="b2" onclick="spread()" disabled>② 펼치기</button>
+  <button onclick="reset()">처음으로</button>
+</div>
+
+<div class="note">
+  <p><span class="step">지금 보신 것</span>실사 고양이가 <b>앞발로 카드를 섞고</b>, <b>발을 쓸어 부채꼴로 펼치는</b> 영상입니다. Seedance 2.0으로 생성했고 5초짜리 클립 2개입니다.</p>
+  <p style="margin-top:9px"><span class="step">핵심 기술</span>펼치기 영상이 끝나면 <b>마지막 프레임을 그대로 정지 이미지로 굳히고</b>, 그 위에 실제 클릭 가능한 카드 영역을 겹쳐 얹습니다. 그래서 영상 속 카드를 진짜로 고를 수 있습니다.</p>
+  <p style="margin-top:9px"><span class="step">확장</span>카드를 고르면 뒤집히며 해석이 나옵니다. 고양이 말투(…냥)로 풀이하면 귀곡과 완전히 다른 결의 콘텐츠가 됩니다.</p>
+</div>
+
+<script>
+var V={shuffle:"img/cat/cat-shuffle.mp4",spread:"img/cat/cat-spread.mp4"};
+var STILL="img/cat/cat-spread-last.webp", IDLE="img/cat/cat-a.webp";
+var vid=document.getElementById("vid"), still=document.getElementById("still"),
+    say=document.getElementById("say"), cards=document.getElementById("cards"),
+    result=document.getElementById("result"), b1=document.getElementById("b1"), b2=document.getElementById("b2");
+
+var DECK=[["🌙","달 (The Moon)","지금 보이는 게 전부가 아니다냥.<br>흐릿한 건 흐릿한 채로 두고, 조금 더 기다려보라옹."],
+          ["⭐","별 (The Star)","오래 바라던 게 슬슬 모양을 갖춘다냥.<br>지금 품은 그 마음, 버리지 말라옹."],
+          ["🌞","태양 (The Sun)","숨길 것 없이 다 잘 풀리는 시기다냥.<br>망설이지 말고 나가서 부딪혀보라옹."],
+          ["🗼","탑 (The Tower)","무너지는 건 무너져야 할 것이었다냥.<br>붙잡지 말고 손을 놓아보라옹."],
+          ["🎡","운명의 수레바퀴","곧 판이 한 번 돌아간다냥.<br>지금 자리에 너무 애쓰지 말라옹."],
+          ["🔮","여사제 (High Priestess)","네 직감이 이미 답을 알고 있다냥.<br>남 말보다 네 속을 믿어보라옹."]];
+
+// 초기: 대기 이미지
+still.style.backgroundImage="url('"+IDLE+"')"; still.classList.add("on");
+
+function play(src, onEnd){
+  cards.classList.remove("on"); result.classList.remove("on");
+  vid.onended=null; vid.onplaying=null;
+  vid.loop=false; vid.src=src;
+  vid.onplaying=function(){ still.classList.remove("on"); };   // 재생 시작 후 영상 노출
+  vid.onended=function(){ if(onEnd) onEnd(); };
+  var p=vid.play(); if(p&&p.catch) p.catch(function(){});
+}
+function shuffle(){
+  say.textContent="섞는 중이다냥…";
+  b1.disabled=true; b2.disabled=true;
+  play(V.shuffle, function(){ say.textContent="자, 이제 펼쳐주마옹"; b2.disabled=false; });
+}
+function spread(){
+  say.textContent="…끌리는 걸 하나 골라보라옹";
+  b2.disabled=true;
+  play(V.spread, function(){
+    // 마지막 프레임을 정지 이미지로 굳히고 그 위에 클릭 카드를 얹는다
+    still.style.backgroundImage="url('"+STILL+"')";
+    still.classList.add("on");
+    buildCards();
+    cards.classList.add("on");
+  });
+}
+function buildCards(){
+  cards.innerHTML="";
+  var n=7;
+  for(var i=0;i<n;i++){
+    var t=(i/(n-1))-0.5;                        // -0.5 ~ 0.5
+    var el=document.createElement("i");
+    var rot=t*46, x=t*112, y=Math.abs(t)*Math.abs(t)*30;
+    el.style.setProperty("--rot","rotate("+rot+"deg)");
+    el.style.transform="translateX(calc(-50% + "+x+"px)) translateY("+y+"px) rotate("+rot+"deg)";
+    el.onclick=(function(k){ return function(){ pick(k); }; })(i);
+    cards.appendChild(el);
+  }
+}
+function pick(i){
+  var c=DECK[i%DECK.length];
+  document.getElementById("rcard").textContent=c[0];
+  document.getElementById("rname").textContent=c[1];
+  document.getElementById("rdesc").innerHTML=c[2];
+  cards.classList.remove("on");
+  result.classList.add("on");
+  say.textContent="";
+}
+function reset(){
+  result.classList.remove("on"); cards.classList.remove("on");
+  vid.onended=null; try{ vid.pause(); vid.removeAttribute("src"); vid.load(); }catch(e){}
+  still.style.backgroundImage="url('"+IDLE+"')"; still.classList.add("on");
+  say.textContent="…무엇이 궁금하냐옹";
+  b1.disabled=false; b2.disabled=true;
+}
+</script>
+</body>
+</html>
