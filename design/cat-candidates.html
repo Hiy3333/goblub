@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>고양이 타로 — 흰 오드아이 웃는 고양이 시안</title>
+  <link href="https://fonts.googleapis.com/css2?family=Jua&family=Nanum+Myeongjo:wght@700;800&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #14101a; color: #e8ded6; font-family: 'Jua', sans-serif; padding: 30px 16px 70px; }
+    .top { max-width: 1080px; margin: 0 auto 24px; text-align: center; }
+    .top h1 { font-family: 'Nanum Myeongjo', serif; font-weight: 800; font-size: 1.6rem; color: #ffe0b0; }
+    .top p { color: #ab9f96; margin-top: 8px; line-height: 1.7; font-size: .95rem; }
+    .sect { max-width: 1080px; margin: 30px auto 6px; font-family: 'Nanum Myeongjo', serif;
+      font-weight: 800; color: #ffcf8a; font-size: 1.12rem; border-bottom: 2px solid rgba(255,180,120,.3);
+      padding-bottom: 6px; }
+    .grid { max-width: 1080px; margin: 14px auto 0; display: grid; gap: 16px;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+    figure { background: #1e1826; border: 1px solid #322842; border-radius: 14px; overflow: hidden; }
+    figure img { display: block; width: 100%; aspect-ratio: 1/1; object-fit: cover; cursor: zoom-in; background:#000; }
+    figcaption { padding: 9px 12px 12px; font-size: .84rem; color: #b7aba0; line-height: 1.5; }
+    figcaption b { color: #ffd9a8; font-family: 'Nanum Myeongjo', serif; }
+    #lb { position: fixed; inset: 0; background: rgba(4,3,8,.95); display: none; align-items: center;
+      justify-content: center; z-index: 99; cursor: zoom-out; padding: 20px; }
+    #lb.on { display: flex; } #lb img { max-width: 100%; max-height: 100%; border-radius: 10px; }
+  </style>
+</head>
+<body>
+  <div class="top">
+    <h1>🐱 고양이 타로 — 점술사 고양이 시안</h1>
+    <p>흰 털 · 오드아이(파란 눈 + 호박색 눈) · 웃는상 귀여운 고양이 7종.<br />
+      A = 클로즈업 포트레이트(캐릭터 지정용) · B = 타로 점술사 연출(실제 장면용). 눌러서 크게 보세요.</p>
+  </div>
+
+  <div class="sect">A · 포트레이트 (캐릭터 확정용)</div>
+  <div class="grid">
+    <figure><img src="img/cat/cat-a1.webp" alt="A1"><figcaption><b>A1</b> 도톰한 볼 · 잔잔한 미소상</figcaption></figure>
+    <figure><img src="img/cat/cat-a2.webp" alt="A2"><figcaption><b>A2</b> 오드아이 가장 또렷 · 단정</figcaption></figure>
+    <figure><img src="img/cat/cat-a3.webp" alt="A3"><figcaption><b>A3</b> 입 살짝 벌린 함박 웃는상 👍</figcaption></figure>
+    <figure><img src="img/cat/cat-a4.webp" alt="A4"><figcaption><b>A4</b> 긴 털 · 기품 있는 미소</figcaption></figure>
+  </div>
+
+  <div class="sect">B · 점술사 연출 (실제 장면용)</div>
+  <div class="grid">
+    <figure><img src="img/cat/cat-b1.webp" alt="B1"><figcaption><b>B1</b> 수정구 · 타로 · 앞발 올린 자세</figcaption></figure>
+    <figure><img src="img/cat/cat-b2.webp" alt="B2"><figcaption><b>B2</b> 카드 부채꼴로 펼치는 순간 · 웃는상</figcaption></figure>
+    <figure><img src="img/cat/cat-b3.webp" alt="B3"><figcaption><b>B3</b> 스카프 · 수정구 · 별밤 배경</figcaption></figure>
+  </div>
+
+  <div id="lb"><img id="lbi" alt=""></div>
+  <script>
+    var lb=document.getElementById("lb"),lbi=document.getElementById("lbi");
+    document.querySelectorAll("figure img").forEach(function(im){
+      im.addEventListener("click",function(){lbi.src=im.src;lb.classList.add("on");});
+    });
+    lb.addEventListener("click",function(){lb.classList.remove("on");lbi.src="";});
+  </script>
+</body>
+</html>
