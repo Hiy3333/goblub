@@ -2,7 +2,6 @@
 // Vercel 마켓플레이스 Upstash 연결 시 KV_REST_API_URL/TOKEN 또는 UPSTASH_REDIS_REST_URL/TOKEN 이 설정됨.
 
 const ALLOWED_ORIGINS = [
-  "https://goblub.vercel.app",
   "https://goblub-2.vercel.app",
   "https://hiy3333.github.io",
   "http://localhost:8777",

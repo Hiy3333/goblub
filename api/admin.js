@@ -14,7 +14,6 @@ function checkIdPw(id, pw) {
 }
 
 const ALLOWED_ORIGINS = [
-  "https://goblub.vercel.app",
   "https://goblub-2.vercel.app",
   "https://hiy3333.github.io",
   "http://localhost:8777",
