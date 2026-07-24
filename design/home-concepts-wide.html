@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>고블럽 홈 개편 시안 — 데스크톱 16:9 (B·D)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Jua&family=Nanum+Myeongjo:wght@400;700;800&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0c0a10; color: #ddd4e6; font-family: 'Jua', system-ui, sans-serif;
+      padding: 30px 18px 70px; }
+    .top { max-width: 1080px; margin: 0 auto 30px; text-align: center; }
+    .top h1 { font-family: 'Nanum Myeongjo', serif; font-weight: 800; font-size: 1.6rem;
+      color: #ffd9a0; letter-spacing: -.02em; }
+    .top p { color: #9a8ba8; font-size: .95rem; margin-top: 9px; line-height: 1.7; }
+
+    .wrap { max-width: 1080px; margin: 0 auto; }
+    .group { margin-bottom: 14px; }
+    .group > h2 { font-family: 'Nanum Myeongjo', serif; font-weight: 800; font-size: 1.15rem;
+      color: #f0e6d2; margin: 26px 0 4px; display: flex; align-items: center; gap: 10px; }
+    .group > h2 .k { font-size: .72rem; letter-spacing: .1em; padding: 4px 11px; border-radius: 999px; }
+    .group > .lead { color: #9a8ba8; font-size: .9rem; margin-bottom: 16px; line-height: 1.6; }
+
+    .item { background: #16121e; border: 1px solid #2e2438; border-radius: 16px;
+      overflow: hidden; margin-bottom: 18px; }
+    .item .shot { display: block; width: 100%; aspect-ratio: 1376/768; object-fit: cover;
+      background: #000; cursor: zoom-in; }
+    .meta { padding: 14px 18px 18px; display: flex; flex-wrap: wrap; gap: 6px 20px; align-items: baseline; }
+    .meta .name { font-family: 'Nanum Myeongjo', serif; font-weight: 800; font-size: 1.05rem; color: #f0e6d2; }
+    .meta .desc { color: #a99cbb; font-size: .87rem; line-height: 1.6; flex: 1 1 320px; }
+
+    .kb { background: rgba(160,220,60,.14); color: #cdf05f; border: 1px solid rgba(160,220,60,.35); }
+    .kd { background: rgba(60,220,200,.13); color: #6fe8d4; border: 1px solid rgba(60,220,200,.35); }
+
+    #lb { position: fixed; inset: 0; background: rgba(4,3,8,.94); display: none;
+      align-items: center; justify-content: center; z-index: 99; cursor: zoom-out; padding: 20px; }
+    #lb.on { display: flex; }
+    #lb img { max-width: 100%; max-height: 100%; border-radius: 10px; box-shadow: 0 30px 90px rgba(0,0,0,.8); }
+  </style>
+</head>
+<body>
+  <div class="top">
+    <h1>고블럽 홈 개편 — 데스크톱 16:9</h1>
+    <p>PC 브라우저 가로 화면 기준으로 다시 뽑았습니다. 마음에 들어하신 <b>B(소굴·캐릭터)</b>와 <b>D(자판기)</b> 두 방향만 각 2안씩.<br />
+      눌러서 크게 볼 수 있습니다.</p>
+  </div>
+
+  <div class="wrap">
+    <div class="group">
+      <h2><span class="k kb">B · 캐릭터</span> 고블럽 소굴</h2>
+      <p class="lead">마스코트를 전면에 세우고, 두꺼운 검정 테두리 + 하드 그림자의 네오브루탈리즘. 시끄럽고 친근하고 스크린샷이 잘 나오는 방향.</p>
+
+      <div class="item">
+        <img class="shot" src="img/home/w-b1-sogul.webp" alt="B-1 소굴 좌우 분할" />
+        <div class="meta">
+          <span class="name">B-1 · 좌우 분할</span>
+          <span class="desc">왼쪽에 큰 마스코트, 오른쪽에 워드마크·태그라인·CTA. 하단은 스티커 카드 한 줄. 히어로가 명확하고 정보 위계가 깔끔합니다.</span>
+        </div>
+      </div>
+
+      <div class="item">
+        <img class="shot" src="img/home/w-b2-sogul.webp" alt="B-2 소굴 3캐릭터 그리드" />
+        <div class="meta">
+          <span class="name">B-2 · 3캐릭터 + 그리드</span>
+          <span class="desc">고블럽 삼형제(초록·핑크·파랑)가 가운데, 좌우로 컬러 패널이 감싸는 만화 포스터형. 캐릭터 IP를 밀 거면 이쪽이 더 세계관이 넓어 보입니다.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="group">
+      <h2><span class="k kd">D · 오브젝트</span> 심야 자판기</h2>
+      <p class="lead">화면 자체가 자판기. 콘텐츠는 진열된 상품이 되고, 젬리(재화)로 뽑는 구조와 은유가 딱 맞습니다.</p>
+
+      <div class="item">
+        <img class="shot" src="img/home/w-d1-japangi.webp" alt="D-1 자판기 3대 나열" />
+        <div class="meta">
+          <span class="name">D-1 · 자판기 3대 나열</span>
+          <span class="desc">운세·테스트·미니게임을 각각 한 대씩 세운 골목 풍경. 카테고리가 자판기 단위로 나뉘어 몰입감이 가장 큽니다. 하단에 실제 푸터(로그인·이용안내)까지 자연스럽게 얹힘.</span>
+        </div>
+      </div>
+
+      <div class="item">
+        <img class="shot" src="img/home/w-d2-japangi.webp" alt="D-2 자판기 + UI 패널 분할" />
+        <div class="meta">
+          <span class="name">D-2 · 자판기 + UI 패널</span>
+          <span class="desc">왼쪽은 실사 자판기 분위기, 오른쪽은 또렷한 네온 UI 타일 그리드. 감성은 살리면서 실제 클릭 UI는 읽기 쉽게 분리 — 구현·가독성 면에서 가장 현실적입니다.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="lb"><img id="lbi" alt="" /></div>
+  <script>
+    var lb = document.getElementById("lb"), lbi = document.getElementById("lbi");
+    document.querySelectorAll(".shot").forEach(function (im) {
+      im.addEventListener("click", function () { lbi.src = im.src; lb.classList.add("on"); });
+    });
+    lb.addEventListener("click", function () { lb.classList.remove("on"); lbi.src = ""; });
+  </script>
+</body>
+</html>
