@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>고양이 타로 — goblub</title>
+<meta name="description" content="오드아이 흰 고양이 점술사가 앞발로 카드를 펼쳐준다 — 끌리는 한 장을 골라 오늘의 운을 보라옹" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Nanum+Myeongjo:wght@700;800&display=swap" rel="stylesheet" />
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:
+  radial-gradient(600px 420px at 50% -6%, rgba(150,110,60,.18), transparent 62%),
+  radial-gradient(700px 520px at 50% 108%, rgba(90,40,140,.22), transparent 64%),
+  linear-gradient(180deg,#140f1e 0%,#0e0a18 60%,#0c0814 100%) fixed;
+  color:#eee6ff;font-family:'Jua','Malgun Gothic',sans-serif;
+  min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:16px 14px 44px}
+.top{width:min(94vw,380px);display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.top a{color:#b6a6df;font-size:.9rem;text-decoration:none}
+.top .t{font-family:'Nanum Myeongjo',serif;font-weight:800;color:#ffd98a;font-size:1.15rem;margin-left:auto;margin-right:auto;
+  text-shadow:0 0 16px rgba(220,160,80,.4)}
+.top .sp{width:38px}
+
+/* 무대 — 정사각(소스 이미지 비율) */
+.stage{position:relative;width:min(94vw,380px);aspect-ratio:1/1;border-radius:20px;overflow:hidden;
+  background:#000;box-shadow:0 22px 64px rgba(0,0,0,.72),0 0 46px rgba(130,70,220,.22);
+  border:1px solid rgba(150,110,200,.25)}
+.stage video,.stage .still{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.stage .still{background-size:cover;background-position:center;opacity:0;transition:opacity .35s}
+.stage .still.on{opacity:1}
+video::-webkit-media-controls,video::-webkit-media-controls-start-playback-button,
+video::-webkit-media-controls-overlay-play-button{display:none!important;-webkit-appearance:none!important}
+
+/* 상단 대사 */
+.say{position:absolute;left:0;right:0;top:14px;text-align:center;z-index:5;
+  font-family:'Nanum Myeongjo',serif;font-size:1.02rem;color:#fff;padding:0 20px;line-height:1.6;
+  text-shadow:0 2px 16px rgba(0,0,0,.96);transition:opacity .3s}
+
+/* 펼쳐진 카드 위에 얹는 실제 클릭 카드 */
+.cards{position:absolute;left:0;right:0;bottom:0;height:42%;z-index:6;opacity:0;
+  pointer-events:none;transition:opacity .45s}
+.cards.on{opacity:1;pointer-events:auto}
+.cards i{position:absolute;bottom:6%;left:50%;width:15%;height:56%;border-radius:5px;cursor:pointer;
+  transform-origin:bottom center;transition:transform .18s ease, box-shadow .18s;
+  background:rgba(255,255,255,0)}
+.cards i::after{content:"";position:absolute;inset:0;border-radius:5px;
+  border:1.5px solid rgba(255,225,150,0);transition:.18s}
+.cards i:hover{transform:translateX(var(--x)) translateY(calc(var(--y) - 16px)) rotate(var(--rot))!important;
+  box-shadow:0 0 24px rgba(255,225,120,.9)}
+.cards i:hover::after{border-color:rgba(255,225,150,.85);background:rgba(255,235,150,.14)}
+
+/* 안내 화살표(펼친 뒤) */
+.hint{position:absolute;left:0;right:0;bottom:calc(42% + 4px);text-align:center;z-index:6;
+  color:#ffe6a6;font-size:.9rem;opacity:0;transition:.4s;text-shadow:0 2px 10px rgba(0,0,0,.9);pointer-events:none}
+.hint.on{opacity:1;animation:bob 1.4s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(5px)}}
+
+/* 결과 */
+.result{position:absolute;inset:0;z-index:8;background:rgba(10,7,20,.95);display:none;
+  flex-direction:column;align-items:center;justify-content:center;padding:16px;text-align:center}
+.result.on{display:flex;animation:fade .4s}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.result .card{width:30%;max-height:34%;aspect-ratio:2/3.4;border-radius:10px;border:2px solid rgba(255,210,120,.6);
+  background:linear-gradient(160deg,#2a1c5a,#0d1130);display:flex;align-items:center;justify-content:center;
+  font-size:2.2rem;box-shadow:0 0 40px rgba(255,200,90,.4);animation:flip .6s;flex:none}
+@keyframes flip{from{transform:rotateY(90deg)}to{transform:rotateY(0)}}
+.result h2{font-family:'Nanum Myeongjo',serif;color:#ffd98a;margin:12px 0 6px;font-size:1.18rem}
+.result p{color:#cbc0ea;font-size:.88rem;line-height:1.7;max-width:290px}
+.result .again{margin-top:14px;background:linear-gradient(180deg,#5a3a9a,#3a2268);color:#efe7ff;
+  border:1px solid rgba(170,130,255,.5);border-radius:12px;padding:10px 22px;font-family:inherit;
+  font-size:.95rem;cursor:pointer;box-shadow:0 0 20px rgba(120,70,210,.5)}
+
+/* 하단 컨트롤 */
+.ctl{margin-top:20px;display:flex;flex-direction:column;align-items:center;gap:10px}
+.spread-btn{background:linear-gradient(180deg,#c98a3a,#8a5620);color:#fff2e0;border:1px solid rgba(255,200,140,.5);
+  border-radius:14px;padding:14px 30px;font-family:'Nanum Myeongjo',serif;font-weight:700;font-size:1.08rem;
+  cursor:pointer;box-shadow:0 12px 30px rgba(160,90,30,.4),inset 0 2px 4px rgba(255,220,180,.35);
+  transition:transform .1s, box-shadow .1s}
+.spread-btn:hover{transform:translateY(-2px);box-shadow:0 16px 36px rgba(160,90,30,.55)}
+.spread-btn:disabled{opacity:.4;cursor:default;transform:none}
+.mini{color:#8f83b4;font-size:.82rem;text-align:center;line-height:1.7}
+</style>
+</head>
+<body>
+<div class="top">
+  <a href="fortune-hub.html">← 운세</a>
+  <span class="t">🔮 고양이 타로</span>
+  <span class="sp"></span>
+</div>
+
+<div class="stage" id="stage">
+  <video id="vid" muted playsinline webkit-playsinline preload="auto"></video>
+  <div class="still" id="still"></div>
+  <p class="say" id="say">…무엇이 궁금하냐옹?</p>
+  <div class="hint" id="hint">끌리는 카드를 하나 톡, 하고 눌러보라옹 👇</div>
+  <div class="cards" id="cards"></div>
+  <div class="result" id="result">
+    <div class="card" id="rcard">🌙</div>
+    <h2 id="rname"></h2>
+    <p id="rdesc"></p>
+    <button class="again" onclick="redraw()">🐾 다시 뽑기</button>
+  </div>
+</div>
+
+<div class="ctl">
+  <button class="spread-btn" id="spreadBtn" onclick="spread()">🐾 카드 펼치기</button>
+  <p class="mini">흰 고양이 점술사가 앞발로 카드를 쭉 펼쳐준다옹.<br>펼쳐진 카드 중 끌리는 한 장을 고르라옹.</p>
+</div>
+
+<script>
+var SPREAD="img/cat/cat2-spread.mp4";
+var STILL="img/cat/cat2-spread-last.webp";      // 펼침 영상 마지막 프레임
+var IDLE="img/cat/dressed-hat2.webp";            // 대기(모자2 고양이)
+var vid=document.getElementById("vid"), still=document.getElementById("still"),
+    say=document.getElementById("say"), cards=document.getElementById("cards"),
+    hint=document.getElementById("hint"), result=document.getElementById("result"),
+    spreadBtn=document.getElementById("spreadBtn");
+
+var DECK=[
+ ["🌞","태양 — The Sun","숨길 것 없이 다 잘 풀리는 날이다냥.<br>망설이지 말고 나가서 부딪혀보라옹."],
+ ["⭐","별 — The Star","오래 바라던 게 슬슬 모양을 갖춘다냥.<br>지금 그 마음, 버리지 말라옹."],
+ ["🌙","달 — The Moon","지금 보이는 게 전부가 아니다냥.<br>흐릿한 건 흐릿한 채로 두고 조금 더 기다려보라옹."],
+ ["🔮","여사제 — High Priestess","네 직감이 이미 답을 알고 있다냥.<br>남 말보다 네 속을 믿어보라옹."],
+ ["🎡","운명의 수레바퀴","곧 판이 한 번 돌아간다냥.<br>지금 자리에 너무 애쓰지 말라옹."],
+ ["🗼","탑 — The Tower","무너지는 건 무너져야 할 것이었다냥.<br>붙잡지 말고 손을 놓아보라옹."],
+ ["💗","연인 — The Lovers","마음 가는 쪽으로 한 발 내밀어도 좋다냥.<br>재보기만 하다간 놓친다옹."],
+ ["🌿","힘 — Strength","세게 밀지 말고 부드럽게 다스리라냥.<br>오늘의 너에겐 그 편이 더 세다옹."],
+ ["🏮","은둔자 — The Hermit","잠깐 혼자 있는 시간이 답을 준다냥.<br>불 하나 켜고 네 속을 들여다보라옹."],
+ ["💰","별전 — Ace of Coins","작은 기회 하나가 손에 들어온다냥.<br>사소해 보여도 덥석 잡아보라옹."],
+ ["🕊️","절제 — Temperance","한쪽으로 쏠리지 말라냥.<br>덜어낼 건 덜고 섞을 건 섞으면 풀린다옹."],
+ ["🌟","심판 — Judgement","미뤄둔 걸 매듭지을 때다냥.<br>지난 일에 도장 한 번 쾅 찍고 가라옹."]
+];
+
+still.style.backgroundImage="url('"+IDLE+"')"; still.classList.add("on");
+
+function play(src, onEnd){
+  vid.onended=null; vid.onplaying=null;
+  vid.loop=false; vid.src=src;
+  vid.onplaying=function(){ still.classList.remove("on"); };  // 재생 시작 후에만 영상 노출
+  vid.onended=function(){ if(onEnd) onEnd(); };
+  var p=vid.play(); if(p&&p.catch) p.catch(function(){ if(onEnd) onEnd(); });  // 재생 실패해도 진행
+}
+
+function spread(){
+  say.textContent="…끌리는 걸 하나 골라보라옹";
+  spreadBtn.disabled=true;
+  play(SPREAD, function(){
+    // 마지막 프레임을 정지 이미지로 굳히고(정지 video 흔적 제거) 그 위에 클릭 카드를 얹는다
+    still.style.backgroundImage="url('"+STILL+"')"; still.classList.add("on");
+    try{ vid.pause(); vid.removeAttribute("src"); vid.load(); }catch(e){}
+    buildCards(); cards.classList.add("on"); hint.classList.add("on");
+  });
+}
+
+function buildCards(){
+  cards.innerHTML="";
+  var n=7;
+  for(var i=0;i<n;i++){
+    var t=(i/(n-1))-0.5;                 // -0.5 ~ 0.5
+    var rot=t*48, x=t*118, y=Math.abs(t)*Math.abs(t)*34;
+    var el=document.createElement("i");
+    el.style.setProperty("--rot","rotate("+rot+"deg)");
+    el.style.setProperty("--x","calc(-50% + "+x+"px)");
+    el.style.setProperty("--y",y+"px");
+    el.style.transform="translateX(calc(-50% + "+x+"px)) translateY("+y+"px) rotate("+rot+"deg)";
+    el.onclick=(function(k){ return function(){ pick(k); }; })(i);
+    cards.appendChild(el);
+  }
+}
+
+function pick(i){
+  // 어떤 카드를 고르든 그 세션에서 결정론적으로 하나 배정(같은 자리는 같은 카드 느낌)
+  var c=DECK[(i*5+3)%DECK.length];
+  document.getElementById("rcard").textContent=c[0];
+  document.getElementById("rname").textContent=c[1];
+  document.getElementById("rdesc").innerHTML=c[2];
+  cards.classList.remove("on"); hint.classList.remove("on");
+  result.classList.add("on"); say.textContent="";
+}
+
+// 다시 뽑기: 영상 없이 펼쳐진 카드로 바로 복귀
+function redraw(){
+  result.classList.remove("on");
+  say.textContent="…이번엔 어떤 게 끌리냥?";
+  cards.classList.add("on"); hint.classList.add("on");
+}
+function reset(){
+  result.classList.remove("on"); cards.classList.remove("on"); hint.classList.remove("on");
+  vid.onended=null; try{ vid.pause(); vid.removeAttribute("src"); vid.load(); }catch(e){}
+  still.style.backgroundImage="url('"+IDLE+"')"; still.classList.add("on");
+  say.textContent="…또 궁금한 게 있냐옹?";
+  spreadBtn.disabled=false;
+}
+</script>
+</body>
+</html>
