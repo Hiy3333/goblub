@@ -154,7 +154,9 @@ video::-webkit-media-controls-overlay-play-button{display:none!important;-webkit
     <div class="rkw" id="rkw"></div>
     <div class="status" id="rstatus"><span class="spin"></span>고양이가 카드를 읽는 중…</div>
     <div class="reading" id="reading" style="display:none"></div>
-    <div class="oncebar" id="oncebar" style="display:none">🌙 오늘의 카드는 하루에 딱 한 장.<br>내일 밤, 또 궁금한 게 생기면 오라옹.</div>
+    <div class="oncebar" id="oncebar" style="display:none">🌙 오늘의 카드는 하루에 딱 한 장.<br>내일 밤, 또 궁금한 게 생기면 오라옹.<br>
+      <button class="again" style="margin-top:14px" onclick="replay()">🔮 타로 다시 보기</button>
+    </div>
   </div>
 
   <p class="hintbar" id="hintbar">고민을 적고 카드를 펼치면, 끌리는 한 장을 고를 수 있다옹.</p>
@@ -280,9 +282,27 @@ function planFor(pickIdx){
 function pick(pickIdx){
   if(phase!=="pick") return;
   phase="result";
+  // 오늘 이미 뽑았다면(다시 보기 재체험) 어떤 카드를 눌러도 오늘의 카드로 — 잠금을 덮어쓰지 않음
+  var saved=null;
+  try{ saved=JSON.parse(localStorage.getItem(LOCK_KEY)); }catch(e){}
+  if(saved && saved.date===todayStr() && typeof saved.cardIdx==="number"){
+    myWorry=saved.worry||myWorry;
+    revealResult(saved.cardIdx, saved.orient, true);
+    return;
+  }
   var pl=planFor(pickIdx);
   try{ localStorage.setItem(LOCK_KEY, JSON.stringify({date:todayStr(), cardIdx:pl.cardIdx, orient:pl.orient, worry:myWorry})); }catch(e){}
   revealResult(pl.cardIdx, pl.orient, false);
+}
+
+// 타로 다시 보기 — 오늘의 카드·해석은 그대로 두고 과정(고양이→펼치기→선택)만 재체험
+function replay(){
+  phase="intro";
+  try{ vid.pause(); vid.removeAttribute("src"); vid.load(); }catch(e){}
+  still.style.backgroundImage="url('"+CAT_IDLE+"')"; still.classList.add("on");
+  var w=$("worry"); if(w) w.value=myWorry||"";
+  show(scIntro);
+  hintbar.textContent="오늘의 카드는 그대로다옹 — 과정을 다시 보여주는 거라냥.";
 }
 
 function revealResult(cardIdx, orient, fromLock){
