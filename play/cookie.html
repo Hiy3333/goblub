@@ -187,18 +187,9 @@ function choose(i){
 
 function finish(fromLock){
   phase="result";
-  // 정지 video 흔적 제거(재생버튼 방지) — 끝 프레임은 정지 이미지로
-  var endBg=ENDIMG;
-  try{
-    if(!fromLock && vid.videoWidth){
-      var c=document.createElement("canvas");
-      c.width=vid.videoWidth; c.height=vid.videoHeight;
-      c.getContext("2d").drawImage(vid,0,0,c.width,c.height);
-      endBg=c.toDataURL("image/jpeg",.9);
-    }
-  }catch(e){}
+  // 정지 video 흔적 제거(재생버튼 방지) — 끝 프레임은 give 영상의 마지막 프레임을 추출한 정지 이미지
   try{ vid.pause(); vid.removeAttribute("src"); vid.load(); }catch(e){}
-  $("endimg").style.backgroundImage="url('"+endBg+"')";
+  $("endimg").style.backgroundImage="url('"+ENDIMG+"')";
   show(scResult);
   $("fortune").textContent="🥠 "+fortune;
   hintbar.textContent="";
