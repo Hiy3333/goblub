@@ -299,6 +299,15 @@ function revealResult(cardIdx, orient, fromLock){
   readingEl.style.display="none"; readingEl.innerHTML=""; onceBar.style.display="none";
   statusEl.style.display="block"; statusEl.innerHTML='<span class="spin"></span>고양이가 카드를 읽는 중…';
 
+  // 오늘 해석이 이미 저장돼 있으면 API 없이 즉시 표시 — 언제든 다시 보기 가능
+  var saved=null;
+  try{ saved=JSON.parse(localStorage.getItem(LOCK_KEY)); }catch(e){}
+  if(saved && saved.date===todayStr() && saved.reading){
+    readingEl.style.display="block"; statusEl.style.display="none";
+    readingEl.innerHTML=fmt(saved.reading); onceBar.style.display="block";
+    return;
+  }
+
   var acc="";
   Dosa.fetchAI("/api/cat-tarot",
     { tarot:{ worry:myWorry, card:c[1], keyword:c[2], orient:orient } },
@@ -307,12 +316,17 @@ function revealResult(cardIdx, orient, fromLock){
       onChunk:function(t){ acc+=t; readingEl.style.display="block"; statusEl.style.display="none";
         readingEl.innerHTML=fmt(acc); },
       onDone:function(){ readingEl.style.display="block"; statusEl.style.display="none";
-        readingEl.innerHTML=fmt(acc); onceBar.style.display="block"; },
+        readingEl.innerHTML=fmt(acc); onceBar.style.display="block";
+        // 완성된 해석을 통째로 저장 → 재방문 시 API 호출 없이 바로 다시 보기
+        try{ var rec=JSON.parse(localStorage.getItem(LOCK_KEY))||{};
+          rec.reading=acc; localStorage.setItem(LOCK_KEY, JSON.stringify(rec)); }catch(e){}
+      },
       onError:function(code, sec){
         statusEl.style.display="block";
-        statusEl.innerHTML = code==="not_configured" ? "점술묘가 아직 낮잠 중이라옹… 곧 깨어난다냥." :
+        statusEl.innerHTML = (code==="not_configured" ? "점술묘가 아직 낮잠 중이라옹… 곧 깨어난다냥." :
           code==="cooldown" ? "숨 좀 고르고… "+sec+"초 뒤에 다시 보라옹." :
-          "오늘은 손님이 많구나옹. 잠시 뒤 다시 와보라냥.";
+          "오늘은 손님이 많구나옹. 잠시 뒤 다시 와보라냥.") +
+          '<br/><button class="again" style="margin-top:12px" onclick="revealResult('+cardIdx+',\''+orient+'\',true)">🐾 다시 불러오기</button>';
         onceBar.style.display="block";
       }
     });
