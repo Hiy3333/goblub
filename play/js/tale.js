@@ -255,7 +255,7 @@ box-shadow:0 0 0 100vmax #040308,0 0 70px rgba(0,0,0,.8)}}";
       '<video class="tale-bgv" playsinline muted autoplay loop preload="auto"></video>' +
       '<div class="tale-bg a"></div><div class="tale-bg b"></div>' +
       '<div class="tale-vig"></div>' +
-      '<div class="tale-gob"><img src="img/tale/goblub-felt.webp?v=1" alt="고브럽" ' +
+      '<div class="tale-gob"><img src="img/tale/goblub-felt.webp?v=2" alt="고브럽" ' +
       'style="width:160px;height:auto;display:block" draggable="false" /></div>' +
       '<div class="tale-vortex"></div>' +
       '<video class="tale-vid" playsinline webkit-playsinline muted preload="auto"></video>' +
