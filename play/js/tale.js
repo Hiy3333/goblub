@@ -209,7 +209,7 @@ box-shadow:0 0 0 100vmax #040308,0 0 70px rgba(0,0,0,.8)}}";
         { label: "😮‍💨 숨을 고른다", goto: 15 }
       ]},
       { id: 15, name: "", cls: "n-nar", text: "크게 숨을 들이쉰다.\n…가자.", goto: 16 },
-      { id: 16, bg: "gwigok", name: "귀곡", cls: "n-gwi", text: "…앉거라.\n먼 길 오느라 혼이 다 시렸겠구나." },
+      { id: 16, vbg: "gwigok_idle", name: "귀곡", cls: "n-gwi", text: "…앉거라.\n먼 길 오느라 혼이 다 시렸겠구나." },
       // 이름 입력
       { id: 17, name: "귀곡", cls: "n-gwi", text: "산 자여. 네 이름을 이 천막에\n똑똑히 남겨라.",
         input: { kind: "text", key: "name", placeholder: "이름 (또는 불리고 싶은 이름)", maxlen: 12, submit: "🖊 이름을 새긴다" } },
