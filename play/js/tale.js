@@ -5,7 +5,7 @@
 //   onEnter(collected) → { name, focus, focusLabel, birth?, base, deep }
 (function () {
   var IMG = "img/tale/";
-  var IMGV = "?v=5";                    // 이미지 캐시버스트(흰눈 저승사자)
+  var IMGV = "?v=6";                    // 이미지 캐시버스트(귀곡 8초 무한루프 idle)
   var RITUAL_VID = IMG + "ritual.mp4?v=3";
   var GAN_H = { 갑: "甲", 을: "乙", 병: "丙", 정: "丁", 무: "戊", 기: "己", 경: "庚", 신: "辛", 임: "壬", 계: "癸" };
   var JI_H = { 자: "子", 축: "丑", 인: "寅", 묘: "卯", 진: "辰", 사: "巳", 오: "午", 미: "未", 신: "申", 유: "酉", 술: "戌", 해: "亥" };
