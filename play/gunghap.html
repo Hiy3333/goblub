@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>우리 궁합 — 카페 고브럽</title>
-<meta name="description" content="토끼 메이드 모카와 골든리트리버 집사 세바스가 두 사람의 사주를 한 잔에 내려주는 궁합 찻집 — 만세력 기반 궁합 점수와 블렌딩 전표" />
+<meta name="description" content="토끼 메이드 라떼와 골든리트리버 집사 모카가 두 사람의 사주를 한 잔에 내려주는 궁합 찻집 — 만세력 기반 궁합 점수와 블렌딩 전표" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Batang:wght@400;700&display=swap" rel="stylesheet" />
@@ -73,9 +73,11 @@ video::-webkit-media-controls-overlay-play-button{display:none!important;-webkit
 
 /* ── ③ 합 발표 ── */
 #scResult{background:var(--cream);padding:0 0 4px}
+#scResult .photo{position:relative;width:100%}
 #scResult .endimg{display:block;width:100%;aspect-ratio:4/3;background-size:cover;background-position:center 46%}
-#scResult .fade{position:absolute;left:0;right:0;top:0;height:100%;pointer-events:none;
-  background:linear-gradient(180deg,transparent 58%,rgba(255,250,243,.7) 82%,rgba(255,250,243,1) 100%)}
+/* 사진 아래쪽만 크림색으로 녹인다 (사진 영역 밖으로 번지지 않게 photo 안에 가둠) */
+#scResult .fade{position:absolute;inset:auto 0 0 0;height:46%;pointer-events:none;
+  background:linear-gradient(180deg,transparent,rgba(255,250,243,.72) 62%,rgba(255,250,243,1) 100%)}
 .cupwrap{position:relative;margin:-52px 0 0;text-align:center;z-index:3}
 .score{font-family:'Jua',sans-serif;font-size:2.9rem;color:var(--brown);line-height:1.1}
 .score small{font-size:1.1rem;margin-left:2px}
@@ -130,10 +132,10 @@ video::-webkit-media-controls-overlay-play-button{display:none!important;-webkit
 
   <!-- ① 가게 인사 -->
   <div class="screen on" id="scIntro">
-    <img class="bg" src="img/cafe/cafe-intro.webp" alt="토끼 메이드 모카와 집사 세바스" />
+    <img class="bg" src="img/cafe/cafe-intro.webp" alt="토끼 메이드 라떼와 집사 모카" />
     <div class="veil"></div>
     <div class="greet">
-      <span class="nm">모카 · 세바스</span>
+      <span class="nm">라떼 · 모카</span>
       <p>어서 오세요. 두 분의 합, 오늘 저희가 한 잔에 내려 드릴게요.</p>
     </div>
   </div>
@@ -171,8 +173,10 @@ video::-webkit-media-controls-overlay-play-button{display:none!important;-webkit
 
   <!-- ③ 합 발표 -->
   <div class="screen" id="scResult">
-    <div class="endimg" id="endimg"></div>
-    <div class="fade"></div>
+    <div class="photo">
+      <div class="endimg" id="endimg"></div>
+      <div class="fade"></div>
+    </div>
     <div class="cupwrap">
       <p class="score" id="r-score"></p>
       <p class="grade" id="r-grade"></p>
@@ -198,7 +202,7 @@ video::-webkit-media-controls-overlay-play-button{display:none!important;-webkit
     </div>
   </div>
 
-  <p class="hintbar" id="hintbar">두 분의 생일을 적으면, 세바스가 찻잔 두 개를 내려 줍니다.</p>
+  <p class="hintbar" id="hintbar">두 분의 생일을 적으면, 모카가 찻잔 두 개를 내려 줍니다.</p>
 </div>
 
 <script src="../js/common.js?v=5" data-root=".."></script>
@@ -267,7 +271,7 @@ $("btn-go").onclick=function(){
 /* ── 블렌딩 영상 ── */
 function playBlend(){
   phase="play"; show(scPlay);
-  hintbar.textContent="세바스가 두 잔을 내리는 중…";
+  hintbar.textContent="모카가 두 잔을 내리는 중…";
   cap.textContent="같은 주전자에서, 두 잔으로.";
   still.style.transition="none"; still.style.backgroundImage="url('"+POUR+"')";
   still.classList.add("on"); void still.offsetWidth; still.style.transition="";
@@ -307,7 +311,7 @@ function reveal(){
 
   // 두 직원의 티키타카 (등급·관계 기반, API 없이 즉시)
   $("r-talk").innerHTML = talkLines(s).map(function(l){
-    return '<div class="line '+(l[0]==="모카"?"m":"s")+'"><span class="who2">'+l[0]+'</span><p>'+l[1]+'</p></div>';
+    return '<div class="line '+(l[0]==="라떼"?"m":"s")+'"><span class="who2">'+l[0]+'</span><p>'+l[1]+'</p></div>';
   }).join("");
 
   $("r-notes").innerHTML=
@@ -328,26 +332,26 @@ function note(lb,st,txt){
   return '<div class="note"><span class="lb">'+lb+'</span><span class="st">'+st+'</span><span>'+txt+'</span></div>';
 }
 
-// 모카(손님 편) · 세바스(그 사람 편) 한 마디씩
+// 라떼(토끼 메이드 · 손님 편) · 모카(집사 · 그 사람 편) 한 마디씩
 function talkLines(s){
   var g=s.grade, out=[];
   var byGrade={
-    "천생연분":[["모카","손님… 이건 제가 봐도 놀랐어요. 두 잔이 아니라 원래 한 잔이었던 것 같은데요?"],
-               ["세바스","저도 이 배합은 오랜만에 봅니다. 그분 쪽에서도 손님을 오래 기다린 맛이 납니다."]],
-    "찰떡궁합":[["모카","향이 참 곱게 붙었어요. 손님 쪽 향이 저분 쪽 단맛을 잘 끌어올려요."],
-               ["세바스","그분의 결이 손님을 편안하게 받쳐 줍니다. 무리 없이 오래 갈 잔입니다."]],
-    "노력하면 꿀떡":[["모카","기본은 충분해요! 조금만 더 우리면 확 살아날 맛이거든요."],
-                 ["세바스","그분은 시간이 필요한 분입니다. 급히 저으면 흐려지니, 천천히 가시지요."]],
-    "서로 배우는 사이":[["모카","처음엔 낯설 수 있어요. 근데 이런 잔이 오래 기억에 남더라고요."],
-                   ["세바스","서로의 온도를 배우는 중입니다. 익숙해지면 그때가 제일 맛있습니다."]],
-    "파란만장 드라마":[["모카","와… 이건 좀 튀는 조합인데요? 근데 손님, 심심하진 않겠어요."],
-                  ["세바스","맛이 요란한 만큼 이야기가 남습니다. 다만 불 조절은 두 분 몫입니다."]]
+    "천생연분":[["라떼","손님… 이건 제가 봐도 놀랐어요. 두 잔이 아니라 원래 한 잔이었던 것 같은데요?"],
+               ["모카","저도 이 배합은 오랜만에 봅니다. 그분 쪽에서도 손님을 오래 기다린 맛이 납니다."]],
+    "찰떡궁합":[["라떼","향이 참 곱게 붙었어요. 손님 쪽 향이 저분 쪽 단맛을 잘 끌어올려요."],
+               ["모카","그분의 결이 손님을 편안하게 받쳐 줍니다. 무리 없이 오래 갈 잔입니다."]],
+    "노력하면 꿀떡":[["라떼","기본은 충분해요! 조금만 더 우리면 확 살아날 맛이거든요."],
+                 ["모카","그분은 시간이 필요한 분입니다. 급히 저으면 흐려지니, 천천히 가시지요."]],
+    "서로 배우는 사이":[["라떼","처음엔 낯설 수 있어요. 근데 이런 잔이 오래 기억에 남더라고요."],
+                   ["모카","서로의 온도를 배우는 중입니다. 익숙해지면 그때가 제일 맛있습니다."]],
+    "파란만장 드라마":[["라떼","와… 이건 좀 튀는 조합인데요? 근데 손님, 심심하진 않겠어요."],
+                  ["모카","맛이 요란한 만큼 이야기가 남습니다. 다만 불 조절은 두 분 몫입니다."]]
   };
   out=byGrade[g].slice();
-  if(s.ilgan.type==="천간합") out.push(["모카","두 분 일간이 천간합이에요. 이건 다섯 쌍뿐인 배합이라 저희도 아껴 쓰는 잎이거든요."]);
-  else if(s.ilji.type==="충") out.push(["세바스","다만 일지가 충입니다. 생활 습관에서 온도가 어긋나기 쉬우니, 미리 맞춰 두시지요."]);
-  else if(s.oheng.type==="보완") out.push(["모카","손님에게 없는 기운을 저분이 갖고 계세요. 퍼즐처럼 딱 맞는 배합이에요."]);
-  else if(s.tti.type==="육합") out.push(["세바스","띠끼리도 육합입니다. 어른들 앞에 내놓기 좋은 잔이지요."]);
+  if(s.ilgan.type==="천간합") out.push(["라떼","두 분 일간이 천간합이에요. 이건 다섯 쌍뿐인 배합이라 저희도 아껴 쓰는 잎이거든요."]);
+  else if(s.ilji.type==="충") out.push(["모카","다만 일지가 충입니다. 생활 습관에서 온도가 어긋나기 쉬우니, 미리 맞춰 두시지요."]);
+  else if(s.oheng.type==="보완") out.push(["라떼","손님에게 없는 기운을 저분이 갖고 계세요. 퍼즐처럼 딱 맞는 배합이에요."]);
+  else if(s.tti.type==="육합") out.push(["모카","띠끼리도 육합입니다. 어른들 앞에 내놓기 좋은 잔이지요."]);
   return out;
 }
 
@@ -381,8 +385,8 @@ function fmtReport(s){
   ["🫖 첫 모금","☕ 잘 우러나는 지점","🌧 식기 쉬운 지점","🤝 다시 데우는 법"].forEach(function(h){
     out=out.replace(h,'<span class="hd">'+h+'</span>');
   });
-  out=out.replace(/모카\s*:/g,'<span class="mk">모카</span>');
-  out=out.replace(/세바스\s*:/g,'<span class="sb">세바스</span>');
+  out=out.replace(/라떼\s*:/g,'<span class="mk">라떼</span>');
+  out=out.replace(/모카\s*:/g,'<span class="sb">모카</span>');
   return out;
 }
 
@@ -487,7 +491,7 @@ $("btn-receipt").onclick=function(){
 
     var dd=new Date();
     g.fillStyle="#a4917f"; g.font="24px "+GB;
-    g.fillText(dd.getFullYear()+". "+(dd.getMonth()+1)+". "+dd.getDate()+"  ·  담당: 모카 · 세바스", cx, SY+SH-40);
+    g.fillText(dd.getFullYear()+". "+(dd.getMonth()+1)+". "+dd.getDate()+"  ·  담당: 라떼 · 모카", cx, SY+SH-40);
 
     g.fillStyle="#8a7268"; g.font="28px "+GB;
     g.fillText("☕ goblub · 카페 고브럽", cx, H-76);
