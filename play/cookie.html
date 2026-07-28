@@ -141,7 +141,11 @@ video::-webkit-media-controls-overlay-play-button{display:none!important;-webkit
 <script src="js/feed.js?v=4"></script>
 <script>
 var IMG="img/otter/", V_TAKE=IMG+"otter-take.mp4", V_CRACK=IMG+"otter-crack.mp4", V_GIVE=IMG+"otter-give.mp4",
-    INTRO=IMG+"otter-intro.webp", ENDIMG=IMG+"otter-end.webp";
+    INTRO=IMG+"otter-intro.webp", ENDIMG=IMG+"otter-end.webp",
+    MID1=IMG+"otter-mid1.webp", MID2=IMG+"otter-mid2.webp";
+// 전환 중 검은 화면 방지: 다음 영상 첫 장면과 같은 정지 이미지·영상을 미리 받아둔다
+[ENDIMG, MID1, MID2].forEach(function(u){ var im=new Image(); im.src=u; });
+[V_TAKE, V_CRACK, V_GIVE].forEach(function(u){ try{ fetch(u).catch(function(){}); }catch(e){} });
 var $=function(id){return document.getElementById(id);};
 var scIntro=$("scIntro"), scPlay=$("scPlay"), scResult=$("scResult"),
     vid=$("vid"), still=$("still"), cap=$("cap"), hintbar=$("hintbar");
@@ -160,8 +164,10 @@ var phase="intro";
 function show(sc){ [scIntro,scPlay,scResult].forEach(function(s){s.classList.remove("on");}); sc.classList.add("on");
   document.body.classList.toggle("top", sc===scResult); if(sc===scResult) window.scrollTo(0,0); }
 
-function playSeq(src, capText, onEnd){
+function playSeq(src, capText, bridge, onEnd){
   cap.textContent=capText;
+  // src 교체 순간 video가 검게 비는 것을 다음 영상 첫 장면 스틸로 가린다
+  if(bridge){ still.style.backgroundImage="url('"+bridge+"')"; still.classList.add("on"); }
   vid.onended=null; vid.onplaying=null; vid.loop=false; vid.src=src;
   vid.onplaying=function(){ still.classList.remove("on"); };
   vid.onended=function(){ if(onEnd) onEnd(); };
@@ -174,23 +180,23 @@ function choose(i){
   phase="play";
   try{ localStorage.setItem(dk,"1"); }catch(e){}
   if(window.GoblubFeed) GoblubFeed.grant("cookie");
-  show(scPlay); still.classList.remove("on");
+  show(scPlay);
   hintbar.textContent="해달이 쿠키를 집었다달…";
-  playSeq(V_TAKE, "…이걸로 골랐구나달.", function(){
+  playSeq(V_TAKE, "…이걸로 골랐구나달.", INTRO, function(){
     hintbar.textContent="배 위에 올리고… 조개로 콩콩!";
-    playSeq(V_CRACK, "콩… 콩… 쫙!", function(){
+    playSeq(V_CRACK, "콩… 콩… 쫙!", MID1, function(){
       hintbar.textContent="쪽지를 꺼냈다달…";
-      playSeq(V_GIVE, "자, 네 몫이달.", function(){ finish(false); });
+      playSeq(V_GIVE, "자, 네 몫이달.", MID2, function(){ finish(false); });
     });
   });
 }
 
 function finish(fromLock){
   phase="result";
-  // 정지 video 흔적 제거(재생버튼 방지) — 끝 프레임은 give 영상의 마지막 프레임을 추출한 정지 이미지
-  try{ vid.pause(); vid.removeAttribute("src"); vid.load(); }catch(e){}
+  // 끝 프레임(give 마지막 프레임 추출 이미지)을 먼저 띄운 뒤 video를 비운다 — 검은 화면 방지
   $("endimg").style.backgroundImage="url('"+ENDIMG+"')";
   show(scResult);
+  setTimeout(function(){ try{ vid.pause(); vid.removeAttribute("src"); vid.load(); }catch(e){} }, 80);
   $("fortune").textContent="🥠 "+fortune;
   hintbar.textContent="";
   if(fromLock){ showSlip(); }
