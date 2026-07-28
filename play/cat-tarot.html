@@ -92,6 +92,10 @@ video::-webkit-media-controls-overlay-play-button{display:none!important;-webkit
   object-fit:cover;box-shadow:0 0 46px rgba(233,200,119,.4),0 14px 34px rgba(0,0,0,.55);
   animation:flip .7s;background:#120d2c}
 @keyframes flip{from{transform:rotateY(90deg);opacity:.2}to{transform:rotateY(0);opacity:1}}
+/* 역방향으로 뽑힌 카드는 그림도 뒤집어 보여준다 */
+#scResult .rcard.rev{transform:rotate(180deg);animation:flipRev .7s}
+@keyframes flipRev{from{transform:rotate(180deg) rotateY(90deg);opacity:.2}
+  to{transform:rotate(180deg) rotateY(0);opacity:1}}
 #scResult .rname{font-family:'Nanum Myeongjo',serif;color:var(--ink);font-size:1.22rem;text-align:center}
 #scResult .rorient{display:block;color:var(--violet);font-size:.82rem;margin-top:3px;text-align:center;letter-spacing:.04em}
 #scResult .rkw{color:var(--gold-soft);font-size:.82rem;text-align:center;margin:4px 0 14px;letter-spacing:.03em}
@@ -331,6 +335,7 @@ function revealResult(cardIdx, orient, fromLock){
   curIdx=cardIdx; curOrient=orient; lastReading="";
   var pad=(cardIdx<10?"0":"")+cardIdx;
   $("rimg").src="img/cat/arcana/"+pad+".webp?v=2";
+  $("rimg").classList.toggle("rev", orient.indexOf("역")>=0);
   $("rname").textContent=c[0]+" · "+c[1];
   $("rorient").textContent="— "+orient+" —";
   $("rkw").textContent=c[2];
