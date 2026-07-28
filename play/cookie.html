@@ -167,7 +167,14 @@ function show(sc){ [scIntro,scPlay,scResult].forEach(function(s){s.classList.rem
 function playSeq(src, capText, bridge, onEnd){
   cap.textContent=capText;
   // src 교체 순간 video가 검게 비는 것을 다음 영상 첫 장면 스틸로 가린다
-  if(bridge){ still.style.backgroundImage="url('"+bridge+"')"; still.classList.add("on"); }
+  // 나타날 때는 즉시(페이드 없이), 걷을 때만 0.3s 페이드 — 페이드인 중 검은 video가 비치는 것 방지
+  if(bridge){
+    still.style.transition="none";
+    still.style.backgroundImage="url('"+bridge+"')";
+    still.classList.add("on");
+    void still.offsetWidth;
+    still.style.transition="";
+  }
   vid.onended=null; vid.onplaying=null; vid.loop=false; vid.src=src;
   vid.onplaying=function(){ still.classList.remove("on"); };
   vid.onended=function(){ if(onEnd) onEnd(); };
