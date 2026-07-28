@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>귀곡 대기 루프 시안 3종 (선택용)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Jua&family=Nanum+Myeongjo:wght@700;800&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0c0a10; color: #ddd4e6; font-family: 'Jua', sans-serif; padding: 30px 16px 70px; }
+    .top { max-width: 1080px; margin: 0 auto 22px; text-align: center; }
+    .top h1 { font-family: 'Nanum Myeongjo', serif; font-weight: 800; font-size: 1.4rem; color: #ffd9a0; }
+    .top p { color: #9a8ba8; font-size: .93rem; margin-top: 8px; line-height: 1.7; }
+    .grid { max-width: 1080px; margin: 0 auto; display: grid; gap: 16px;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+    figure { background: #16121e; border: 1px solid #2e2438; border-radius: 14px; overflow: hidden; }
+    figure video { display: block; width: 100%; aspect-ratio: 9/16; object-fit: cover; background: #000; }
+    figcaption { padding: 11px 13px 14px; font-size: .86rem; color: #b7aba0; line-height: 1.6; }
+    figcaption b { color: #ffd9a8; font-family: 'Nanum Myeongjo', serif; font-size: .95rem; }
+  </style>
+</head>
+<body>
+  <div class="top">
+    <h1>귀곡 대기 루프 시안 3종</h1>
+    <p>이름·생년월일 적는 동안 맞은편에 앉아 있는 귀곡 —<br>첫 프레임과 끝 프레임을 같은 장면으로 고정해 루프가 끊겨 보이지 않게 만들었습니다. 반복 재생 중이니 이음새를 직접 확인해 보세요.</p>
+  </div>
+  <div class="grid">
+    <figure>
+      <video src="img/gwigok-loop-a.mp4" autoplay muted loop playsinline></video>
+      <figcaption><b>A · 정적</b><br>거의 완전 정지. 중간에 눈 한 번만 천천히 깜빡, 촛불·향 연기만 살아 있음. 가장 조용하고 으스스한 버전.</figcaption>
+    </figure>
+    <figure>
+      <video src="img/gwigok-loop-b.mp4" autoplay muted loop playsinline></video>
+      <figcaption><b>B · 기다리는 사람</b><br>천천히 두 번 깜빡 + 어깨로 숨쉬기 + 미세하게 귀 기울이는 고개. "네가 다 적기를 기다리는 중" 느낌.</figcaption>
+    </figure>
+    <figure>
+      <video src="img/gwigok-loop-c.mp4" autoplay muted loop playsinline></video>
+      <figcaption><b>C · 손가락 툭</b><br>깜빡임+숨쉬기에 더해 중간에 긴 손가락으로 명부를 조용히 한 번 툭. 시선은 끝까지 나를 봄. 살짝 재촉하는 압박감.</figcaption>
+    </figure>
+  </div>
+</body>
+</html>
