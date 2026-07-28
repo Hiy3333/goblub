@@ -1,295 +1,509 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>우리 궁합 — goblub</title>
-  <meta name="description" content="두 사람의 사주로 보는 궁합 점수와 풀이, 연애운 증폭 부적까지" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../css/style.css?v=cl1" />
-  <style>
-    .person-box { border: 2px dashed var(--line); border-radius: 14px; padding: 14px; margin-bottom: 14px; }
-    .person-box h3 { font-size: 1.05rem; margin-bottom: 10px; }
-    .score-big { text-align: center; font-size: 3.2rem; margin: 6px 0 0; }
-    .score-grade { text-align: center; font-size: 1.4rem; margin-bottom: 12px; }
-    .gauge { background: var(--cream); border-radius: 999px; height: 16px; margin: 10px 0 18px; overflow: hidden; }
-    .gauge > div { height: 16px; border-radius: 999px; background: linear-gradient(90deg, var(--coral), var(--purple)); transition: width 0.6s; }
-    .pair { display: flex; justify-content: center; gap: 18px; margin-bottom: 14px; }
-    .pair .pillar { min-width: 100px; }
-    .cat-line { line-height: 1.7; margin-bottom: 8px; }
-    .cat-line .pt { color: var(--ink-soft); font-size: 0.88rem; }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>우리 궁합 — 카페 고브럽</title>
+<meta name="description" content="토끼 메이드 모카와 골든리트리버 집사 세바스가 두 사람의 사주를 한 잔에 내려주는 궁합 찻집 — 만세력 기반 궁합 점수와 블렌딩 전표" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Batang:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+:root{ --ink:#4b3b32; --ink-soft:#8a7268; --brown:#b5705a; --gold:#c99a5b;
+  --cream:#fffaf3; --line:#eddfd4; --mint:#a8c8b8; }
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:#fdf7f0}
+body{background:
+  radial-gradient(700px 420px at 50% -6%, rgba(255,214,180,.45), transparent 62%),
+  radial-gradient(700px 500px at 50% 108%, rgba(200,225,210,.4), transparent 64%),
+  linear-gradient(180deg,#fdf7f0 0%,#fbf1e6 60%,#f8ece0 100%) fixed;
+  color:var(--ink);font-family:'Gowun Batang',serif;min-height:100dvh;
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:14px 14px 26px}
+.app{width:min(94vw,430px);display:flex;flex-direction:column;align-items:center}
+@media (min-width:900px){ .app{width:min(62vw,560px)} }
+.topbar{width:100%;display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.topbar a{color:var(--ink-soft);font-size:.88rem;text-decoration:none}
+.topbar a:hover{color:var(--brown)}
+.topbar .t{font-family:'Jua',sans-serif;color:var(--brown);font-size:1.12rem;margin:0 auto}
+.topbar .sp{width:44px}
+
+.screen{position:relative;width:100%;border-radius:20px;overflow:hidden;display:none;
+  border:1px solid var(--line);box-shadow:0 16px 40px rgba(180,140,120,.18)}
+.screen.on{display:block}
+
+/* ── ① 가게 · 주문서 ── */
+#scIntro{background:var(--cream)}
+#scIntro .bg{display:block;width:100%;aspect-ratio:1/1;object-fit:cover}
+#scIntro .veil{position:absolute;left:0;right:0;top:0;height:100%;pointer-events:none;
+  background:linear-gradient(180deg,transparent 52%,rgba(255,250,243,.55) 78%,rgba(255,250,243,.96) 100%)}
+#scIntro .greet{position:absolute;left:0;right:0;bottom:8px;padding:0 18px;z-index:2;text-align:center}
+#scIntro .greet .nm{display:block;font-family:'Jua',sans-serif;color:var(--brown);font-size:.8rem;margin-bottom:4px}
+#scIntro .greet p{font-size:.98rem;line-height:1.7;color:var(--ink);text-shadow:0 1px 8px rgba(255,250,243,.9)}
+
+.order{width:100%;margin-top:14px;background:var(--cream);border:1px solid var(--line);
+  border-radius:18px;padding:18px 16px 16px;box-shadow:0 10px 26px rgba(180,140,120,.14);position:relative}
+.order::before{content:"";position:absolute;left:12px;right:12px;top:12px;bottom:12px;
+  border:1.5px dashed rgba(201,154,91,.35);border-radius:12px;pointer-events:none}
+.order h2{font-family:'Jua',sans-serif;color:var(--brown);font-size:1rem;text-align:center;margin-bottom:4px}
+.order .sub{text-align:center;color:var(--ink-soft);font-size:.8rem;margin-bottom:14px}
+.who{margin-bottom:12px}
+.who h3{font-family:'Jua',sans-serif;font-size:.92rem;color:var(--ink);margin-bottom:7px}
+.who .row{display:flex;gap:6px;flex-wrap:wrap}
+.who select,.who input{font-family:'Gowun Batang',serif;font-size:.88rem;color:var(--ink);
+  background:#fff;border:1px solid var(--line);border-radius:9px;padding:8px 7px}
+.who select{flex:1;min-width:74px}
+.who input{width:62px}
+.gobtn{margin-top:6px;width:100%;padding:14px;border-radius:14px;cursor:pointer;
+  font-family:'Jua',sans-serif;font-size:1.02rem;color:#4a3018;
+  background:linear-gradient(180deg,#f7d9a8,#e8bb7c);border:1px solid rgba(255,240,214,.9);
+  box-shadow:0 10px 24px rgba(200,150,90,.3),inset 0 2px 3px rgba(255,248,232,.8);transition:transform .1s}
+.gobtn:hover{transform:translateY(-2px)}
+.errmsg{display:none;color:#c05b52;font-size:.85rem;text-align:center;margin-top:10px}
+.fine{color:var(--ink-soft);font-size:.76rem;text-align:center;margin-top:10px;line-height:1.6}
+
+/* ── ② 블렌딩 영상 ── */
+#scPlay{aspect-ratio:1/1;background:#f3e6d8}
+#scPlay video,#scPlay .still{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+#scPlay .still{background-size:cover;background-position:center;opacity:0;transition:opacity .3s}
+#scPlay .still.on{opacity:1}
+video::-webkit-media-controls,video::-webkit-media-controls-start-playback-button,
+video::-webkit-media-controls-overlay-play-button{display:none!important;-webkit-appearance:none!important}
+#scPlay .cap{position:absolute;left:0;right:0;bottom:14px;text-align:center;z-index:3;
+  color:#4a3018;font-size:.96rem;text-shadow:0 2px 10px rgba(255,248,236,.95)}
+
+/* ── ③ 합 발표 ── */
+#scResult{background:var(--cream);padding:0 0 4px}
+#scResult .endimg{display:block;width:100%;aspect-ratio:4/3;background-size:cover;background-position:center 46%}
+#scResult .fade{position:absolute;left:0;right:0;top:0;height:100%;pointer-events:none;
+  background:linear-gradient(180deg,transparent 58%,rgba(255,250,243,.7) 82%,rgba(255,250,243,1) 100%)}
+.cupwrap{position:relative;margin:-52px 0 0;text-align:center;z-index:3}
+.score{font-family:'Jua',sans-serif;font-size:2.9rem;color:var(--brown);line-height:1.1}
+.score small{font-size:1.1rem;margin-left:2px}
+.grade{font-family:'Jua',sans-serif;color:var(--gold);font-size:1.05rem;margin-top:2px}
+.gauge{width:calc(100% - 44px);height:11px;margin:12px auto 0;background:#f0e4d6;border-radius:999px;overflow:hidden}
+.gauge i{display:block;height:100%;width:0;border-radius:999px;transition:width .9s ease;
+  background:linear-gradient(90deg,#f0c493,#e39a86)}
+.pair{display:flex;align-items:center;justify-content:center;gap:10px;margin:14px 0 2px;flex-wrap:wrap}
+.pill{background:#fff;border:1px solid var(--line);border-radius:14px;padding:8px 13px;text-align:center;min-width:96px}
+.pill b{display:block;font-family:'Jua',sans-serif;color:var(--brown);font-size:.74rem;margin-bottom:2px}
+.pill span{font-size:.9rem}
+
+.body{padding:0 18px 18px}
+.talk{margin-top:16px}
+.line{display:flex;gap:9px;margin-bottom:10px;align-items:flex-start}
+.line .who2{flex:0 0 auto;font-family:'Jua',sans-serif;font-size:.76rem;padding:4px 9px;border-radius:999px;white-space:nowrap}
+.line.m .who2{background:#fbe6ea;color:#b8607a}
+.line.s .who2{background:#e7eef0;color:#5d7f8a}
+.line p{font-size:.92rem;line-height:1.75;padding-top:3px}
+
+.notes{margin-top:16px;border-top:1px dashed var(--line);padding-top:14px}
+.note{display:flex;gap:8px;font-size:.88rem;line-height:1.7;margin-bottom:9px}
+.note .lb{flex:0 0 auto;font-family:'Jua',sans-serif;color:var(--brown);min-width:72px}
+.note .st{color:var(--gold);letter-spacing:.06em;flex:0 0 auto}
+.luck{margin-top:12px;border-top:1px dashed var(--line);padding-top:12px;font-size:.88rem;line-height:1.8}
+.luck .st{color:var(--gold);letter-spacing:.06em}
+
+.btnrow{display:flex;gap:9px;justify-content:center;margin-top:16px;flex-wrap:wrap}
+.btnrow button,.btnrow a{background:#fff;color:var(--ink);border:1px solid var(--line);border-radius:12px;
+  padding:11px 18px;font-family:'Gowun Batang',serif;font-size:.9rem;cursor:pointer;text-decoration:none;
+  box-shadow:0 6px 16px rgba(180,140,120,.12);transition:transform .1s}
+.btnrow button:hover,.btnrow a:hover{transform:translateY(-2px)}
+.btnrow button.main{background:linear-gradient(180deg,#f7d9a8,#e8bb7c);color:#4a3018;border-color:rgba(255,240,214,.9)}
+.btnrow button:disabled{opacity:.55;cursor:default;transform:none}
+#gh-status{color:var(--ink-soft);font-size:.84rem;text-align:center;margin-top:12px}
+#gh-text{display:none;white-space:pre-wrap;line-height:1.95;margin-top:12px;background:#fff;
+  border:1px solid var(--line);border-radius:14px;padding:16px 15px;font-size:.92rem}
+#gh-text .mk{color:#b8607a;font-family:'Jua',sans-serif}
+#gh-text .sb{color:#5d7f8a;font-family:'Jua',sans-serif}
+#gh-text .hd{display:block;color:var(--brown);font-family:'Jua',sans-serif;margin:14px 0 4px}
+#gh-text .hd:first-child{margin-top:0}
+.hintbar{margin-top:14px;color:var(--ink-soft);font-size:.82rem;text-align:center;line-height:1.7;max-width:360px}
+</style>
 </head>
-<body class="clay">
-  <div id="site-header"></div>
-  <main>
-    <section class="hero">
-      <h1>💑 우리 궁합</h1>
-      <p>두 사람의 사주팔자로 보는 케미 — 절기 경계까지 정확한 만세력 기반</p>
-    </section>
+<body>
+<div class="app">
+  <div class="topbar">
+    <a href="fortune-hub.html">← 운세</a>
+    <span class="t">☕ 카페 고브럽</span>
+    <span class="sp"></span>
+  </div>
 
-    <section class="panel" id="input-panel">
-      <div class="person-box">
-        <h3>🙋 나</h3>
-        <div class="field-row">
-          <select id="a-year"></select><select id="a-month"></select><select id="a-day"></select>
-          <select id="a-hour"><option value="">시 몰라요</option></select>
-          <input type="number" id="a-min" min="0" max="59" value="0" aria-label="분" title="분(0~59)" style="width:58px" />
-        </div>
-      </div>
-      <div class="person-box">
-        <h3>💘 상대방</h3>
-        <div class="field-row">
-          <select id="b-year"></select><select id="b-month"></select><select id="b-day"></select>
-          <select id="b-hour"><option value="">시 몰라요</option></select>
-          <input type="number" id="b-min" min="0" max="59" value="0" aria-label="분" title="분(0~59)" style="width:58px" />
-        </div>
-      </div>
-      <button class="btn-primary" id="btn-go">궁합 보기</button>
-      <p class="error-msg" id="err"></p>
-      <p class="fine-print" style="text-align:left">두 분의 정보는 이 브라우저에서만 계산되고 저장되지 않아요.</p>
-    </section>
+  <!-- ① 가게 인사 -->
+  <div class="screen on" id="scIntro">
+    <img class="bg" src="img/cafe/cafe-intro.webp" alt="토끼 메이드 모카와 집사 세바스" />
+    <div class="veil"></div>
+    <div class="greet">
+      <span class="nm">모카 · 세바스</span>
+      <p>어서 오세요. 두 분의 합, 오늘 저희가 한 잔에 내려 드릴게요.</p>
+    </div>
+  </div>
 
-    <section class="panel" id="result-panel" style="display:none">
-      <p class="score-big" id="r-score"></p>
-      <p class="score-grade" id="r-grade"></p>
-      <div class="gauge"><div id="r-gauge" style="width:0%"></div></div>
+  <div class="order" id="orderBox">
+    <h2>☕ 오늘의 블렌딩 주문서</h2>
+    <p class="sub">두 분의 생일을 적어 주시면 그대로 내려 드려요</p>
+    <div class="who">
+      <h3>🐰 손님 (나)</h3>
+      <div class="row">
+        <select id="a-year"></select><select id="a-month"></select><select id="a-day"></select>
+        <select id="a-hour"><option value="">시 몰라요</option></select>
+        <input type="number" id="a-min" min="0" max="59" value="0" aria-label="분" />
+      </div>
+    </div>
+    <div class="who">
+      <h3>🐶 그 사람</h3>
+      <div class="row">
+        <select id="b-year"></select><select id="b-month"></select><select id="b-day"></select>
+        <select id="b-hour"><option value="">시 몰라요</option></select>
+        <input type="number" id="b-min" min="0" max="59" value="0" aria-label="분" />
+      </div>
+    </div>
+    <button class="gobtn" id="btn-go">🫖 두 잔 내려 주세요</button>
+    <p class="errmsg" id="err"></p>
+    <p class="fine">두 분의 정보는 이 브라우저에서만 계산되고 저장되지 않아요.</p>
+  </div>
+
+  <!-- ② 블렌딩 -->
+  <div class="screen" id="scPlay">
+    <video id="vid" muted playsinline webkit-playsinline preload="auto"></video>
+    <div class="still" id="still"></div>
+    <p class="cap" id="cap"></p>
+  </div>
+
+  <!-- ③ 합 발표 -->
+  <div class="screen" id="scResult">
+    <div class="endimg" id="endimg"></div>
+    <div class="fade"></div>
+    <div class="cupwrap">
+      <p class="score" id="r-score"></p>
+      <p class="grade" id="r-grade"></p>
+      <div class="gauge"><i id="r-gauge"></i></div>
       <div class="pair" id="r-pair"></div>
-      <div id="r-cats"></div>
-      <p class="cat-line" id="r-advice" style="margin-top:10px"></p>
-      <p class="cat-line" id="r-today" style="margin-top:14px"></p>
-      <p class="cat-line" id="r-month"></p>
+    </div>
+    <div class="body">
+      <div class="talk" id="r-talk"></div>
+      <div class="notes" id="r-notes"></div>
+      <div class="luck" id="r-luck"></div>
 
-      <div id="gh-dosa" style="margin-top:18px; text-align:center">
-        <div class="result-actions">
-          <button class="btn-primary" id="btn-bujeok">🧧 연애운 증폭 부적 받기</button>
-          <button class="btn-ghost" id="btn-ghdosa">🧙 도사의 궁합 리포트</button>
-          <a class="btn-ghost" href="letter.html" style="border-color:var(--coral); color:var(--coral)">💌 이 케미로 마음 배달 보내기</a>
-          <button class="btn-ghost" id="btn-retry">다시 보기</button>
-          <a class="btn-ghost" href="../index.html">🎡 다른 즐길거리 보기</a>
-        </div>
-        <p id="gh-status" class="fine-print" style="display:none"></p>
-        <div id="gh-text" style="display:none; white-space:pre-wrap; line-height:1.8; margin-top:12px; background:var(--cream); border-radius:14px; padding:18px; text-align:left"></div>
+      <div class="btnrow">
+        <button class="main" id="btn-report">📜 두 사람의 티키타카 듣기</button>
+        <button id="btn-receipt">🧾 전표로 저장</button>
       </div>
-    </section>
+      <p id="gh-status" style="display:none"></p>
+      <div id="gh-text"></div>
+      <div class="btnrow">
+        <a href="letter.html">💌 이 케미로 마음 배달</a>
+        <button id="btn-retry">🔁 다시 주문</button>
+        <a href="../index.html">🎡 다른 즐길거리</a>
+      </div>
+    </div>
+  </div>
 
-  </main>
-  <div id="site-footer"></div>
-  <script src="../js/common.js?v=5" data-root=".."></script>
-  <script src="js/saju.js"></script>
-  <script src="js/gunghap.js"></script>
-  <script src="js/dosa.js?v=2"></script>
-  <script src="js/feed.js?v=4"></script>
-  <script>
-    (function () {
-      var $ = function (id) { return document.getElementById(id); };
-      var data = null, last = null;
+  <p class="hintbar" id="hintbar">두 분의 생일을 적으면, 세바스가 찻잔 두 개를 내려 줍니다.</p>
+</div>
 
-      function fillSelects(prefix) {
-        var y = $(prefix + "-year"), m = $(prefix + "-month"), d = $(prefix + "-day"), h = $(prefix + "-hour");
-        for (var i = 2100; i >= 1900; i--) y.add(new Option(i + "년", i));
-        y.value = 1995;
-        for (i = 1; i <= 12; i++) m.add(new Option(i + "월", i));
-        for (i = 1; i <= 31; i++) d.add(new Option(i + "일", i));
-        for (i = 0; i <= 23; i++) h.add(new Option(i + "시", i));
-      }
-      fillSelects("a"); fillSelects("b");
+<script src="../js/common.js?v=5" data-root=".."></script>
+<script src="js/saju.js"></script>
+<script src="js/gunghap.js"></script>
+<script src="js/dosa.js?v=2"></script>
+<script src="js/feed.js?v=4"></script>
+<script>
+var IMGC="img/cafe/", V_BLEND=IMGC+"cafe-blend.mp4", INTRO=IMGC+"cafe-intro.webp",
+    POUR=IMGC+"cafe-pour.webp", ENDIMG=IMGC+"cafe-end.webp";
+[INTRO,POUR,ENDIMG].forEach(function(u){ var im=new Image(); im.src=u; });
+try{ fetch(V_BLEND).catch(function(){}); }catch(e){}
 
-      // 운세 페이지에 저장된 내 생일 프리필
-      try {
-        var mine = JSON.parse(localStorage.getItem("goblub_birth"));
-        if (mine && mine.y) {
-          $("a-year").value = mine.y; $("a-month").value = mine.m; $("a-day").value = mine.d;
-          if (mine.hour != null) $("a-hour").value = mine.hour;
-          if (mine.min) $("a-min").value = mine.min;
-        }
-      } catch (e) {}
+var $=function(id){return document.getElementById(id);};
+var scIntro=$("scIntro"), scPlay=$("scPlay"), scResult=$("scResult"),
+    vid=$("vid"), still=$("still"), cap=$("cap"), hintbar=$("hintbar"), orderBox=$("orderBox");
+var data=null, last=null, phase="intro";
 
-      function showErr(msg) { var e = $("err"); e.textContent = msg; e.style.display = "block"; }
+function show(sc){
+  [scIntro,scPlay,scResult].forEach(function(s){ s.classList.remove("on"); });
+  sc.classList.add("on");
+  orderBox.style.display = (sc===scIntro) ? "block" : "none";
+  if(sc!==scIntro) window.scrollTo(0,0);
+}
 
-      function readBirth(prefix) {
-        var yy = +$(prefix + "-year").value, mm = +$(prefix + "-month").value, dd = +$(prefix + "-day").value;
-        var date = new Date(yy, mm - 1, dd);
-        if (date.getFullYear() !== yy || date.getMonth() !== mm - 1 || date.getDate() !== dd) return null;
-        var hv = $(prefix + "-hour").value;
-        var mv = hv === "" ? 0 : Math.min(59, Math.max(0, +($(prefix + "-min").value || 0)));
-        return { y: yy, m: mm, d: dd, hour: hv === "" ? null : +hv, min: mv };
-      }
+/* ── 주문서 ── */
+function fillSelects(p){
+  var y=$(p+"-year"), m=$(p+"-month"), d=$(p+"-day"), h=$(p+"-hour"), now=new Date().getFullYear();
+  for(var i=now;i>=1930;i--) y.add(new Option(i+"년", i));
+  for(var j=1;j<=12;j++) m.add(new Option(j+"월", j));
+  for(var k=1;k<=31;k++) d.add(new Option(k+"일", k));
+  for(var t=0;t<24;t++) h.add(new Option(("0"+t).slice(-2)+"시", t));
+  y.value=1995; m.value=1; d.value=1;
+}
+fillSelects("a"); fillSelects("b");
 
-      fetch("data/saju-terms.json")
-        .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
-        .then(function (d) { data = d; })
-        .catch(function () { showErr("데이터를 불러오지 못했어요. 새로고침 해주세요."); });
+function readBirth(p){
+  var y=+$(p+"-year").value, m=+$(p+"-month").value, d=+$(p+"-day").value;
+  var hv=$(p+"-hour").value, mi=+($(p+"-min").value||0);
+  var dt=new Date(y,m-1,d);
+  if(dt.getFullYear()!==y || dt.getMonth()!==m-1 || dt.getDate()!==d) return null;
+  var b={ y:y, m:m, d:d };
+  if(hv!==""){ b.hour=+hv; b.min=Math.max(0,Math.min(59,mi)); }
+  return b;
+}
+function showErr(msg){ var e=$("err"); e.textContent=msg; e.style.display="block"; }
 
-      $("btn-go").onclick = function () {
-        $("err").style.display = "none";
-        if (!data) { showErr("데이터를 불러오지 못했어요. 새로고침 해주세요."); return; }
-        var ba = readBirth("a"), bb = readBirth("b");
-        if (!ba || !bb) { showErr("없는 날짜가 있어요. 다시 확인해주세요!"); return; }
-        var rA = Saju.compute(data, ba, { trueSolar: true });
-        var rB = Saju.compute(data, bb, { trueSolar: true });
-        var s = Gunghap.score(rA, rB);
-        var now = new Date();
-        var rT = Saju.compute(data, { y: now.getFullYear(), m: now.getMonth() + 1, d: now.getDate(), hour: 12, min: 0 }, {});
-        var luck = Gunghap.coupleLuck(rA, rB, rT);
-        last = { rA: rA, rB: rB, ba: ba, bb: bb, s: s };
-        render(rA, rB, s);
-        renderLuck(luck);
-        $("gh-text").style.display = "none"; $("gh-text").textContent = "";
-        $("gh-status").style.display = "none"; $("btn-ghdosa").disabled = false;
-        $("input-panel").style.display = "none";
-        $("result-panel").style.display = "block";
-        if (window.GoblubFeed) GoblubFeed.grant("gunghap");
-      };
+fetch("data/saju-terms.json").then(function(r){ if(!r.ok) throw 0; return r.json(); })
+  .then(function(d){ data=d; })
+  .catch(function(){ showErr("차 재료를 못 꺼냈어요. 새로고침 해주세요."); });
 
-      function pillarBox(label, r) {
-        var t = Saju.pillarText(r.pillars.day);
-        return '<div class="pillar"><span class="role">' + label + '</span><span class="hanja">' + t.hanja +
-          '</span><span class="hangul">' + t.hangul + " · " + r.zodiac + "띠</span></div>";
-      }
+$("btn-go").onclick=function(){
+  $("err").style.display="none";
+  if(!data){ showErr("차 재료를 못 꺼냈어요. 새로고침 해주세요."); return; }
+  var ba=readBirth("a"), bb=readBirth("b");
+  if(!ba||!bb){ showErr("없는 날짜가 있어요. 다시 확인해 주세요!"); return; }
+  var rA=Saju.compute(data,ba,{trueSolar:true}), rB=Saju.compute(data,bb,{trueSolar:true});
+  var s=Gunghap.score(rA,rB);
+  var now=new Date();
+  var rT=Saju.compute(data,{y:now.getFullYear(),m:now.getMonth()+1,d:now.getDate(),hour:12,min:0},{});
+  last={ rA:rA, rB:rB, ba:ba, bb:bb, s:s, luck:Gunghap.coupleLuck(rA,rB,rT) };
+  if(window.GoblubFeed) GoblubFeed.grant("gunghap");
+  playBlend();
+};
 
-      function render(rA, rB, s) {
-        $("r-score").textContent = s.total + "점";
-        $("r-grade").textContent = "「" + s.grade + "」";
-        setTimeout(function () { $("r-gauge").style.width = s.total + "%"; }, 50);
-        $("r-pair").innerHTML = pillarBox("나", rA) + '<div style="align-self:center; font-size:1.6rem">❤️</div>' + pillarBox("상대", rB);
-        var T = Gunghap.TEXTS;
-        $("r-cats").innerHTML =
-          '<p class="cat-line">🌟 일간 케미 <span class="pt">(' + s.ilgan.pt + "/" + s.ilgan.max + ")</span> — " + T.ilgan[s.ilgan.type] + "</p>" +
-          '<p class="cat-line">🏠 일지 케미 <span class="pt">(' + s.ilji.pt + "/" + s.ilji.max + ")</span> — " + T.ilji[s.ilji.type] + "</p>" +
-          '<p class="cat-line">⚖️ 오행 케미 <span class="pt">(' + s.oheng.pt + "/" + s.oheng.max + ")</span> — " + T.oheng[s.oheng.type] + "</p>" +
-          '<p class="cat-line">🐭 띠 케미 <span class="pt">(' + s.tti.pt + "/" + s.tti.max + ")</span> — " + T.tti[s.tti.type] + "</p>" +
-          '<p class="cat-line" style="margin-top:10px">' + T.grade[s.grade] + "</p>";
-        $("r-advice").textContent = T.advice[s.grade];
-      }
+/* ── 블렌딩 영상 ── */
+function playBlend(){
+  phase="play"; show(scPlay);
+  hintbar.textContent="세바스가 두 잔을 내리는 중…";
+  cap.textContent="같은 주전자에서, 두 잔으로.";
+  still.style.transition="none"; still.style.backgroundImage="url('"+POUR+"')";
+  still.classList.add("on"); void still.offsetWidth; still.style.transition="";
+  var started=false;
+  vid.loop=false;
+  vid.onplaying=function(){ started=true; still.classList.remove("on"); };
+  vid.onended=function(){ reveal(); };
+  vid.onerror=function(){ reveal(); };
+  vid.src=V_BLEND;
+  var p=vid.play(); if(p&&p.catch) p.catch(function(){ reveal(); });
+  setTimeout(function(){ if(!started && vid.paused && !vid.ended) reveal(); },8000);
+}
 
-      function stars(n) { return "★★★★★".slice(0, n) + "☆☆☆☆☆".slice(0, 5 - n); }
+/* ── 합 발표 ── */
+function stars(n){ return "★★★★★".slice(0,n)+"☆☆☆☆☆".slice(0,5-n); }
+function starOf(pt,max){ return stars(Math.max(1,Math.round(pt/max*5))); }
 
-      function renderLuck(luck) {
-        $("r-today").innerHTML = '📅 오늘의 궁합 <span class="stars">' + stars(luck.day.score) + "</span> — " + luck.day.text;
-        $("r-month").innerHTML = '🗓️ 이번 달 궁합 <span class="stars">' + stars(luck.month.score) + "</span> — " + luck.month.text;
-      }
+function reveal(){
+  if(phase==="result") return;
+  phase="result";
+  vid.onended=null; vid.onerror=null; vid.onplaying=null;
+  $("endimg").style.backgroundImage="url('"+ENDIMG+"')";
+  show(scResult);
+  setTimeout(function(){ try{ vid.pause(); vid.removeAttribute("src"); vid.load(); }catch(e){} },80);
+  hintbar.textContent="";
 
-      $("btn-retry").onclick = function () {
-        $("result-panel").style.display = "none";
-        $("input-panel").style.display = "block";
-      };
+  var s=last.s, T=Gunghap.TEXTS;
+  $("r-score").innerHTML=s.total+'<small>점</small>';
+  $("r-grade").textContent="「"+s.grade+"」";
+  setTimeout(function(){ $("r-gauge").style.width=s.total+"%"; },60);
 
-      // 🧧 부적 카드
-      $("btn-bujeok").onclick = function () {
-        if (!last) return;
-        var tA = Saju.pillarText(last.rA.pillars.day), tB = Saju.pillarText(last.rB.pillars.day);
-        var c = document.createElement("canvas");
-        c.width = 720; c.height = 1280;
-        var g = c.getContext("2d");
-        var W = 720, H = 1280, neon = "#ff2e6e";
-        function rr(x, y, w, h, rad) {
-          g.beginPath(); g.moveTo(x + rad, y);
-          g.arcTo(x + w, y, x + w, y + h, rad); g.arcTo(x + w, y + h, x, y + h, rad);
-          g.arcTo(x, y + h, x, y, rad); g.arcTo(x, y, x + w, y, rad); g.closePath();
-        }
-        // 어두운 야경 배경
-        var grd = g.createLinearGradient(0, 0, 0, H);
-        grd.addColorStop(0, "#0d0a2b"); grd.addColorStop(0.45, "#1c1250"); grd.addColorStop(1, "#45227a");
-        g.fillStyle = grd; g.fillRect(0, 0, W, H);
-        // 시티 스카이라인
-        g.fillStyle = "#0a0620";
-        [[0, 1150, 90, 130], [110, 1120, 70, 160], [200, 1160, 80, 120], [300, 1100, 65, 180], [385, 1140, 95, 140],
-         [500, 1110, 70, 170], [590, 1155, 80, 125], [685, 1125, 60, 155]].forEach(function (b) { g.fillRect(b[0], b[1], b[2], b[3]); });
-        var win = ["#ffd93d", "#ff6ec7", "#4deeea"];
-        [[30, 1175], [135, 1150], [230, 1185], [325, 1130], [420, 1165], [525, 1140], [615, 1180], [705, 1155]].forEach(function (p, wi) {
-          g.fillStyle = win[wi % 3]; g.globalAlpha = 0.85; g.fillRect(p[0], p[1], 7, 7); g.globalAlpha = 1;
-        });
-        // 이중 네온 프레임 — 바깥 레드핑크 굵게 + 안쪽 가는 흰 선
-        g.save(); g.shadowColor = neon; g.shadowBlur = 30; g.strokeStyle = neon; g.lineWidth = 8;
-        rr(26, 26, W - 52, H - 52, 30); g.stroke(); g.stroke(); g.restore();
-        g.strokeStyle = "rgba(255,255,255,0.7)"; g.lineWidth = 1.5;
-        rr(48, 48, W - 96, H - 96, 22); g.stroke();
-        // 반짝이 장식
-        g.textAlign = "center"; g.fillStyle = "#ffd93d"; g.font = "30px sans-serif";
-        g.save(); g.shadowColor = "#ffd93d"; g.shadowBlur = 14;
-        g.fillText("✦", 120, 210); g.fillText("✦", W - 110, 560); g.fillText("✧", W - 130, 170); g.fillText("✧", 130, 620);
-        g.restore();
-        // 세로 부적 글씨 — 네온 사인
-        g.fillStyle = "#ffffff";
-        g.font = "84px 'Jua', 'Malgun Gothic', serif";
-        var title = "戀愛運上昇符";
-        g.save(); g.shadowColor = neon; g.shadowBlur = 34;
-        for (var i = 0; i < title.length; i++) { g.fillText(title[i], 360, 200 + i * 100); g.fillText(title[i], 360, 200 + i * 100); }
-        g.restore();
-        g.save(); g.shadowColor = neon; g.shadowBlur = 12; g.fillStyle = neon; g.globalAlpha = 0.35;
-        for (var i2 = 0; i2 < title.length; i2++) g.fillText(title[i2], 360, 200 + i2 * 100);
-        g.restore(); g.globalAlpha = 1;
-        // 띠 이모지 조합
-        var ZE = { 쥐: "🐭", 소: "🐮", 호랑이: "🐯", 토끼: "🐰", 용: "🐲", 뱀: "🐍", 말: "🐴", 양: "🐑", 원숭이: "🐵", 닭: "🐔", 개: "🐶", 돼지: "🐷" };
-        g.font = "84px 'Segoe UI Emoji', sans-serif";
-        g.save(); g.shadowColor = neon; g.shadowBlur = 26;
-        g.fillText((ZE[last.rA.zodiac] || "🐭") + " ❤️ " + (ZE[last.rB.zodiac] || "🐭"), 360, 880);
-        g.restore();
-        // 일주 한자
-        g.font = "54px 'Jua', 'Malgun Gothic', serif"; g.fillStyle = "#ffffff";
-        g.save(); g.shadowColor = "#9d6bff"; g.shadowBlur = 18;
-        g.fillText(tA.hanja + "  ♥  " + tB.hanja, 360, 968);
-        g.restore();
-        // 점수 + 등급 — 노랑 네온
-        g.font = "52px 'Jua', 'Malgun Gothic', sans-serif"; g.fillStyle = "#ffd93d";
-        g.save(); g.shadowColor = "#ffd93d"; g.shadowBlur = 24;
-        g.fillText(last.s.total + "점 · " + last.s.grade, 360, 1048); g.fillText(last.s.total + "점 · " + last.s.grade, 360, 1048);
-        g.restore();
-        // 축원 두 줄 — 연보라
-        var bless = Gunghap.blessing(last.s);
-        g.font = "28px 'Jua', 'Malgun Gothic', sans-serif";
-        g.fillStyle = "#cdbdf6";
-        g.fillText(bless[0], 360, 1112);
-        g.fillText(bless[1], 360, 1156);
-        // 하단 CTA
-        g.font = "28px 'Jua', 'Malgun Gothic', sans-serif"; g.fillStyle = "#4deeea";
-        g.save(); g.shadowColor = "#4deeea"; g.shadowBlur = 12;
-        g.fillText("나도 해보기 ▶ goblub-2.vercel.app", 360, H - 68);
-        g.restore();
-        c.toBlob(function (blob) {
-          if (!blob) { window.open(c.toDataURL("image/png")); return; }
-          var a = document.createElement("a");
-          a.href = URL.createObjectURL(blob);
-          a.download = "goblub-bujeok-" + last.s.total + ".png";
-          document.body.appendChild(a); a.click(); a.remove();
-          setTimeout(function () { URL.revokeObjectURL(a.href); }, 5000);
-        }, "image/png");
-      };
+  var tA=Saju.pillarText(last.rA.pillars.day), tB=Saju.pillarText(last.rB.pillars.day);
+  $("r-pair").innerHTML=
+    '<div class="pill"><b>손님</b><span>'+tA.hanja+" · "+last.rA.zodiac+'띠</span></div>'+
+    '<div style="font-size:1.3rem">🫖</div>'+
+    '<div class="pill"><b>그 사람</b><span>'+tB.hanja+" · "+last.rB.zodiac+'띠</span></div>';
 
-      // 🧙 도사의 궁합 리포트
-      $("btn-ghdosa").onclick = function () {
-        if (!last) return;
-        var btn = $("btn-ghdosa"), txt = $("gh-text"), st = $("gh-status");
-        btn.disabled = true;
-        st.style.display = "block";
-        st.textContent = "🧙 도사님이 두 사주를 나란히 펼쳐보는 중…";
-        txt.style.display = "block"; txt.textContent = "";
-        var payload = {
-          a: Dosa.buildPayload(last.rA, last.ba, null, false),
-          b: Dosa.buildPayload(last.rB, last.bb, null, false),
-          score: { total: last.s.total, grade: last.s.grade,
-            ilgan: last.s.ilgan.type, ilji: last.s.ilji.type,
-            oheng: last.s.oheng.type, tti: last.s.tti.type }
-        };
-        Dosa.fetchGunghap(payload, {
-          onChunk: function (t) { txt.textContent += t; },
-          onDone: function (fromCache) {
-            st.textContent = fromCache ? "🧙 (지난번에 봐드린 리포트예요)" : "🧙 리포트 끝!";
-          },
-          onError: function (code, sec) {
-            txt.style.display = "none";
-            st.textContent =
-              code === "not_configured" ? "도사님이 아직 수련 중이에요. 곧 찾아옵니다!" :
-              code === "cooldown" ? "도사님이 숨 고르는 중… " + sec + "초 후에 다시!" :
-              "도사님이 지금 손님이 많아요. 잠시 후 다시 시도해 주세요.";
-            btn.disabled = false;
-          }
-        });
-      };
-    })();
-  </script>
+  // 두 직원의 티키타카 (등급·관계 기반, API 없이 즉시)
+  $("r-talk").innerHTML = talkLines(s).map(function(l){
+    return '<div class="line '+(l[0]==="모카"?"m":"s")+'"><span class="who2">'+l[0]+'</span><p>'+l[1]+'</p></div>';
+  }).join("");
+
+  $("r-notes").innerHTML=
+    note("🌿 향", starOf(s.ilgan.pt,s.ilgan.max), T.ilgan[s.ilgan.type])+
+    note("🌡 온도", starOf(s.ilji.pt,s.ilji.max), T.ilji[s.ilji.type])+
+    note("⚗ 배합", starOf(s.oheng.pt,s.oheng.max), T.oheng[s.oheng.type])+
+    note("🍰 곁들임", starOf(s.tti.pt,s.tti.max), T.tti[s.tti.type]);
+
+  var lk=last.luck;
+  $("r-luck").innerHTML=
+    '📅 오늘의 합 <span class="st">'+stars(lk.day.score)+'</span> — '+lk.day.text+'<br>'+
+    '🗓️ 이번 달 합 <span class="st">'+stars(lk.month.score)+'</span> — '+lk.month.text;
+
+  $("gh-text").style.display="none"; $("gh-text").innerHTML="";
+  $("gh-status").style.display="none"; $("btn-report").disabled=false;
+}
+function note(lb,st,txt){
+  return '<div class="note"><span class="lb">'+lb+'</span><span class="st">'+st+'</span><span>'+txt+'</span></div>';
+}
+
+// 모카(손님 편) · 세바스(그 사람 편) 한 마디씩
+function talkLines(s){
+  var g=s.grade, out=[];
+  var byGrade={
+    "천생연분":[["모카","손님… 이건 제가 봐도 놀랐어요. 두 잔이 아니라 원래 한 잔이었던 것 같은데요?"],
+               ["세바스","저도 이 배합은 오랜만에 봅니다. 그분 쪽에서도 손님을 오래 기다린 맛이 납니다."]],
+    "찰떡궁합":[["모카","향이 참 곱게 붙었어요. 손님 쪽 향이 저분 쪽 단맛을 잘 끌어올려요."],
+               ["세바스","그분의 결이 손님을 편안하게 받쳐 줍니다. 무리 없이 오래 갈 잔입니다."]],
+    "노력하면 꿀떡":[["모카","기본은 충분해요! 조금만 더 우리면 확 살아날 맛이거든요."],
+                 ["세바스","그분은 시간이 필요한 분입니다. 급히 저으면 흐려지니, 천천히 가시지요."]],
+    "서로 배우는 사이":[["모카","처음엔 낯설 수 있어요. 근데 이런 잔이 오래 기억에 남더라고요."],
+                   ["세바스","서로의 온도를 배우는 중입니다. 익숙해지면 그때가 제일 맛있습니다."]],
+    "파란만장 드라마":[["모카","와… 이건 좀 튀는 조합인데요? 근데 손님, 심심하진 않겠어요."],
+                  ["세바스","맛이 요란한 만큼 이야기가 남습니다. 다만 불 조절은 두 분 몫입니다."]]
+  };
+  out=byGrade[g].slice();
+  if(s.ilgan.type==="천간합") out.push(["모카","두 분 일간이 천간합이에요. 이건 다섯 쌍뿐인 배합이라 저희도 아껴 쓰는 잎이거든요."]);
+  else if(s.ilji.type==="충") out.push(["세바스","다만 일지가 충입니다. 생활 습관에서 온도가 어긋나기 쉬우니, 미리 맞춰 두시지요."]);
+  else if(s.oheng.type==="보완") out.push(["모카","손님에게 없는 기운을 저분이 갖고 계세요. 퍼즐처럼 딱 맞는 배합이에요."]);
+  else if(s.tti.type==="육합") out.push(["세바스","띠끼리도 육합입니다. 어른들 앞에 내놓기 좋은 잔이지요."]);
+  return out;
+}
+
+/* ── 티키타카 리포트(AI) ── */
+$("btn-report").onclick=function(){
+  if(!last) return;
+  var btn=$("btn-report"), txt=$("gh-text"), st=$("gh-status");
+  btn.disabled=true; st.style.display="block"; st.textContent="🫖 두 사람이 잔을 앞에 두고 이야기 중…";
+  txt.style.display="block"; txt.innerHTML="";
+  var acc="";
+  Dosa.fetchGunghap({
+    a: Dosa.buildPayload(last.rA,last.ba,null,false),
+    b: Dosa.buildPayload(last.rB,last.bb,null,false),
+    score:{ total:last.s.total, grade:last.s.grade, ilgan:last.s.ilgan.type,
+            ilji:last.s.ilji.type, oheng:last.s.oheng.type, tti:last.s.tti.type }
+  },{
+    onChunk:function(t){ acc+=t; txt.innerHTML=fmtReport(acc); },
+    onDone:function(fromCache){ txt.innerHTML=fmtReport(acc);
+      st.textContent=fromCache?"🫖 (지난번에 내려 드린 잔이에요)":"🫖 오늘의 블렌딩, 맛있게 드세요."; },
+    onError:function(code,sec){
+      txt.style.display="none";
+      st.textContent = code==="not_configured" ? "두 사람이 아직 출근 전이에요. 곧 문 엽니다!" :
+        code==="cooldown" ? "잠깐 숨 고르는 중… "+sec+"초 후에 다시 불러 주세요." :
+        "지금 손님이 많아요. 잠시 후 다시 시도해 주세요.";
+      btn.disabled=false;
+    }
+  });
+};
+function fmtReport(s){
+  var out=s.replace(/</g,"&lt;");
+  ["🫖 첫 모금","☕ 잘 우러나는 지점","🌧 식기 쉬운 지점","🤝 다시 데우는 법"].forEach(function(h){
+    out=out.replace(h,'<span class="hd">'+h+'</span>');
+  });
+  out=out.replace(/모카\s*:/g,'<span class="mk">모카</span>');
+  out=out.replace(/세바스\s*:/g,'<span class="sb">세바스</span>');
+  return out;
+}
+
+$("btn-retry").onclick=function(){
+  phase="intro"; show(scIntro);
+  hintbar.textContent="다른 분과의 합도 내려 드릴게요.";
+};
+
+/* ── 🧾 블렌딩 전표 저장 ── */
+function rr(g,x,y,w,h,r){ g.beginPath();
+  g.moveTo(x+r,y); g.arcTo(x+w,y,x+w,y+h,r); g.arcTo(x+w,y+h,x,y+h,r);
+  g.arcTo(x,y+h,x,y,r); g.arcTo(x,y,x+w,y,r); g.closePath(); }
+function wrapLines(g,text,maxW){
+  var out=[],line="";
+  text.split(" ").forEach(function(w){ var t=line?line+" "+w:w;
+    if(g.measureText(t).width<=maxW||!line){ line=t; return; } out.push(line); line=w; });
+  if(line) out.push(line); return out;
+}
+function ensureFonts(){
+  if(!document.fonts||!document.fonts.load) return Promise.resolve();
+  return Promise.all([document.fonts.load("700 44px 'Gowun Batang'"),
+    document.fonts.load("400 26px 'Gowun Batang'"), document.fonts.load("400 34px 'Jua'")]).catch(function(){});
+}
+
+$("btn-receipt").onclick=function(){
+  if(!last) return;
+  var btn=$("btn-receipt"), old=btn.textContent;
+  btn.disabled=true; btn.textContent="전표 뽑는 중…";
+  var im=new Image();
+  im.onerror=function(){ btn.disabled=false; btn.textContent=old; alert("전표를 못 뽑았어요. 잠시 후 다시 시도해 주세요."); };
+  im.onload=function(){ ensureFonts().then(function(){ draw(im); btn.disabled=false; btn.textContent=old; }); };
+  im.src=ENDIMG;
+
+  function draw(img){
+    var W=1080, PAD=70, CW=W-PAD*2, PY=64, PH=560, GB="'Gowun Batang',serif", JU="'Jua',sans-serif";
+    var s=last.s, T=Gunghap.TEXTS;
+    var tA=Saju.pillarText(last.rA.pillars.day), tB=Saju.pillarText(last.rB.pillars.day);
+    var rows=[["향 (일간)",starOf(s.ilgan.pt,s.ilgan.max),s.ilgan.pt+"/"+s.ilgan.max],
+              ["온도 (일지)",starOf(s.ilji.pt,s.ilji.max),s.ilji.pt+"/"+s.ilji.max],
+              ["배합 (오행)",starOf(s.oheng.pt,s.oheng.max),s.oheng.pt+"/"+s.oheng.max],
+              ["곁들임 (띠)",starOf(s.tti.pt,s.tti.max),s.tti.pt+"/"+s.tti.max]];
+    var quote=(talkLines(s)[0]||["",""])[1];
+
+    var m=document.createElement("canvas").getContext("2d");
+    m.font="34px "+GB;
+    var qs=wrapLines(m,quote,CW-140), QLH=52;
+    var SY=PY+PH-40;
+    var SH=54+70+56+46+rows.length*56+34+96+30+qs.length*QLH+70;
+    var H=SY+SH+130;
+
+    var c=document.createElement("canvas"); c.width=W; c.height=H;
+    var g=c.getContext("2d");
+    var bg=g.createLinearGradient(0,0,0,H);
+    bg.addColorStop(0,"#fdf7f0"); bg.addColorStop(1,"#f6e9db");
+    g.fillStyle=bg; g.fillRect(0,0,W,H);
+
+    // 사진
+    var sh=img.width*(PH/CW), sy=Math.max(0,Math.min(img.height-sh,img.height*0.46-sh/2));
+    g.save(); g.shadowColor="rgba(150,110,90,.35)"; g.shadowBlur=36; g.shadowOffsetY=12;
+    rr(g,PAD,PY,CW,PH,24); g.fillStyle="#fff"; g.fill(); g.restore();
+    g.save(); rr(g,PAD,PY,CW,PH,24); g.clip();
+    g.drawImage(img,0,sy,img.width,sh,PAD,PY,CW,PH);
+    var fd=g.createLinearGradient(0,PY+PH*0.5,0,PY+PH);
+    fd.addColorStop(0,"rgba(253,247,240,0)"); fd.addColorStop(1,"rgba(253,247,240,.95)");
+    g.fillStyle=fd; g.fillRect(PAD,PY+PH*0.5,CW,PH*0.5);
+    g.restore();
+
+    // 전표
+    g.save(); g.shadowColor="rgba(150,110,90,.3)"; g.shadowBlur=40; g.shadowOffsetY=14;
+    rr(g,PAD,SY,CW,SH,22); g.fillStyle="#fffdf8"; g.fill(); g.restore();
+    g.save(); g.setLineDash([10,9]); g.strokeStyle="rgba(201,154,91,.4)"; g.lineWidth=2;
+    rr(g,PAD+16,SY+16,CW-32,SH-32,14); g.stroke(); g.restore();
+
+    var cx=W/2, y=SY+78;
+    g.textAlign="center";
+    g.fillStyle="#b5705a"; g.font="38px "+JU;
+    g.fillText("CAFÉ 고브럽 · 블렌딩 전표", cx, y); y+=54;
+    g.fillStyle="#8a7268"; g.font="28px "+GB;
+    g.fillText(tA.hanja+"("+last.rA.zodiac+"띠)  ×  "+tB.hanja+"("+last.rB.zodiac+"띠)", cx, y); y+=52;
+
+    g.strokeStyle="rgba(201,154,91,.45)"; g.lineWidth=2;
+    g.beginPath(); g.moveTo(PAD+56,y); g.lineTo(W-PAD-56,y); g.stroke(); y+=52;
+
+    g.font="30px "+GB;
+    rows.forEach(function(r){
+      g.textAlign="left";  g.fillStyle="#4b3b32"; g.fillText(r[0], PAD+62, y);
+      g.textAlign="center";g.fillStyle="#c99a5b"; g.fillText(r[1], cx+40, y);
+      g.textAlign="right"; g.fillStyle="#8a7268"; g.fillText(r[2], W-PAD-62, y);
+      y+=56;
+    });
+    y+=6;
+    g.textAlign="center"; g.strokeStyle="rgba(201,154,91,.45)";
+    g.beginPath(); g.moveTo(PAD+56,y); g.lineTo(W-PAD-56,y); g.stroke(); y+=76;
+
+    g.fillStyle="#b5705a"; g.font="64px "+JU;
+    g.fillText(s.total+"점", cx, y);
+    g.fillStyle="#c99a5b"; g.font="34px "+JU;
+    g.fillText("「"+s.grade+"」", cx, y+46); y+=46+58;
+
+    g.fillStyle="#5c4a40"; g.font="34px "+GB;
+    qs.forEach(function(ln){ g.fillText(ln,cx,y); y+=QLH; });
+
+    var dd=new Date();
+    g.fillStyle="#a4917f"; g.font="24px "+GB;
+    g.fillText(dd.getFullYear()+". "+(dd.getMonth()+1)+". "+dd.getDate()+"  ·  담당: 모카 · 세바스", cx, SY+SH-40);
+
+    g.fillStyle="#8a7268"; g.font="28px "+GB;
+    g.fillText("☕ goblub · 카페 고브럽", cx, H-76);
+    g.fillStyle="#b5705a"; g.font="26px "+GB;
+    g.fillText("goblub-2.vercel.app", cx, H-36);
+
+    var name="goblub-cafe-"+dd.getFullYear()+("0"+(dd.getMonth()+1)).slice(-2)+("0"+dd.getDate()).slice(-2)+".png";
+    if(!c.toBlob){ window.open(c.toDataURL("image/png")); return; }
+    c.toBlob(function(b){
+      if(!b){ window.open(c.toDataURL("image/png")); return; }
+      var a=document.createElement("a"); a.href=URL.createObjectURL(b); a.download=name;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function(){ URL.revokeObjectURL(a.href); },5000);
+    },"image/png");
+  }
+};
+</script>
 </body>
 </html>
