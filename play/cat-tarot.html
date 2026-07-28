@@ -103,6 +103,13 @@ video::-webkit-media-controls-overlay-play-button{display:none!important;-webkit
 #scResult .status{color:var(--ink-soft);font-size:.9rem;text-align:center;padding:8px 0}
 #scResult .oncebar{margin-top:18px;text-align:center;color:var(--gold-soft);font-size:.86rem;
   font-family:'Nanum Myeongjo',serif;border-top:1px dashed var(--line);padding-top:14px;line-height:1.7}
+.btnrow{display:flex;gap:10px;justify-content:center;margin-top:14px;flex-wrap:wrap}
+.btnrow button,#scResult .again{background:linear-gradient(180deg,#2a2246,#191233);color:var(--ink);
+  border:1px solid var(--line);border-radius:12px;padding:11px 20px;font-family:'Nanum Myeongjo',serif;
+  font-size:.92rem;cursor:pointer;box-shadow:0 0 18px rgba(160,130,230,.22);transition:transform .1s}
+.btnrow button:hover,#scResult .again:hover{transform:translateY(-2px)}
+.btnrow button.save{background:linear-gradient(180deg,#f2d488,#d8b055);color:#241a08;
+  border-color:rgba(255,235,180,.6);box-shadow:0 8px 22px rgba(180,140,50,.3)}
 #scResult .worry-echo{color:var(--ink-soft);font-size:.84rem;text-align:center;margin-bottom:12px;
   font-style:italic;line-height:1.5}
 
@@ -156,8 +163,11 @@ video::-webkit-media-controls-overlay-play-button{display:none!important;-webkit
     <div class="rkw" id="rkw"></div>
     <div class="status" id="rstatus"><span class="spin"></span>고양이가 카드를 읽는 중…</div>
     <div class="reading" id="reading" style="display:none"></div>
-    <div class="oncebar" id="oncebar" style="display:none">🌙 오늘의 카드는 하루에 딱 한 장.<br>내일 밤, 또 궁금한 게 생기면 오라옹.<br>
-      <button class="again" style="margin-top:14px" onclick="replay()">🔮 타로 다시 보기</button>
+    <div class="oncebar" id="oncebar" style="display:none">🌙 오늘의 카드는 하루에 딱 한 장.<br>내일 밤, 또 궁금한 게 생기면 오라옹.
+      <div class="btnrow">
+        <button onclick="replay()">🔮 타로 다시 보기</button>
+        <button class="save" id="btn-save" onclick="saveCard()">📥 이미지로 저장</button>
+      </div>
     </div>
   </div>
 
@@ -169,6 +179,8 @@ video::-webkit-media-controls-overlay-play-button{display:none!important;-webkit
 var SPREAD="img/cat/cat2-spread.mp4", CAT_IDLE="img/cat/cat2-start.webp",
     TABLE="img/cat/cat2-tablecat.mp4",
     BACK="img/cat/cat2-back.webp?v=2", LOCK_KEY="goblub_cattarot_v2";
+// 저장 카드에 쓰는 오늘의 결과
+var curIdx=null, curOrient="", lastReading="";
 
 // 메이저 아르카나 22 [로마숫자, 이름, 키워드, 이모지]
 var MAJOR=[
@@ -316,6 +328,7 @@ function replay(){
 function revealResult(cardIdx, orient, fromLock){
   phase="result"; show(scResult);
   var c=MAJOR[cardIdx];
+  curIdx=cardIdx; curOrient=orient; lastReading="";
   var pad=(cardIdx<10?"0":"")+cardIdx;
   $("rimg").src="img/cat/arcana/"+pad+".webp?v=2";
   $("rname").textContent=c[0]+" · "+c[1];
@@ -332,7 +345,8 @@ function revealResult(cardIdx, orient, fromLock){
   try{ saved=JSON.parse(localStorage.getItem(LOCK_KEY)); }catch(e){}
   if(saved && saved.date===todayStr() && saved.reading){
     readingEl.style.display="block"; statusEl.style.display="none";
-    readingEl.innerHTML=fmt(saved.reading); onceBar.style.display="block";
+    readingEl.innerHTML=fmt(saved.reading); lastReading=saved.reading;
+    onceBar.style.display="block";
     return;
   }
 
@@ -344,7 +358,7 @@ function revealResult(cardIdx, orient, fromLock){
       onChunk:function(t){ acc+=t; readingEl.style.display="block"; statusEl.style.display="none";
         readingEl.innerHTML=fmt(acc); },
       onDone:function(){ readingEl.style.display="block"; statusEl.style.display="none";
-        readingEl.innerHTML=fmt(acc); onceBar.style.display="block";
+        readingEl.innerHTML=fmt(acc); lastReading=acc; onceBar.style.display="block";
         // 완성된 해석을 통째로 저장 → 재방문 시 API 호출 없이 바로 다시 보기
         try{ var rec=JSON.parse(localStorage.getItem(LOCK_KEY))||{};
           rec.reading=acc; localStorage.setItem(LOCK_KEY, JSON.stringify(rec)); }catch(e){}
@@ -358,6 +372,149 @@ function revealResult(cardIdx, orient, fromLock){
         onceBar.style.display="block";
       }
     });
+}
+
+/* ── 이미지로 저장: 고양이 + 오늘의 카드 + 결과 한 줄 ── */
+function rr(g,x,y,w,h,r){ g.beginPath();
+  g.moveTo(x+r,y); g.arcTo(x+w,y,x+w,y+h,r); g.arcTo(x+w,y+h,x,y+h,r);
+  g.arcTo(x,y+h,x,y,r); g.arcTo(x,y,x+w,y,r); g.closePath(); }
+
+function wrapLines(g,text,maxW){
+  var out=[], line="";
+  text.split(" ").forEach(function(w){
+    var t=line?line+" "+w:w;
+    if(g.measureText(t).width<=maxW || !line){ line=t; return; }
+    out.push(line); line=w;
+  });
+  if(line) out.push(line);
+  return out;
+}
+
+// 해석에서 한 줄만 뽑는다 — '발자국 하나'(오늘의 행동)를 우선, 없으면 키워드
+function oneLiner(){
+  var t=(lastReading||"").replace(/\r/g,""), seg="";
+  var i=t.indexOf("발자국 하나");
+  if(i>=0) seg=t.slice(i+6);
+  if(!seg.trim()){ var j=t.indexOf("지금의 너에게"); if(j>=0) seg=t.slice(j+7); }
+  if(!seg.trim()) seg=t;
+  seg=seg.replace(/^[\s:：·\-—]+/,"");
+  seg=(seg.split("\n").filter(function(x){return x.trim();})[0]||"").trim();
+  var m=seg.match(/^[^.!?]*[.!?]/);
+  var line=(m?m[0]:seg).trim();
+  if(line.length>64) line=line.slice(0,63).trim()+"…";
+  return line || (MAJOR[curIdx]?MAJOR[curIdx][2]:"");
+}
+
+function ensureFonts(){
+  if(!document.fonts||!document.fonts.load) return Promise.resolve();
+  return Promise.all([
+    document.fonts.load("700 42px 'Nanum Myeongjo'"),
+    document.fonts.load("400 26px 'Nanum Myeongjo'")
+  ]).catch(function(){});
+}
+
+function loadImg(src){
+  return new Promise(function(res,rej){
+    var im=new Image(); im.onload=function(){res(im);}; im.onerror=rej; im.src=src;
+  });
+}
+
+function saveCard(){
+  if(curIdx===null) return;
+  var btn=document.getElementById("btn-save"), old=btn.textContent;
+  btn.disabled=true; btn.textContent="카드 만드는 중…";
+  var pad=(curIdx<10?"0":"")+curIdx;
+  Promise.all([ loadImg(CAT_IDLE), loadImg("img/cat/arcana/"+pad+".webp?v=2"), ensureFonts() ])
+    .then(function(r){ draw(r[0], r[1]); })
+    .catch(function(){ alert("이미지를 불러오지 못했다옹… 잠시 뒤 다시 해보라냥."); })
+    .then(function(){ btn.disabled=false; btn.textContent=old; });
+
+  function draw(cat, card){
+    var W=1080, PAD=60, CW=W-PAD*2;
+    var PY=64, PH=660;                      // 고양이 사진
+    var THW=180, THH=Math.round(THW*626/420);
+    var THX=(W-THW)/2, THY=PY+PH-110;       // 뽑은 카드(사진과 쪽지에 걸치게)
+    var SY=PY+PH+44;                        // 쪽지 패널
+    var MJ="'Nanum Myeongjo','Gowun Batang',serif";
+    var c0=MAJOR[curIdx], line=oneLiner();
+
+    var m=document.createElement("canvas").getContext("2d");
+    m.font="700 42px "+MJ;
+    var lines=wrapLines(m,line,CW-140), LH=68;
+    var top=THY+THH+30;                     // 카드 아래에서 글이 시작
+    var SH=(top-SY)+52+44+lines.length*LH+48+40;
+    var H=SY+SH+150;
+
+    var c=document.createElement("canvas"); c.width=W; c.height=H;
+    var g=c.getContext("2d");
+
+    var bg=g.createLinearGradient(0,0,0,H);
+    bg.addColorStop(0,"#151027"); bg.addColorStop(.65,"#0c0918"); bg.addColorStop(1,"#0a0714");
+    g.fillStyle=bg; g.fillRect(0,0,W,H);
+    function glow(x,y,r,col){ var rg=g.createRadialGradient(x,y,0,x,y,r);
+      rg.addColorStop(0,col); rg.addColorStop(1,"rgba(0,0,0,0)"); g.fillStyle=rg; g.fillRect(0,0,W,H); }
+    glow(540,60,520,"rgba(160,132,232,.30)");
+    glow(540,H-60,540,"rgba(233,200,119,.16)");
+
+    // 고양이 사진
+    var sh=cat.width*(PH/CW), sy=Math.max(0,Math.min(cat.height-sh,cat.height*0.42-sh/2));
+    g.save(); g.shadowColor="rgba(0,0,0,.6)"; g.shadowBlur=40; g.shadowOffsetY=14;
+    rr(g,PAD,PY,CW,PH,26); g.fillStyle="#000"; g.fill(); g.restore();
+    g.save(); rr(g,PAD,PY,CW,PH,26); g.clip();
+    g.drawImage(cat,0,sy,cat.width,sh,PAD,PY,CW,PH);
+    var fd=g.createLinearGradient(0,PY+PH*0.55,0,PY+PH);
+    fd.addColorStop(0,"rgba(12,9,24,0)"); fd.addColorStop(1,"rgba(12,9,24,.94)");
+    g.fillStyle=fd; g.fillRect(PAD,PY+PH*0.55,CW,PH*0.45);
+    g.textAlign="left"; g.fillStyle="#e9c877"; g.font="30px "+MJ;
+    g.fillText("🐱 점술묘가 뽑아준 카드", PAD+34, PY+PH-46);
+    g.restore();
+    g.strokeStyle="rgba(233,200,119,.3)"; g.lineWidth=2; rr(g,PAD,PY,CW,PH,26); g.stroke();
+
+    // 쪽지 패널
+    g.save(); g.shadowColor="rgba(0,0,0,.6)"; g.shadowBlur=44; g.shadowOffsetY=16;
+    rr(g,PAD,SY,CW,SH,24); g.fillStyle="rgba(26,20,50,.96)"; g.fill(); g.restore();
+    g.strokeStyle="rgba(233,200,119,.34)"; g.lineWidth=2; rr(g,PAD,SY,CW,SH,24); g.stroke();
+    g.save(); g.setLineDash([9,8]); g.strokeStyle="rgba(233,200,119,.20)"; g.lineWidth=1.5;
+    rr(g,PAD+16,SY+16,CW-32,SH-32,16); g.stroke(); g.restore();
+
+    // 뽑은 카드 (역방향이면 뒤집어서)
+    g.save(); g.shadowColor="rgba(233,200,119,.45)"; g.shadowBlur=40; g.shadowOffsetY=10;
+    rr(g,THX,THY,THW,THH,12); g.fillStyle="#120d2c"; g.fill(); g.restore();
+    g.save(); rr(g,THX,THY,THW,THH,12); g.clip();
+    if(curOrient.indexOf("역")>=0){ g.translate(THX+THW/2,THY+THH/2); g.rotate(Math.PI);
+      g.drawImage(card,-THW/2,-THH/2,THW,THH); }
+    else g.drawImage(card,THX,THY,THW,THH);
+    g.restore();
+    g.strokeStyle="rgba(233,200,119,.55)"; g.lineWidth=2; rr(g,THX,THY,THW,THH,12); g.stroke();
+
+    // 글
+    g.textAlign="center";
+    g.fillStyle="#e9c877"; g.font="700 42px "+MJ;
+    g.fillText(c0[0]+" · "+c0[1], W/2, top+22);
+    g.fillStyle="#a184e8"; g.font="26px "+MJ;
+    g.fillText("— "+curOrient+" — "+c0[2], W/2, top+22+46);
+    g.fillStyle="#efe7d6"; g.font="700 42px "+MJ;
+    var y=top+22+46+62;
+    lines.forEach(function(ln){ g.fillText(ln,W/2,y); y+=LH; });
+    g.fillStyle="#b6acc9"; g.font="24px "+MJ;
+    var dd=new Date();
+    g.fillText(dd.getFullYear()+". "+(dd.getMonth()+1)+". "+dd.getDate()+" · 하루 한 장", W/2, y+2);
+
+    g.fillStyle="#b6acc9"; g.font="28px "+MJ;
+    g.fillText("🔮 goblub · 고양이 타로", W/2, H-84);
+    g.fillStyle="#e9c877"; g.font="26px "+MJ;
+    g.fillText("goblub-2.vercel.app", W/2, H-44);
+
+    var name="goblub-tarot-"+todayStr()+".png";
+    if(!c.toBlob){ window.open(c.toDataURL("image/png")); return; }
+    c.toBlob(function(b){
+      if(!b){ window.open(c.toDataURL("image/png")); return; }
+      var a=document.createElement("a");
+      a.href=URL.createObjectURL(b); a.download=name;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function(){ URL.revokeObjectURL(a.href); },5000);
+    },"image/png");
+  }
 }
 
 // 소제목 3개를 골드 헤딩으로
