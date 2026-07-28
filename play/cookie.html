@@ -160,12 +160,19 @@ video::-webkit-media-controls-overlay-play-button{display:none!important;-webkit
 <script src="../js/common.js?v=5" data-root=".."></script>
 <script src="js/feed.js?v=4"></script>
 <script>
-var IMG="img/otter/", V_TAKE=IMG+"otter-take.mp4", V_CRACK=IMG+"otter-crack.mp4", V_GIVE=IMG+"otter-give.mp4",
+var IMG="img/otter/",
+    V_ALL=IMG+"otter-all.mp4",          // 집기+깨기+건네기를 한 파일로 이어붙인 본편(전환 없음)
+    V_TAKE=IMG+"otter-take.mp4", V_CRACK=IMG+"otter-crack.mp4", V_GIVE=IMG+"otter-give.mp4",
     INTRO=IMG+"otter-intro.webp", ENDIMG=IMG+"otter-end.webp",
     MID1=IMG+"otter-mid1.webp", MID2=IMG+"otter-mid2.webp";
-// 전환 중 검은 화면 방지: 다음 영상 첫 장면과 같은 정지 이미지·영상을 미리 받아둔다
-[ENDIMG, MID1, MID2].forEach(function(u){ var im=new Image(); im.src=u; });
-[V_TAKE, V_CRACK, V_GIVE].forEach(function(u){ try{ fetch(u).catch(function(){}); }catch(e){} });
+// 각 장면이 시작되는 시각(초) — 5.041667초짜리 세 편을 이어붙인 기준
+var SEG=[
+  { t:0,      cap:"…이걸로 골랐구나달.", hint:"해달이 쿠키를 집었다달…" },
+  { t:5.0417, cap:"콩… 콩… 쫙!",        hint:"배 위에 올리고… 조개로 콩콩!" },
+  { t:10.083, cap:"자, 네 몫이달.",      hint:"쪽지를 꺼냈다달…" }
+];
+[ENDIMG, INTRO, MID1, MID2].forEach(function(u){ var im=new Image(); im.src=u; });
+try{ fetch(V_ALL).catch(function(){}); }catch(e){}
 var $=function(id){return document.getElementById(id);};
 var scIntro=$("scIntro"), scPlay=$("scPlay"), scResult=$("scResult"),
     vid=$("vid"), still=$("still"), cap=$("cap"), hintbar=$("hintbar");
@@ -208,18 +215,49 @@ function choose(i){
   try{ localStorage.setItem(dk,"1"); }catch(e){}
   if(window.GoblubFeed) GoblubFeed.grant("cookie");
   show(scPlay);
-  hintbar.textContent="해달이 쿠키를 집었다달…";
-  playSeq(V_TAKE, "…이걸로 골랐구나달.", INTRO, function(){
-    hintbar.textContent="배 위에 올리고… 조개로 콩콩!";
-    playSeq(V_CRACK, "콩… 콩… 쫙!", MID1, function(){
-      hintbar.textContent="쪽지를 꺼냈다달…";
-      playSeq(V_GIVE, "자, 네 몫이달.", MID2, function(){ finish(false); });
+  playAll();
+}
+
+// 본편 한 파일을 끊김 없이 재생 — 자막·안내만 장면 시각에 맞춰 바뀐다
+function playAll(){
+  var seg=-1, started=false;
+  cap.textContent=SEG[0].cap; hintbar.textContent=SEG[0].hint;
+  // 첫 프레임이 디코딩되기 전 검은 화면을 인트로 스틸로 가린다
+  still.style.transition="none"; still.style.backgroundImage="url('"+INTRO+"')";
+  still.classList.add("on"); void still.offsetWidth; still.style.transition="";
+
+  vid.loop=false;
+  vid.onplaying=function(){ started=true; still.classList.remove("on"); };
+  vid.ontimeupdate=function(){
+    var i=0;
+    for(var k=0;k<SEG.length;k++) if(vid.currentTime>=SEG[k].t) i=k;
+    if(i!==seg){ seg=i; cap.textContent=SEG[i].cap; hintbar.textContent=SEG[i].hint; }
+  };
+  vid.onended=function(){ vid.ontimeupdate=null; finish(false); };
+  vid.onerror=function(){ chainFallback(); };   // 본편을 못 받으면 예전처럼 세 편을 이어 재생
+  vid.src=V_ALL;
+
+  var p=vid.play();
+  if(p&&p.catch) p.catch(function(){ finish(false); });  // 자동재생 차단 시 결과로
+  setTimeout(function(){ if(!started && vid.paused && !vid.ended) finish(false); }, 8000);
+}
+
+function chainFallback(){
+  vid.onerror=null; vid.ontimeupdate=null;
+  hintbar.textContent=SEG[0].hint;
+  playSeq(V_TAKE, SEG[0].cap, INTRO, function(){
+    hintbar.textContent=SEG[1].hint;
+    playSeq(V_CRACK, SEG[1].cap, MID1, function(){
+      hintbar.textContent=SEG[2].hint;
+      playSeq(V_GIVE, SEG[2].cap, MID2, function(){ finish(false); });
     });
   });
 }
 
 function finish(fromLock){
+  if(phase==="result") return;          // 종료 이벤트와 감시 타이머가 겹쳐도 한 번만
   phase="result";
+  vid.onended=null; vid.ontimeupdate=null; vid.onerror=null; vid.onplaying=null;
   // 끝 프레임(give 마지막 프레임 추출 이미지)을 먼저 띄운 뒤 video를 비운다 — 검은 화면 방지
   $("endimg").style.backgroundImage="url('"+ENDIMG+"')";
   show(scResult);
