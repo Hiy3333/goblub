@@ -63,18 +63,33 @@ video::-webkit-media-controls-overlay-play-button{display:none!important;-webkit
 
 /* ── 결과 ── */
 #scResult{background:#0b1220}
-#scResult .endimg{display:block;width:100%;aspect-ratio:1/1;object-fit:cover;
-  background-size:cover;background-position:center}
-.slip{margin:14px 2px 4px;background:linear-gradient(180deg,#fdf7ea,#f5ecd8);color:#4a3b26;
-  border-radius:16px;padding:20px 18px;position:relative;
-  box-shadow:0 14px 34px rgba(0,0,0,.45), inset 0 1.5px 0 #fff}
-.slip::before{content:"";position:absolute;left:14px;right:14px;top:8px;border-top:2px dashed rgba(150,120,70,.35)}
-.slip .f{font-family:'Nanum Myeongjo',serif;font-weight:700;font-size:1.05rem;line-height:1.8;color:#3c2f1c}
+#scResult .endimg{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;
+  background-size:cover;background-position:center 44%}
+#scResult .fade{position:absolute;left:0;right:0;bottom:0;height:34%;pointer-events:none;
+  background:linear-gradient(180deg,transparent,rgba(11,18,32,.72) 72%,rgba(11,18,32,.96))}
+#scResult .tag{position:absolute;left:16px;bottom:46px;z-index:2;color:var(--amber);
+  font-family:'Nanum Myeongjo',serif;font-size:.82rem;letter-spacing:.04em;
+  text-shadow:0 2px 10px rgba(0,0,0,.9)}
+.slip{margin:-34px 12px 4px;background:linear-gradient(180deg,#fdf8ec,#f2e7cf);color:#4a3b26;
+  border-radius:18px;padding:26px 22px 20px;position:relative;z-index:3;
+  box-shadow:0 20px 44px rgba(0,0,0,.55), inset 0 1.5px 0 #fff}
+.slip::before{content:"";position:absolute;left:13px;right:13px;top:13px;bottom:13px;
+  border:1.5px dashed rgba(150,120,70,.32);border-radius:11px;pointer-events:none}
+.slip .lbl{font-family:'Nanum Myeongjo',serif;font-size:.76rem;letter-spacing:.14em;
+  color:#a58a55;text-align:center;margin-bottom:12px}
+.slip .f{font-family:'Nanum Myeongjo',serif;font-weight:700;font-size:1.12rem;line-height:1.95;
+  color:#3c2f1c;text-align:center}
+.slip .dt{margin-top:14px;text-align:center;font-family:'Nanum Myeongjo',serif;
+  font-size:.74rem;color:#b09a6c}
 .oncebar{text-align:center;color:#c9b48c;font-size:.85rem;font-family:'Nanum Myeongjo',serif;
-  margin-top:14px;line-height:1.7}
-.oncebar .again{margin-top:12px;background:linear-gradient(180deg,#2c3d63,#1c2946);color:#e8eefb;
-  border:1px solid rgba(150,180,240,.4);border-radius:12px;padding:11px 24px;font-family:inherit;
-  font-size:.94rem;cursor:pointer;box-shadow:0 0 18px rgba(80,120,220,.3)}
+  margin-top:16px;line-height:1.7}
+.btnrow{display:flex;gap:10px;justify-content:center;margin-top:12px;flex-wrap:wrap}
+.btnrow button{background:linear-gradient(180deg,#2c3d63,#1c2946);color:#e8eefb;
+  border:1px solid rgba(150,180,240,.4);border-radius:12px;padding:11px 20px;font-family:inherit;
+  font-size:.92rem;cursor:pointer;box-shadow:0 0 18px rgba(80,120,220,.3);transition:transform .1s}
+.btnrow button:hover{transform:translateY(-2px)}
+.btnrow button.save{background:linear-gradient(180deg,#f2d488,#d8b055);color:#241a08;
+  border-color:rgba(255,235,180,.6);box-shadow:0 8px 22px rgba(180,140,50,.3)}
 .linksrow{display:flex;gap:10px;justify-content:center;margin-top:12px;flex-wrap:wrap}
 .linksrow a{color:var(--ink-soft);font-size:.85rem;text-decoration:none;border:1px solid rgba(120,150,210,.3);
   border-radius:999px;padding:8px 16px}
@@ -117,14 +132,21 @@ video::-webkit-media-controls-overlay-play-button{display:none!important;-webkit
   <!-- ③ 결과 -->
   <div class="screen" id="scResult">
     <div class="endimg" id="endimg"></div>
+    <div class="fade"></div>
+    <span class="tag">🦦 부둣가 해달이 건넨 쪽지</span>
   </div>
   <div class="revealbar" id="revealbar"><button onclick="showSlip()">🥠 포춘쿠키를 본다</button></div>
   <div id="resultBody" style="display:none;width:100%">
     <div class="slip">
+      <p class="lbl">오 늘 의 한 줄</p>
       <p class="f" id="fortune"></p>
+      <p class="dt" id="slipdate"></p>
     </div>
-    <div class="oncebar">🌊 쿠키는 하루에 딱 하나 — 내일 또 와달!<br>
-      <button class="again" onclick="replay()">🦦 쿠키 깨기 다시 보기</button>
+    <div class="oncebar">🌊 쿠키는 하루에 딱 하나 — 내일 또 와달!
+      <div class="btnrow">
+        <button onclick="replay()">🦦 다시 보기</button>
+        <button class="save" id="btn-save" onclick="saveCard()">📥 이미지로 저장</button>
+      </div>
     </div>
     <div class="linksrow">
       <a href="fortune-hub.html">🔮 운세 더 보기</a>
@@ -202,7 +224,8 @@ function finish(fromLock){
   $("endimg").style.backgroundImage="url('"+ENDIMG+"')";
   show(scResult);
   setTimeout(function(){ try{ vid.pause(); vid.removeAttribute("src"); vid.load(); }catch(e){} }, 80);
-  $("fortune").textContent="🥠 "+fortune;
+  $("fortune").textContent=fortune;
+  $("slipdate").textContent=d.getFullYear()+". "+(d.getMonth()+1)+". "+d.getDate()+" · 하루 한 장";
   hintbar.textContent="";
   if(fromLock){ showSlip(); }
   else { $("revealbar").style.display="block"; }
@@ -221,6 +244,117 @@ function replay(){
   $("revealbar").style.display="none";
   show(scIntro);
   hintbar.textContent="오늘의 운세는 그대로다달 — 깨는 것만 다시 보여줄게달.";
+}
+
+/* ── 이미지로 저장: 해달 사진 + 아래 오늘의 한 줄 ── */
+function rr(g,x,y,w,h,r){ g.beginPath();
+  g.moveTo(x+r,y); g.arcTo(x+w,y,x+w,y+h,r); g.arcTo(x+w,y+h,x,y+h,r);
+  g.arcTo(x,y+h,x,y,r); g.arcTo(x,y,x+w,y,r); g.closePath(); }
+
+// 어절(띄어쓰기) 단위 줄바꿈 — 단어가 잘리지 않게
+function wrap(g,text,maxW){
+  var out=[], line="";
+  text.split(" ").forEach(function(w){
+    var t=line?line+" "+w:w;
+    if(g.measureText(t).width<=maxW || !line){ line=t; return; }
+    out.push(line); line=w;
+  });
+  if(line) out.push(line);
+  return out;
+}
+
+function ensureFonts(){
+  if(!document.fonts||!document.fonts.load) return Promise.resolve();
+  return Promise.all([
+    document.fonts.load("700 46px 'Nanum Myeongjo'"),
+    document.fonts.load("400 26px 'Nanum Myeongjo'"),
+    document.fonts.load("400 30px 'Jua'")
+  ]).catch(function(){});
+}
+
+function saveCard(){
+  var btn=$("btn-save"), old=btn.textContent;
+  btn.disabled=true; btn.textContent="쪽지 만드는 중…";
+  function done(){ btn.disabled=false; btn.textContent=old; }
+
+  var im=new Image();
+  im.onerror=function(){ done(); alert("이미지를 불러오지 못했다달… 잠시 후 다시 시도해달."); };
+  im.onload=function(){ ensureFonts().then(function(){ draw(im); done(); }); };
+  im.src=ENDIMG;
+
+  function draw(img){
+    var W=1080, PAD=60, CW=W-PAD*2;           // 카드 폭
+    var PH=720, PY=64;                        // 사진 영역
+    var SY=PY+PH-32;                          // 쪽지(사진과 살짝 겹침)
+    var MJ="'Nanum Myeongjo','Gowun Batang',serif";
+
+    // 줄 수 먼저 계산 → 최종 높이 결정
+    var m=document.createElement("canvas").getContext("2d");
+    m.font="700 46px "+MJ;
+    var lines=wrap(m,fortune,CW-120), LH=78;
+    var SH=44+30+26+lines.length*LH+28+26+40;
+    var H=SY+SH+150;
+
+    var c=document.createElement("canvas"); c.width=W; c.height=H;
+    var g=c.getContext("2d");
+
+    // 배경 — 밤바다
+    var bg=g.createLinearGradient(0,0,0,H);
+    bg.addColorStop(0,"#101a30"); bg.addColorStop(.6,"#0b1220"); bg.addColorStop(1,"#0a101c");
+    g.fillStyle=bg; g.fillRect(0,0,W,H);
+    function glow(x,y,r,col){ var rg=g.createRadialGradient(x,y,0,x,y,r);
+      rg.addColorStop(0,col); rg.addColorStop(1,"rgba(0,0,0,0)"); g.fillStyle=rg; g.fillRect(0,0,W,H); }
+    glow(540,40,520,"rgba(70,110,190,.30)");
+    glow(540,H-40,560,"rgba(255,150,60,.16)");
+
+    // 사진 (가운데 위쪽 기준 커버 크롭)
+    var sh=img.width*(PH/CW), sy=Math.max(0,Math.min(img.height-sh,img.height*0.44-sh/2));
+    g.save(); g.shadowColor="rgba(0,0,0,.55)"; g.shadowBlur=40; g.shadowOffsetY=14;
+    rr(g,PAD,PY,CW,PH,26); g.fillStyle="#000"; g.fill(); g.restore();
+    g.save(); rr(g,PAD,PY,CW,PH,26); g.clip();
+    g.drawImage(img,0,sy,img.width,sh,PAD,PY,CW,PH);
+    var fd=g.createLinearGradient(0,PY+PH*0.55,0,PY+PH);
+    fd.addColorStop(0,"rgba(11,18,32,0)"); fd.addColorStop(1,"rgba(11,18,32,.92)");
+    g.fillStyle=fd; g.fillRect(PAD,PY+PH*0.55,CW,PH*0.45);
+    g.textAlign="left"; g.fillStyle="#ffce7a"; g.font="30px "+MJ;
+    g.fillText("🦦 부둣가 해달이 건넨 쪽지", PAD+34, PY+PH-72);
+    g.restore();
+    g.strokeStyle="rgba(255,206,122,.28)"; g.lineWidth=2; rr(g,PAD,PY,CW,PH,26); g.stroke();
+
+    // 쪽지
+    g.save(); g.shadowColor="rgba(0,0,0,.6)"; g.shadowBlur=46; g.shadowOffsetY=18;
+    rr(g,PAD,SY,CW,SH,24);
+    var pg=g.createLinearGradient(0,SY,0,SY+SH);
+    pg.addColorStop(0,"#fdf8ec"); pg.addColorStop(1,"#f2e7cf");
+    g.fillStyle=pg; g.fill(); g.restore();
+    g.save(); g.setLineDash([9,8]); g.strokeStyle="rgba(150,120,70,.34)"; g.lineWidth=2;
+    rr(g,PAD+16,SY+16,CW-32,SH-32,16); g.stroke(); g.restore();
+
+    g.textAlign="center";
+    g.fillStyle="#a58a55"; g.font="26px "+MJ;
+    g.fillText("오 늘 의 한 줄", W/2, SY+72);
+    g.fillStyle="#3c2f1c"; g.font="700 46px "+MJ;
+    var y=SY+72+26+56;
+    lines.forEach(function(ln){ g.fillText(ln,W/2,y); y+=LH; });
+    g.fillStyle="#b09a6c"; g.font="24px "+MJ;
+    g.fillText(d.getFullYear()+". "+(d.getMonth()+1)+". "+d.getDate()+" · 하루 한 장", W/2, y+6);
+
+    // 발문
+    g.fillStyle="#aab6cc"; g.font="28px "+MJ;
+    g.fillText("🥠 goblub · 오늘의 포춘쿠키", W/2, H-84);
+    g.fillStyle="#ffce7a"; g.font="26px "+MJ;
+    g.fillText("goblub-2.vercel.app", W/2, H-44);
+
+    var name="goblub-fortune-"+dstr+".png";
+    if(!c.toBlob){ window.open(c.toDataURL("image/png")); return; }
+    c.toBlob(function(b){
+      if(!b){ window.open(c.toDataURL("image/png")); return; }
+      var a=document.createElement("a");
+      a.href=URL.createObjectURL(b); a.download=name;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function(){ URL.revokeObjectURL(a.href); },5000);
+    },"image/png");
+  }
 }
 
 // 오늘 이미 깼으면 결과로 직행 (영상 없이)
