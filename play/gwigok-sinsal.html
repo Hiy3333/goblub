@@ -40,6 +40,22 @@ a{color:inherit;text-decoration:none}
 .intro{font-family:'Nanum Myeongjo',serif;text-align:center;color:#e0d2bd;font-size:.95rem;
   line-height:1.9;margin:14px 0 20px}
 .intro b{color:#ff8a5a}
+/* 원국(검증용) */
+.wongook{margin:14px 0 4px;border:1px solid rgba(150,70,55,.28);background:rgba(20,11,13,.55);padding:14px 12px}
+.wongook .row{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+.wongook .p{min-width:64px;text-align:center;padding:6px 8px;border:1px solid rgba(150,70,55,.22)}
+.wongook .p .lb{display:block;color:#6b4a3c;font-size:.68rem;font-family:'Nanum Myeongjo',serif;letter-spacing:.1em}
+.wongook .p .hj{display:block;font-family:'Nanum Myeongjo',serif;font-size:1.28rem;color:#ecdcc6;line-height:1.5}
+.wongook .p .ko{display:block;color:#8a7568;font-size:.7rem}
+.wongook .p .us{display:block;color:#a8563c;font-size:.66rem;margin-top:3px;font-family:'Nanum Myeongjo',serif}
+.wongook .gm{text-align:center;color:#a89887;font-size:.78rem;margin-top:10px;line-height:1.7}
+.wongook .gm b{color:#c98060;font-family:'Nanum Myeongjo',serif}
+/* 분류 머리 */
+.grp{display:flex;align-items:baseline;gap:10px;margin:26px 0 12px}
+.grp .hj{font-family:'Nanum Myeongjo',serif;font-size:1.5rem;font-weight:800;color:#7d2a18;line-height:1}
+.grp .ko{font-family:'Nanum Myeongjo',serif;color:#e0cdb6;font-size:1rem;letter-spacing:.08em}
+.grp .ds{margin-left:auto;color:#6f6157;font-size:.76rem}
+.card .basis{margin-left:auto;font-size:.72rem;color:#7d685c;font-family:'Nanum Myeongjo',serif}
 .card{position:relative;border:1px solid rgba(150,70,55,.35);margin-bottom:16px;overflow:hidden;
   background:linear-gradient(160deg,rgba(30,16,17,.95),rgba(13,8,10,.98))}
 .card::before{content:attr(data-hj);position:absolute;right:6px;top:-16px;font-family:'Nanum Myeongjo',serif;
@@ -88,6 +104,7 @@ a{color:inherit;text-decoration:none}
       <span class="me" id="me-pill"></span>
       <a href="#" id="edit">다른 명부로 본다</a>
     </div>
+    <div class="wongook" id="wongook"></div>
     <p class="intro" id="intro"></p>
     <div id="cards"></div>
     <p class="sign">— 살은 흉기가 아니라 연장이다. 쥐는 법을 배워라. · 귀곡(鬼哭)</p>
@@ -101,37 +118,119 @@ a{color:inherit;text-decoration:none}
 </div>
 
 <script src="js/saju.js"></script>
-<script src="js/saju-deep.js"></script>
+<script src="js/sinsal.js?v=1"></script>
 <script src="js/gwigok-log.js?v=1"></script>
 <script>
 (function(){
   var $=function(id){return document.getElementById(id);};
 
-  // 도감 — 귀곡 톤
+  // 도감 — 귀곡 톤 (신살 명칭은 js/sinsal.js 의 고전 표와 1:1 대응)
   var BOOK={
-    "도화살":{hj:"桃",als:"복사꽃의 살",
-      tx:"네 곁에 복사꽃이 피어 있다. 걷기만 해도 눈길이 따라붙고, 가만있어도 말이 먼저 걸려오는 팔자다. 다만 꽃에는 벌만 오는 게 아니다 — 오는 인연을 다 받지 마라.",
-      cure:"매력은 열어 두되, 지갑과 비밀은 닫아 두어라. 그러면 이 살은 복이 된다."},
-    "역마살":{hj:"驛",als:"떠도는 말발굽",
-      tx:"네 발밑에 말발굽 소리가 깔려 있다. 한자리에 오래 묶이면 병이 나고, 움직여야 운이 도는 명이다. 이사·출장·여행·이직 — 남들이 두려워하는 '옮김'이 너에겐 약이다.",
-      cure:"떠나는 것을 겁내지 마라. 다만 떠나기 전날 밤의 결정만은 하루 재워라."},
-    "화개살":{hj:"華",als:"홀로 피는 일산(日傘)",
-      tx:"머리 위에 홀로 쓰는 일산이 있다. 무리에 섞여도 어딘가 혼자인 자, 그 고독에서 재주가 자라는 팔자다. 예술·학문·연구 — 혼자 파는 우물일수록 깊게 판다.",
-      cure:"고독을 벌이라 여기지 마라. 그 시간이 네 창고다. 다만 사람 부르는 날을 한 달에 하루는 정해 두어라."},
-    "양인살":{hj:"刃",als:"칼을 쥔 손",
-      tx:"네 손에 날이 선 칼이 들려 있다. 밀어붙이는 힘이 남다르고, 궁지에서 오히려 강해진다. 다만 칼은 밖으로도 안으로도 벤다 — 급할수록 손잡이를 고쳐 쥐어라.",
-      cure:"큰 힘은 큰 일에만 써라. 사소한 시비에 칼을 빼는 순간, 이 살은 흉이 된다."},
-    "천을귀인":{hj:"貴",als:"등 뒤의 귀인",
-      tx:"살이 아니라 사람이다 — 네 등 뒤에 귀인이 서 있다. 벼랑 끝에 몰릴 때마다 어디선가 손이 내려오는 명. 저승에서도 함부로 건드리지 못하는 표식이다.",
-      cure:"도움을 받았거든 반드시 갚아라. 귀인은 갚는 자에게 두 번 온다."},
+    /* ── 대살 ── */
+    "백호대살":{hj:"虎",als:"흰 호랑이의 이빨",
+      tx:"옛사람들이 가장 무서워한 살이다. 피를 보는 일 — 사고·수술·다툼이 따라붙는다 하여 혈광지재(血光之災)라 불렀다. 다만 기운 자체가 워낙 강해, 다스린 자에겐 큰일을 해내는 힘이 된다.",
+      cure:"과로와 과속, 이 둘만 끊어라. 호랑이는 지친 주인부터 문다."},
     "괴강살":{hj:"魁",als:"우두머리의 별",
       tx:"북두의 우두머리 별이 네 일주에 내려앉았다. 총명함과 결단이 극단으로 치닫는 명 — 크게 서든가, 크게 부딪히든가 둘 중 하나다. 어중간함이 제일 해롭다.",
       cure:"네 그릇은 반쯤 채우라고 있는 그릇이 아니다. 판을 골랐으면 끝까지 가라."},
-    "백호살":{hj:"虎",als:"흰 호랑이의 이빨",
-      tx:"명부의 이 자리에 흰 호랑이가 웅크리고 있다. 기운이 강렬해서 큰일을 해내지만, 몸이 상하기 쉬운 자리이기도 하다. 옛사람들이 가장 무서워한 살이나 — 다스린 자에겐 가장 큰 힘이었다.",
-      cure:"과로와 과속, 이 둘만 끊어라. 호랑이는 지친 주인부터 문다."}
+    "양인살":{hj:"刃",als:"칼을 쥔 손",
+      tx:"일간이 가장 강해지는 자리 — 손에 날 선 칼이 들려 있다. 밀어붙이는 힘이 남다르고 궁지에서 오히려 강해진다. 다만 칼은 밖으로도 안으로도 벤다. 수술수가 따라붙는 것도 이 때문이다.",
+      cure:"큰 힘은 큰 일에만 써라. 사소한 시비에 칼을 빼는 순간, 이 살은 흉이 된다."},
+    /* ── 십이신살 ── */
+    "겁살":{hj:"劫",als:"빼앗기는 자리",
+      tx:"십이신살 중 가장 매서운 살이다. 내 것을 빼앗기는 자리라, 재물이든 사람이든 방심한 틈에 훅 나간다. 대신 이 자리를 쥔 자는 위기 감각이 남달라 한 번 크게 잃고 나면 두 번은 안 잃는다.",
+      cure:"보증·투자·큰 지출은 반드시 하루 재워라. 급하게 정한 것부터 빠져나간다."},
+    "재살":{hj:"災",als:"갇히는 자리 (수옥살)",
+      tx:"수옥살(囚獄殺)이라고도 한다. 송사·구설·갇힘의 기운이라 남의 싸움에 증인으로 끌려들기 쉽다. 뒤집어 쓰면 법·수사·감사처럼 남을 다루는 자리에 서는 기운이기도 하다.",
+      cure:"서류에 이름을 올릴 땐 끝줄까지 읽어라. 남의 분쟁에 편들지 마라 — 편든 쪽이 먼저 물린다."},
+    "천살":{hj:"天",als:"하늘이 내리는 것",
+      tx:"사람 힘으로 막을 수 없는 일이 스치는 자리다. 천재지변, 윗사람의 변덕, 예고 없는 통보 — 내 잘못이 아닌데 내가 맞는다. 그래서 이 살을 지닌 자는 일찍 하늘을 무서워할 줄 안다.",
+      cure:"윗사람과 정면으로 맞서지 마라. 못 막을 일에는 힘을 빼고, 막을 수 있는 것만 단단히 해라."},
+    "지살":{hj:"地",als:"길 떠나는 자리",
+      tx:"역마의 동생 격이다. 제 발로 움직여 길을 내는 자리라, 고향을 떠나거나 스스로 판을 옮겨 자수성가하는 명이다. 앉아서 물려받기보다 나가서 벌어오는 팔자.",
+      cure:"떠나는 것을 두려워 마라. 다만 짐은 가볍게 — 미련이 무거우면 발이 안 떨어진다."},
+    "연살":{hj:"桃",als:"복사꽃의 살 (도화살)",
+      tx:"십이신살로는 연살(年煞), 흔히 도화살이라 부른다. 걷기만 해도 눈길이 따라붙고 가만있어도 말이 먼저 걸려오는 자리다. 사람 상대하는 일에는 이만한 무기가 없다. 다만 꽃에는 벌만 오는 게 아니다.",
+      cure:"매력은 열어 두되 지갑과 비밀은 닫아 두어라. 오는 인연을 다 받지 않는 것이 이 살을 복으로 만든다."},
+    "월살":{hj:"月",als:"마르는 자리 (고초살)",
+      tx:"고초살(枯焦殺)이라고도 한다. 물기가 마르는 자리라 진행하던 일이 까닭 없이 정체되고, 애쓴 만큼 나오지 않는다. 씨를 뿌려도 싹이 늦게 트는 땅이다.",
+      cure:"이 자리에서는 새로 벌이지 말고 있는 것을 지켜라. 마른 땅에 물 주듯, 쉬는 것도 일이다."},
+    "망신살":{hj:"亡",als:"드러나는 자리",
+      tx:"숨긴 것이 드러나 체면이 상하는 자리다. 술자리 말실수, 새어 나간 비밀, 뒤늦게 밝혀지는 일 — 남이 아니라 내 입과 내 행실에서 시작된다. 감출 것 없이 사는 자에게는 힘을 못 쓰는 살이다.",
+      cure:"떳떳하지 못한 일을 애초에 만들지 마라. 술과 말, 이 둘만 단속하면 절반은 막힌다."},
+    "장성살":{hj:"將",als:"장수의 별",
+      tx:"살이라 부르나 실은 권세의 자리다. 남 밑에 오래 있지 못하고 끝내 제 판을 짓는 명 — 우두머리 기질이 뼈에 박혀 있다. 뚝심 하나는 사주에서 제일간다.",
+      cure:"권위를 세우되 독불장군은 되지 마라. 네 뜻을 꺾어 줄 사람 하나는 곁에 둬라."},
+    "반안살":{hj:"鞍",als:"말안장에 오르는 자리",
+      tx:"말 등에 안장을 얹는 자리다. 출세와 승진, 윗사람의 등을 타는 기운 — 험한 길도 안장이 있으면 편히 가듯, 이 살을 지닌 자는 어디서든 앉을 자리를 얻는다.",
+      cure:"밀어주는 손을 부끄러워 마라. 다만 안장에 앉았거든 고삐는 네가 쥐어라."},
+    "역마살":{hj:"驛",als:"떠도는 말발굽",
+      tx:"한자리에 오래 묶이면 병이 나고, 움직여야 운이 도는 자리다. 이사·출장·해외·이직 — 남들이 두려워하는 '옮김'이 너에겐 약이다. 요즘 세상에선 가장 값나가는 살이기도 하다.",
+      cure:"떠나는 것을 겁내지 마라. 다만 떠나기 전날 밤의 결정만은 하루 재워라."},
+    "육해살":{hj:"害",als:"발목 잡는 자리",
+      tx:"여섯 가지로 해롭다는 자리다. 일이 다 되어가는데 마지막에 발목이 잡히고, 몸은 큰 병보다 잔병으로 자주 앓는다. 서두르는 자에게 특히 매섭다.",
+      cure:"일정을 촘촘히 짜지 마라. 빈틈을 미리 만들어 두면 이 살은 그 빈틈에 앉았다 간다."},
+    "화개살":{hj:"華",als:"홀로 피는 일산(日傘)",
+      tx:"머리 위에 홀로 쓰는 일산이 있다. 무리에 섞여도 어딘가 혼자인 자, 그 고독에서 재주가 자라는 자리다. 예술·학문·종교·연구 — 혼자 파는 우물일수록 깊게 판다.",
+      cure:"고독을 벌이라 여기지 마라. 그 시간이 네 창고다. 다만 사람 부르는 날을 한 달에 하루는 정해 두어라."},
+    /* ── 귀인 ── */
+    "천을귀인":{hj:"貴",als:"등 뒤의 귀인",
+      tx:"신살 중 으뜸가는 길신이다 — 네 등 뒤에 사람이 서 있다. 벼랑 끝에 몰릴 때마다 어디선가 손이 내려오는 명. 저승에서도 함부로 건드리지 못하는 표식이다.",
+      cure:"도움을 받았거든 반드시 갚아라. 귀인은 갚는 자에게 두 번 온다."},
+    "문창귀인":{hj:"文",als:"글의 별",
+      tx:"머리가 트이는 길신이다. 배운 것이 남고 시험과 글에 운이 붙는다. 남들이 외울 때 너는 이해하는 자리 — 공부와 글로 먹고사는 팔자에 특히 귀하다.",
+      cure:"읽고 쓰는 일을 놓지 마라. 이 별은 쓰지 않으면 흐려진다."},
+    "천덕귀인":{hj:"德",als:"하늘이 덮어 주는 것",
+      tx:"월지에서 나오는 최상급 길신이다. 하늘이 덮어 준다는 뜻이라, 흉한 일이 와도 한 겹이 먼저 막아 준다. 옛 책은 이 귀인이 있으면 '흉이 흉으로 끝나지 않는다'고 적었다.",
+      cure:"덕은 쌓아야 유지된다. 남의 사정을 한 번 봐주는 일이 이 귀인을 붙잡아 둔다."},
+    "월덕귀인":{hj:"月",als:"달이 비추는 자리",
+      tx:"천덕과 짝을 이루는 길신이다. 사람됨이 원만하고 인덕이 따르며, 어려울 때 주변이 먼저 나서 준다. 요란한 복은 아니나 오래 가는 복이다.",
+      cure:"받은 호의를 당연히 여기지 마라. 이 달빛은 고마움을 아는 자리에만 머문다."},
+    "암록":{hj:"祿",als:"숨은 곳간",
+      tx:"드러나지 않는 녹(祿)이다. 남들 눈에는 안 보이는 자리에서 도움이 오고, 막다른 길에서 뜻밖의 활로가 열린다. 큰 부자는 아니어도 굶지 않는 명이다.",
+      cure:"숨은 복은 자랑하면 새어 나간다. 조용히 쓰면 오래 남는다."},
+    "금여":{hj:"輿",als:"금수레",
+      tx:"금으로 만든 수레를 타는 자리다. 몸이 편안하고 품위가 따르며 배우자 덕이 좋다고 옛 책은 적었다. 애써 구하지 않아도 탈것이 와 있는 명이다.",
+      cure:"편안함에 익숙해지되 게을러지지는 마라. 수레도 끌어 줄 사람이 있어야 굴러간다."},
+    /* ── 기질과 인연 ── */
+    "홍염살":{hj:"艶",als:"붉은 고움",
+      tx:"도화가 겉으로 피는 꽃이라면 이것은 안에서 배어 나오는 색이다. 요란하지 않은데 사람이 붙고 은근히 마음을 흔든다. 예술·접객·사람 다루는 일에 힘이 된다.",
+      cure:"은근한 것일수록 오해를 부른다. 선은 네가 먼저 그어 두어라."},
+    "귀문관살":{hj:"鬼",als:"귀신 드나드는 문",
+      tx:"저승 문이 반쯤 열린 자리다. 남이 못 보는 것을 보고 못 느끼는 것을 느낀다. 촉이 비상해 예술·상담·역술에 재능을 보이나, 신경이 곤두서고 잠을 설치기 쉽다.",
+      cure:"예민함을 병으로 만들지 마라. 잠자리와 술을 다스리면 이 문은 좋은 쪽으로만 열린다."},
+    "원진살":{hj:"怨",als:"이유 없는 미움",
+      tx:"까닭 없이 서로 미운 기운이다. 잘잘못을 따져도 답이 안 나오고, 미워하면서도 못 끊는 애증이 된다. 원국 안에 있으면 내 안에서 두 마음이 자주 싸운다.",
+      cure:"이 기운이 도는 사이에서는 시비를 가리려 들지 마라. 거리를 두는 것이 유일한 약이다."},
+    "현침살":{hj:"針",als:"매달린 바늘",
+      tx:"글자 모양이 바늘처럼 뾰족하다 하여 붙은 이름이다. 말이 날카로워 상대를 찌르기 쉽고, 손끝은 정교해 의료·바느질·칼 쓰는 일에 재능이 있다. 찌르는 힘을 어디에 쓰느냐의 문제다.",
+      cure:"바늘로 사람을 찌르지 말고 실을 꿰어라. 말하기 전에 한 번 삼키면 그게 실이 된다."},
+    "고신살":{hj:"孤",als:"홀로 남는 자리",
+      tx:"무리에서 떨어져 나오는 기운이다. 사람이 없는 게 아니라 있어도 마음이 겉도는 자리 — 옛 책은 남자 사주에서 특히 무겁게 보았다. 대신 혼자의 시간을 자산으로 바꾸는 자에겐 큰 힘이 된다.",
+      cure:"먼저 연락하는 습관 하나면 이 살은 반으로 준다. 외로움은 참는 게 아니라 쓰는 것이다."},
+    "과숙살":{hj:"寡",als:"빈 자리를 지키는 살",
+      tx:"고신과 짝을 이루는 살로, 옛 책은 여자 사주에서 무겁게 보았다. 곁에 사람이 있어도 속을 다 못 주고 끝내 제 힘으로 서는 명이다. 옛말은 무거우나 요즘 세상에선 홀로 서는 힘으로 읽는다.",
+      cure:"혼자 감당하는 버릇을 조금 내려놔라. 도움을 청하는 말 한마디가 이 살을 푼다."},
+    "공망":{hj:"空",als:"비어 있는 자리",
+      tx:"그 자리가 텅 비었다는 뜻이다. 채워도 새고 기대면 허전하다. 다만 흉한 것이 들어와도 함께 비어 버리니, 흉살이 앉은 자리라면 오히려 다행이다. 옛사람들은 이 자리를 종교·예술·학문처럼 손에 안 잡히는 것으로 채웠다.",
+      cure:"그 자리에서 손에 잡히는 것만 바라지 마라. 비운 만큼 다른 것이 들어온다."},
+    "천라(天羅)":{hj:"羅",als:"하늘의 그물",
+      tx:"술(戌)과 해(亥)가 나란히 앉아 하늘에 그물이 걸린 자리다. 활동이 묶이고 답답한 일이 잦으나, 그물 안에서 도(道)를 닦는 자리이기도 하다. 의료·종교·역술처럼 사람의 어두운 곳을 다루면 오히려 풀린다.",
+      cure:"묶였다고 몸부림치면 더 조인다. 갇힌 김에 안을 들여다보는 것이 이 자리의 정답이다."},
+    "지망(地網)":{hj:"網",als:"땅의 그물",
+      tx:"진(辰)과 사(巳)가 나란히 앉아 땅에 그물이 깔린 자리다. 발이 자꾸 걸리고 일이 지체되나, 한 번 자리를 잡으면 좀처럼 흔들리지 않는다. 천라와 마찬가지로 남의 어려움을 다루는 일에서 힘을 얻는다.",
+      cure:"빨리 가려 하지 마라. 그물 위를 뛰면 걸리고, 걸으면 건넌다."}
   };
-  var ORDER=["괴강살","백호살","양인살","도화살","역마살","화개살","천을귀인"];
+  // 분류 — 표시 순서
+  var GROUPS=[
+    { hj:"大", ko:"대살", ds:"기운이 가장 센 것들", keys:["백호대살","괴강살","양인살"] },
+    { hj:"十二", ko:"십이신살", ds:"년지·일지에서 자리마다 하나씩 붙는다",
+      keys:["겁살","재살","천살","지살","연살","월살","망신살","장성살","반안살","역마살","육해살","화개살"] },
+    { hj:"貴", ko:"귀인", ds:"도와주는 것들",
+      keys:["천을귀인","천덕귀인","월덕귀인","문창귀인","금여","암록"] },
+    { hj:"氣", ko:"기질과 인연", ds:"성정·관계에 새겨진 것들",
+      keys:["홍염살","귀문관살","원진살","현침살","고신살","과숙살","공망","천라(天羅)","지망(地網)"] }
+  ];
 
   function fillSelects(){
     var y=$("g-year"),m=$("g-month"),d=$("g-day"),h=$("g-hour"),now=new Date().getFullYear();
@@ -143,46 +242,61 @@ a{color:inherit;text-decoration:none}
   }
 
   var data=null;
+  function esc(s){ return String(s).replace(/</g,"&lt;"); }
+
   function boot(birth){
     var r=Saju.compute(data,{y:birth.y,m:birth.m,d:birth.d,hour:birth.hour,min:birth.min||0},{trueSolar:true});
-    var f=SajuDeep.facts(r,birth,birth.gender||null);
     var t=Saju.pillarText(r.pillars.day);
     var bs=birth.y+"."+birth.m+"."+birth.d+(birth.hour!=null?" "+("0"+birth.hour).slice(-2)+":"+("0"+(birth.min||0)).slice(-2):"")+"생";
     $("me-pill").textContent=bs+" · "+t.hanja+"("+t.hangul+") · "+r.zodiac+"띠";
 
-    // "년지 오 — 도화살(매력·인기)" → {name, pos}
-    var found={};
-    (f.sinsal||[]).forEach(function(s){
-      var m2=s.match(/^(.+?)\s*—\s*(도화살|역마살|화개살|양인살|천을귀인|괴강살|백호살)/);
-      if(!m2) return;
-      var name=m2[2], pos=m2[1];
-      if(!found[name]) found[name]=[];
-      if(found[name].indexOf(pos)<0) found[name].push(pos);
-    });
-    var names=ORDER.filter(function(n){ return found[n]; });
+    // 원국 표기 — 계산 근거를 눈으로 확인할 수 있게
+    var wg=Sinsal.wongook(r), gm=Sinsal.gongmangJi(r);
+    $("wongook").innerHTML='<div class="row">'+wg.map(function(p){
+        return '<span class="p"><span class="lb">'+p.pos+'</span><span class="hj">'+p.hj+'</span>'+
+               '<span class="ko">'+p.ko+'</span><span class="us">'+p.unseong+'</span></span>';
+      }).join("")+'</div>'+
+      '<p class="gm">이 명부의 공망은 <b>'+gm.hj+'('+gm.ko+')</b>다. 작은 글씨는 십이운성(十二運星).'+
+      (r.pillars.hour ? "" : "<br>태어난 시를 모르니 시주는 비워 두었다 — 시지에 붙는 살은 빠진다.")+'</p>';
+
+    var found={}; // 이름 → {hits, basis}
+    Sinsal.list(r).forEach(function(s){ found[s.name]=s; });
 
     var cards=$("cards"); cards.innerHTML="";
-    if(!names.length){
-      $("intro").innerHTML="네 명부를 샅샅이 뒤졌다.";
-      cards.innerHTML='<div class="none">붙은 살이 없다 — 드물게 깨끗한 명부다.<br>'+
-        "다만 명심해라. 살이 없다는 건 무기도 없다는 뜻이다.<br>네 길은 순전히 네 걸음으로 가야 한다.</div>";
-    }else{
-      $("intro").innerHTML="네 명부에서 <b>"+names.length+"개</b>가 나왔다. 하나씩 보여 주마.";
-      names.forEach(function(n){
-        var b=BOOK[n];
+    var total=0, names=[];
+    GROUPS.forEach(function(g){
+      var hit=g.keys.filter(function(k){ return found[k]; });
+      if(!hit.length) return;
+      var head=document.createElement("div");
+      head.className="grp";
+      head.innerHTML='<span class="hj">'+g.hj+'</span><span class="ko">'+g.ko+'</span><span class="ds">'+g.ds+'</span>';
+      cards.appendChild(head);
+      hit.forEach(function(n){
+        var b=BOOK[n], f=found[n];
+        total++; names.push(n);
         var el=document.createElement("div");
         el.className="card"; el.setAttribute("data-hj",b.hj);
         el.innerHTML='<div class="in"><div class="top"><span class="nm">'+n+'</span>'+
           '<span class="als">'+b.als+'</span>'+
-          '<span class="pos">'+found[n].join(" · ")+'</span></div>'+
+          '<span class="basis">'+esc(f.basis)+'</span></div>'+
+          '<div class="top" style="margin-top:8px"><span class="pos">'+esc(f.hits.join(" · "))+'</span></div>'+
           '<p class="tx">'+b.tx+'</p>'+
           '<p class="cure"><b>다스리는 법</b> — '+b.cure+'</p></div>';
         cards.appendChild(el);
       });
+    });
+
+    if(!total){
+      $("intro").innerHTML="네 명부를 샅샅이 뒤졌다.";
+      cards.innerHTML='<div class="none">붙은 살이 없다 — 드물게 깨끗한 명부다.<br>'+
+        "다만 명심해라. 살이 없다는 건 무기도 없다는 뜻이다.<br>네 길은 순전히 네 걸음으로 가야 한다.</div>";
+    }else{
+      $("intro").innerHTML="네 명부에서 <b>"+total+"가지</b>가 나왔다.<br>"+
+        "십이신살은 흉한 것만이 아니라 자리마다 하나씩 붙는 것이니, 이름만 보고 겁먹지 마라.";
     }
     $("gate").style.display="none"; $("board").style.display="block";
     if(window.GwigokLog) GwigokLog.add("sinsal","신살 도감",
-      names.length ? names.join("·")+" — "+names.length+"개가 붙어 있었다" : "붙은 살이 없는 깨끗한 명부였다");
+      total ? names.slice(0,6).join("·")+(names.length>6?" 외":"")+" — "+total+"가지가 붙어 있었다" : "붙은 살이 없는 깨끗한 명부였다");
   }
 
   fillSelects();
