@@ -56,6 +56,10 @@ a{color:inherit;text-decoration:none}
 .grp .ko{font-family:'Nanum Myeongjo',serif;color:#e0cdb6;font-size:1rem;letter-spacing:.08em}
 .grp .ds{margin-left:auto;color:#6f6157;font-size:.76rem}
 .card .basis{margin-left:auto;font-size:.72rem;color:#7d685c;font-family:'Nanum Myeongjo',serif}
+/* 분류 설명 */
+.gnote{margin:-4px 0 16px;padding:14px 16px;border-left:2px solid rgba(150,70,55,.45);
+  background:rgba(20,11,13,.5);color:#c9b8a4;font-size:.88rem;line-height:1.9}
+.gnote b{color:#ffb08a;font-family:'Nanum Myeongjo',serif}
 .card{position:relative;border:1px solid rgba(150,70,55,.35);margin-bottom:16px;overflow:hidden;
   background:linear-gradient(160deg,rgba(30,16,17,.95),rgba(13,8,10,.98))}
 .card::before{content:attr(data-hj);position:absolute;right:6px;top:-16px;font-family:'Nanum Myeongjo',serif;
@@ -225,6 +229,10 @@ a{color:inherit;text-decoration:none}
   var GROUPS=[
     { hj:"大", ko:"대살", ds:"기운이 가장 센 것들", keys:["백호대살","괴강살","양인살"] },
     { hj:"十二", ko:"십이신살", ds:"년지·일지에서 자리마다 하나씩 붙는다",
+      note:"십이신살(十二神煞)은 네 <b>년지와 일지가 속한 삼합국(三合局)</b>을 기준으로, 열두 지지에 <b>겁살부터 화개살까지 열두 이름을 차례로 붙인 것</b>이다. "+
+           "그러니 사주의 네 자리에는 반드시 하나씩 붙는다 — 없는 것이 이상한 것이지, 붙었다고 흉한 게 아니다. "+
+           "이름이 사나운 겁살·재살이 있는가 하면, 권세를 뜻하는 장성살·반안살도 이 열둘에 함께 들어 있다. "+
+           "귀곡은 <b>년지 기준과 일지 기준을 둘 다</b> 짚어 주니, 카드마다 어느 기준으로 나온 것인지 오른쪽에 적어 두었다.",
       keys:["겁살","재살","천살","지살","연살","월살","망신살","장성살","반안살","역마살","육해살","화개살"] },
     { hj:"貴", ko:"귀인", ds:"도와주는 것들",
       keys:["천을귀인","천덕귀인","월덕귀인","문창귀인","금여","암록"] },
@@ -271,6 +279,11 @@ a{color:inherit;text-decoration:none}
       head.className="grp";
       head.innerHTML='<span class="hj">'+g.hj+'</span><span class="ko">'+g.ko+'</span><span class="ds">'+g.ds+'</span>';
       cards.appendChild(head);
+      if(g.note){
+        var nt=document.createElement("p");
+        nt.className="gnote"; nt.innerHTML=g.note;
+        cards.appendChild(nt);
+      }
       hit.forEach(function(n){
         var b=BOOK[n], f=found[n];
         total++; names.push(n);
