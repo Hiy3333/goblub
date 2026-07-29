@@ -7,6 +7,17 @@
 
   function ganOh(g) { return Math.floor(g / 2); }
 
+  // 오행 분포 비율 — 고르면 각 0.2
+  var LOW = 0.12, HIGH = 0.30, FILL = 0.22;   // 부족 / 과다 / 채워주는 기준
+  function ohShare(oh) {
+    var total = 0;
+    OH.forEach(function (k) { total += (oh[k] || 0); });
+    if (!total) total = 1;
+    var sh = {};
+    OH.forEach(function (k) { sh[k] = (oh[k] || 0) / total; });
+    return sh;
+  }
+
   function jiRel(a, b) {
     if (YUKHAP[a] === b) return "육합";
     if (CHUNG[a] === b) return "충";
@@ -32,14 +43,23 @@
     var iljiType = jiRel(jiA, jiB);
     var iljiPt = { 육합: 30, 삼합: 26, 평: 18, 충: 8 }[iljiType];
 
-    // 3) 오행 보완 (25)
-    var lackA = OH.filter(function (k) { return rA.oheng[k] < 0.5; });
-    var lackB = OH.filter(function (k) { return rB.oheng[k] < 0.5; });
-    var ohengType, ohengPt, fill = 0;
-    if (lackA.length === 0 && lackB.length === 0) { ohengType = "균형"; ohengPt = 20; }
+    /* 3) 오행 균형·보완 (25)
+       절대량이 아니라 '분포 비율'로 본다. 다섯 기운이 고르면 각 20%이므로
+         12% 미만 = 빈 자리(부족), 30% 초과 = 넘치는 자리(과다)로 판정한다.
+       (예전에는 "0.5 미만인 기운이 없으면 균형"으로 봐서, 화 3.6 · 목 0.5처럼
+        심하게 치우친 사주도 균형으로 잘못 잡혔다.) */
+    var shA = ohShare(rA.oheng), shB = ohShare(rB.oheng);
+    var weakA = OH.filter(function (k) { return shA[k] < LOW; });
+    var strongA = OH.filter(function (k) { return shA[k] > HIGH; });
+    var weakB = OH.filter(function (k) { return shB[k] < LOW; });
+    var strongB = OH.filter(function (k) { return shB[k] > HIGH; });
+    var evenA = !weakA.length && !strongA.length;
+    var evenB = !weakB.length && !strongB.length;
+    var ohengType, ohengPt, fill = 0, filled = [];
+    if (evenA && evenB) { ohengType = "균형"; ohengPt = 20; }
     else {
-      lackA.forEach(function (k) { if (rB.oheng[k] >= 1.0) fill++; });
-      lackB.forEach(function (k) { if (rA.oheng[k] >= 1.0) fill++; });
+      weakA.forEach(function (k) { if (shB[k] >= FILL) { fill++; filled.push({ who: "a", oh: k }); } });
+      weakB.forEach(function (k) { if (shA[k] >= FILL) { fill++; filled.push({ who: "b", oh: k }); } });
       ohengType = fill > 0 ? "보완" : "결핍";
       ohengPt = Math.min(25, 13 + 4 * fill);
     }
@@ -59,7 +79,9 @@
       total: total, grade: grade,
       ilgan: { type: ilganType, pt: ilganPt, max: 30 },
       ilji: { type: iljiType, pt: iljiPt, max: 30 },
-      oheng: { type: ohengType, pt: ohengPt, max: 25, fill: fill },
+      oheng: { type: ohengType, pt: ohengPt, max: 25, fill: fill, filled: filled,
+        weakA: weakA, strongA: strongA, weakB: weakB, strongB: strongB,
+        shareA: shA, shareB: shB, rawA: rA.oheng, rawB: rB.oheng },
       tti: { type: ttiType, pt: ttiPt, max: 15 }
     };
   }

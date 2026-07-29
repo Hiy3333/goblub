@@ -98,6 +98,24 @@ video::-webkit-media-controls-overlay-play-button{display:none!important;-webkit
 .line.s .who2{background:#e7eef0;color:#5d7f8a}
 .line p{font-size:.92rem;line-height:1.75;padding-top:3px}
 
+/* 오행 분포(검증용) */
+.ohbox{margin-top:16px;border-top:1px dashed var(--line);padding-top:14px}
+.ohbox h4{font-family:'Jua',sans-serif;color:var(--brown);font-size:.86rem;margin-bottom:10px;text-align:center}
+.ohrow{display:flex;align-items:center;gap:6px;margin-bottom:7px}
+.ohrow .who3{flex:0 0 auto;width:3.6em;font-size:.78rem;color:var(--ink-soft);text-align:right}
+.ohrow .bars{flex:1;display:flex;gap:4px}
+.ohrow .b{flex:1;text-align:center}
+.ohrow .b .bar{height:38px;display:flex;align-items:flex-end;justify-content:center}
+.ohrow .b .fill{width:100%;border-radius:4px 4px 0 0;background:linear-gradient(180deg,#f0c493,#e39a86);min-height:2px}
+.ohrow .b .lb{display:block;font-size:.7rem;color:var(--ink-soft);margin-top:3px}
+.ohrow .b .vl{display:block;font-size:.66rem;color:#b0968a}
+.ohrow .b.hi .fill{background:linear-gradient(180deg,#e8735c,#c2492f)}
+.ohrow .b.lo .fill{background:#e6d7c8}
+.ohrow .b.hi .lb{color:#c2492f;font-weight:700}
+.ohrow .b.lo .lb{color:#b9a99c}
+.ohnote{font-size:.85rem;line-height:1.8;color:var(--ink);margin-top:8px}
+.ohnote b{color:var(--brown)}
+.ohlegend{text-align:center;color:var(--ink-soft);font-size:.72rem;margin-top:6px}
 .notes{margin-top:16px;border-top:1px dashed var(--line);padding-top:14px}
 .note{display:flex;gap:8px;font-size:.88rem;line-height:1.7;margin-bottom:9px}
 .note .lb{flex:0 0 auto;font-family:'Jua',sans-serif;color:var(--brown);min-width:72px}
@@ -185,6 +203,7 @@ video::-webkit-media-controls-overlay-play-button{display:none!important;-webkit
     </div>
     <div class="body">
       <div class="talk" id="r-talk"></div>
+      <div class="ohbox" id="r-oheng"></div>
       <div class="notes" id="r-notes"></div>
       <div class="luck" id="r-luck"></div>
 
@@ -207,7 +226,7 @@ video::-webkit-media-controls-overlay-play-button{display:none!important;-webkit
 
 <script src="../js/common.js?v=5" data-root=".."></script>
 <script src="js/saju.js"></script>
-<script src="js/gunghap.js"></script>
+<script src="js/gunghap.js?v=2"></script>
 <script src="js/dosa.js?v=2"></script>
 <script src="js/feed.js?v=4"></script>
 <script>
@@ -314,10 +333,12 @@ function reveal(){
     return '<div class="line '+(l[0]==="라떼"?"m":"s")+'"><span class="who2">'+l[0]+'</span><p>'+l[1]+'</p></div>';
   }).join("");
 
+  renderOheng(s);
+
   $("r-notes").innerHTML=
     note("🌿 향", starOf(s.ilgan.pt,s.ilgan.max), T.ilgan[s.ilgan.type])+
     note("🌡 온도", starOf(s.ilji.pt,s.ilji.max), T.ilji[s.ilji.type])+
-    note("⚗ 배합", starOf(s.oheng.pt,s.oheng.max), T.oheng[s.oheng.type])+
+    note("⚗ 배합", starOf(s.oheng.pt,s.oheng.max), ohengLine(s.oheng))+
     note("🍰 곁들임", starOf(s.tti.pt,s.tti.max), T.tti[s.tti.type]);
 
   var lk=last.luck;
@@ -330,6 +351,56 @@ function reveal(){
 }
 function note(lb,st,txt){
   return '<div class="note"><span class="lb">'+lb+'</span><span class="st">'+st+'</span><span>'+txt+'</span></div>';
+}
+
+/* ── 오행 분포를 눈으로 확인할 수 있게 (막대 + 실제 수치) ── */
+var OH_KO=["목","화","토","금","수"], OH_HJ={목:"木",화:"火",토:"土",금:"金",수:"水"};
+function ohBars(label, raw, share, weak, strong){
+  var max=0; OH_KO.forEach(function(k){ if(raw[k]>max) max=raw[k]; });
+  if(!max) max=1;
+  return '<div class="ohrow"><span class="who3">'+label+'</span><span class="bars">'+
+    OH_KO.map(function(k){
+      var cls = strong.indexOf(k)>=0 ? " hi" : (weak.indexOf(k)>=0 ? " lo" : "");
+      var h = Math.max(2, Math.round(raw[k]/max*38));
+      return '<span class="b'+cls+'"><span class="bar"><span class="fill" style="height:'+h+'px"></span></span>'+
+             '<span class="lb">'+k+'</span><span class="vl">'+Math.round(share[k]*100)+'%</span></span>';
+    }).join("")+'</span></div>';
+}
+function ohList(arr){ return arr.map(function(k){ return k+"("+OH_HJ[k]+")"; }).join("·"); }
+// 받침 있는 오행은 목·금뿐 — 조사를 맞춘다
+function batchim(k){ return k==="목"||k==="금"; }
+function josa(arr, withB, withoutB){ return batchim(arr[arr.length-1]) ? withB : withoutB; }
+function renderOheng(s){
+  var o=s.oheng;
+  var html='<h4>⚖ 두 분의 오행 분포</h4>'+
+    ohBars("손님", o.rawA, o.shareA, o.weakA, o.strongA)+
+    ohBars("그 사람", o.rawB, o.shareB, o.weakB, o.strongB)+
+    '<p class="ohlegend">진한 막대 = 넘치는 기운(30% 초과) · 흐린 막대 = 비어 있는 기운(12% 미만)</p>'+
+    '<p class="ohnote">'+ohengLine(o)+'</p>';
+  $("r-oheng").innerHTML=html;
+}
+// 배합 한 줄 — 실제로 어느 기운이 넘치고 비었는지 짚어 준다
+function ohengLine(o){
+  function part(strong, weak){
+    var p=[];
+    if(strong.length) p.push("<b>"+ohList(strong)+"</b>"+josa(strong,"이","가")+" 넘치고");
+    if(weak.length) p.push("<b>"+ohList(weak)+"</b>"+josa(weak,"이","가")+" 비어 있어요");
+    if(!p.length) return "다섯 기운이 고르게 찼어요";
+    if(p.length===1) return p[0].replace(" 넘치고"," 넘쳐요");
+    return p.join(" ");
+  }
+  if(o.type==="균형")
+    return "두 분 다 오행이 고르게 찼어요. 서로 기대기보다 나란히 걷는 안정형 배합이에요.";
+  var me="손님은 "+part(o.strongA,o.weakA)+".";
+  var you="그분은 "+part(o.strongB,o.weakB)+".";
+  if(o.type==="보완"){
+    var f=o.filled.map(function(x){
+      var nm="<b>"+ohList([x.oh])+"</b>"+josa([x.oh],"을","를");
+      return x.who==="a" ? "손님의 빈 "+nm+" 그분이 채워 줘요"
+                         : "그분의 빈 "+nm+" 손님이 채워 줘요"; }).join(", ");
+    return me+" "+you+" — "+f+". 퍼즐처럼 맞물리는 배합이에요.";
+  }
+  return me+" "+you+" — 서로의 빈 자리를 메워 주지는 못하는 배합이라, 부족한 기운은 각자 의식해서 챙기는 편이 좋아요.";
 }
 
 // 라떼(토끼 메이드 · 손님 편) · 모카(집사 · 그 사람 편) 한 마디씩
