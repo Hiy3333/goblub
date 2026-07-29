@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>흉몽 해몽소 — 冥簿館</title>
+<title>간밤의 장부 — 冥簿館</title>
 <meta name="description" content="간밤의 꿈을 귀곡(鬼哭)이 풀어준다 — 꿈의 정체, 명부와 겹쳐 보기, 액막이 하나" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -64,7 +64,7 @@ button.fire:hover{background:rgba(190,55,25,.36)}
   <div class="head">
     <a class="back" href="fortune.html">← 명부관</a>
     <p class="kicker">冥 簿 館 · 夢</p>
-    <h1>흉몽 <em>해몽소</em></h1>
+    <h1>간밤의 <em>장부</em></h1>
     <p>꿈은 저승 문틈으로 새어 나온 그림자다.<br>간밤의 꿈을 두고 가라 — 하루에 한 꿈만 받는다.</p>
   </div>
 
@@ -157,7 +157,7 @@ button.fire:hover{background:rgba(190,55,25,.36)}
         $("status").style.display="none"; $("reading").innerHTML=fmt(acc); },
       onDone:function(){ showAnswer(q,acc,true);
         try{ localStorage.setItem(todayKey(),JSON.stringify({q:q,a:acc})); }catch(e){}
-        if(window.GwigokLog) GwigokLog.add("dream","흉몽 해몽소","“"+q.slice(0,40)+(q.length>40?"…":"")+"” 꿈을 두고 갔다");
+        if(window.GwigokLog) GwigokLog.add("dream","간밤의 장부","“"+q.slice(0,40)+(q.length>40?"…":"")+"” 꿈을 두고 갔다");
       },
       onError:function(code,sec){
         $("status").style.display="block";

@@ -1,6 +1,6 @@
 // 명부관 문답소 통합 프록시 — 한 함수로 세 가지를 받는다(Vercel 함수 수 절약).
 //   { ask:   { question, saju } }  → 귀곡 문답
-//   { dream: { text, ilju? } }     → 흉몽 해몽소
+//   { dream: { text, ilju? } }     → 간밤의 장부(해몽)
 //   { tarot: { worry?, card, keyword, orient } } → 고양이 타로
 import { streamGemini, geminiConfigured } from "../lib/gemini.js";
 
@@ -45,7 +45,7 @@ const ASK_SYSTEM = `당신은 '귀곡(鬼哭)'입니다. 저승의 기록보관�
 
 [분량] 공백 포함 350~550자. 인사말·서론 없이 곧장 시작.`;
 
-/* ── 흉몽 해몽소 ── */
+/* ── 간밤의 장부(해몽) ── */
 const DREAM_SYSTEM = `당신은 '귀곡(鬼哭)'입니다. 저승의 기록보관소 명부관(冥簿館)을 지키는 저승사자입니다. 꿈은 저승의 문틈으로 새어 나온 그림자라 여기며, 산 자들의 꿈을 수백 년 풀어 왔습니다. 서늘하고 단호하지만, 바닥에는 산 자를 살려 보내려는 정이 깔려 있습니다.
 
 [상황]
