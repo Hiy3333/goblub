@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>귀곡이 읽는 오늘 — 冥簿館</title>
+<meta name="description" content="귀곡(鬼哭)이 오늘 일진과 네 명부를 대조해 읽어주는 오늘의 혼·곳간·연·문서 — 총운·재물운·연애운·시험운" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&family=Gowun+Batang:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0a0709;color:#d9cdbb;font-family:'Gowun Batang',serif;min-height:100dvh;
+  display:flex;flex-direction:column;align-items:center;padding:0 0 60px}
+a{color:inherit;text-decoration:none}
+.wrap{width:min(94vw,720px)}
+/* 머리 */
+.head{position:relative;width:100%;padding:34px 0 22px;text-align:center}
+.head .back{position:absolute;left:2px;top:38px;color:#7d685c;font-size:.9rem}
+.head .back:hover{color:#ff6a3a}
+.head .kicker{font-family:'Nanum Myeongjo',serif;color:#a8563c;letter-spacing:.5em;font-size:.72rem;margin-bottom:10px}
+.head h1{font-family:'Nanum Myeongjo',serif;font-weight:800;font-size:1.7rem;color:#f0e4d2}
+.head h1 em{font-style:normal;color:#ff5a2a;text-shadow:0 0 24px rgba(255,70,30,.5)}
+/* 일진 띠 */
+.ilgin{display:flex;align-items:center;justify-content:center;gap:14px;margin:10px 0 26px;flex-wrap:wrap}
+.ilgin .gj{font-family:'Nanum Myeongjo',serif;color:#ff8a5a;font-size:.9rem;
+  border:1px solid rgba(200,80,50,.4);padding:5px 14px}
+.ilgin .tx{color:#a89887;font-size:.88rem}
+/* 명부 입력 */
+.gate{width:100%;background:linear-gradient(180deg,#171017,#100b10);border:1px solid rgba(150,60,70,.4);
+  padding:26px 22px;text-align:center}
+.gate p{font-family:'Nanum Myeongjo',serif;color:#e0d2bd;line-height:1.9;margin-bottom:16px}
+.gate .row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:14px}
+.gate select{background:#1c1216;color:#d9cdbb;border:1px solid rgba(150,70,55,.4);
+  padding:9px 8px;font-family:'Gowun Batang',serif;font-size:.9rem}
+.gate button{padding:12px 30px;background:rgba(150,40,20,.16);border:1px solid rgba(220,90,50,.55);
+  color:#ffc4a8;font-family:'Nanum Myeongjo',serif;font-size:1rem;letter-spacing:.12em;cursor:pointer;transition:.2s}
+.gate button:hover{background:rgba(190,55,25,.36);box-shadow:0 0 26px rgba(220,70,40,.35)}
+.gate .err{display:none;color:#ff7a6a;font-size:.85rem;margin-top:10px}
+/* 결과 */
+#board{display:none;width:100%}
+.who{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:22px;flex-wrap:wrap}
+.who .me{font-family:'Nanum Myeongjo',serif;color:#ecdcc6;font-size:1rem;
+  border:1px solid rgba(150,70,55,.35);padding:6px 16px;background:rgba(20,11,13,.6)}
+.who a{color:#8a7565;font-size:.8rem;border-bottom:1px solid rgba(125,104,92,.4)}
+.who a:hover{color:#ff6a3a}
+.card{border:1px solid rgba(150,70,55,.28);background:linear-gradient(180deg,rgba(23,14,16,.9),rgba(14,9,11,.95));
+  margin-bottom:16px;padding:20px 22px 18px}
+.card .top{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+.card .hj{font-family:'Nanum Myeongjo',serif;font-size:1.7rem;font-weight:800;color:#7d2a18;line-height:1}
+.card .nm{font-family:'Nanum Myeongjo',serif;font-size:1.08rem;color:#ffb08a}
+.card .st{margin-left:auto;color:#ff6a3a;letter-spacing:.12em;font-size:.95rem;text-shadow:0 0 12px rgba(255,80,40,.5)}
+.card .tx{font-family:'Nanum Myeongjo',serif;color:#e0d2bd;font-size:.97rem;line-height:2.0;white-space:pre-wrap}
+.omen{border:1px solid rgba(150,70,55,.4);background:rgba(90,25,15,.14);padding:14px 18px;margin:4px 0 18px;
+  font-family:'Nanum Myeongjo',serif;color:#ffb08a;font-size:.92rem;line-height:1.8;text-align:center}
+.sign{text-align:right;color:#8a7080;font-size:.84rem;font-family:'Nanum Myeongjo',serif;margin-top:4px}
+.links{display:flex;gap:10px;justify-content:center;margin-top:26px;flex-wrap:wrap}
+.links a{color:#c98060;font-size:.88rem;border:1px solid rgba(200,100,70,.4);padding:10px 18px;transition:.2s}
+.links a:hover{color:#ffc4a8;border-color:#ff6a3a;box-shadow:0 0 20px rgba(220,70,40,.3)}
+.foot{margin-top:44px;color:#5d5148;font-size:.78rem;letter-spacing:.2em;font-family:'Nanum Myeongjo',serif}
+@media(max-width:520px){ .card{padding:16px 15px 14px} .card .tx{font-size:.92rem} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head">
+    <a class="back" href="fortune.html">← 명부관</a>
+    <p class="kicker">冥 簿 館 · 日 誌</p>
+    <h1>귀곡이 읽는 <em>오늘</em></h1>
+  </div>
+
+  <div class="ilgin">
+    <span class="gj" id="gj"></span>
+    <span class="tx" id="gj-tx"></span>
+  </div>
+
+  <!-- 명부(생년월일)가 없으면 -->
+  <div class="gate" id="gate" style="display:none">
+    <p>네 명부가 아직 여기 없구나.<br>태어난 날을 적어라 — 오늘 일진과 대조해 주마.</p>
+    <div class="row">
+      <select id="g-year"></select><select id="g-month"></select><select id="g-day"></select>
+      <select id="g-hour"><option value="">시 모름</option></select>
+    </div>
+    <button id="g-go">명부에 새긴다</button>
+    <p class="err" id="g-err"></p>
+  </div>
+
+  <!-- 결과 -->
+  <div id="board">
+    <div class="who">
+      <span class="me" id="me-pill"></span>
+      <a href="#" id="edit">다른 명부로 본다</a>
+    </div>
+    <div class="omen" id="omen" style="display:none"></div>
+    <div class="card"><div class="top"><span class="hj">魂</span><span class="nm">혼 · 총운</span><span class="st" id="s-total"></span></div><p class="tx" id="t-total"></p></div>
+    <div class="card"><div class="top"><span class="hj">庫</span><span class="nm">곳간 · 재물운</span><span class="st" id="s-money"></span></div><p class="tx" id="t-money"></p></div>
+    <div class="card"><div class="top"><span class="hj">緣</span><span class="nm">연 · 연애운</span><span class="st" id="s-love"></span></div><p class="tx" id="t-love"></p></div>
+    <div class="card"><div class="top"><span class="hj">書</span><span class="nm">문서 · 시험운</span><span class="st" id="s-study"></span></div><p class="tx" id="t-study"></p></div>
+    <p class="sign">— 오늘 치 기록은 여기까지다. 내일 다시 오너라. · 귀곡(鬼哭)</p>
+    <div class="links">
+      <a href="saju-premium.html">🕯 명부 본편을 펼친다</a>
+      <a href="bujeok.html">🧧 오늘의 기운을 부적에 담는다</a>
+    </div>
+  </div>
+
+  <p class="foot" style="text-align:center">goblub · 冥 簿 館</p>
+</div>
+
+<script src="js/saju.js"></script>
+<script src="js/fortune.js"></script>
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id);};
+  var GAN_HJ="甲乙丙丁戊己庚辛壬癸", JI_HJ="子丑寅卯辰巳午未申酉戌亥";
+  var GAN="갑을병정무기경신임계", JI="자축인묘진사오미신유술해";
+
+  // ── 귀곡 말투 문구 풀 (십성 인덱스 0~9: 비견 겁재 식신 상관 편재 정재 편관 정관 편인 정인)
+  var TXT={
+    total:[
+      "네 기운과 같은 기운이 겹치는 날이다. 오늘은 네 걸음이 두 배로 나간다 — 다만 두 배로 고집도 세진다.",
+      "네 몫을 노리는 기운이 스치는 날. 오늘 맺는 약속은 반드시 셈을 먼저 정해라.",
+      "속에 있던 것이 술술 풀려나오는 날이다. 만들고, 말하고, 내보내라 — 오늘 나온 것은 산다.",
+      "혀끝에 불이 붙는 날이군. 빛나되 데이기 쉽다. 윗사람 앞에서는 세 마디 중 한 마디만 해라.",
+      "기회가 값을 달고 지나가는 날이다. 눈은 크게, 손은 늦게 — 그러면 오늘은 네 것이다.",
+      "쌓아온 것이 이자를 붙여 돌아오는 날이다. 성실했던 자에게만 보이는 운이니, 네가 그자라면 받아라.",
+      "위에서 누르는 기운이 있다. 맞서지 마라 — 오늘은 굽힌 허리가 제일 강한 등이다.",
+      "격(格)이 서는 날이다. 규칙을 지키는 네 모습이 곧 부적이 된다. 공적인 자리에 나가라.",
+      "생각이 안으로 고이는 날이다. 결정은 미루고, 오늘은 읽고 적기만 해라 — 그게 남는다.",
+      "귀인의 그림자가 스치는 날이다. 오는 연락을 미루지 마라. 오늘의 조언 한 줄이 열흘을 먹여 살린다."
+    ],
+    money:[
+      "곳간 문을 함께 여는 자가 있는 날이다. 나눌 셈은 먼저 정하고 열어라.",
+      "곳간에 손대는 기운이 있다. 오늘은 빌려주지도, 빌리지도 마라 — 둘 다 오래 간다.",
+      "손끝에서 돈이 열리는 날이다. 네가 만든 것에 값을 매겨 보아라. 생각보다 높게 쳐준다.",
+      "말로 버는 기운이나, 말로 새는 기운도 같다. 오늘 계약은 글자로 남겨라.",
+      "큰돈이 지나가는 길목에 서 있는 날이다. 올라타되, 전부 싣지는 마라.",
+      "한 푼이 제자리를 찾는 날이다. 장부 정리, 묵은 정산 — 오늘 하면 두 배로 깔끔하다.",
+      "곳간이 새기 쉬운 날이다. 벌금·수리비 같은 헛돈을 조심해라. 큰 결제는 내일로 미뤄라.",
+      "나라의 돈, 회사의 돈이 순한 날이다. 월급·정산·환급 — 서류 붙는 돈은 오늘 처리해라.",
+      "정보가 돈보다 비싼 날이다. 다만 달콤한 제안일수록 한 번 더 뒤집어 보아라.",
+      "웃어른의 손에서 곳간이 채워지는 날이다. 도움을 받았다면 오늘 안에 인사해라 — 그래야 다음이 있다."
+    ],
+    love:[
+      "편안함이 무기가 되는 날이다. 꾸미지 말고 평소의 너로 마주 앉아라.",
+      "연 옆에 경쟁자의 그림자가 어른대는 날이군. 조급해 보이는 쪽이 진다 — 오늘은 여유가 갑옷이다.",
+      "웃음이 연을 끌어오는 날이다. 맛있는 것을 함께 먹어라 — 밥상이 곧 월하노인이다.",
+      "치명적으로 빛나되 혀가 앞서는 날이다. 밀당은 접고 진심 한 마디만 얹어라.",
+      "새 연이 스치는 날이다. 혼자인 자는 오늘 문밖을 나서라 — 연은 방 안으로 배달되지 않는다.",
+      "연이 뿌리를 내리는 날이다. 앞날의 이야기를 꺼내기에 오늘만 한 날이 없다.",
+      "강하게 끌리되 휘둘리기 쉬운 날이다. 네 중심을 쥐고 만나라.",
+      "격식이 통하는 날이다. 소개·상견례·어른 인사 — 오늘은 반듯한 모습이 가장 매력이다.",
+      "생각이 많아 마음이 굳는 날이다. 오해가 생기면 그 자리에서 풀어라 — 하루 묵히면 열흘 간다.",
+      "묵은 연이 따뜻해지는 날이다. 오래된 이에게 먼저 안부를 물어라. 그 한 줄이 연을 되살린다."
+    ],
+    study:[
+      "네 속도로 밀어붙이기 좋은 날이다. 정한 분량은 오늘 안에 끝내라 — 내일의 너는 못 믿는다.",
+      "집중을 훔치는 손이 많은 날이다. 오늘은 스스로를 가둬라 — 도서관이 곧 부적이다.",
+      "머리가 트이는 날이다. 새 것을 들여라 — 오늘 이해한 것은 오래 남는다.",
+      "번뜩이되 엉덩이가 가벼운 날이군. 남에게 설명하며 외워라 — 그게 네 방식이다.",
+      "딴짓의 유혹이 상투 끝까지 차오른 날이다. 짧게 끊어 여러 번 — 그것만이 살길이다.",
+      "쌓는 공부가 먹히는 날이다. 복습·오답 — 오늘 다진 바닥은 꺼지지 않는다.",
+      "시험대의 압박이 어깨를 누르는 날이다. 다만 마감이 너를 달리게 하니, 밤샘만 피해라.",
+      "정해진 틀이 힘이 되는 날이다. 시간표대로, 기출대로 — 오늘은 정석이 지름길이다.",
+      "직감이 예리한 날이다. 어려운 놈부터 베어라 — 오늘의 칼은 잘 든다.",
+      "배움의 문이 열린 날이다. 스승의 말이 귀에 붙는다. 미뤄둔 강의는 오늘 들어라."
+    ]
+  };
+  var HAP_OMEN="오늘 일진이 네 일지와 합(合)을 이룬다 — 사람 붙는 일마다 순풍이 분다.";
+  var CHUNG_OMEN="오늘 일진이 네 일지를 친다(沖) — 변동수가 있으니 큰 결정과 언쟁 한 번은 삼켜라.";
+
+  function stars(n){ return "★★★★★".slice(0,n)+"☆☆☆☆☆".slice(0,5-n); }
+  function fillSelects(){
+    var y=$("g-year"),m=$("g-month"),d=$("g-day"),h=$("g-hour"),now=new Date().getFullYear();
+    for(var i=now;i>=1930;i--) y.add(new Option(i+"년",i));
+    for(var j=1;j<=12;j++) m.add(new Option(j+"월",j));
+    for(var k=1;k<=31;k++) d.add(new Option(k+"일",k));
+    for(var t=0;t<24;t++) h.add(new Option(("0"+t).slice(-2)+"시",t));
+    y.value=1995;
+  }
+
+  var data=null;
+  function render(birth){
+    var f=Fortune.get(data,{y:birth.y,m:birth.m,d:birth.d,hour:birth.hour,min:birth.min||0},new Date());
+    var tg=f.today.pillars.day[0], tj=f.today.pillars.day[1];
+    $("gj").textContent=GAN[tg]+JI[tj]+"("+GAN_HJ[tg]+JI_HJ[tj]+")일";
+    $("gj-tx").textContent="오늘 저승 장부의 일진이다";
+    var meT=Saju.pillarText(f.me.pillars.day);
+    $("me-pill").textContent=meT.hanja+"("+meT.hangul+") · "+f.me.zodiac+"띠의 명부";
+    var omen=f.modMsg?(f.modMsg.indexOf("합")>=0?HAP_OMEN:CHUNG_OMEN):null;
+    if(omen){ $("omen").textContent="⚠ "+omen; $("omen").style.display="block"; }
+    else $("omen").style.display="none";
+    // 오늘 일진의 십성(ss) 하나로 네 풀에서 같은 인덱스를 읽는다 — 결정적, API 없음
+    var ss=f.total.ss;
+    $("s-total").textContent=stars(f.total.score); $("t-total").textContent=TXT.total[ss];
+    $("s-money").textContent=stars(f.money.score); $("t-money").textContent=TXT.money[ss];
+    $("s-love").textContent=stars(f.love.score);   $("t-love").textContent=TXT.love[ss];
+    $("s-study").textContent=stars(f.study.score); $("t-study").textContent=TXT.study[ss];
+    $("gate").style.display="none"; $("board").style.display="block";
+  }
+
+  function boot(){
+    var b=null;
+    try{ b=JSON.parse(localStorage.getItem("goblub_birth")); }catch(e){}
+    if(b&&b.y){ render(b); } else { $("gate").style.display="block"; }
+  }
+
+  fillSelects();
+  $("g-go").onclick=function(){
+    var y=+$("g-year").value,m=+$("g-month").value,d=+$("g-day").value,hv=$("g-hour").value;
+    var dt=new Date(y,m-1,d);
+    if(dt.getFullYear()!==y||dt.getMonth()!==m-1||dt.getDate()!==d){
+      $("g-err").textContent="없는 날짜다. 다시 보아라."; $("g-err").style.display="block"; return;
+    }
+    var b={y:y,m:m,d:d}; if(hv!==""){ b.hour=+hv; b.min=0; }
+    try{ localStorage.setItem("goblub_birth",JSON.stringify(b)); }catch(e){}
+    render(b);
+  };
+  $("edit").onclick=function(ev){ ev.preventDefault();
+    $("board").style.display="none"; $("gate").style.display="block"; };
+
+  fetch("data/saju-terms.json").then(function(r){ if(!r.ok) throw 0; return r.json(); })
+    .then(function(d){ data=d; boot(); })
+    .catch(function(){ $("gate").style.display="block";
+      $("g-err").textContent="장부를 못 펼쳤다. 새로고침 해보아라."; $("g-err").style.display="block"; });
+})();
+</script>
+</body>
+</html>
