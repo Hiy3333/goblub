@@ -34,6 +34,13 @@
        <a href="moon-bg.html">🌕 달 배경 8종도 보기 ⟶</a></p>
   </div>
   <div class="grid" id="grid"></div>
+
+  <div class="top" style="margin-top:44px">
+    <h1>🏖 물가 시안 8종 (추가)</h1>
+    <p>물과 자갈 해변이 만나는 경계 위주로 다시 뽑은 세트 — 파도 거품 라인, 물에 잠긴 돌.</p>
+  </div>
+  <div class="grid" id="grid2"></div>
+
   <div id="lb"><img id="lbi" alt=""></div>
   <script>
     var NOTES = {
@@ -54,6 +61,26 @@
         '<figcaption><b>' + i + '번</b> · ' + NOTES[i] + '</figcaption>';
       g.appendChild(f);
     }
+    // 물가 세트
+    var NOTES2 = {
+      1: "옥빛 물 + 왼쪽 자갈밭 — 밝고 화사한 톤",
+      2: "물가 정석 구도",
+      3: "거품 라인이 또렷한 버전",
+      4: "자갈 비중 큰 버전",
+      5: "물에 잠긴 돌 + 소용돌이 + 금빛 햇살",
+      6: "따뜻한 늦은 오후 빛",
+      7: "대각선 해안선",
+      8: "잔잔한 물결 위주"
+    };
+    var g2 = document.getElementById("grid2");
+    for (var j = 1; j <= 8; j++) {
+      var f2 = document.createElement("figure");
+      f2.innerHTML = '<div class="bgwrap" data-src="img/shore-' + j + '.webp" style="background-image:url(img/shore-' + j + '.webp)">' +
+        '<div class="demo"><b>goblub</b><span>배경 가독성 미리보기</span></div></div>' +
+        '<figcaption><b>물가 ' + j + '번</b> · ' + NOTES2[j] + '</figcaption>';
+      g2.appendChild(f2);
+    }
+
     var lb = document.getElementById("lb"), lbi = document.getElementById("lbi");
     document.querySelectorAll(".bgwrap").forEach(function (w) {
       w.addEventListener("click", function () { lbi.src = w.getAttribute("data-src"); lb.classList.add("on"); });
