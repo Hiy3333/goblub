@@ -247,6 +247,8 @@
       </div>
 
       <div id="report-panel" style="display:none; text-align:left">
+        <p id="rp-whose" style="display:none; text-align:center; margin:0 0 12px;
+          font-family:'Nanum Myeongjo',serif; font-size:.9rem; color:#c9b48c"></p>
         <div id="pager">
           <div class="pg-frame">
             <div class="pg-vign"></div>
@@ -629,6 +631,22 @@
       function openReport() {
         $("gate").style.display = "none";
         $("report-panel").style.display = "block";
+        // 이 명부가 누구 것인지 상단에 명시 (생년월일·시 + 일주 + 띠)
+        try {
+          var wb = birth();
+          if (wb && base && base.pillars && base.pillars.day) {
+            // base 는 buildPayload 산출물 — 일주가 한글 문자열(ganji)로 들어 있다
+            var GH = { 갑: "甲", 을: "乙", 병: "丙", 정: "丁", 무: "戊", 기: "己", 경: "庚", 신: "辛", 임: "壬", 계: "癸" };
+            var JH = { 자: "子", 축: "丑", 인: "寅", 묘: "卯", 진: "辰", 사: "巳", 오: "午", 미: "未", 신: "申", 유: "酉", 술: "戌", 해: "亥" };
+            var dg = base.pillars.day.gan, dj = base.pillars.day.ji;
+            var hj = (GH[dg] || "") + (JH[dj] || "");
+            var ws = wb.y + "." + wb.m + "." + wb.d +
+              (wb.hour != null ? " " + ("0" + wb.hour).slice(-2) + ":" + ("0" + (wb.min || 0)).slice(-2) : "") + "생";
+            $("rp-whose").textContent = "🕯 " + (userName ? userName + " · " : "") + ws +
+              " · " + hj + "(" + dg + dj + ") · " + base.zodiac + "띠의 명부";
+            $("rp-whose").style.display = "block";
+          }
+        } catch (e) {}
         PARTS.forEach(function (p) { p.done = false; p.text = ""; });
         pages = [{ type: "cover" }]; cur = 0; allDone = false; genFailed = false;
         $("pg-end").style.display = "none";
