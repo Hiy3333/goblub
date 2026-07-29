@@ -100,7 +100,9 @@ button.fire:disabled{opacity:.5;cursor:default}
       <div class="status" id="status"><span class="spin"></span>귀곡이 명부를 넘기는 중…</div>
       <div class="reading" id="reading"></div>
       <div class="oncebar" id="oncebar">🕯 오늘 치 문답은 여기까지다. 내일 또 오너라.<br>
+        <span style="font-size:.8rem;color:#8a7565">— 굳이 더 묻겠다면 말리진 않으마. 다만 오늘의 답은 새것으로 덮인다.</span><br>
         <button class="fire" id="againBtn" style="display:none">다시 불러온다</button>
+        <button class="fire" id="reaskBtn" style="margin-top:12px">🕯 다시 묻는다</button>
       </div>
     </div>
     <p class="sign">— 귀곡(鬼哭)</p>
@@ -213,6 +215,16 @@ button.fire:disabled{opacity:.5;cursor:default}
     // 오늘 문답이 있으면 게이트에서 답으로 되돌아갈 길을 열어 둔다
     var saved=null; try{ saved=JSON.parse(localStorage.getItem(todayKey())); }catch(e){}
     $("backToAnswer").style.display=(saved&&saved.q&&saved.a)?"inline":"none"; };
+
+  // 오늘 답을 본 뒤에도 다시 물을 수 있게 — 새 답이 오늘 치를 덮는다
+  $("reaskBtn").onclick=function(){
+    if(!birth||!birth.y){ $("board").style.display="none"; $("who").style.display="none";
+      $("gate").style.display="block"; return; }
+    $("board").style.display="none";
+    $("q").value=""; $("q-err").style.display="none";
+    showPill(); $("askbox").style.display="block";
+    $("q").focus();
+  };
 
   $("backToAnswer").onclick=function(ev){ ev.preventDefault();
     var saved=null; try{ saved=JSON.parse(localStorage.getItem(todayKey())); }catch(e){}

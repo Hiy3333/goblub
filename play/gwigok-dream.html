@@ -99,7 +99,9 @@ button.fire:hover{background:rgba(190,55,25,.36)}
       <div class="status" id="status"><span class="spin"></span>귀곡이 꿈의 문을 여는 중…</div>
       <div class="reading" id="reading"></div>
       <div class="oncebar" id="oncebar">🕯 오늘 치 해몽은 여기까지다. 또 꾸거든 오너라.<br>
+        <span style="font-size:.8rem;color:#8a7565">— 간밤에 여러 꿈을 꾸었거든 마저 두고 가라. 오늘의 풀이는 새것으로 덮인다.</span><br>
         <button class="fire" id="againBtn" style="display:none">다시 불러온다</button>
+        <button class="fire" id="reaskBtn" style="margin-top:12px">🕯 다른 꿈을 두고 간다</button>
       </div>
     </div>
     <p class="sign">— 귀곡(鬼哭)</p>
@@ -227,6 +229,14 @@ button.fire:hover{background:rgba(190,55,25,.36)}
     // 오늘 해몽이 있으면 게이트에서 되돌아갈 길을 열어 둔다
     var saved=null; try{ saved=JSON.parse(localStorage.getItem(todayKey())); }catch(e){}
     $("backToAnswer").style.display=(saved&&saved.q&&saved.a)?"inline":"none"; };
+
+  // 오늘 풀이를 본 뒤에도 다른 꿈을 맡길 수 있게 — 새 풀이가 오늘 치를 덮는다
+  $("reaskBtn").onclick=function(){
+    $("board").style.display="none";
+    $("q").value=""; $("q-err").style.display="none";
+    showPill(); $("askbox").style.display="block";
+    $("q").focus();
+  };
 
   $("backToAnswer").onclick=function(ev){ ev.preventDefault();
     var saved=null; try{ saved=JSON.parse(localStorage.getItem(todayKey())); }catch(e){}
