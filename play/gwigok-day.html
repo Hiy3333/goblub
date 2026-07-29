@@ -31,7 +31,7 @@ a{color:inherit;text-decoration:none}
   padding:26px 22px;text-align:center}
 .gate p{font-family:'Nanum Myeongjo',serif;color:#e0d2bd;line-height:1.9;margin-bottom:16px}
 .gate .row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:14px}
-.gate select{background:#1c1216;color:#d9cdbb;border:1px solid rgba(150,70,55,.4);
+.gate select,.gate input{background:#1c1216;color:#d9cdbb;border:1px solid rgba(150,70,55,.4);
   padding:9px 8px;font-family:'Gowun Batang',serif;font-size:.9rem}
 .gate button{padding:12px 30px;background:rgba(150,40,20,.16);border:1px solid rgba(220,90,50,.55);
   color:#ffc4a8;font-family:'Nanum Myeongjo',serif;font-size:1rem;letter-spacing:.12em;cursor:pointer;transition:.2s}
@@ -80,6 +80,7 @@ a{color:inherit;text-decoration:none}
     <div class="row">
       <select id="g-year"></select><select id="g-month"></select><select id="g-day"></select>
       <select id="g-hour"><option value="">시 모름</option></select>
+      <input type="number" id="g-min" min="0" max="59" value="0" aria-label="분" title="분(0~59)" style="width:62px" />
     </div>
     <button id="g-go">명부에 새긴다</button>
     <p class="err" id="g-err"></p>
@@ -214,7 +215,7 @@ a{color:inherit;text-decoration:none}
     if(dt.getFullYear()!==y||dt.getMonth()!==m-1||dt.getDate()!==d){
       $("g-err").textContent="없는 날짜다. 다시 보아라."; $("g-err").style.display="block"; return;
     }
-    var b={y:y,m:m,d:d}; if(hv!==""){ b.hour=+hv; b.min=0; }
+    var b={y:y,m:m,d:d}; if(hv!==""){ b.hour=+hv; b.min=Math.max(0,Math.min(59,+(document.getElementById("g-min").value)||0)); }
     try{ localStorage.setItem("goblub_birth",JSON.stringify(b)); }catch(e){}
     render(b);
   };
