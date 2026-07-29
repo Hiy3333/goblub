@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>물결 배경 시안 8종 (선택용)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #12242c; color: #e8ecdf; font-family: 'Jua', sans-serif; padding: 30px 16px 70px; }
+    .top { max-width: 1180px; margin: 0 auto 24px; text-align: center; }
+    .top h1 { font-size: 1.5rem; color: #f2e2ac; }
+    .top p { color: #9db4ba; font-size: .94rem; margin-top: 8px; line-height: 1.7; }
+    .top a { color: #8fd0c8; }
+    .grid { max-width: 1180px; margin: 0 auto; display: grid; gap: 18px;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); }
+    figure { background: #0d1d24; border: 1px solid #24444d; border-radius: 14px; overflow: hidden; }
+    figure .bgwrap { position: relative; aspect-ratio: 16/9; background-size: cover;
+      background-position: center; cursor: zoom-in; }
+    figure .demo { position: absolute; left: 18px; top: 16px; text-shadow: 0 2px 10px rgba(8,25,32,.6); }
+    figure .demo b { display: block; font-size: 1.15rem; color: #fdf7e3; }
+    figure .demo span { font-size: .78rem; color: #e6ead2; opacity: .9; }
+    figcaption { padding: 10px 14px 13px; font-size: .86rem; color: #9db4ba; }
+    figcaption b { color: #f2e2ac; }
+    #lb { position: fixed; inset: 0; background: rgba(5,14,18,.95); display: none; align-items: center;
+      justify-content: center; z-index: 99; cursor: zoom-out; padding: 14px; }
+    #lb.on { display: flex; } #lb img { max-width: 100%; max-height: 100%; border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <div class="top">
+    <h1>🌊 물결 배경 시안 8종</h1>
+    <p>유화 붓터치 · 소용돌이 수면 · 자갈 해변 — HTML 배경용 16:9. 눌러서 크게 보세요.<br>
+       <a href="moon-bg.html">🌕 달 배경 8종도 보기 ⟶</a></p>
+  </div>
+  <div class="grid" id="grid"></div>
+  <div id="lb"><img id="lbi" alt=""></div>
+  <script>
+    var NOTES = {
+      1: "소용돌이 물결 + 오른쪽 위 자갈 — 원본 구도에 가장 가까움",
+      2: "파스텔 톤 얕은 물",
+      3: "짙은 물살 버전",
+      4: "자갈 비중이 큰 버전",
+      5: "짙은 남빛 연못 + 금빛 반짝임 + 빛줄기",
+      6: "잔잔한 파문 한 겹",
+      7: "큰 소용돌이 + 오른쪽 자갈 띠 + 빛기둥",
+      8: "물살에 잠긴 돌들 — 질감이 가장 풍부"
+    };
+    var g = document.getElementById("grid");
+    for (var i = 1; i <= 8; i++) {
+      var f = document.createElement("figure");
+      f.innerHTML = '<div class="bgwrap" data-src="img/water-' + i + '.webp" style="background-image:url(img/water-' + i + '.webp)">' +
+        '<div class="demo"><b>goblub</b><span>배경 가독성 미리보기</span></div></div>' +
+        '<figcaption><b>' + i + '번</b> · ' + NOTES[i] + '</figcaption>';
+      g.appendChild(f);
+    }
+    var lb = document.getElementById("lb"), lbi = document.getElementById("lbi");
+    document.querySelectorAll(".bgwrap").forEach(function (w) {
+      w.addEventListener("click", function () { lbi.src = w.getAttribute("data-src"); lb.classList.add("on"); });
+    });
+    lb.addEventListener("click", function () { lb.classList.remove("on"); lbi.src = ""; });
+  </script>
+</body>
+</html>
