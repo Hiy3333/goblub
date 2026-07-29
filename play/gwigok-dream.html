@@ -128,7 +128,7 @@ button.fire:hover{background:rgba(190,55,25,.36)}
     var body={ dream:{ text:q } };
     var ilju=myIlju(); if(ilju) body.dream.ilju=ilju;
     var acc="";
-    Dosa.fetchAI("/api/gwigok-dream", body, "goblub_gkd_", {
+    Dosa.fetchAI("/api/gwigok-mun", body, "goblub_gkd_", {
       onChunk:function(t){ acc+=t; $("reading").style.display="block";
         $("status").style.display="none"; $("reading").innerHTML=fmt(acc); },
       onDone:function(){ showAnswer(q,acc,true);

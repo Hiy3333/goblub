@@ -140,7 +140,7 @@ button.fire:disabled{opacity:.5;cursor:default}
     $("status").innerHTML='<span class="spin"></span>귀곡이 명부를 넘기는 중…';
     var r=Saju.compute(data,{y:birth.y,m:birth.m,d:birth.d,hour:birth.hour,min:birth.min||0},{trueSolar:true});
     var acc="";
-    Dosa.fetchAI("/api/gwigok-ask",
+    Dosa.fetchAI("/api/gwigok-mun",
       { ask:{ question:q, saju:Dosa.buildPayload(r,birth,birth.gender||null,true) } },
       "goblub_gka_",
       {
