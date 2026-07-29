@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>귀곡 문답 — 한 가지만 묻거라 · 冥簿館</title>
+<meta name="description" content="하루에 딱 한 번, 귀곡(鬼哭)이 네 명부를 짚어 물음에 답한다" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&family=Gowun+Batang:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0a0709;color:#d9cdbb;font-family:'Gowun Batang',serif;min-height:100dvh;
+  display:flex;flex-direction:column;align-items:center;padding:0 14px 60px}
+a{color:inherit;text-decoration:none}
+.wrap{width:min(94vw,640px)}
+.head{position:relative;width:100%;padding:34px 0 16px;text-align:center}
+.head .back{position:absolute;left:2px;top:38px;color:#7d685c;font-size:.9rem}
+.head .back:hover{color:#ff6a3a}
+.head .kicker{font-family:'Nanum Myeongjo',serif;color:#a8563c;letter-spacing:.5em;font-size:.72rem;margin-bottom:10px}
+.head h1{font-family:'Nanum Myeongjo',serif;font-weight:800;font-size:1.7rem;color:#f0e4d2}
+.head h1 em{font-style:normal;color:#ff5a2a;text-shadow:0 0 24px rgba(255,70,30,.5)}
+.head p{color:#a89887;font-size:.86rem;margin-top:10px;line-height:1.7}
+.gate,.askbox{width:100%;background:linear-gradient(180deg,#171017,#100b10);border:1px solid rgba(150,60,70,.4);
+  padding:26px 22px;text-align:center;margin-top:14px}
+.gate p,.askbox .lead{font-family:'Nanum Myeongjo',serif;color:#e0d2bd;line-height:1.9;margin-bottom:16px}
+.gate .row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:14px}
+.gate select{background:#1c1216;color:#d9cdbb;border:1px solid rgba(150,70,55,.4);
+  padding:9px 8px;font-family:'Gowun Batang',serif;font-size:.9rem}
+button.fire{padding:12px 30px;background:rgba(150,40,20,.16);border:1px solid rgba(220,90,50,.55);
+  color:#ffc4a8;font-family:'Nanum Myeongjo',serif;font-size:1rem;letter-spacing:.12em;cursor:pointer;transition:.2s}
+button.fire:hover{background:rgba(190,55,25,.36)}
+button.fire:disabled{opacity:.5;cursor:default}
+.err{display:none;color:#ff7a6a;font-size:.85rem;margin-top:10px}
+.askbox textarea{width:100%;min-height:96px;background:#150e12;border:1px solid rgba(150,70,55,.45);
+  color:#e8dcc8;font-family:'Gowun Batang',serif;font-size:.96rem;line-height:1.8;padding:14px;resize:vertical;margin-bottom:14px}
+.askbox textarea:focus{outline:none;border-color:#ff6a3a}
+.askbox .fine{color:#8a7565;font-size:.78rem;margin-top:12px;line-height:1.7}
+#board{display:none;width:100%;margin-top:14px}
+.qecho{font-family:'Nanum Myeongjo',serif;color:#c9b48c;font-size:.9rem;text-align:center;
+  font-style:italic;line-height:1.7;margin-bottom:16px}
+.paper{border:1px solid rgba(150,70,55,.35);background:linear-gradient(180deg,rgba(24,15,17,.95),rgba(13,8,10,.98));
+  padding:24px 24px 20px}
+.status{color:#a89887;font-size:.9rem;text-align:center;padding:6px 0}
+.spin{display:inline-block;width:13px;height:13px;border:2px solid rgba(255,110,60,.3);
+  border-top-color:#ff6a3a;border-radius:50%;animation:sp .8s linear infinite;vertical-align:-2px;margin-right:7px}
+@keyframes sp{to{transform:rotate(360deg)}}
+.reading{display:none;font-family:'Nanum Myeongjo',serif;color:#e0d2bd;font-size:.97rem;line-height:2.05;white-space:pre-wrap}
+.reading .hd{display:block;color:#ffb08a;font-weight:800;margin:16px 0 4px}
+.reading .hd:first-child{margin-top:0}
+.oncebar{display:none;margin-top:18px;border-top:1px dashed rgba(150,70,55,.3);padding-top:14px;
+  text-align:center;color:#c9b48c;font-size:.86rem;font-family:'Nanum Myeongjo',serif;line-height:1.8}
+.oncebar button{margin-top:10px}
+.sign{text-align:right;color:#8a7080;font-size:.84rem;font-family:'Nanum Myeongjo',serif;margin-top:14px}
+.foot{margin-top:40px;color:#5d5148;font-size:.78rem;letter-spacing:.2em;font-family:'Nanum Myeongjo',serif;text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head">
+    <a class="back" href="fortune.html">← 명부관</a>
+    <p class="kicker">冥 簿 館 · 問</p>
+    <h1>한 가지만 <em>묻거라</em></h1>
+    <p>하루에 한 번, 물음 하나만 받는다.<br>귀곡이 네 명부를 짚어 답한다.</p>
+  </div>
+
+  <div class="gate" id="gate" style="display:none">
+    <p>물음보다 명부가 먼저다.<br>태어난 날을 적어라.</p>
+    <div class="row">
+      <select id="g-year"></select><select id="g-month"></select><select id="g-day"></select>
+      <select id="g-hour"><option value="">시 모름</option></select>
+    </div>
+    <button class="fire" id="g-go">명부에 새긴다</button>
+    <p class="err" id="g-err"></p>
+  </div>
+
+  <div class="askbox" id="askbox" style="display:none">
+    <p class="lead">무엇이 궁금하냐.<br>오늘 치 물음은 하나뿐이니, 골라서 물어라.</p>
+    <textarea id="q" maxlength="300" placeholder="예) 지금 하는 일을 계속 밀고 가도 될까"></textarea>
+    <button class="fire" id="askBtn">🕯 귀곡에게 묻는다</button>
+    <p class="err" id="q-err"></p>
+    <p class="fine">물음과 답은 이 브라우저에만 남는다. 내일이 되면 새 물음을 받는다.</p>
+  </div>
+
+  <div id="board">
+    <p class="qecho" id="qecho"></p>
+    <div class="paper">
+      <div class="status" id="status"><span class="spin"></span>귀곡이 명부를 넘기는 중…</div>
+      <div class="reading" id="reading"></div>
+      <div class="oncebar" id="oncebar">🕯 오늘 치 문답은 여기까지다. 내일 또 오너라.<br>
+        <button class="fire" id="againBtn" style="display:none">다시 불러온다</button>
+      </div>
+    </div>
+    <p class="sign">— 귀곡(鬼哭)</p>
+  </div>
+
+  <p class="foot">goblub · 冥 簿 館</p>
+</div>
+
+<script src="js/saju.js"></script>
+<script src="js/dosa.js?v=2"></script>
+<script src="js/gwigok-log.js?v=1"></script>
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id);};
+  var LOCK="goblub_gwigokask_";
+  function todayKey(){ var d=new Date();
+    return LOCK+d.getFullYear()+("0"+(d.getMonth()+1)).slice(-2)+("0"+d.getDate()).slice(-2); }
+
+  function fillSelects(){
+    var y=$("g-year"),m=$("g-month"),d=$("g-day"),h=$("g-hour"),now=new Date().getFullYear();
+    for(var i=now;i>=1930;i--) y.add(new Option(i+"년",i));
+    for(var j=1;j<=12;j++) m.add(new Option(j+"월",j));
+    for(var k=1;k<=31;k++) d.add(new Option(k+"일",k));
+    for(var t=0;t<24;t++) h.add(new Option(("0"+t).slice(-2)+"시",t));
+    y.value=1995;
+  }
+
+  function fmt(s){
+    var out=s.replace(/</g,"&lt;");
+    ["명부를 짚으니","답을 주마","한 가지 금기"].forEach(function(h){
+      out=out.replace(h,'<span class="hd">'+h+'</span>');
+    });
+    return out;
+  }
+
+  var data=null, birth=null, myQuestion="";
+
+  function showAnswer(q, text, done){
+    $("askbox").style.display="none"; $("board").style.display="block";
+    $("qecho").textContent="“"+q+"”";
+    if(text){ $("reading").style.display="block"; $("reading").innerHTML=fmt(text); }
+    if(done){ $("status").style.display="none"; $("oncebar").style.display="block"; }
+  }
+
+  function ask(q){
+    myQuestion=q;
+    showAnswer(q,null,false);
+    $("status").style.display="block";
+    $("status").innerHTML='<span class="spin"></span>귀곡이 명부를 넘기는 중…';
+    var r=Saju.compute(data,{y:birth.y,m:birth.m,d:birth.d,hour:birth.hour,min:birth.min||0},{trueSolar:true});
+    var acc="";
+    Dosa.fetchAI("/api/gwigok-ask",
+      { ask:{ question:q, saju:Dosa.buildPayload(r,birth,birth.gender||null,true) } },
+      "goblub_gka_",
+      {
+        onChunk:function(t){ acc+=t; $("reading").style.display="block";
+          $("status").style.display="none"; $("reading").innerHTML=fmt(acc); },
+        onDone:function(){ showAnswer(q,acc,true);
+          try{ localStorage.setItem(todayKey(),JSON.stringify({q:q,a:acc})); }catch(e){}
+          if(window.GwigokLog) GwigokLog.add("ask","귀곡 문답","“"+q.slice(0,40)+(q.length>40?"…":"")+"”라 물었다");
+        },
+        onError:function(code,sec){
+          $("status").style.display="block";
+          $("status").innerHTML = (code==="not_configured" ? "귀곡이 아직 자리를 비웠다. 곧 돌아온다." :
+            code==="cooldown" ? "귀곡이 숨을 고른다… "+sec+"초 후에 다시 물어라." :
+            "지금은 명부관에 줄이 길다. 잠시 후 다시 오너라.");
+          $("againBtn").style.display="inline-block";
+          $("oncebar").style.display="block";
+          $("againBtn").onclick=function(){ $("againBtn").style.display="none"; $("oncebar").style.display="none"; ask(myQuestion); };
+        }
+      });
+  }
+
+  fillSelects();
+  $("g-go").onclick=function(){
+    var y=+$("g-year").value,m=+$("g-month").value,d=+$("g-day").value,hv=$("g-hour").value;
+    var dt=new Date(y,m-1,d);
+    if(dt.getFullYear()!==y||dt.getMonth()!==m-1||dt.getDate()!==d){
+      $("g-err").textContent="없는 날짜다. 다시 보아라."; $("g-err").style.display="block"; return;
+    }
+    birth={y:y,m:m,d:d}; if(hv!==""){ birth.hour=+hv; birth.min=0; }
+    try{ localStorage.setItem("goblub_birth",JSON.stringify(birth)); }catch(e){}
+    $("gate").style.display="none"; $("askbox").style.display="block";
+  };
+
+  $("askBtn").onclick=function(){
+    var q=($("q").value||"").trim();
+    if(q.length<2){ $("q-err").textContent="물음이 너무 짧다. 제대로 물어라."; $("q-err").style.display="block"; return; }
+    $("q-err").style.display="none";
+    ask(q);
+  };
+
+  fetch("data/saju-terms.json").then(function(r){ if(!r.ok) throw 0; return r.json(); })
+    .then(function(d){
+      data=d;
+      // 오늘 이미 물었으면 저장된 문답을 바로 보여준다
+      var saved=null; try{ saved=JSON.parse(localStorage.getItem(todayKey())); }catch(e){}
+      if(saved&&saved.q&&saved.a){ showAnswer(saved.q,saved.a,true); return; }
+      try{ birth=JSON.parse(localStorage.getItem("goblub_birth")); }catch(e){}
+      if(birth&&birth.y){ $("askbox").style.display="block"; }
+      else $("gate").style.display="block";
+    })
+    .catch(function(){ $("gate").style.display="block";
+      $("g-err").textContent="장부를 못 펼쳤다. 새로고침 해보아라."; $("g-err").style.display="block"; });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>붉은 날 달력 — 冥簿館</title>
+<meta name="description" content="귀곡(鬼哭)이 이번 달 일진을 네 명부와 대조해 붉은 날(흉일)과 금빛 날(길일)을 표시한 달력" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&family=Gowun+Batang:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0a0709;color:#d9cdbb;font-family:'Gowun Batang',serif;min-height:100dvh;
+  display:flex;flex-direction:column;align-items:center;padding:0 14px 60px}
+a{color:inherit;text-decoration:none}
+.wrap{width:min(94vw,680px)}
+.head{position:relative;width:100%;padding:34px 0 16px;text-align:center}
+.head .back{position:absolute;left:2px;top:38px;color:#7d685c;font-size:.9rem}
+.head .back:hover{color:#ff6a3a}
+.head .kicker{font-family:'Nanum Myeongjo',serif;color:#a8563c;letter-spacing:.5em;font-size:.72rem;margin-bottom:10px}
+.head h1{font-family:'Nanum Myeongjo',serif;font-weight:800;font-size:1.7rem;color:#f0e4d2}
+.head h1 em{font-style:normal;color:#ff5a2a;text-shadow:0 0 24px rgba(255,70,30,.5)}
+.head p{color:#a89887;font-size:.86rem;margin-top:10px;line-height:1.7}
+/* 게이트 */
+.gate{width:100%;background:linear-gradient(180deg,#171017,#100b10);border:1px solid rgba(150,60,70,.4);
+  padding:26px 22px;text-align:center;margin-top:14px}
+.gate p{font-family:'Nanum Myeongjo',serif;color:#e0d2bd;line-height:1.9;margin-bottom:16px}
+.gate .row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:14px}
+.gate select{background:#1c1216;color:#d9cdbb;border:1px solid rgba(150,70,55,.4);
+  padding:9px 8px;font-family:'Gowun Batang',serif;font-size:.9rem}
+.gate button{padding:12px 30px;background:rgba(150,40,20,.16);border:1px solid rgba(220,90,50,.55);
+  color:#ffc4a8;font-family:'Nanum Myeongjo',serif;font-size:1rem;letter-spacing:.12em;cursor:pointer;transition:.2s}
+.gate button:hover{background:rgba(190,55,25,.36)}
+.gate .err{display:none;color:#ff7a6a;font-size:.85rem;margin-top:10px}
+/* 달력 */
+#board{display:none;width:100%}
+.who{display:flex;align-items:center;justify-content:center;gap:12px;margin:8px 0 18px;flex-wrap:wrap}
+.who .me{font-family:'Nanum Myeongjo',serif;color:#ecdcc6;font-size:.95rem;
+  border:1px solid rgba(150,70,55,.35);padding:5px 15px;background:rgba(20,11,13,.6)}
+.who a{color:#8a7565;font-size:.8rem;border-bottom:1px solid rgba(125,104,92,.4)}
+.who a:hover{color:#ff6a3a}
+.mon{display:flex;align-items:center;justify-content:center;gap:20px;margin-bottom:14px}
+.mon b{font-family:'Nanum Myeongjo',serif;font-size:1.25rem;color:#f0e4d2;letter-spacing:.08em}
+.mon button{background:none;border:1px solid rgba(150,70,55,.35);color:#a89887;padding:5px 13px;
+  cursor:pointer;font-family:'Gowun Batang',serif;transition:.2s}
+.mon button:hover{color:#ff6a3a;border-color:#ff6a3a}
+.legend{display:flex;gap:16px;justify-content:center;margin-bottom:12px;font-size:.78rem;color:#a89887;flex-wrap:wrap}
+.legend i{display:inline-block;width:10px;height:10px;margin-right:5px;vertical-align:-1px}
+.legend .r i{background:#c2372a}
+.legend .g i{background:#c99a5b}
+.legend .n i{background:#3a2c2c}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;width:100%}
+.dow{font-family:'Nanum Myeongjo',serif;text-align:center;color:#6b4a3c;font-size:.76rem;padding:6px 0}
+.day{position:relative;aspect-ratio:1/1.06;background:rgba(23,14,16,.8);border:1px solid rgba(150,70,55,.16);
+  cursor:pointer;padding:6px 7px;transition:.15s;display:flex;flex-direction:column}
+.day:hover{border-color:#ff6a3a}
+.day .n{font-family:'Nanum Myeongjo',serif;font-size:.9rem;color:#d9cdbb}
+.day .gz{margin-top:auto;font-size:.62rem;color:#6f6157;letter-spacing:.02em}
+.day.red{background:linear-gradient(180deg,rgba(120,25,15,.55),rgba(70,15,10,.5));border-color:rgba(220,80,50,.55)}
+.day.red .n{color:#ffb08a}
+.day.gold{background:linear-gradient(180deg,rgba(120,90,30,.4),rgba(70,52,18,.4));border-color:rgba(201,154,91,.6)}
+.day.gold .n{color:#f2d488}
+.day.off{opacity:0;pointer-events:none;border:none;background:none}
+.day.today::after{content:"";position:absolute;inset:2px;border:1px dashed rgba(255,120,80,.8);pointer-events:none}
+.day .mk{position:absolute;top:5px;right:7px;font-size:.68rem}
+/* 하단 풀이 */
+.read{margin-top:16px;border:1px solid rgba(150,70,55,.3);background:linear-gradient(180deg,rgba(23,14,16,.9),rgba(14,9,11,.95));
+  padding:18px 20px;font-family:'Nanum Myeongjo',serif;color:#e0d2bd;font-size:.95rem;line-height:1.95;min-height:5.4em}
+.read b{color:#ffb08a}
+.cnt{margin-top:12px;text-align:center;color:#a89887;font-size:.84rem;line-height:1.8}
+.cnt b{color:#ff8a5a}
+.sign{text-align:right;color:#8a7080;font-size:.84rem;font-family:'Nanum Myeongjo',serif;margin-top:14px}
+.foot{margin-top:40px;color:#5d5148;font-size:.78rem;letter-spacing:.2em;font-family:'Nanum Myeongjo',serif;text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head">
+    <a class="back" href="fortune.html">← 명부관</a>
+    <p class="kicker">冥 簿 館 · 曆</p>
+    <h1>붉은 날 <em>달력</em></h1>
+    <p>귀곡이 이 달 일진을 네 명부와 대조했다.<br>붉게 물든 날은 삼가고, 금빛 나는 날에 움직여라.</p>
+  </div>
+
+  <div class="gate" id="gate" style="display:none">
+    <p>네 명부가 아직 여기 없구나.<br>태어난 날을 적어라 — 이 달의 길흉을 짚어 주마.</p>
+    <div class="row">
+      <select id="g-year"></select><select id="g-month"></select><select id="g-day"></select>
+      <select id="g-hour"><option value="">시 모름</option></select>
+    </div>
+    <button id="g-go">명부에 새긴다</button>
+    <p class="err" id="g-err"></p>
+  </div>
+
+  <div id="board">
+    <div class="who">
+      <span class="me" id="me-pill"></span>
+      <a href="#" id="edit">다른 명부로 본다</a>
+    </div>
+    <div class="mon">
+      <button id="prev">◀ 지난달</button>
+      <b id="mon-t"></b>
+      <button id="next">다음달 ▶</button>
+    </div>
+    <div class="legend">
+      <span class="r"><i></i>붉은 날 — 일진이 네 일지를 친다(沖)</span>
+      <span class="g"><i></i>금빛 날 — 일진이 네 일지와 합(合)</span>
+      <span class="n"><i></i>여느 날</span>
+    </div>
+    <div class="grid" id="grid"></div>
+    <div class="read" id="read">날짜를 짚으면, 그날의 일진을 읽어 주마.</div>
+    <p class="cnt" id="cnt"></p>
+    <p class="sign">— 달이 바뀌면 다시 오너라. · 귀곡(鬼哭)</p>
+  </div>
+
+  <p class="foot">goblub · 冥 簿 館</p>
+</div>
+
+<script src="js/saju.js"></script>
+<script src="js/gwigok-log.js?v=1"></script>
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id);};
+  var GAN="갑을병정무기경신임계", JI="자축인묘진사오미신유술해";
+  var GAN_HJ="甲乙丙丁戊己庚辛壬癸", JI_HJ="子丑寅卯辰巳午未申酉戌亥";
+  var CHUNG={0:6,6:0,1:7,7:1,2:8,8:2,3:9,9:3,4:10,10:4,5:11,11:5};
+  var YUKHAP={0:1,1:0,2:11,11:2,3:10,10:3,4:9,9:4,5:8,8:5,6:7,7:6};
+  var RED_LINE=[
+    "이 날 일진 {gz}가 네 일지를 정통으로 친다(沖). 큰 결정·계약·언쟁은 이 날을 피해라.",
+    "{gz}일 — 네 뿌리가 흔들리는 날이다. 움직이지 말고, 지키기만 해라.",
+    "{gz}일은 변동수가 크다. 이 날 잡은 약속은 한 번 더 확인해라."
+  ];
+  var GOLD_LINE=[
+    "이 날 일진 {gz}가 네 일지와 합을 이룬다. 사람 만나는 일·부탁·시작은 이 날에 해라.",
+    "{gz}일 — 연이 붙는 날이다. 미뤄둔 만남은 이 날로 잡아라.",
+    "{gz}일은 순풍이 분다. 중요한 걸음은 이 날 내디뎌라."
+  ];
+  var PLAIN_LINE=[
+    "{gz}일 — 여느 날이다. 평소대로 걸어라.",
+    "{gz}일 — 크게 밀지도, 당기지도 않는 날이다.",
+    "{gz}일 — 무탈하다. 무탈한 것도 복이다."
+  ];
+
+  var data=null, myJi=null, cur=new Date(), me=null;
+
+  function hash(s){var h=5381;for(var i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))|0;return h>>>0;}
+  function pick(pool,seed){ return pool[seed%pool.length]; }
+
+  function fillSelects(){
+    var y=$("g-year"),m=$("g-month"),d=$("g-day"),h=$("g-hour"),now=new Date().getFullYear();
+    for(var i=now;i>=1930;i--) y.add(new Option(i+"년",i));
+    for(var j=1;j<=12;j++) m.add(new Option(j+"월",j));
+    for(var k=1;k<=31;k++) d.add(new Option(k+"일",k));
+    for(var t=0;t<24;t++) h.add(new Option(("0"+t).slice(-2)+"시",t));
+    y.value=1995;
+  }
+
+  function dayInfo(y,m,d){
+    var r=Saju.compute(data,{y:y,m:m,d:d,hour:12,min:0},{});
+    var g=r.pillars.day[0], j=r.pillars.day[1];
+    var kind = CHUNG[myJi]===j ? "red" : (YUKHAP[myJi]===j ? "gold" : "plain");
+    return { g:g, j:j, gz:GAN[g]+JI[j], hj:GAN_HJ[g]+JI_HJ[j], kind:kind };
+  }
+
+  function renderMonth(){
+    var y=cur.getFullYear(), m=cur.getMonth()+1;
+    $("mon-t").textContent=y+"년 "+m+"월";
+    var grid=$("grid"); grid.innerHTML="";
+    ["일","월","화","수","목","금","토"].forEach(function(w){
+      var e=document.createElement("div"); e.className="dow"; e.textContent=w; grid.appendChild(e);
+    });
+    var first=new Date(y,m-1,1).getDay(), days=new Date(y,m,0).getDate();
+    var now=new Date(), reds=0, golds=0;
+    for(var b=0;b<first;b++){ var o=document.createElement("div"); o.className="day off"; grid.appendChild(o); }
+    for(var d=1;d<=days;d++){
+      (function(d){
+        var inf=dayInfo(y,m,d);
+        if(inf.kind==="red") reds++; if(inf.kind==="gold") golds++;
+        var e=document.createElement("div");
+        e.className="day "+(inf.kind==="plain"?"":inf.kind);
+        if(y===now.getFullYear()&&m===now.getMonth()+1&&d===now.getDate()) e.className+=" today";
+        e.innerHTML='<span class="n">'+d+'</span>'+
+          (inf.kind==="red"?'<span class="mk">⚠</span>':inf.kind==="gold"?'<span class="mk">✦</span>':"")+
+          '<span class="gz">'+inf.gz+"</span>";
+        e.onclick=function(){
+          var pool=inf.kind==="red"?RED_LINE:inf.kind==="gold"?GOLD_LINE:PLAIN_LINE;
+          var seed=hash(y+"-"+m+"-"+d+"|"+myJi);
+          $("read").innerHTML="<b>"+m+"월 "+d+"일 · "+inf.gz+"("+inf.hj+")일</b><br>"+
+            pick(pool,seed).replace("{gz}",inf.gz);
+        };
+        grid.appendChild(e);
+      })(d);
+    }
+    $("cnt").innerHTML=m+"월엔 붉은 날이 <b>"+reds+"일</b>, 금빛 날이 <b>"+golds+"일</b> 적혀 있다.";
+    $("read").textContent="날짜를 짚으면, 그날의 일진을 읽어 주마.";
+  }
+
+  function boot(birth){
+    me=Saju.compute(data,{y:birth.y,m:birth.m,d:birth.d,hour:birth.hour,min:birth.min||0},{trueSolar:true});
+    myJi=me.pillars.day[1];
+    var t=Saju.pillarText(me.pillars.day);
+    $("me-pill").textContent=t.hanja+"("+t.hangul+") · "+me.zodiac+"띠의 명부";
+    $("gate").style.display="none"; $("board").style.display="block";
+    cur=new Date();
+    renderMonth();
+    if(window.GwigokLog) GwigokLog.add("cal","붉은 날 달력",(cur.getMonth()+1)+"월의 길흉을 짚었다");
+  }
+
+  $("prev").onclick=function(){ cur=new Date(cur.getFullYear(),cur.getMonth()-1,1); renderMonth(); };
+  $("next").onclick=function(){ cur=new Date(cur.getFullYear(),cur.getMonth()+1,1); renderMonth(); };
+  $("edit").onclick=function(ev){ ev.preventDefault(); $("board").style.display="none"; $("gate").style.display="block"; };
+
+  fillSelects();
+  $("g-go").onclick=function(){
+    var y=+$("g-year").value,m=+$("g-month").value,d=+$("g-day").value,hv=$("g-hour").value;
+    var dt=new Date(y,m-1,d);
+    if(dt.getFullYear()!==y||dt.getMonth()!==m-1||dt.getDate()!==d){
+      $("g-err").textContent="없는 날짜다. 다시 보아라."; $("g-err").style.display="block"; return;
+    }
+    var b={y:y,m:m,d:d}; if(hv!==""){ b.hour=+hv; b.min=0; }
+    try{ localStorage.setItem("goblub_birth",JSON.stringify(b)); }catch(e){}
+    boot(b);
+  };
+
+  fetch("data/saju-terms.json").then(function(r){ if(!r.ok) throw 0; return r.json(); })
+    .then(function(d){
+      data=d;
+      var b=null; try{ b=JSON.parse(localStorage.getItem("goblub_birth")); }catch(e){}
+      if(b&&b.y) boot(b); else $("gate").style.display="block";
+    })
+    .catch(function(){ $("gate").style.display="block";
+      $("g-err").textContent="장부를 못 펼쳤다. 새로고침 해보아라."; $("g-err").style.display="block"; });
+})();
+</script>
+</body>
+</html>

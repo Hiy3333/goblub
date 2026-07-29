@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>신살 도감 — 네 몸에 붙은 것들 · 冥簿館</title>
+<meta name="description" content="귀곡(鬼哭)이 네 사주에 붙은 신살을 짚어준다 — 도화·역마·화개·양인·괴강·백호·천을귀인" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&family=Gowun+Batang:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0a0709;color:#d9cdbb;font-family:'Gowun Batang',serif;min-height:100dvh;
+  display:flex;flex-direction:column;align-items:center;padding:0 14px 60px}
+a{color:inherit;text-decoration:none}
+.wrap{width:min(94vw,680px)}
+.head{position:relative;width:100%;padding:34px 0 16px;text-align:center}
+.head .back{position:absolute;left:2px;top:38px;color:#7d685c;font-size:.9rem}
+.head .back:hover{color:#ff6a3a}
+.head .kicker{font-family:'Nanum Myeongjo',serif;color:#a8563c;letter-spacing:.5em;font-size:.72rem;margin-bottom:10px}
+.head h1{font-family:'Nanum Myeongjo',serif;font-weight:800;font-size:1.7rem;color:#f0e4d2}
+.head h1 em{font-style:normal;color:#ff5a2a;text-shadow:0 0 24px rgba(255,70,30,.5)}
+.head p{color:#a89887;font-size:.86rem;margin-top:10px;line-height:1.7}
+.gate{width:100%;background:linear-gradient(180deg,#171017,#100b10);border:1px solid rgba(150,60,70,.4);
+  padding:26px 22px;text-align:center;margin-top:14px}
+.gate p{font-family:'Nanum Myeongjo',serif;color:#e0d2bd;line-height:1.9;margin-bottom:16px}
+.gate .row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:14px}
+.gate select{background:#1c1216;color:#d9cdbb;border:1px solid rgba(150,70,55,.4);
+  padding:9px 8px;font-family:'Gowun Batang',serif;font-size:.9rem}
+.gate button{padding:12px 30px;background:rgba(150,40,20,.16);border:1px solid rgba(220,90,50,.55);
+  color:#ffc4a8;font-family:'Nanum Myeongjo',serif;font-size:1rem;letter-spacing:.12em;cursor:pointer;transition:.2s}
+.gate button:hover{background:rgba(190,55,25,.36)}
+.gate .err{display:none;color:#ff7a6a;font-size:.85rem;margin-top:10px}
+#board{display:none;width:100%}
+.who{display:flex;align-items:center;justify-content:center;gap:12px;margin:8px 0 6px;flex-wrap:wrap}
+.who .me{font-family:'Nanum Myeongjo',serif;color:#ecdcc6;font-size:.95rem;
+  border:1px solid rgba(150,70,55,.35);padding:5px 15px;background:rgba(20,11,13,.6)}
+.who a{color:#8a7565;font-size:.8rem;border-bottom:1px solid rgba(125,104,92,.4)}
+.who a:hover{color:#ff6a3a}
+.intro{font-family:'Nanum Myeongjo',serif;text-align:center;color:#e0d2bd;font-size:.95rem;
+  line-height:1.9;margin:14px 0 20px}
+.intro b{color:#ff8a5a}
+.card{position:relative;border:1px solid rgba(150,70,55,.35);margin-bottom:16px;overflow:hidden;
+  background:linear-gradient(160deg,rgba(30,16,17,.95),rgba(13,8,10,.98))}
+.card::before{content:attr(data-hj);position:absolute;right:6px;top:-16px;font-family:'Nanum Myeongjo',serif;
+  font-size:6.4rem;font-weight:800;color:rgba(125,42,24,.18);line-height:1;pointer-events:none}
+.card .in{position:relative;padding:20px 22px 18px}
+.card .top{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.card .nm{font-family:'Nanum Myeongjo',serif;font-size:1.25rem;font-weight:800;color:#ffb08a}
+.card .als{color:#8a7080;font-size:.8rem;font-family:'Nanum Myeongjo',serif}
+.card .pos{margin-left:auto;font-size:.76rem;color:#c98060;border:1px solid rgba(200,100,70,.4);padding:2px 10px}
+.card .tx{margin-top:12px;font-family:'Nanum Myeongjo',serif;color:#e0d2bd;font-size:.94rem;line-height:1.95}
+.card .cure{margin-top:12px;border-top:1px dashed rgba(150,70,55,.3);padding-top:10px;
+  color:#c9b48c;font-size:.86rem;line-height:1.8}
+.card .cure b{color:#f2d488;font-family:'Nanum Myeongjo',serif}
+.none{border:1px solid rgba(150,70,55,.3);padding:26px 22px;text-align:center;
+  font-family:'Nanum Myeongjo',serif;color:#e0d2bd;line-height:2.0}
+.sign{text-align:right;color:#8a7080;font-size:.84rem;font-family:'Nanum Myeongjo',serif;margin-top:6px}
+.links{display:flex;gap:10px;justify-content:center;margin-top:24px;flex-wrap:wrap}
+.links a{color:#c98060;font-size:.88rem;border:1px solid rgba(200,100,70,.4);padding:10px 18px;transition:.2s}
+.links a:hover{color:#ffc4a8;border-color:#ff6a3a}
+.foot{margin-top:40px;color:#5d5148;font-size:.78rem;letter-spacing:.2em;font-family:'Nanum Myeongjo',serif;text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head">
+    <a class="back" href="fortune.html">← 명부관</a>
+    <p class="kicker">冥 簿 館 · 煞</p>
+    <h1>네 몸에 <em>붙은 것들</em></h1>
+    <p>살(煞)은 태어나는 순간 명부에 같이 적힌다.<br>무서워할 것 없다 — 이름을 알면, 다스릴 수 있다.</p>
+  </div>
+
+  <div class="gate" id="gate" style="display:none">
+    <p>네 명부가 아직 여기 없구나.<br>태어난 날을 적어라 — 붙은 것들을 짚어 주마.</p>
+    <div class="row">
+      <select id="g-year"></select><select id="g-month"></select><select id="g-day"></select>
+      <select id="g-hour"><option value="">시 모름</option></select>
+    </div>
+    <button id="g-go">명부에 새긴다</button>
+    <p class="err" id="g-err"></p>
+  </div>
+
+  <div id="board">
+    <div class="who">
+      <span class="me" id="me-pill"></span>
+      <a href="#" id="edit">다른 명부로 본다</a>
+    </div>
+    <p class="intro" id="intro"></p>
+    <div id="cards"></div>
+    <p class="sign">— 살은 흉기가 아니라 연장이다. 쥐는 법을 배워라. · 귀곡(鬼哭)</p>
+    <div class="links">
+      <a href="bujeok.html">🧧 살을 눌러 둘 부적을 받는다</a>
+      <a href="saju-premium.html">🕯 명부 본편을 펼친다</a>
+    </div>
+  </div>
+
+  <p class="foot">goblub · 冥 簿 館</p>
+</div>
+
+<script src="js/saju.js"></script>
+<script src="js/saju-deep.js"></script>
+<script src="js/gwigok-log.js?v=1"></script>
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id);};
+
+  // 도감 — 귀곡 톤
+  var BOOK={
+    "도화살":{hj:"桃",als:"복사꽃의 살",
+      tx:"네 곁에 복사꽃이 피어 있다. 걷기만 해도 눈길이 따라붙고, 가만있어도 말이 먼저 걸려오는 팔자다. 다만 꽃에는 벌만 오는 게 아니다 — 오는 인연을 다 받지 마라.",
+      cure:"매력은 열어 두되, 지갑과 비밀은 닫아 두어라. 그러면 이 살은 복이 된다."},
+    "역마살":{hj:"驛",als:"떠도는 말발굽",
+      tx:"네 발밑에 말발굽 소리가 깔려 있다. 한자리에 오래 묶이면 병이 나고, 움직여야 운이 도는 명이다. 이사·출장·여행·이직 — 남들이 두려워하는 '옮김'이 너에겐 약이다.",
+      cure:"떠나는 것을 겁내지 마라. 다만 떠나기 전날 밤의 결정만은 하루 재워라."},
+    "화개살":{hj:"華",als:"홀로 피는 일산(日傘)",
+      tx:"머리 위에 홀로 쓰는 일산이 있다. 무리에 섞여도 어딘가 혼자인 자, 그 고독에서 재주가 자라는 팔자다. 예술·학문·연구 — 혼자 파는 우물일수록 깊게 판다.",
+      cure:"고독을 벌이라 여기지 마라. 그 시간이 네 창고다. 다만 사람 부르는 날을 한 달에 하루는 정해 두어라."},
+    "양인살":{hj:"刃",als:"칼을 쥔 손",
+      tx:"네 손에 날이 선 칼이 들려 있다. 밀어붙이는 힘이 남다르고, 궁지에서 오히려 강해진다. 다만 칼은 밖으로도 안으로도 벤다 — 급할수록 손잡이를 고쳐 쥐어라.",
+      cure:"큰 힘은 큰 일에만 써라. 사소한 시비에 칼을 빼는 순간, 이 살은 흉이 된다."},
+    "천을귀인":{hj:"貴",als:"등 뒤의 귀인",
+      tx:"살이 아니라 사람이다 — 네 등 뒤에 귀인이 서 있다. 벼랑 끝에 몰릴 때마다 어디선가 손이 내려오는 명. 저승에서도 함부로 건드리지 못하는 표식이다.",
+      cure:"도움을 받았거든 반드시 갚아라. 귀인은 갚는 자에게 두 번 온다."},
+    "괴강살":{hj:"魁",als:"우두머리의 별",
+      tx:"북두의 우두머리 별이 네 일주에 내려앉았다. 총명함과 결단이 극단으로 치닫는 명 — 크게 서든가, 크게 부딪히든가 둘 중 하나다. 어중간함이 제일 해롭다.",
+      cure:"네 그릇은 반쯤 채우라고 있는 그릇이 아니다. 판을 골랐으면 끝까지 가라."},
+    "백호살":{hj:"虎",als:"흰 호랑이의 이빨",
+      tx:"명부의 이 자리에 흰 호랑이가 웅크리고 있다. 기운이 강렬해서 큰일을 해내지만, 몸이 상하기 쉬운 자리이기도 하다. 옛사람들이 가장 무서워한 살이나 — 다스린 자에겐 가장 큰 힘이었다.",
+      cure:"과로와 과속, 이 둘만 끊어라. 호랑이는 지친 주인부터 문다."}
+  };
+  var ORDER=["괴강살","백호살","양인살","도화살","역마살","화개살","천을귀인"];
+
+  function fillSelects(){
+    var y=$("g-year"),m=$("g-month"),d=$("g-day"),h=$("g-hour"),now=new Date().getFullYear();
+    for(var i=now;i>=1930;i--) y.add(new Option(i+"년",i));
+    for(var j=1;j<=12;j++) m.add(new Option(j+"월",j));
+    for(var k=1;k<=31;k++) d.add(new Option(k+"일",k));
+    for(var t=0;t<24;t++) h.add(new Option(("0"+t).slice(-2)+"시",t));
+    y.value=1995;
+  }
+
+  var data=null;
+  function boot(birth){
+    var r=Saju.compute(data,{y:birth.y,m:birth.m,d:birth.d,hour:birth.hour,min:birth.min||0},{trueSolar:true});
+    var f=SajuDeep.facts(r,birth,birth.gender||null);
+    var t=Saju.pillarText(r.pillars.day);
+    $("me-pill").textContent=t.hanja+"("+t.hangul+") · "+r.zodiac+"띠의 명부";
+
+    // "년지 오 — 도화살(매력·인기)" → {name, pos}
+    var found={};
+    (f.sinsal||[]).forEach(function(s){
+      var m2=s.match(/^(.+?)\s*—\s*(도화살|역마살|화개살|양인살|천을귀인|괴강살|백호살)/);
+      if(!m2) return;
+      var name=m2[2], pos=m2[1];
+      if(!found[name]) found[name]=[];
+      if(found[name].indexOf(pos)<0) found[name].push(pos);
+    });
+    var names=ORDER.filter(function(n){ return found[n]; });
+
+    var cards=$("cards"); cards.innerHTML="";
+    if(!names.length){
+      $("intro").innerHTML="네 명부를 샅샅이 뒤졌다.";
+      cards.innerHTML='<div class="none">붙은 살이 없다 — 드물게 깨끗한 명부다.<br>'+
+        "다만 명심해라. 살이 없다는 건 무기도 없다는 뜻이다.<br>네 길은 순전히 네 걸음으로 가야 한다.</div>";
+    }else{
+      $("intro").innerHTML="네 명부에서 <b>"+names.length+"개</b>가 나왔다. 하나씩 보여 주마.";
+      names.forEach(function(n){
+        var b=BOOK[n];
+        var el=document.createElement("div");
+        el.className="card"; el.setAttribute("data-hj",b.hj);
+        el.innerHTML='<div class="in"><div class="top"><span class="nm">'+n+'</span>'+
+          '<span class="als">'+b.als+'</span>'+
+          '<span class="pos">'+found[n].join(" · ")+'</span></div>'+
+          '<p class="tx">'+b.tx+'</p>'+
+          '<p class="cure"><b>다스리는 법</b> — '+b.cure+'</p></div>';
+        cards.appendChild(el);
+      });
+    }
+    $("gate").style.display="none"; $("board").style.display="block";
+    if(window.GwigokLog) GwigokLog.add("sinsal","신살 도감",
+      names.length ? names.join("·")+" — "+names.length+"개가 붙어 있었다" : "붙은 살이 없는 깨끗한 명부였다");
+  }
+
+  fillSelects();
+  $("g-go").onclick=function(){
+    var y=+$("g-year").value,m=+$("g-month").value,d=+$("g-day").value,hv=$("g-hour").value;
+    var dt=new Date(y,m-1,d);
+    if(dt.getFullYear()!==y||dt.getMonth()!==m-1||dt.getDate()!==d){
+      $("g-err").textContent="없는 날짜다. 다시 보아라."; $("g-err").style.display="block"; return;
+    }
+    var b={y:y,m:m,d:d}; if(hv!==""){ b.hour=+hv; b.min=0; }
+    try{ localStorage.setItem("goblub_birth",JSON.stringify(b)); }catch(e){}
+    boot(b);
+  };
+  $("edit").onclick=function(ev){ ev.preventDefault(); $("board").style.display="none"; $("gate").style.display="block"; };
+
+  fetch("data/saju-terms.json").then(function(r){ if(!r.ok) throw 0; return r.json(); })
+    .then(function(d){
+      data=d;
+      var b=null; try{ b=JSON.parse(localStorage.getItem("goblub_birth")); }catch(e){}
+      if(b&&b.y) boot(b); else $("gate").style.display="block";
+    })
+    .catch(function(){ $("gate").style.display="block";
+      $("g-err").textContent="장부를 못 펼쳤다. 새로고침 해보아라."; $("g-err").style.display="block"; });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>흉몽 해몽소 — 冥簿館</title>
+<meta name="description" content="간밤의 꿈을 귀곡(鬼哭)이 풀어준다 — 꿈의 정체, 명부와 겹쳐 보기, 액막이 하나" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&family=Gowun+Batang:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0a0709;color:#d9cdbb;font-family:'Gowun Batang',serif;min-height:100dvh;
+  display:flex;flex-direction:column;align-items:center;padding:0 14px 60px}
+a{color:inherit;text-decoration:none}
+.wrap{width:min(94vw,640px)}
+.head{position:relative;width:100%;padding:34px 0 16px;text-align:center}
+.head .back{position:absolute;left:2px;top:38px;color:#7d685c;font-size:.9rem}
+.head .back:hover{color:#ff6a3a}
+.head .kicker{font-family:'Nanum Myeongjo',serif;color:#a8563c;letter-spacing:.5em;font-size:.72rem;margin-bottom:10px}
+.head h1{font-family:'Nanum Myeongjo',serif;font-weight:800;font-size:1.7rem;color:#f0e4d2}
+.head h1 em{font-style:normal;color:#ff5a2a;text-shadow:0 0 24px rgba(255,70,30,.5)}
+.head p{color:#a89887;font-size:.86rem;margin-top:10px;line-height:1.7}
+.askbox{width:100%;background:linear-gradient(180deg,#171017,#100b10);border:1px solid rgba(150,60,70,.4);
+  padding:26px 22px;text-align:center;margin-top:14px}
+.askbox .lead{font-family:'Nanum Myeongjo',serif;color:#e0d2bd;line-height:1.9;margin-bottom:16px}
+.askbox textarea{width:100%;min-height:120px;background:#150e12;border:1px solid rgba(150,70,55,.45);
+  color:#e8dcc8;font-family:'Gowun Batang',serif;font-size:.96rem;line-height:1.8;padding:14px;resize:vertical;margin-bottom:14px}
+.askbox textarea:focus{outline:none;border-color:#ff6a3a}
+button.fire{padding:12px 30px;background:rgba(150,40,20,.16);border:1px solid rgba(220,90,50,.55);
+  color:#ffc4a8;font-family:'Nanum Myeongjo',serif;font-size:1rem;letter-spacing:.12em;cursor:pointer;transition:.2s}
+button.fire:hover{background:rgba(190,55,25,.36)}
+.err{display:none;color:#ff7a6a;font-size:.85rem;margin-top:10px}
+.askbox .fine{color:#8a7565;font-size:.78rem;margin-top:12px;line-height:1.7}
+#board{display:none;width:100%;margin-top:14px}
+.qecho{font-family:'Nanum Myeongjo',serif;color:#c9b48c;font-size:.9rem;text-align:center;
+  font-style:italic;line-height:1.7;margin-bottom:16px;white-space:pre-wrap}
+.paper{border:1px solid rgba(150,70,55,.35);background:linear-gradient(180deg,rgba(24,15,17,.95),rgba(13,8,10,.98));
+  padding:24px 24px 20px}
+.status{color:#a89887;font-size:.9rem;text-align:center;padding:6px 0}
+.spin{display:inline-block;width:13px;height:13px;border:2px solid rgba(255,110,60,.3);
+  border-top-color:#ff6a3a;border-radius:50%;animation:sp .8s linear infinite;vertical-align:-2px;margin-right:7px}
+@keyframes sp{to{transform:rotate(360deg)}}
+.reading{display:none;font-family:'Nanum Myeongjo',serif;color:#e0d2bd;font-size:.97rem;line-height:2.05;white-space:pre-wrap}
+.reading .hd{display:block;color:#ffb08a;font-weight:800;margin:16px 0 4px}
+.reading .hd:first-child{margin-top:0}
+.oncebar{display:none;margin-top:18px;border-top:1px dashed rgba(150,70,55,.3);padding-top:14px;
+  text-align:center;color:#c9b48c;font-size:.86rem;font-family:'Nanum Myeongjo',serif;line-height:1.8}
+.oncebar button{margin-top:10px}
+.sign{text-align:right;color:#8a7080;font-size:.84rem;font-family:'Nanum Myeongjo',serif;margin-top:14px}
+.foot{margin-top:40px;color:#5d5148;font-size:.78rem;letter-spacing:.2em;font-family:'Nanum Myeongjo',serif;text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head">
+    <a class="back" href="fortune.html">← 명부관</a>
+    <p class="kicker">冥 簿 館 · 夢</p>
+    <h1>흉몽 <em>해몽소</em></h1>
+    <p>꿈은 저승 문틈으로 새어 나온 그림자다.<br>간밤의 꿈을 두고 가라 — 하루에 한 꿈만 받는다.</p>
+  </div>
+
+  <div class="askbox" id="askbox" style="display:none">
+    <p class="lead">무슨 꿈을 꾸었느냐.<br>기억나는 장면을 그대로 적어라 — 토막이어도 좋다.</p>
+    <textarea id="q" maxlength="600" placeholder="예) 이가 우수수 빠지는 꿈을 꿨다. 거울을 봤는데 얼굴이 내가 아니었다…"></textarea>
+    <button class="fire" id="askBtn">🕯 꿈을 두고 간다</button>
+    <p class="err" id="q-err"></p>
+    <p class="fine">꿈과 풀이는 이 브라우저에만 남는다. 내일이 되면 새 꿈을 받는다.</p>
+  </div>
+
+  <div id="board">
+    <p class="qecho" id="qecho"></p>
+    <div class="paper">
+      <div class="status" id="status"><span class="spin"></span>귀곡이 꿈의 문을 여는 중…</div>
+      <div class="reading" id="reading"></div>
+      <div class="oncebar" id="oncebar">🕯 오늘 치 해몽은 여기까지다. 또 꾸거든 오너라.<br>
+        <button class="fire" id="againBtn" style="display:none">다시 불러온다</button>
+      </div>
+    </div>
+    <p class="sign">— 귀곡(鬼哭)</p>
+  </div>
+
+  <p class="foot">goblub · 冥 簿 館</p>
+</div>
+
+<script src="js/saju.js"></script>
+<script src="js/dosa.js?v=2"></script>
+<script src="js/gwigok-log.js?v=1"></script>
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id);};
+  var LOCK="goblub_gwigokdream_";
+  function todayKey(){ var d=new Date();
+    return LOCK+d.getFullYear()+("0"+(d.getMonth()+1)).slice(-2)+("0"+d.getDate()).slice(-2); }
+
+  function fmt(s){
+    var out=s.replace(/</g,"&lt;");
+    ["꿈의 정체","명부와 겹쳐 보니","액막이 하나"].forEach(function(h){
+      out=out.replace(h,'<span class="hd">'+h+'</span>');
+    });
+    return out;
+  }
+
+  var myDream="";
+
+  function showAnswer(q,text,done){
+    $("askbox").style.display="none"; $("board").style.display="block";
+    $("qecho").textContent="“"+(q.length>90?q.slice(0,90)+"…":q)+"”";
+    if(text){ $("reading").style.display="block"; $("reading").innerHTML=fmt(text); }
+    if(done){ $("status").style.display="none"; $("oncebar").style.display="block"; }
+  }
+
+  // 명부가 있으면 일주를 참고로 같이 보낸다(없어도 동작)
+  function myIlju(){
+    try{
+      var b=JSON.parse(localStorage.getItem("goblub_birth"));
+      if(!b||!b.y||!window.__sajuData) return null;
+      var r=Saju.compute(window.__sajuData,{y:b.y,m:b.m,d:b.d,hour:b.hour,min:b.min||0},{trueSolar:true});
+      return Saju.pillarText(r.pillars.day).hangul;
+    }catch(e){ return null; }
+  }
+
+  function ask(q){
+    myDream=q;
+    showAnswer(q,null,false);
+    $("status").style.display="block";
+    $("status").innerHTML='<span class="spin"></span>귀곡이 꿈의 문을 여는 중…';
+    var body={ dream:{ text:q } };
+    var ilju=myIlju(); if(ilju) body.dream.ilju=ilju;
+    var acc="";
+    Dosa.fetchAI("/api/gwigok-dream", body, "goblub_gkd_", {
+      onChunk:function(t){ acc+=t; $("reading").style.display="block";
+        $("status").style.display="none"; $("reading").innerHTML=fmt(acc); },
+      onDone:function(){ showAnswer(q,acc,true);
+        try{ localStorage.setItem(todayKey(),JSON.stringify({q:q,a:acc})); }catch(e){}
+        if(window.GwigokLog) GwigokLog.add("dream","흉몽 해몽소","“"+q.slice(0,40)+(q.length>40?"…":"")+"” 꿈을 두고 갔다");
+      },
+      onError:function(code,sec){
+        $("status").style.display="block";
+        $("status").innerHTML = (code==="not_configured" ? "귀곡이 아직 자리를 비웠다. 곧 돌아온다." :
+          code==="cooldown" ? "귀곡이 숨을 고른다… "+sec+"초 후에 다시 오너라." :
+          "지금은 해몽소에 줄이 길다. 잠시 후 다시 오너라.");
+        $("againBtn").style.display="inline-block";
+        $("oncebar").style.display="block";
+        $("againBtn").onclick=function(){ $("againBtn").style.display="none"; $("oncebar").style.display="none"; ask(myDream); };
+      }
+    });
+  }
+
+  $("askBtn").onclick=function(){
+    var q=($("q").value||"").trim();
+    if(q.length<5){ $("q-err").textContent="너무 짧다. 장면 하나라도 더 적어라."; $("q-err").style.display="block"; return; }
+    $("q-err").style.display="none";
+    ask(q);
+  };
+
+  // 일주 참고용 데이터(실패해도 해몽은 동작)
+  fetch("data/saju-terms.json").then(function(r){ return r.ok?r.json():null; })
+    .then(function(d){ if(d) window.__sajuData=d; }).catch(function(){});
+
+  // 오늘 이미 풀었으면 바로 보여준다
+  var saved=null; try{ saved=JSON.parse(localStorage.getItem(todayKey())); }catch(e){}
+  if(saved&&saved.q&&saved.a){ showAnswer(saved.q,saved.a,true); }
+  else $("askbox").style.display="block";
+})();
+</script>
+</body>
+</html>

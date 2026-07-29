@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>명부 열람 기록 — 冥簿館</title>
+<meta name="description" content="네가 명부관에 다녀간 기록 — 열람한 것들이 한 권의 장부에 쌓인다" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&family=Gowun+Batang:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0a0709;color:#d9cdbb;font-family:'Gowun Batang',serif;min-height:100dvh;
+  display:flex;flex-direction:column;align-items:center;padding:0 14px 60px}
+a{color:inherit;text-decoration:none}
+.wrap{width:min(94vw,640px)}
+.head{position:relative;width:100%;padding:34px 0 16px;text-align:center}
+.head .back{position:absolute;left:2px;top:38px;color:#7d685c;font-size:.9rem}
+.head .back:hover{color:#ff6a3a}
+.head .kicker{font-family:'Nanum Myeongjo',serif;color:#a8563c;letter-spacing:.5em;font-size:.72rem;margin-bottom:10px}
+.head h1{font-family:'Nanum Myeongjo',serif;font-weight:800;font-size:1.7rem;color:#f0e4d2}
+.head h1 em{font-style:normal;color:#ff5a2a;text-shadow:0 0 24px rgba(255,70,30,.5)}
+.head p{color:#a89887;font-size:.86rem;margin-top:10px;line-height:1.7}
+.book{width:100%;border:1px solid rgba(150,70,55,.35);margin-top:14px;
+  background:linear-gradient(180deg,rgba(24,15,17,.95),rgba(13,8,10,.98))}
+.entry{display:flex;gap:14px;padding:16px 20px;border-bottom:1px solid rgba(150,70,55,.16);align-items:baseline;flex-wrap:wrap}
+.entry:last-child{border-bottom:none}
+.entry .d{font-family:'Nanum Myeongjo',serif;color:#6b4a3c;font-size:.8rem;flex:none;width:6.2em;letter-spacing:.04em}
+.entry .ic{flex:none;font-size:.95rem}
+.entry .h{font-family:'Nanum Myeongjo',serif;color:#ecdcc6;font-size:.96rem;flex:none;min-width:7em}
+.entry .l{color:#8a7568;font-size:.85rem;flex:1 1 12em;line-height:1.7}
+.empty{padding:44px 22px;text-align:center;font-family:'Nanum Myeongjo',serif;color:#e0d2bd;line-height:2.0}
+.empty a{color:#c98060;border-bottom:1px solid rgba(200,100,70,.5)}
+.cnt{margin-top:14px;text-align:center;color:#a89887;font-size:.84rem}
+.cnt b{color:#ff8a5a}
+.burn{display:flex;justify-content:center;margin-top:18px}
+.burn button{padding:10px 22px;background:none;border:1px solid rgba(150,70,55,.4);color:#8a7565;
+  font-family:'Nanum Myeongjo',serif;font-size:.86rem;letter-spacing:.1em;cursor:pointer;transition:.2s}
+.burn button:hover{color:#ff6a3a;border-color:#ff6a3a}
+.sign{text-align:right;color:#8a7080;font-size:.84rem;font-family:'Nanum Myeongjo',serif;margin-top:14px}
+.foot{margin-top:40px;color:#5d5148;font-size:.78rem;letter-spacing:.2em;font-family:'Nanum Myeongjo',serif;text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head">
+    <a class="back" href="fortune.html">← 명부관</a>
+    <p class="kicker">冥 簿 館 · 錄</p>
+    <h1>명부 열람 <em>기록</em></h1>
+    <p>네가 여기 다녀간 흔적이다.<br>이 장부는 네 것이라, 이 브라우저 밖으로는 나가지 않는다.</p>
+  </div>
+
+  <div class="book" id="book"></div>
+  <p class="cnt" id="cnt"></p>
+  <div class="burn" id="burnWrap" style="display:none">
+    <button id="burn">🔥 기록을 태운다</button>
+  </div>
+  <p class="sign">— 산 자의 걸음은 다 장부에 남는 법이다. · 귀곡(鬼哭)</p>
+
+  <p class="foot">goblub · 冥 簿 館</p>
+</div>
+
+<script src="js/gwigok-log.js?v=1"></script>
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id);};
+  var ICON={ day:"日", cal:"曆", sinsal:"煞", ask:"問", dream:"夢", bujeok:"符", myeongbu:"對", book:"冥" };
+
+  function render(){
+    var list=GwigokLog.list();
+    var book=$("book");
+    if(!list.length){
+      book.innerHTML='<div class="empty">아직 아무것도 적혀 있지 않다.<br>'+
+        '<a href="gwigok-day.html">오늘 치 운</a>부터 읽고 오너라 — 그때부터 장부가 시작된다.</div>';
+      $("cnt").textContent=""; $("burnWrap").style.display="none";
+      return;
+    }
+    book.innerHTML=list.map(function(e){
+      return '<div class="entry"><span class="d">'+e.d+'</span>'+
+        '<span class="ic">'+(ICON[e.t]||"·")+'</span>'+
+        '<span class="h">'+String(e.h).replace(/</g,"&lt;")+'</span>'+
+        '<span class="l">'+String(e.l).replace(/</g,"&lt;")+'</span></div>';
+    }).join("");
+    $("cnt").innerHTML="지금까지 <b>"+list.length+"건</b>이 적혀 있다.";
+    $("burnWrap").style.display="flex";
+  }
+
+  $("burn").onclick=function(){
+    if(!confirm("기록을 전부 태운다. 되돌릴 수 없다 — 태우겠느냐?")) return;
+    GwigokLog.clear(); render();
+  };
+
+  render();
+})();
+</script>
+</body>
+</html>
