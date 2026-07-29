@@ -27,6 +27,11 @@ a{color:inherit;text-decoration:none}
 .gate .row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:14px}
 .gate select,.gate input{background:#1c1216;color:#d9cdbb;border:1px solid rgba(150,70,55,.4);
   padding:9px 8px;font-family:'Gowun Batang',serif;font-size:.9rem}
+.who{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:10px;flex-wrap:wrap}
+.who .me{font-family:'Nanum Myeongjo',serif;color:#ecdcc6;font-size:.92rem;
+  border:1px solid rgba(150,70,55,.35);padding:5px 15px;background:rgba(20,11,13,.6)}
+.who a{color:#8a7565;font-size:.8rem;border-bottom:1px solid rgba(125,104,92,.4)}
+.who a:hover{color:#ff6a3a}
 button.fire{padding:12px 30px;background:rgba(150,40,20,.16);border:1px solid rgba(220,90,50,.55);
   color:#ffc4a8;font-family:'Nanum Myeongjo',serif;font-size:1rem;letter-spacing:.12em;cursor:pointer;transition:.2s}
 button.fire:hover{background:rgba(190,55,25,.36)}
@@ -62,6 +67,11 @@ button.fire:disabled{opacity:.5;cursor:default}
     <p class="kicker">冥 簿 館 · 問</p>
     <h1>한 가지만 <em>묻거라</em></h1>
     <p>하루에 한 번, 물음 하나만 받는다.<br>귀곡이 네 명부를 짚어 답한다.</p>
+  </div>
+
+  <div class="who" id="who" style="display:none">
+    <span class="me" id="me-pill"></span>
+    <a href="#" id="edit">다른 명부로 본다</a>
   </div>
 
   <div class="gate" id="gate" style="display:none">
@@ -127,6 +137,22 @@ button.fire:disabled{opacity:.5;cursor:default}
 
   var data=null, birth=null, myQuestion="";
 
+  // 상단에 내 명부(생년월일·일주·띠)를 항상 보여준다
+  function showPill(){
+    if(!birth||!birth.y){ $("who").style.display="none"; return; }
+    var bs=birth.y+"."+birth.m+"."+birth.d+(birth.hour!=null?" "+("0"+birth.hour).slice(-2)+":"+("0"+(birth.min||0)).slice(-2):"")+"생";
+    var tail="";
+    try{
+      if(data){
+        var r=Saju.compute(data,{y:birth.y,m:birth.m,d:birth.d,hour:birth.hour,min:birth.min||0},{trueSolar:true});
+        var t=Saju.pillarText(r.pillars.day);
+        tail=" · "+t.hanja+"("+t.hangul+") · "+r.zodiac+"띠";
+      }
+    }catch(e){}
+    $("me-pill").textContent=bs+tail;
+    $("who").style.display="flex";
+  }
+
   function showAnswer(q, text, done){
     $("askbox").style.display="none"; $("board").style.display="block";
     $("qecho").textContent="“"+q+"”";
@@ -172,8 +198,17 @@ button.fire:disabled{opacity:.5;cursor:default}
     }
     birth={y:y,m:m,d:d}; if(hv!==""){ birth.hour=+hv; birth.min=Math.max(0,Math.min(59,+(document.getElementById("g-min").value)||0)); }
     try{ localStorage.setItem("goblub_birth",JSON.stringify(birth)); }catch(e){}
-    $("gate").style.display="none"; $("askbox").style.display="block";
+    $("gate").style.display="none";
+    showPill();
+    // 오늘 답이 이미 있으면 그 답으로, 아니면 물음 입력으로
+    var saved=null; try{ saved=JSON.parse(localStorage.getItem(todayKey())); }catch(e){}
+    if(saved&&saved.q&&saved.a) showAnswer(saved.q,saved.a,true);
+    else $("askbox").style.display="block";
   };
+
+  $("edit").onclick=function(ev){ ev.preventDefault();
+    $("askbox").style.display="none"; $("board").style.display="none";
+    $("who").style.display="none"; $("gate").style.display="block"; };
 
   $("askBtn").onclick=function(){
     var q=($("q").value||"").trim();
@@ -185,10 +220,11 @@ button.fire:disabled{opacity:.5;cursor:default}
   fetch("data/saju-terms.json").then(function(r){ if(!r.ok) throw 0; return r.json(); })
     .then(function(d){
       data=d;
+      try{ birth=JSON.parse(localStorage.getItem("goblub_birth")); }catch(e){}
+      showPill();
       // 오늘 이미 물었으면 저장된 문답을 바로 보여준다
       var saved=null; try{ saved=JSON.parse(localStorage.getItem(todayKey())); }catch(e){}
       if(saved&&saved.q&&saved.a){ showAnswer(saved.q,saved.a,true); return; }
-      try{ birth=JSON.parse(localStorage.getItem("goblub_birth")); }catch(e){}
       if(birth&&birth.y){ $("askbox").style.display="block"; }
       else $("gate").style.display="block";
     })

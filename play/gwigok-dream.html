@@ -21,9 +21,17 @@ a{color:inherit;text-decoration:none}
 .head h1{font-family:'Nanum Myeongjo',serif;font-weight:800;font-size:1.7rem;color:#f0e4d2}
 .head h1 em{font-style:normal;color:#ff5a2a;text-shadow:0 0 24px rgba(255,70,30,.5)}
 .head p{color:#a89887;font-size:.86rem;margin-top:10px;line-height:1.7}
-.askbox{width:100%;background:linear-gradient(180deg,#171017,#100b10);border:1px solid rgba(150,60,70,.4);
+.gate,.askbox{width:100%;background:linear-gradient(180deg,#171017,#100b10);border:1px solid rgba(150,60,70,.4);
   padding:26px 22px;text-align:center;margin-top:14px}
-.askbox .lead{font-family:'Nanum Myeongjo',serif;color:#e0d2bd;line-height:1.9;margin-bottom:16px}
+.gate p,.askbox .lead{font-family:'Nanum Myeongjo',serif;color:#e0d2bd;line-height:1.9;margin-bottom:16px}
+.gate .row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:14px}
+.gate select,.gate input{background:#1c1216;color:#d9cdbb;border:1px solid rgba(150,70,55,.4);
+  padding:9px 8px;font-family:'Gowun Batang',serif;font-size:.9rem}
+.who{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:10px;flex-wrap:wrap}
+.who .me{font-family:'Nanum Myeongjo',serif;color:#ecdcc6;font-size:.92rem;
+  border:1px solid rgba(150,70,55,.35);padding:5px 15px;background:rgba(20,11,13,.6)}
+.who a{color:#8a7565;font-size:.8rem;border-bottom:1px solid rgba(125,104,92,.4)}
+.who a:hover{color:#ff6a3a}
 .askbox textarea{width:100%;min-height:120px;background:#150e12;border:1px solid rgba(150,70,55,.45);
   color:#e8dcc8;font-family:'Gowun Batang',serif;font-size:.96rem;line-height:1.8;padding:14px;resize:vertical;margin-bottom:14px}
 .askbox textarea:focus{outline:none;border-color:#ff6a3a}
@@ -58,6 +66,22 @@ button.fire:hover{background:rgba(190,55,25,.36)}
     <p class="kicker">冥 簿 館 · 夢</p>
     <h1>흉몽 <em>해몽소</em></h1>
     <p>꿈은 저승 문틈으로 새어 나온 그림자다.<br>간밤의 꿈을 두고 가라 — 하루에 한 꿈만 받는다.</p>
+  </div>
+
+  <div class="who" id="who" style="display:none">
+    <span class="me" id="me-pill"></span>
+    <a href="#" id="edit">다른 명부로 본다</a>
+  </div>
+
+  <div class="gate" id="gate" style="display:none">
+    <p>꿈보다 명부가 먼저다.<br>태어난 날을 적어라 — 네 꿈인지 알아야 풀지.</p>
+    <div class="row">
+      <select id="g-year"></select><select id="g-month"></select><select id="g-day"></select>
+      <select id="g-hour"><option value="">시 모름</option></select>
+      <input type="number" id="g-min" min="0" max="59" value="0" aria-label="분" title="분(0~59)" style="width:62px" />
+    </div>
+    <button class="fire" id="g-go">명부에 새긴다</button>
+    <p class="err" id="g-err"></p>
   </div>
 
   <div class="askbox" id="askbox" style="display:none">
@@ -154,14 +178,57 @@ button.fire:hover{background:rgba(190,55,25,.36)}
     ask(q);
   };
 
-  // 일주 참고용 데이터(실패해도 해몽은 동작)
-  fetch("data/saju-terms.json").then(function(r){ return r.ok?r.json():null; })
-    .then(function(d){ if(d) window.__sajuData=d; }).catch(function(){});
+  // ── 명부(생년월일) 게이트 + 상단 표시 — 다른 귀곡 페이지와 동일
+  var birth=null;
+  function fillSelects(){
+    var y=$("g-year"),m=$("g-month"),d=$("g-day"),h=$("g-hour"),now=new Date().getFullYear();
+    for(var i=now;i>=1930;i--) y.add(new Option(i+"년",i));
+    for(var j=1;j<=12;j++) m.add(new Option(j+"월",j));
+    for(var k=1;k<=31;k++) d.add(new Option(k+"일",k));
+    for(var t=0;t<24;t++) h.add(new Option(("0"+t).slice(-2)+"시",t));
+    y.value=1995;
+  }
+  function showPill(){
+    if(!birth||!birth.y){ $("who").style.display="none"; return; }
+    var bs=birth.y+"."+birth.m+"."+birth.d+(birth.hour!=null?" "+("0"+birth.hour).slice(-2)+":"+("0"+(birth.min||0)).slice(-2):"")+"생";
+    var tail="";
+    try{
+      if(window.__sajuData){
+        var r=Saju.compute(window.__sajuData,{y:birth.y,m:birth.m,d:birth.d,hour:birth.hour,min:birth.min||0},{trueSolar:true});
+        var t=Saju.pillarText(r.pillars.day);
+        tail=" · "+t.hanja+"("+t.hangul+") · "+r.zodiac+"띠";
+      }
+    }catch(e){}
+    $("me-pill").textContent=bs+tail;
+    $("who").style.display="flex";
+  }
+  function enter(){
+    showPill();
+    var saved=null; try{ saved=JSON.parse(localStorage.getItem(todayKey())); }catch(e){}
+    if(saved&&saved.q&&saved.a){ showAnswer(saved.q,saved.a,true); return; }
+    if(birth&&birth.y){ $("gate").style.display="none"; $("askbox").style.display="block"; }
+    else { $("askbox").style.display="none"; $("gate").style.display="block"; }
+  }
+  fillSelects();
+  $("g-go").onclick=function(){
+    var y=+$("g-year").value,m=+$("g-month").value,d=+$("g-day").value,hv=$("g-hour").value;
+    var dt=new Date(y,m-1,d);
+    if(dt.getFullYear()!==y||dt.getMonth()!==m-1||dt.getDate()!==d){
+      $("g-err").textContent="없는 날짜다. 다시 보아라."; $("g-err").style.display="block"; return;
+    }
+    birth={y:y,m:m,d:d}; if(hv!==""){ birth.hour=+hv; birth.min=Math.max(0,Math.min(59,+($("g-min").value)||0)); }
+    try{ localStorage.setItem("goblub_birth",JSON.stringify(birth)); }catch(e){}
+    enter();
+  };
+  $("edit").onclick=function(ev){ ev.preventDefault();
+    $("askbox").style.display="none"; $("board").style.display="none";
+    $("who").style.display="none"; $("gate").style.display="block"; };
 
-  // 오늘 이미 풀었으면 바로 보여준다
-  var saved=null; try{ saved=JSON.parse(localStorage.getItem(todayKey())); }catch(e){}
-  if(saved&&saved.q&&saved.a){ showAnswer(saved.q,saved.a,true); }
-  else $("askbox").style.display="block";
+  // 일주 계산용 데이터를 받은 뒤 입장 처리 (실패해도 게이트/해몽은 동작)
+  try{ birth=JSON.parse(localStorage.getItem("goblub_birth")); }catch(e){}
+  fetch("data/saju-terms.json").then(function(r){ return r.ok?r.json():null; })
+    .then(function(d){ if(d) window.__sajuData=d; enter(); })
+    .catch(function(){ enter(); });
 })();
 </script>
 </body>

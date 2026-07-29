@@ -187,7 +187,8 @@ a{color:inherit;text-decoration:none}
     $("gj").textContent=GAN[tg]+JI[tj]+"("+GAN_HJ[tg]+JI_HJ[tj]+")일";
     $("gj-tx").textContent="오늘 저승 장부의 일진이다";
     var meT=Saju.pillarText(f.me.pillars.day);
-    $("me-pill").textContent=meT.hanja+"("+meT.hangul+") · "+f.me.zodiac+"띠의 명부";
+    var bs=birth.y+"."+birth.m+"."+birth.d+(birth.hour!=null?" "+("0"+birth.hour).slice(-2)+":"+("0"+(birth.min||0)).slice(-2):"")+"생";
+    $("me-pill").textContent=bs+" · "+meT.hanja+"("+meT.hangul+") · "+f.me.zodiac+"띠";
     var omen=f.modMsg?(f.modMsg.indexOf("합")>=0?HAP_OMEN:CHUNG_OMEN):null;
     if(omen){ $("omen").textContent="⚠ "+omen; $("omen").style.display="block"; }
     else $("omen").style.display="none";
