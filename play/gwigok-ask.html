@@ -83,6 +83,7 @@ button.fire:disabled{opacity:.5;cursor:default}
     </div>
     <button class="fire" id="g-go">명부에 새긴다</button>
     <p class="err" id="g-err"></p>
+    <p style="margin-top:14px"><a href="#" id="backToAnswer" style="display:none;color:#c98060;font-size:.86rem;border-bottom:1px solid rgba(200,100,70,.5)">↩ 오늘의 문답 다시 보기</a></p>
   </div>
 
   <div class="askbox" id="askbox" style="display:none">
@@ -208,7 +209,15 @@ button.fire:disabled{opacity:.5;cursor:default}
 
   $("edit").onclick=function(ev){ ev.preventDefault();
     $("askbox").style.display="none"; $("board").style.display="none";
-    $("who").style.display="none"; $("gate").style.display="block"; };
+    $("who").style.display="none"; $("gate").style.display="block";
+    // 오늘 문답이 있으면 게이트에서 답으로 되돌아갈 길을 열어 둔다
+    var saved=null; try{ saved=JSON.parse(localStorage.getItem(todayKey())); }catch(e){}
+    $("backToAnswer").style.display=(saved&&saved.q&&saved.a)?"inline":"none"; };
+
+  $("backToAnswer").onclick=function(ev){ ev.preventDefault();
+    var saved=null; try{ saved=JSON.parse(localStorage.getItem(todayKey())); }catch(e){}
+    if(!saved||!saved.q||!saved.a) return;
+    $("gate").style.display="none"; showPill(); showAnswer(saved.q,saved.a,true); };
 
   $("askBtn").onclick=function(){
     var q=($("q").value||"").trim();
