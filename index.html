@@ -21,7 +21,7 @@
     /* 하늘만 진한 남색으로(아래 지면쪽으로 갈수록 사라짐) */
     .gm-tint {
       position: absolute; inset: 0; z-index: 1; pointer-events: none;
-      background: linear-gradient(180deg, rgba(5, 9, 46, .92) 0%, rgba(5, 9, 46, .68) 46%, rgba(5, 9, 46, 0) 76%);
+      background: linear-gradient(180deg, rgba(8, 14, 56, .82) 0%, rgba(8, 14, 56, .56) 45%, rgba(8, 14, 56, 0) 74%);
       mix-blend-mode: multiply;
     }
     /* 토성 글로우 */
@@ -153,7 +153,7 @@
 
   <div class="gm-tint"></div>
   <div class="gm-glow" id="gm-glow"></div>
-  <img class="gm-ground" src="design/img/home/ground-moon.webp" alt="" draggable="false" />
+  <img class="gm-ground" src="design/img/home/ground-felt.webp" alt="" draggable="false" />
   <div class="gm-shad" id="gm-shad"></div>
   <img class="gm-obj" id="gm-obj" src="design/img/home/obj-rocket.webp" alt="" draggable="false" />
 
@@ -382,10 +382,11 @@
       var dC = Math.max(-0.6, Math.min(0.6, dN)); // 화면 밖 광원일 때 과하게 밀리지 않게
       shad.style.transform = "translate(" + (ccx + dC * 110 - sw2 / 2) + "px," + (groundY() - sh2 / 2 - 3) + "px)";
 
-      // 전경 로켓: 발밑 라인에 심어두기(고브럽이 뒤로 지나가면 눈만 빼꼼)
-      var ow = isMobile() ? 84 : 100, oh = ow * 1.438;
+      // 전경 로켓(고브럽 2배 크기 — 타고 온 우주선): 발밑 라인에 심어두기
+      var ow = isMobile() ? 110 : 245, oh = ow * 1.438;
+      var ox = isMobile() ? Math.min(W * 0.72, W - ow - 6) : W * 0.70;
       obj.style.width = ow + "px";
-      obj.style.transform = "translate(" + (W * (isMobile() ? 0.76 : 0.72)) + "px," + (groundY() + 14 - oh) + "px) rotate(-3deg)";
+      obj.style.transform = "translate(" + ox + "px," + (groundY() + 16 - oh) + "px) rotate(-3deg)";
 
       var face = (mode === "spit" || mode === "cards") ? 1 : dir;
       img.style.transformOrigin = "50% 100%";
