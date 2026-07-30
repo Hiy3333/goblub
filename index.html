@@ -178,6 +178,8 @@
     var FRONT_IMG = "design/img/home/gb-front.webp";
     var MOUTH_FX = 0.593, MOUTH_FY = 0.539; // 정면 이미지 입 중심
     var WALK_SPEED = 200, RUN_SPEED = 1250, SPIT_POWER = 1600, CHAR_W = 170;
+    // 옆모습(600×613)과 정면(600×560)의 몸높이를 맞추기 위한 폭 — 정면은 186px일 때 동일 신장
+    var WALK_W = 170, FRONT_W = 186;
     var HINTS = [
       "나를 눌러봐~",
       "심심하지? 콕 눌러봐!",
@@ -217,7 +219,7 @@
     var last = Date.now();
 
     function groundY() { return window.innerHeight * 0.94 - 75; } // 2cm쯤 위로
-    function centerX() { return (window.innerWidth - CHAR_W) / 2; }
+    function centerX() { return (window.innerWidth - el.offsetWidth) / 2; }
     function isMobile() { return window.innerWidth < 700; } // 모바일: 중앙 고정, 걷기 없음
 
     // moon-5.webp(1376×768) 속 토성 중심(1151,150) — cover 배치를 화면 좌표로 환산
@@ -229,7 +231,12 @@
     }
     function setMouth(open) {
       var want = open ? FRONT_IMG : WALK_IMG;
-      if (img.src.indexOf(want.split("/").pop()) === -1) img.src = want;
+      var w = open ? FRONT_W : WALK_W;
+      if (img.src.indexOf(want.split("/").pop()) === -1) {
+        x -= (w - el.offsetWidth) / 2; // 폭이 변해도 좌우 중심 유지
+        img.src = want;
+      }
+      el.style.width = w + "px";
     }
 
     function rnd(i) { var s = Math.sin((i + 1) * 127.1) * 43758.5453; return s - Math.floor(s); }
@@ -276,7 +283,7 @@
       word.style.opacity = "0";
       setTimeout(function () { if (word.style.opacity === "0") word.style.visibility = "hidden"; }, 520);
       var h = el.offsetHeight;
-      var mouthX = x + CHAR_W * MOUTH_FX;
+      var mouthX = x + el.offsetWidth * MOUTH_FX;
       var mouthY = groundY() - h + h * MOUTH_FY;
       var kids = Array.prototype.slice.call(cont.children);
       var tg = targets();
@@ -365,7 +372,7 @@
       var gs = sat.r * 2.9; // 토성 자체만 살짝 밝게
       glow.style.width = gs + "px"; glow.style.height = gs + "px";
       glow.style.transform = "translate(" + (sat.x - gs / 2) + "px," + (sat.y - gs / 2) + "px)";
-      var ccx = x + CHAR_W / 2;
+      var ccx = x + el.offsetWidth / 2;
       var dN = (ccx - sat.x) / W; // 토성 기준 좌우 거리(-: 토성이 오른쪽)
       var sw2 = CHAR_W * (0.74 + Math.min(0.5, Math.abs(dN)) * 0.6) * (1 - hop / 40);
       var sh2 = sw2 * 0.17;
@@ -429,17 +436,30 @@
       }, 60);
     }, 2600);
 
+    function closeCards() {
+      for (var i = 0; i < cards.length; i++) { cards[i].el.style.opacity = "0"; cards[i].el.style.pointerEvents = "none"; }
+      cards = [];
+      word.style.visibility = "visible"; word.style.opacity = "1";
+      mode = "idle"; gaitUntil = 0;
+      setMouth(isMobile());
+      if (hint) hint.style.display = ""; // 돌아오면 멘트 다시
+    }
+
+    // 카드가 떠 있을 때 빈 배경을 눌러도 닫힘(카드·고브럽 클릭은 제외)
+    document.addEventListener("click", function (ev) {
+      if (mode !== "cards") return;
+      if (el.contains(ev.target)) return;
+      var t = ev.target;
+      while (t && t !== document.body) {
+        if (t.classList && t.classList.contains("gm-card")) return;
+        t = t.parentNode;
+      }
+      closeCards();
+    });
+
     el.addEventListener("click", function () {
       if (mode === "run" || mode === "spit") return;
-      if (mode === "cards") {
-        for (var i = 0; i < cards.length; i++) { cards[i].el.style.opacity = "0"; cards[i].el.style.pointerEvents = "none"; }
-        cards = [];
-        word.style.visibility = "visible"; word.style.opacity = "1";
-        mode = "idle"; gaitUntil = 0;
-        setMouth(isMobile());
-        if (hint) hint.style.display = ""; // 돌아오면 멘트 다시
-        return;
-      }
+      if (mode === "cards") { closeCards(); return; }
       if (hint) hint.style.display = "none";
       if (isMobile()) { beginSpit(Date.now()); } // 모바일은 그 자리에서 바로
       else mode = "run";
