@@ -248,7 +248,9 @@
       } else if (mode === "idle") {
         if (isMobile()) {
           x = centerX(); gait = "stand"; dir = 1;
+          setMouth(true); // 모바일은 늘 정면
         } else {
+          setMouth(false);
           if (now > gaitUntil) pickGait(now);
           var sp = gait === "dash" ? 400 : gait === "walk" ? WALK_SPEED : 0;
           x += dir * sp * dt;
@@ -329,7 +331,7 @@
         cards = [];
         word.style.visibility = "visible"; word.style.opacity = "1";
         mode = "idle"; gaitUntil = 0;
-        setMouth(false);
+        setMouth(isMobile());
         if (hint) hint.style.display = ""; // 돌아오면 멘트 다시
         return;
       }
