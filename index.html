@@ -21,22 +21,20 @@
     /* 하늘만 진한 남색으로(아래 지면쪽으로 갈수록 사라짐) */
     .gm-tint {
       position: absolute; inset: 0; z-index: 1; pointer-events: none;
-      background: linear-gradient(180deg, rgba(12, 22, 66, .62) 0%, rgba(12, 22, 66, .42) 42%, rgba(12, 22, 66, 0) 72%);
+      background: linear-gradient(180deg, rgba(8, 14, 56, .82) 0%, rgba(8, 14, 56, .56) 45%, rgba(8, 14, 56, 0) 74%);
       mix-blend-mode: multiply;
     }
     /* 토성 글로우 */
     .gm-glow {
       position: absolute; left: 0; top: 0; z-index: 2; pointer-events: none;
       border-radius: 50%; mix-blend-mode: screen;
-      background: radial-gradient(circle, rgba(255, 228, 165, .9) 0%, rgba(255, 205, 125, .38) 30%, rgba(255, 195, 115, 0) 68%);
-      animation: gm-glowp 3.2s ease-in-out infinite; will-change: opacity;
+      background: radial-gradient(circle, rgba(255, 228, 170, .55) 0%, rgba(255, 210, 135, .2) 42%, rgba(255, 200, 120, 0) 66%);
     }
-    @keyframes gm-glowp { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
     /* 토성 광원 기준 고브럽 그림자 */
     .gm-shad {
       position: absolute; left: 0; top: 0; z-index: 9; pointer-events: none;
       border-radius: 50%; filter: blur(3px);
-      background: radial-gradient(ellipse at center, rgba(6, 14, 26, .52) 0%, rgba(6, 14, 26, .3) 45%, rgba(6, 14, 26, 0) 72%);
+      background: radial-gradient(ellipse at center, rgba(4, 10, 20, .68) 0%, rgba(4, 10, 20, .4) 45%, rgba(4, 10, 20, 0) 72%);
       will-change: transform, width, opacity;
     }
     body.home-moon a { color: #ffe9b8; text-decoration: none; }
@@ -357,7 +355,7 @@
 
       // 토성 글로우 + 광원 기준 그림자(방향·거리 따라 위치/크기 변화)
       var sat = saturnPos();
-      var gs = sat.r * 5.4;
+      var gs = sat.r * 2.9; // 토성 자체만 살짝 밝게
       glow.style.width = gs + "px"; glow.style.height = gs + "px";
       glow.style.transform = "translate(" + (sat.x - gs / 2) + "px," + (sat.y - gs / 2) + "px)";
       var ccx = x + CHAR_W / 2;
@@ -365,7 +363,7 @@
       var sw2 = CHAR_W * (0.74 + Math.min(0.5, Math.abs(dN)) * 0.6) * (1 - hop / 40);
       var sh2 = sw2 * 0.17;
       shad.style.width = sw2 + "px"; shad.style.height = sh2 + "px";
-      shad.style.opacity = String(0.8 - Math.min(0.34, Math.abs(dN) * 0.5) - hop / 30);
+      shad.style.opacity = String(0.94 - Math.min(0.3, Math.abs(dN) * 0.45) - hop / 30);
       var dC = Math.max(-0.6, Math.min(0.6, dN)); // 화면 밖 광원일 때 과하게 밀리지 않게
       shad.style.transform = "translate(" + (ccx + dC * 110 - sw2 / 2) + "px," + (groundY() - sh2 / 2 - 3) + "px)";
 
