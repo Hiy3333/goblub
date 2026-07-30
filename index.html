@@ -376,7 +376,7 @@
 
       // 전경 로켓(고브럽 2배 크기 — 타고 온 우주선): 발밑 라인에 심어두기
       var ow = isMobile() ? 100 : 190, oh = ow * 1.882;
-      var ox = isMobile() ? Math.min(W * 0.72, W - ow - 6) : W * 0.70;
+      var ox = isMobile() ? Math.min(W * 0.72, W - ow - 6) : Math.min(W * 0.78, W - ow - 24);
       obj.style.width = ow + "px";
       obj.style.transform = "translate(" + ox + "px," + (groundY() + 16 - oh) + "px) rotate(-3deg)";
 
