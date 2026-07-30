@@ -129,21 +129,23 @@
     .gm-goblub .bodywrap { position: relative; width: 100%; will-change: transform; }
     .gm-goblub img { width: 100%; height: auto; display: block; user-select: none; -webkit-user-drag: none;
       filter: drop-shadow(0 8px 9px rgba(0, 22, 32, .22)); }
-    /* 입 소용돌이 회전(옆모습으로 걸을 때만) — 입 부분만 원형 클립해서 돌린다 */
-    .gm-mouth { position: absolute; left: 55%; top: 38%; width: 34%; height: 33.3%;
-      border-radius: 50%; overflow: hidden; pointer-events: none; }
-    .gm-mouth img { position: absolute; width: 294.1%; max-width: none; left: -161.8%; top: -114.1%;
-      transform-origin: 72% 54.6%; animation: gm-spin 2.4s linear infinite; filter: none; }
+    /* 입 소용돌이 회전(옆모습으로 걸을 때만) — 소용돌이 중심(0.7253,0.541), 이빨 밖 반경 15.2%만 클립 */
+    .gm-mouth { position: absolute; left: 57.33%; top: 39.22%; width: 30.4%; height: 29.75%;
+      border-radius: 50%; overflow: hidden; pointer-events: none;
+      -webkit-mask-image: radial-gradient(circle, #000 58%, transparent 96%);
+      mask-image: radial-gradient(circle, #000 58%, transparent 96%); }
+    .gm-mouth img { position: absolute; width: 328.9%; max-width: none; left: -188.6%; top: -131.8%;
+      transform-origin: 72.53% 54.1%; animation: gm-spin 2.4s linear infinite; filter: none; }
     @keyframes gm-spin { to { transform: rotate(360deg); } }
     .gm-goblub.front .gm-mouth { display: none; }
-    /* 꼬리 구슬 빛(첫 클릭 후 계속) */
-    .gm-orb { position: absolute; left: -9%; top: 41.4%; width: 36%; aspect-ratio: 1;
+    /* 꼬리 구슬 빛(클릭한 동안만) */
+    .gm-orb { position: absolute; left: -14%; top: 36.5%; width: 46%; aspect-ratio: 1;
       border-radius: 50%; pointer-events: none; display: none; mix-blend-mode: screen;
-      background: radial-gradient(circle, rgba(175, 235, 255, .95) 0%, rgba(125, 205, 255, .4) 40%, rgba(125, 205, 255, 0) 68%);
-      animation: gm-orbp 1.6s ease-in-out infinite; }
-    .gm-goblub.front .gm-orb { left: -10%; top: 40.7%; }
+      background: radial-gradient(circle, rgba(215, 248, 255, 1) 0%, rgba(150, 220, 255, .7) 34%, rgba(130, 210, 255, 0) 68%);
+      animation: gm-orbp 1.3s ease-in-out infinite; }
+    .gm-goblub.front .gm-orb { left: -15%; top: 35.4%; }
     .gm-goblub.orbon .gm-orb { display: block; }
-    @keyframes gm-orbp { 0%, 100% { opacity: .5; transform: scale(.9); } 50% { opacity: 1; transform: scale(1.1); } }
+    @keyframes gm-orbp { 0%, 100% { opacity: .6; transform: scale(.88); } 50% { opacity: 1; transform: scale(1.18); } }
     .gm-hint {
       position: absolute; left: 50%; top: -60px; transform: translateX(-50%);
       background: #f7ecc8; color: #35506a; font-size: 1.18rem; padding: 9px 19px;
@@ -595,6 +597,7 @@
       word.style.visibility = "visible"; word.style.opacity = "1";
       mode = "idle"; gaitUntil = 0;
       setMouth(isMobile());
+      el.classList.remove("orbon"); // 산책으로 돌아가면 구슬 빛 끔
       if (hint) hint.style.display = ""; // 돌아오면 멘트 다시
     }
 
@@ -611,9 +614,9 @@
     });
 
     el.addEventListener("click", function () {
-      el.classList.add("orbon"); // 클릭된 순간부터 꼬리 구슬이 계속 빛남
       if (mode === "run" || mode === "spit") return;
       if (mode === "cards") { closeCards(); return; }
+      el.classList.add("orbon"); // 클릭한 동안(달리기·카드)만 꼬리 구슬이 빛남
       if (hint) hint.style.display = "none";
       if (isMobile()) { beginSpit(Date.now()); } // 모바일은 그 자리에서 바로
       else mode = "run";
