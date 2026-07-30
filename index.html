@@ -122,7 +122,7 @@
   </div>
 
   <div class="gm-goblub" id="gm-goblub">
-    <div class="gm-hint" id="gm-hint">나를 눌러봐!</div>
+    <div class="gm-hint" id="gm-hint">나를 눌러봐~</div>
     <img id="gm-img" src="design/img/home/gb-walk.webp" alt="고브럽" draggable="false" />
   </div>
 
@@ -135,7 +135,15 @@
     var WALK_IMG = "design/img/home/gb-walk.webp";
     var FRONT_IMG = "design/img/home/gb-front.webp";
     var MOUTH_FX = 0.593, MOUTH_FY = 0.539; // 정면 이미지 입 중심
-    var WALK_SPEED = 200, SPIT_POWER = 1600, CHAR_W = 170;
+    var WALK_SPEED = 200, RUN_SPEED = 1250, SPIT_POWER = 1600, CHAR_W = 170;
+    var HINTS = [
+      "나를 눌러봐~",
+      "심심하지? 콕 눌러봐!",
+      "여기야 여기~ 클릭!",
+      "놀 거 잔뜩 물고 있어!",
+      "누르면 좋은 일 생김 ✦",
+      "입 벌리면 놀라지 마!"
+    ];
 
     var el = document.getElementById("gm-goblub");
     var img = document.getElementById("gm-img");
@@ -213,7 +221,7 @@
       if (mode === "run") {
         var cx = centerX();
         dir = cx > x ? 1 : -1;
-        x += dir * 640 * dt;
+        x += dir * RUN_SPEED * dt;
         if (Math.abs(x - cx) < 14) { x = cx; beginSpit(now); }
       } else if (mode === "idle" && now > pauseUntil) {
         x += dir * WALK_SPEED * dt;
@@ -267,6 +275,19 @@
         }
       }
     }
+
+    var hintIdx = 0;
+    var hintTimer = setInterval(function () {
+      if (!hint || hint.style.display === "none") { clearInterval(hintTimer); return; }
+      hintIdx = (hintIdx + 1) % HINTS.length;
+      hint.style.transition = "none";
+      hint.style.opacity = "0";
+      hint.textContent = HINTS[hintIdx];
+      setTimeout(function () {
+        hint.style.transition = "opacity .25s";
+        hint.style.opacity = "1";
+      }, 60);
+    }, 2600);
 
     el.addEventListener("click", function () {
       if (mode === "run" || mode === "spit") return;
