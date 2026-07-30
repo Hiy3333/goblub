@@ -33,8 +33,16 @@
     /* 전경 오브젝트(로켓): 고브럽이 뒤로 지나가면 가려짐 */
     .gm-obj {
       position: absolute; left: 0; top: 0; z-index: 12; pointer-events: none;
-      filter: drop-shadow(-6px 10px 10px rgba(0, 22, 32, .38));
+      filter: drop-shadow(-6px 10px 10px rgba(0, 22, 32, .28));
     }
+    /* 우주선 창문 빼꼼(원형 클립 속 고브럽 눈) */
+    .gm-peek {
+      position: absolute; left: 0; top: 0; z-index: 13; pointer-events: none;
+      border-radius: 50%; overflow: hidden; background: #22333c;
+      opacity: 0; transition: opacity .28s;
+    }
+    .gm-peek img { position: absolute; display: block; }
+    .gm-goblub { transition: opacity .18s; }
     /* 토성 광원 기준 고브럽 그림자 */
     .gm-shad {
       position: absolute; left: 0; top: 0; z-index: 9; pointer-events: none;
@@ -150,6 +158,8 @@
   <div class="gm-glow" id="gm-glow"></div>
   <div class="gm-shad" id="gm-shad"></div>
   <img class="gm-obj" id="gm-obj" src="design/img/home/obj-rocket.webp" alt="" draggable="false" />
+  <div class="gm-shad" id="gm-objshad"></div>
+  <div class="gm-peek" id="gm-peek"><img src="design/img/home/gb-front.webp" alt="" /></div>
 
   <span class="gm-star" style="top:22%;left:14%;font-size:1rem;">✦</span>
   <span class="gm-star" style="top:36%;right:20%;font-size:.8rem;animation-delay:-1.2s;">✦</span>
@@ -199,6 +209,11 @@
     var glow = document.getElementById("gm-glow");
     var shad = document.getElementById("gm-shad");
     var obj = document.getElementById("gm-obj");
+    var objshad = document.getElementById("gm-objshad");
+    var peek = document.getElementById("gm-peek");
+
+    // 우주선 탑승 시퀀스: in(들어감)→peek(창문 빼꼼)→out(나옴)
+    var ship = null, lastShipAt = Date.now() - 6000;
 
     var x = window.innerWidth * 0.3, dir = 1;
     var mode = "idle"; // idle | run | spit | cards
@@ -261,7 +276,7 @@
         }
       } else {
         // 고양이 타로처럼: 세로형 카드가 아크 위에서 왼쪽→오른쪽 부채꼴로 촤라락
-        var cw2 = Math.min(185, W * 0.15), ch2 = Math.round(cw2 * 1.24);
+        var cw2 = Math.min(204, W * 0.165), ch2 = Math.round(cw2 * 1.24); // +10%
         var span = Math.min(W * 0.80, 1100);   // 부채 전체 폭(양끝 카드 중심 간)
         var cy = H * 0.40, curve = H * 0.16;   // 가운데가 높고 양끝이 내려오는 호
         for (var j = 0; j < n; j++) {
@@ -340,11 +355,30 @@
           setMouth(true); // 모바일은 늘 정면
         } else {
           setMouth(false);
-          if (now > gaitUntil) pickGait(now);
-          var sp = gait === "dash" ? 400 : gait === "walk" ? WALK_SPEED : 0;
-          x += dir * sp * dt;
-          if (x > maxX) { x = maxX; dir = -1; gait = "walk"; gaitUntil = now + 600; }
-          if (x < minX) { x = minX; dir = 1; gait = "walk"; gaitUntil = now + 600; }
+          if (ship) {
+            if (now > ship.until) {
+              if (ship.phase === "in") { peek.style.opacity = "1"; ship = { phase: "peek", until: now + 1500 }; }
+              else if (ship.phase === "peek") { peek.style.opacity = "0"; ship = { phase: "out", until: now + 350 }; }
+              else { // 다시 나와서 걸어다니기
+                el.style.opacity = "1"; el.style.pointerEvents = "";
+                ship = null; lastShipAt = now;
+                dir = -1; gait = "walk"; gaitUntil = now + 1100;
+              }
+            }
+          } else {
+            if (now > gaitUntil) pickGait(now);
+            var sp = gait === "dash" ? 400 : gait === "walk" ? WALK_SPEED : 0;
+            x += dir * sp * dt;
+            if (x > maxX) { x = maxX; dir = -1; gait = "walk"; gaitUntil = now + 600; }
+            if (x < minX) { x = minX; dir = 1; gait = "walk"; gaitUntil = now + 600; }
+            // 우주선 문 앞을 지나면 (12초에 한 번) 들어갔다 나온다
+            var doorX = Math.min(W * 0.78, W - 190 - 24) + 95;
+            if (sp > 0 && now - lastShipAt > 12000 && Math.abs(x + el.offsetWidth / 2 - doorX) < 16) {
+              x = doorX - el.offsetWidth / 2;
+              el.style.opacity = "0"; el.style.pointerEvents = "none";
+              ship = { phase: "in", until: now + 500 };
+            }
+          }
         }
       }
       if (mode === "spit" && now > mouthCloseAt) mode = "cards";
@@ -386,8 +420,28 @@
       // 전경 로켓(고브럽 2배 크기 — 타고 온 우주선): 발밑 라인에 심어두기
       var ow = isMobile() ? 100 : 190, oh = ow * 1.882;
       var ox = isMobile() ? Math.min(W * 0.72, W - ow - 6) : Math.min(W * 0.78, W - ow - 24);
+      var oy = groundY() + 16 - oh;
       obj.style.width = ow + "px";
-      obj.style.transform = "translate(" + ox + "px," + (groundY() + 16 - oh) + "px) rotate(-3deg)";
+      obj.style.transform = "translate(" + ox + "px," + oy + "px) rotate(-3deg)";
+
+      // 우주선 그림자(토성 광원 기준)
+      var rcx = ox + ow / 2;
+      var rdN = Math.max(-0.6, Math.min(0.6, (rcx - sat.x) / W));
+      var rsw = ow * 1.18, rsh = rsw * 0.16;
+      objshad.style.width = rsw + "px"; objshad.style.height = rsh + "px";
+      objshad.style.opacity = "0.62";
+      objshad.style.transform = "translate(" + (rcx + rdN * 90 - rsw / 2) + "px," + (groundY() + 12 - rsh / 2) + "px)";
+
+      // 창문 빼꼼 원형 클립 위치(창 중심 0.65, 0.44 / 유리 지름 0.24×몸폭)
+      var pd = ow * 0.24;
+      peek.style.width = pd + "px"; peek.style.height = pd + "px";
+      peek.style.transform = "translate(" + (ox + ow * 0.65 - pd / 2) + "px," + (oy + oh * 0.44 - pd / 2) + "px) rotate(-3deg)";
+      var pimg = peek.firstElementChild;
+      pimg.style.width = (pd * 3.4) + "px";
+      pimg.style.left = (-1.2 * pd) + "px";
+      pimg.style.top = (-0.1 * pd) + "px";
+
+      if (ship) shad.style.opacity = "0"; // 안에 들어가 있을 땐 고브럽 그림자도 숨김
 
       var face = (mode === "spit" || mode === "cards") ? 1 : dir;
       img.style.transformOrigin = "50% 100%";
@@ -480,6 +534,7 @@
           el.style.visibility = "visible";
           obj.style.visibility = "visible";
           shad.style.visibility = "visible";
+          objshad.style.visibility = "visible";
           glow.style.visibility = "visible";
         }
       } catch (e) {}
