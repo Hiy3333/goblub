@@ -101,32 +101,29 @@
     .gm-cards { position: absolute; inset: 0; z-index: 20; pointer-events: none; }
     .gm-card {
       position: absolute; left: 0; top: 0; opacity: 0; pointer-events: none;
-      display: grid; grid-template-columns: 58px 1fr; grid-template-rows: auto auto;
-      column-gap: 15px; row-gap: 3px; align-content: center; align-items: center;
-      width: 250px; height: 150px; border-radius: 20px; padding: 16px 20px; box-sizing: border-box;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+      width: 250px; height: 190px; border-radius: 18px; padding: 12px; box-sizing: border-box;
       background: linear-gradient(180deg, #f9f0d4, #efe3bd);
-      color: #235a6b; text-align: left; border: 3px solid rgba(29, 90, 107, .25);
-      box-shadow: 0 18px 38px rgba(0, 22, 32, .5), inset 0 2px 0 rgba(255,255,255,.8);
+      color: #235a6b; text-align: center; border: 3px solid rgba(29, 90, 107, .25);
+      box-shadow: 0 16px 32px rgba(0, 22, 32, .48), inset 0 2px 0 rgba(255,255,255,.8);
       will-change: transform; transform-origin: center;
     }
     body.home-moon .gm-card, body.home-moon .gm-card:hover { color: #235a6b; }
     .gm-card:hover { border-color: rgba(29, 90, 107, .55);
-      box-shadow: 0 24px 46px rgba(0, 22, 32, .58), inset 0 2px 0 rgba(255,255,255,.8); }
+      box-shadow: 0 22px 42px rgba(0, 22, 32, .58), inset 0 2px 0 rgba(255,255,255,.8); }
     .gm-card .ic {
       display: flex; align-items: center; justify-content: center;
-      grid-row: 1 / 3; width: 58px; height: 58px; border-radius: 50%;
+      width: 56px; height: 56px; border-radius: 50%;
       box-shadow: inset 0 -4px 8px rgba(29, 90, 107, .14), inset 0 2px 3px rgba(255,255,255,.7);
-      font-size: 1.8rem; line-height: 1;
+      font-size: 1.7rem; line-height: 1;
     }
-    .gm-card .tt { font-size: 1.32rem; line-height: 1.1; align-self: end; }
-    .gm-card .ds { font-size: .82rem; color: #58818c; align-self: start; }
-    /* 모바일 카드는 이전 세로형 2열 그리드 (.gm-card 기본 규칙보다 뒤에 있어야 이김) */
+    .gm-card .tt { font-size: 1.2rem; line-height: 1.1; }
+    .gm-card .ds { font-size: .76rem; color: #58818c; }
     @media (max-width: 700px) {
-      .gm-card { display: flex; flex-direction: column; align-items: center; justify-content: center;
-        gap: 7px; text-align: center; padding: 10px; }
+      .gm-card { gap: 7px; padding: 10px; }
       .gm-card .ic { width: 52px; height: 52px; font-size: 1.6rem; }
-      .gm-card .tt { font-size: 1.12rem; align-self: auto; }
-      .gm-card .ds { font-size: .72rem; align-self: auto; }
+      .gm-card .tt { font-size: 1.12rem; }
+      .gm-card .ds { font-size: .72rem; }
     }
 
     .gm-footer { position: absolute; bottom: 10px; right: 16px; z-index: 4;
@@ -249,14 +246,17 @@
           out.push({ x: (W - rowW) / 2 + c0 * (cw + gap), y: mTop + r * (ch + gap), w: cw, h: ch, rot: 0 });
         }
       } else {
-        // 왼쪽에서 시작해 시계방향 링(아래 중앙은 고브럽 자리) — 카드끼리 안 겹침
-        var cw2 = Math.min(270, W * 0.21), ch2 = 150;
-        var SLOT = [[0.14, 0.46], [0.19, 0.20], [0.41, 0.24], [0.63, 0.21], [0.85, 0.34], [0.86, 0.58], [0.70, 0.78]];
+        // 고양이 타로처럼: 세로형 카드가 아크 위에서 왼쪽→오른쪽 부채꼴로 촤라락
+        var cw2 = Math.min(185, W * 0.15), ch2 = Math.round(cw2 * 1.24);
+        var span = Math.min(W * 0.80, 1100);   // 부채 전체 폭(양끝 카드 중심 간)
+        var cy = H * 0.42, curve = H * 0.12;   // 가운데가 높고 양끝이 내려오는 호
         for (var j = 0; j < n; j++) {
-          var s = SLOT[j % SLOT.length];
+          var t = j / (n - 1) - 0.5;
           out.push({
-            x: s[0] * W - cw2 / 2, y: s[1] * H - ch2 / 2, w: cw2, h: ch2,
-            rot: (j % 2 ? 1 : -1) * (2.5 + rnd(j + 3) * 3.5)
+            x: W / 2 + t * span - cw2 / 2,
+            y: cy + t * t * 4 * curve - ch2 / 2,
+            w: cw2, h: ch2,
+            rot: t * 36 // 부채살 기울기: 왼쪽 -18° ~ 오른쪽 +18°
           });
         }
       }
@@ -290,7 +290,7 @@
           k.addEventListener("mouseenter", function () {
             if (!this._fin) return;
             this.style.zIndex = "99";
-            this.style.transform = "translate(" + this._fin.x + "px," + this._fin.y + "px) rotate(0deg) scale(1.06)";
+            this.style.transform = "translate(" + this._fin.x + "px," + (this._fin.y - 14) + "px) rotate(0deg) scale(1.06)";
           });
           k.addEventListener("mouseleave", function () {
             if (!this._fin) return;
