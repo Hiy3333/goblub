@@ -30,6 +30,18 @@
       border-radius: 50%; mix-blend-mode: screen;
       background: radial-gradient(circle, rgba(255, 228, 170, .55) 0%, rgba(255, 210, 135, .2) 42%, rgba(255, 200, 120, 0) 66%);
     }
+    /* 펠트 질감 3D 땅(하단 오버레이, 위쪽은 배경으로 자연스럽게 페이드) */
+    .gm-ground {
+      position: absolute; left: 0; right: 0; bottom: 0; z-index: 8; pointer-events: none;
+      width: 100%; height: 40vh; object-fit: cover; object-position: center bottom;
+      -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 36%);
+      mask-image: linear-gradient(180deg, transparent 0, #000 36%);
+    }
+    /* 전경 오브젝트(로켓): 고브럽이 뒤로 지나가면 가려지고 눈만 빼꼼 */
+    .gm-obj {
+      position: absolute; left: 0; top: 0; z-index: 12; pointer-events: none;
+      filter: drop-shadow(-6px 10px 10px rgba(0, 22, 32, .38));
+    }
     /* 토성 광원 기준 고브럽 그림자 */
     .gm-shad {
       position: absolute; left: 0; top: 0; z-index: 9; pointer-events: none;
@@ -124,7 +136,7 @@
       .gm-card .ds { font-size: .72rem; }
     }
 
-    .gm-footer { position: absolute; bottom: 10px; right: 16px; z-index: 4;
+    .gm-footer { position: absolute; bottom: 10px; right: 16px; z-index: 13;
       color: rgba(230, 240, 235, .55); font-size: .75rem; pointer-events: none; }
     body.home-moon .site-footer { display: none; }
     /* 홈에서는 떠다니는 버디 숨김(걸어다니는 고브럽과 중복) */
@@ -141,7 +153,9 @@
 
   <div class="gm-tint"></div>
   <div class="gm-glow" id="gm-glow"></div>
+  <img class="gm-ground" src="design/img/home/ground-felt.webp" alt="" draggable="false" />
   <div class="gm-shad" id="gm-shad"></div>
+  <img class="gm-obj" id="gm-obj" src="design/img/home/obj-rocket.webp" alt="" draggable="false" />
 
   <span class="gm-star" style="top:22%;left:14%;font-size:1rem;">✦</span>
   <span class="gm-star" style="top:36%;right:20%;font-size:.8rem;animation-delay:-1.2s;">✦</span>
@@ -188,6 +202,7 @@
     var cont = document.getElementById("gm-cards");
     var glow = document.getElementById("gm-glow");
     var shad = document.getElementById("gm-shad");
+    var obj = document.getElementById("gm-obj");
 
     var x = window.innerWidth * 0.3, dir = 1;
     var mode = "idle"; // idle | run | spit | cards
@@ -294,13 +309,13 @@
             this.style.transform = "translate(" + this._fin.x + "px," + this._fin.y + "px) rotate(" + this._fin.rot + "deg)";
           });
         }
-        var t0 = Date.now() + 90 + i * 85; // 왼쪽부터 한 장씩 챠라락
+        var t0 = Date.now() + 80 + i * 70; // 왼쪽부터 한 장씩 챠라라락
         var tcx = tg[i].x + tg[i].w / 2, tcy = tg[i].y + tg[i].h / 2;
         return {
           el: k, x: mouthX - tg[i].w / 2, y: mouthY - tg[i].h / 2,
-          // 제 슬롯을 향해 위로 크게 포물선을 그리며 날아감(딜링 느낌)
-          vx: (tcx - mouthX) * 2.6, vy: (tcy - mouthY) * 2.6 - 430,
-          rot: (Math.random() - 0.5) * 26, vr: (Math.random() - 0.5) * 260,
+          // 제 슬롯을 향해 위로 크게 포물선을 그리며 세차게 날아감(딜링 느낌)
+          vx: (tcx - mouthX) * 3.3, vy: (tcy - mouthY) * 3.3 - 620,
+          rot: (Math.random() - 0.5) * 30, vr: (Math.random() - 0.5) * 560,
           rotF: tg[i].rot, z: 5 + i,
           tx: tg[i].x, ty: tg[i].y, t0: t0, t1: t0 + 300,
           fx: 0, fy: 0, frot: 0, done: false
@@ -367,6 +382,11 @@
       var dC = Math.max(-0.6, Math.min(0.6, dN)); // 화면 밖 광원일 때 과하게 밀리지 않게
       shad.style.transform = "translate(" + (ccx + dC * 110 - sw2 / 2) + "px," + (groundY() - sh2 / 2 - 3) + "px)";
 
+      // 전경 로켓: 발밑 라인에 심어두기(고브럽이 뒤로 지나가면 눈만 빼꼼)
+      var ow = isMobile() ? 84 : 100, oh = ow * 1.438;
+      obj.style.width = ow + "px";
+      obj.style.transform = "translate(" + (W * (isMobile() ? 0.76 : 0.72)) + "px," + (groundY() + 14 - oh) + "px) rotate(-3deg)";
+
       var face = (mode === "spit" || mode === "cards") ? 1 : dir;
       img.style.transformOrigin = "50% 100%";
       img.style.transform = "rotate(" + (rock + lean) + "deg) scaleX(" + (face * (sx + step)) + ") scaleY(" + (sy - step) + ")";
@@ -384,12 +404,13 @@
           kEl.style.transform = "translate(" + p.x + "px, " + p.y + "px) rotate(" + p.rot + "deg) scale(" + sc + ")";
           p.fx = p.x; p.fy = p.y; p.frot = p.rot;
         } else {
-          var u = Math.min(1, (now - p.t1) / 540);
-          var e = 1 + 2.2 * Math.pow(u - 1, 3) + 1.2 * Math.pow(u - 1, 2);
+          var u = Math.min(1, (now - p.t1) / 440);
+          var e = 1 + 2.6 * Math.pow(u - 1, 3) + 1.6 * Math.pow(u - 1, 2);   // 크기 오버슈트
+          var eb = 1 + 3.2 * Math.pow(u - 1, 3) + 2.2 * Math.pow(u - 1, 2);  // 회전 오버슈트(휙-탁)
           var eo = 1 - Math.pow(1 - u, 3);
           var xx = p.fx + (p.tx - p.fx) * eo, yy = p.fy + (p.ty - p.fy) * eo;
-          var sc2 = Math.max(0.2, 0.55 + 0.45 * e);
-          var rot2 = p.frot + (p.rotF - p.frot) * eo; // 최종 기울기로 착지
+          var sc2 = Math.max(0.2, 0.5 + 0.5 * e);
+          var rot2 = p.frot + (p.rotF - p.frot) * eb; // 최종 기울기를 지나쳤다 되돌아오며 착지
           kEl.style.transform = "translate(" + xx + "px, " + yy + "px) rotate(" + rot2 + "deg) scale(" + sc2 + ")";
           if (u >= 1) {
             kEl.style.transform = "translate(" + p.tx + "px, " + p.ty + "px) rotate(" + p.rotF + "deg)";
