@@ -62,8 +62,8 @@
     .gm-goblub img { width: 100%; height: auto; display: block; user-select: none; -webkit-user-drag: none;
       filter: drop-shadow(0 14px 16px rgba(0, 22, 32, .45)); }
     .gm-hint {
-      position: absolute; left: 50%; top: -54px; transform: translateX(-50%);
-      background: #f7ecc8; color: #35506a; font-size: .95rem; padding: 8px 16px;
+      position: absolute; left: 50%; top: -60px; transform: translateX(-50%);
+      background: #f7ecc8; color: #35506a; font-size: 1.18rem; padding: 9px 19px;
       border-radius: 999px; white-space: nowrap;
       box-shadow: 0 8px 18px rgba(0, 22, 32, .35); animation: gm-hint 2s ease-in-out infinite;
     }
@@ -153,7 +153,21 @@
 
     var x = window.innerWidth * 0.3, dir = 1;
     var mode = "idle"; // idle | run | spit | cards
-    var pauseUntil = 0, squashT = 0, mouthCloseAt = 0;
+    var squashT = 0, mouthCloseAt = 0;
+
+    // 걸음새: 서기 ↔ 아장아장 ↔ 우다다다 를 무작위로 오간다
+    var gait = "walk", gaitUntil = 0;
+    function pickGait(now) {
+      var r = Math.random();
+      if (gait === "stand") gait = r < 0.55 ? "walk" : "dash";
+      else if (r < 0.28) gait = "stand";
+      else gait = gait === "walk" ? "dash" : "walk";
+      var dur = gait === "stand" ? 500 + Math.random() * 1000
+              : gait === "dash" ? 600 + Math.random() * 900
+              : 900 + Math.random() * 1600;
+      gaitUntil = now + dur;
+      if (gait !== "stand" && Math.random() < 0.22) dir = -dir;
+    }
     var cards = [];
     var last = Date.now();
 
@@ -221,22 +235,29 @@
       if (mode === "run") {
         var cx = centerX();
         dir = cx > x ? 1 : -1;
-        x += dir * RUN_SPEED * dt;
-        if (Math.abs(x - cx) < 14) { x = cx; beginSpit(now); }
-      } else if (mode === "idle" && now > pauseUntil) {
-        x += dir * WALK_SPEED * dt;
-        if (x > maxX) { x = maxX; dir = -1; pauseUntil = now + 700; }
-        if (x < minX) { x = minX; dir = 1; pauseUntil = now + 700; }
+        if (Math.abs(cx - x) <= RUN_SPEED * dt + 14) { x = cx; beginSpit(now); }
+        else x += dir * RUN_SPEED * dt;
+      } else if (mode === "idle") {
+        if (now > gaitUntil) pickGait(now);
+        var sp = gait === "dash" ? 560 : gait === "walk" ? WALK_SPEED : 0;
+        x += dir * sp * dt;
+        if (x > maxX) { x = maxX; dir = -1; gait = "walk"; gaitUntil = now + 600; }
+        if (x < minX) { x = minX; dir = 1; gait = "walk"; gaitUntil = now + 600; }
       }
       if (mode === "spit" && now > mouthCloseAt) mode = "cards";
 
-      var moving = mode === "run" || (mode === "idle" && now > pauseUntil);
-      var wf = mode === "run" ? 15 : 6.5;
+      var g = mode === "run" ? "run" : (mode === "idle" ? gait : "stand");
+      var moving = g === "run" || g === "walk" || g === "dash";
+      var wf = g === "run" ? 15 : g === "dash" ? 13 : 7;
       var ph = now / 1000 * wf;
-      var rock = moving ? Math.sin(ph) * (mode === "run" ? 6 : 4.5) : Math.sin(now / 1000 * 1.4) * 1.2;
-      var bob = moving ? Math.abs(Math.sin(ph)) * 3 : 0;
-      var step = moving ? Math.sin(ph * 2) * 0.02 : 0;
-      var y = groundY() - el.offsetHeight - bob;
+      var rock = g === "run" ? Math.sin(ph) * 6
+               : g === "dash" ? Math.sin(ph) * 7
+               : g === "walk" ? Math.sin(ph) * 4
+               : Math.sin(now / 1000 * 1.4) * 1.2;
+      var lean = g === "run" ? 8 : g === "dash" ? 6 : 0; // 달릴 땐 앞으로 기울기
+      var hop = (g === "run" || g === "dash") ? Math.abs(Math.sin(ph)) * 3 : 0;
+      var step = moving ? Math.sin(ph * 2) * 0.012 : 0;
+      var y = groundY() - el.offsetHeight - hop;
       var sx = 1, sy = 1;
       if (squashT > 0) {
         squashT -= dt;
@@ -246,7 +267,7 @@
       el.style.transform = "translate(" + x + "px, " + y + "px)";
       var face = (mode === "spit" || mode === "cards") ? 1 : dir;
       img.style.transformOrigin = "50% 100%";
-      img.style.transform = "rotate(" + rock + "deg) scaleX(" + (face * (sx + step)) + ") scaleY(" + (sy - step) + ")";
+      img.style.transform = "rotate(" + (rock + lean) + "deg) scaleX(" + (face * (sx + step)) + ") scaleY(" + (sy - step) + ")";
 
       for (var i = 0; i < cards.length; i++) {
         var p = cards[i];
@@ -277,8 +298,8 @@
     }
 
     var hintIdx = 0;
-    var hintTimer = setInterval(function () {
-      if (!hint || hint.style.display === "none") { clearInterval(hintTimer); return; }
+    setInterval(function () {
+      if (!hint || hint.style.display === "none") return;
       hintIdx = (hintIdx + 1) % HINTS.length;
       hint.style.transition = "none";
       hint.style.opacity = "0";
@@ -291,15 +312,16 @@
 
     el.addEventListener("click", function () {
       if (mode === "run" || mode === "spit") return;
-      if (hint) { hint.style.display = "none"; }
       if (mode === "cards") {
         for (var i = 0; i < cards.length; i++) { cards[i].el.style.opacity = "0"; cards[i].el.style.pointerEvents = "none"; }
         cards = [];
         word.style.visibility = "visible"; word.style.opacity = "1";
-        mode = "idle"; pauseUntil = 0;
+        mode = "idle"; gaitUntil = 0;
         setMouth(false);
+        if (hint) hint.style.display = ""; // 돌아오면 멘트 다시
         return;
       }
+      if (hint) hint.style.display = "none";
       mode = "run";
     });
 
