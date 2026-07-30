@@ -41,7 +41,15 @@
       border-radius: 50%; overflow: hidden; background: #22333c;
       opacity: 0; transition: opacity .28s;
     }
-    .gm-peek img { position: absolute; display: block; }
+    .gm-peek img { position: absolute; display: block; max-width: none; filter: none;
+      animation: gm-look 2.4s ease-in-out infinite; }
+    /* 창문 안에서 좌우 둘러보기 */
+    @keyframes gm-look {
+      0%, 12% { margin-left: 0; }
+      30%, 44% { margin-left: -9px; }
+      62%, 78% { margin-left: 9px; }
+      95%, 100% { margin-left: 0; }
+    }
     .gm-goblub { transition: opacity .18s; }
     /* 토성 광원 기준 고브럽 그림자 */
     .gm-shad {
@@ -100,8 +108,24 @@
     .gm-goblub { position: absolute; left: 0; top: 0; z-index: 10; width: 170px; cursor: pointer; will-change: transform; }
     /* 첫 프레임에서 위치 잡기 전까지 숨김(로드 직후 왼쪽 위에 깜빡 보이는 것 방지) */
     .gm-goblub, .gm-obj, .gm-shad, .gm-glow { visibility: hidden; }
+    .gm-goblub .bodywrap { position: relative; width: 100%; will-change: transform; }
     .gm-goblub img { width: 100%; height: auto; display: block; user-select: none; -webkit-user-drag: none;
       filter: drop-shadow(0 8px 9px rgba(0, 22, 32, .22)); }
+    /* 입 소용돌이 회전(옆모습으로 걸을 때만) — 입 부분만 원형 클립해서 돌린다 */
+    .gm-mouth { position: absolute; left: 55%; top: 38%; width: 34%; height: 33.3%;
+      border-radius: 50%; overflow: hidden; pointer-events: none; }
+    .gm-mouth img { position: absolute; width: 294.1%; max-width: none; left: -161.8%; top: -114.1%;
+      transform-origin: 72% 54.6%; animation: gm-spin 2.4s linear infinite; filter: none; }
+    @keyframes gm-spin { to { transform: rotate(360deg); } }
+    .gm-goblub.front .gm-mouth { display: none; }
+    /* 꼬리 구슬 빛(첫 클릭 후 계속) */
+    .gm-orb { position: absolute; left: -9%; top: 41.4%; width: 36%; aspect-ratio: 1;
+      border-radius: 50%; pointer-events: none; display: none; mix-blend-mode: screen;
+      background: radial-gradient(circle, rgba(175, 235, 255, .95) 0%, rgba(125, 205, 255, .4) 40%, rgba(125, 205, 255, 0) 68%);
+      animation: gm-orbp 1.6s ease-in-out infinite; }
+    .gm-goblub.front .gm-orb { left: -10%; top: 40.7%; }
+    .gm-goblub.orbon .gm-orb { display: block; }
+    @keyframes gm-orbp { 0%, 100% { opacity: .5; transform: scale(.9); } 50% { opacity: 1; transform: scale(1.1); } }
     .gm-hint {
       position: absolute; left: 50%; top: -60px; transform: translateX(-50%);
       background: #f7ecc8; color: #35506a; font-size: 1.18rem; padding: 9px 19px;
@@ -177,7 +201,11 @@
 
   <div class="gm-goblub" id="gm-goblub">
     <div class="gm-hint" id="gm-hint">나를 눌러봐~</div>
-    <img id="gm-img" src="design/img/home/gb-walk.webp" alt="고브럽" draggable="false" />
+    <div class="bodywrap" id="gm-body">
+      <img id="gm-img" src="design/img/home/gb-walk.webp" alt="고브럽" draggable="false" />
+      <div class="gm-mouth"><img src="design/img/home/gb-walk.webp" alt="" draggable="false" /></div>
+      <div class="gm-orb"></div>
+    </div>
   </div>
 
   <div class="gm-footer">© 2026 goblub</div>
@@ -202,6 +230,7 @@
     ];
 
     var el = document.getElementById("gm-goblub");
+    var bod = document.getElementById("gm-body");
     var img = document.getElementById("gm-img");
     var hint = document.getElementById("gm-hint");
     var word = document.getElementById("gm-word");
@@ -254,6 +283,7 @@
         img.src = want;
       }
       el.style.width = w + "px";
+      el.classList.toggle("front", !!open); // 정면일 땐 입 회전 숨김·구슬 위치 보정
     }
 
     function rnd(i) { var s = Math.sin((i + 1) * 127.1) * 43758.5453; return s - Math.floor(s); }
@@ -357,7 +387,7 @@
           setMouth(false);
           if (ship) {
             if (now > ship.until) {
-              if (ship.phase === "in") { peek.style.opacity = "1"; ship = { phase: "peek", until: now + 1500 }; }
+              if (ship.phase === "in") { peek.style.opacity = "1"; ship = { phase: "peek", until: now + 2600 }; }
               else if (ship.phase === "peek") { peek.style.opacity = "0"; ship = { phase: "out", until: now + 350 }; }
               else { // 다시 나와서 걸어다니기
                 el.style.opacity = "1"; el.style.pointerEvents = "";
@@ -435,17 +465,18 @@
       // 창문 빼꼼 원형 클립 위치(창 중심 0.65, 0.44 / 유리 지름 0.24×몸폭)
       var pd = ow * 0.24;
       peek.style.width = pd + "px"; peek.style.height = pd + "px";
-      peek.style.transform = "translate(" + (ox + ow * 0.65 - pd / 2) + "px," + (oy + oh * 0.44 - pd / 2) + "px) rotate(-3deg)";
+      peek.style.transform = "translate(" + (ox + ow * 0.65 - pd / 2) + "px," + (oy + oh * 0.44 - pd / 2) + "px)";
+      // 정면 이미지의 눈알 중심(0.565, 0.155)이 창 정중앙에 오도록
       var pimg = peek.firstElementChild;
-      pimg.style.width = (pd * 3.4) + "px";
-      pimg.style.left = (-1.2 * pd) + "px";
-      pimg.style.top = (-0.1 * pd) + "px";
+      pimg.style.width = (pd * 4.47) + "px";
+      pimg.style.left = (-2.026 * pd) + "px";
+      pimg.style.top = (-0.147 * pd) + "px";
 
       if (ship) shad.style.opacity = "0"; // 안에 들어가 있을 땐 고브럽 그림자도 숨김
 
       var face = (mode === "spit" || mode === "cards") ? 1 : dir;
-      img.style.transformOrigin = "50% 100%";
-      img.style.transform = "rotate(" + (rock + lean) + "deg) scaleX(" + (face * (sx + step)) + ") scaleY(" + (sy - step) + ")";
+      bod.style.transformOrigin = "50% 100%";
+      bod.style.transform = "rotate(" + (rock + lean) + "deg) scaleX(" + (face * (sx + step)) + ") scaleY(" + (sy - step) + ")";
 
       for (var i = 0; i < cards.length; i++) {
         var p = cards[i];
@@ -514,6 +545,7 @@
     });
 
     el.addEventListener("click", function () {
+      el.classList.add("orbon"); // 클릭된 순간부터 꼬리 구슬이 계속 빛남
       if (mode === "run" || mode === "spit") return;
       if (mode === "cards") { closeCards(); return; }
       if (hint) hint.style.display = "none";
