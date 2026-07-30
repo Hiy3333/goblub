@@ -30,11 +30,22 @@
       border-radius: 50%; mix-blend-mode: screen;
       background: radial-gradient(circle, rgba(255, 228, 170, .55) 0%, rgba(255, 210, 135, .2) 42%, rgba(255, 200, 120, 0) 66%);
     }
-    /* 전경 오브젝트(로켓): 고브럽이 뒤로 지나가면 가려짐 */
+    /* 전경 오브젝트(로켓): 고브럽이 뒤로 지나가면 가려짐. 누르면 발사! */
     .gm-obj {
-      position: absolute; left: 0; top: 0; z-index: 12; pointer-events: none;
+      position: absolute; left: 0; top: 0; z-index: 12; pointer-events: auto; cursor: pointer;
       filter: drop-shadow(-6px 10px 10px rgba(0, 22, 32, .28));
     }
+    /* 로켓 분사 불꽃 */
+    .gm-flame { position: absolute; left: 0; top: 0; z-index: 11; pointer-events: none; display: none; }
+    .gm-flame b {
+      display: block; width: 100%; height: 100%; transform-origin: 50% 0; filter: blur(1px);
+      background: radial-gradient(ellipse 50% 62% at 50% 22%, #fff6c9 0%, #ffb84d 42%, rgba(255, 110, 40, .85) 68%, rgba(255, 90, 30, 0) 100%);
+      border-radius: 50% 50% 62% 62%;
+      animation: gm-flick .12s ease-in-out infinite alternate;
+    }
+    .gm-flame.sputter b { animation: gm-sputter .32s steps(2) infinite; }
+    @keyframes gm-flick { from { opacity: .95; transform: scaleY(1); } to { opacity: .72; transform: scaleY(.8); } }
+    @keyframes gm-sputter { 0% { opacity: .85; transform: scaleY(.85); } 50% { opacity: .12; transform: scaleY(.35); } 100% { opacity: .6; transform: scaleY(.6); } }
     /* 우주선 창문 빼꼼(원형 클립 속 고브럽 눈) */
     .gm-peek {
       position: absolute; left: 0; top: 0; z-index: 13; pointer-events: none;
@@ -103,6 +114,13 @@
 
     .gm-star { position: absolute; z-index: 3; color: #f7ecc8; pointer-events: none; animation: gm-tw 2.8s ease-in-out infinite; }
     @keyframes gm-tw { 0%,100% { opacity: .4; transform: scale(.85); } 50% { opacity: 1; transform: scale(1.1); } }
+    /* 별똥별 */
+    .gm-meteor {
+      position: absolute; left: 0; top: 0; z-index: 3; pointer-events: none;
+      width: 130px; height: 2px; border-radius: 2px; opacity: 0;
+      background: linear-gradient(90deg, rgba(255, 250, 220, .95), rgba(255, 250, 220, 0));
+      box-shadow: 0 0 6px rgba(255, 250, 220, .5);
+    }
 
     /* 고브럽 */
     .gm-goblub { position: absolute; left: 0; top: 0; z-index: 10; width: 170px; cursor: pointer; will-change: transform; }
@@ -182,12 +200,17 @@
   <div class="gm-glow" id="gm-glow"></div>
   <div class="gm-shad" id="gm-shad"></div>
   <img class="gm-obj" id="gm-obj" src="design/img/home/obj-rocket.webp" alt="" draggable="false" />
+  <div class="gm-flame" id="gm-flame"><b></b></div>
   <div class="gm-shad" id="gm-objshad"></div>
   <div class="gm-peek" id="gm-peek"><img src="design/img/home/gb-front.webp" alt="" /></div>
 
   <span class="gm-star" style="top:22%;left:14%;font-size:1rem;">✦</span>
   <span class="gm-star" style="top:36%;right:20%;font-size:.8rem;animation-delay:-1.2s;">✦</span>
   <span class="gm-star" style="top:12%;left:38%;font-size:.7rem;animation-delay:-.6s;">✦</span>
+  <span class="gm-star" style="top:8%;left:64%;font-size:.85rem;animation-delay:-1.8s;">✦</span>
+  <span class="gm-star" style="top:30%;left:6%;font-size:.6rem;animation-delay:-2.2s;">✦</span>
+  <span class="gm-star" style="top:45%;left:30%;font-size:.65rem;animation-delay:-.9s;">✦</span>
+  <span class="gm-star" style="top:26%;left:52%;font-size:.55rem;animation-delay:-1.5s;">✧</span>
 
   <div class="gm-cards" id="gm-cards">
     <a class="gm-card" href="play/fortune-hub.html"><span class="ic" style="background:#cfe0e4">🔮</span><span class="tt">운세</span><span class="ds">사주·궁합·타로·전생·부적까지</span></a>
@@ -243,6 +266,14 @@
 
     // 우주선 탑승 시퀀스: in(들어감)→peek(창문 빼꼼)→out(나옴)
     var ship = null, lastShipAt = Date.now() - 6000;
+    var flame = document.getElementById("gm-flame");
+    var rocketFx = null; // 발사 시퀀스: up(불 뿜으며 상승)→sputter(연료 부족 픽픽)→fall(추락)→land(쿵)
+    obj.addEventListener("click", function () {
+      if (rocketFx || ship) return;
+      rocketFx = { phase: "up", t0: Date.now(), max: Math.min(window.innerHeight * 0.38, 330) };
+      flame.className = "gm-flame";
+      flame.style.display = "block";
+    });
 
     var x = window.innerWidth * 0.3, dir = 1;
     var mode = "idle"; // idle | run | spit | cards
@@ -403,7 +434,7 @@
             if (x < minX) { x = minX; dir = 1; gait = "walk"; gaitUntil = now + 600; }
             // 우주선 문 앞을 지나면 (12초에 한 번) 들어갔다 나온다
             var doorX = Math.min(W * 0.78, W - 190 - 24) + 95;
-            if (sp > 0 && now - lastShipAt > 12000 && Math.abs(x + el.offsetWidth / 2 - doorX) < 16) {
+            if (sp > 0 && !rocketFx && now - lastShipAt > 12000 && Math.abs(x + el.offsetWidth / 2 - doorX) < 16) {
               x = doorX - el.offsetWidth / 2;
               el.style.opacity = "0"; el.style.pointerEvents = "none";
               ship = { phase: "in", until: now + 500 };
@@ -451,15 +482,50 @@
       var ow = isMobile() ? 100 : 190, oh = ow * 1.882;
       var ox = isMobile() ? Math.min(W * 0.72, W - ow - 6) : Math.min(W * 0.78, W - ow - 24);
       var oy = groundY() + 16 - oh;
+
+      // 발사 시퀀스 진행
+      var rdy = 0, rjx = 0, rrot = -3, rsc = "";
+      if (rocketFx) {
+        var ft = now - rocketFx.t0;
+        if (rocketFx.phase === "up") {
+          var fp = Math.min(1, ft / 1100);
+          rdy = rocketFx.max * (1 - Math.pow(1 - fp, 2));
+          rjx = Math.sin(now / 18) * 1.6; // 분사 진동
+          if (fp >= 1) { rocketFx = { phase: "sputter", t0: now, max: rocketFx.max }; flame.className = "gm-flame sputter"; }
+        } else if (rocketFx.phase === "sputter") {
+          var fp2 = Math.min(1, ft / 1000);
+          rdy = rocketFx.max - 30 * fp2 + Math.sin(ft / 40) * 5; // 픽픽거리며 주춤
+          rrot = -3 + Math.sin(ft / 90) * 3;
+          if (fp2 >= 1) { rocketFx = { phase: "fall", t0: now, v: 0, dy: rdy }; flame.style.display = "none"; }
+        } else if (rocketFx.phase === "fall") {
+          rocketFx.v += 2600 * dt;
+          rocketFx.dy -= rocketFx.v * dt;
+          rdy = Math.max(0, rocketFx.dy);
+          rrot = -3 + Math.sin(now / 70) * 4; // 비틀비틀 추락
+          if (rocketFx.dy <= 0) { rocketFx = { phase: "land", t0: now }; }
+        } else { // 착지 쿵 스쿼시
+          var fp3 = Math.min(1, ft / 260);
+          var fk = Math.sin(fp3 * Math.PI) * 0.06;
+          rsc = " scale(" + (1 + fk) + "," + (1 - fk) + ")";
+          if (fp3 >= 1) { rocketFx = null; lastShipAt = now; } // 착륙 직후엔 잠시 탑승 안 함
+        }
+      }
       obj.style.width = ow + "px";
-      obj.style.transform = "translate(" + ox + "px," + oy + "px) rotate(-3deg)";
+      obj.style.transformOrigin = "50% 100%";
+      obj.style.transform = "translate(" + (ox + rjx) + "px," + (oy - rdy) + "px) rotate(" + rrot + "deg)" + rsc;
+      // 불꽃은 노즐 바로 아래를 따라간다
+      if (flame.style.display !== "none") {
+        var fw = ow * 0.36, fh = ow * 0.52;
+        flame.style.width = fw + "px"; flame.style.height = fh + "px";
+        flame.style.transform = "translate(" + (ox + rjx + ow / 2 - fw / 2) + "px," + (oy - rdy + oh - 10) + "px)";
+      }
 
       // 우주선 그림자(토성 광원 기준)
       var rcx = ox + ow / 2;
       var rdN = Math.max(-0.6, Math.min(0.6, (rcx - sat.x) / W));
-      var rsw = ow * 1.18, rsh = rsw * 0.16;
+      var rsw = ow * 1.18 * Math.max(0.6, 1 - rdy / 900), rsh = rsw * 0.16;
       objshad.style.width = rsw + "px"; objshad.style.height = rsh + "px";
-      objshad.style.opacity = "0.62";
+      objshad.style.opacity = String(Math.max(0.15, 0.62 - rdy / 650)); // 떠오르면 그림자가 옅어짐
       objshad.style.transform = "translate(" + (rcx + rdN * 90 - rsw / 2) + "px," + (groundY() + 12 - rsh / 2) + "px)";
 
       // 창문 빼꼼 원형 클립 위치(창 중심 0.65, 0.44 / 유리 지름 0.24×몸폭)
@@ -552,6 +618,26 @@
       if (isMobile()) { beginSpit(Date.now()); } // 모바일은 그 자리에서 바로
       else mode = "run";
     });
+
+    // 별똥별: 3~4초에 한 번쯤 하늘을 가로질러 떨어진다
+    function spawnMeteor() {
+      if (!document.body.animate) return;
+      var m = document.createElement("div");
+      m.className = "gm-meteor";
+      var W = window.innerWidth, H = window.innerHeight;
+      var sx = W * (0.15 + Math.random() * 0.75), sy = H * (0.04 + Math.random() * 0.3);
+      var ang = 145 + Math.random() * 20; // 왼쪽 아래로
+      var rad = ang * Math.PI / 180;
+      var dist = 180 + Math.random() * 220;
+      document.body.appendChild(m);
+      var a = m.animate([
+        { transform: "translate(" + sx + "px," + sy + "px) rotate(" + ang + "deg)", opacity: 0 },
+        { opacity: .95, offset: 0.22 },
+        { transform: "translate(" + (sx + Math.cos(rad) * dist) + "px," + (sy + Math.sin(rad) * dist) + "px) rotate(" + ang + "deg)", opacity: 0 }
+      ], { duration: 750 + Math.random() * 500, easing: "ease-out" });
+      a.onfinish = function () { m.remove(); };
+    }
+    setInterval(function () { if (!document.hidden && Math.random() < 0.8) spawnMeteor(); }, 3400);
 
     var booted = false;
     function loop() {
