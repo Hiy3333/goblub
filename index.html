@@ -249,14 +249,14 @@
         // 고양이 타로처럼: 세로형 카드가 아크 위에서 왼쪽→오른쪽 부채꼴로 촤라락
         var cw2 = Math.min(185, W * 0.15), ch2 = Math.round(cw2 * 1.24);
         var span = Math.min(W * 0.80, 1100);   // 부채 전체 폭(양끝 카드 중심 간)
-        var cy = H * 0.42, curve = H * 0.12;   // 가운데가 높고 양끝이 내려오는 호
+        var cy = H * 0.40, curve = H * 0.16;   // 가운데가 높고 양끝이 내려오는 호
         for (var j = 0; j < n; j++) {
           var t = j / (n - 1) - 0.5;
           out.push({
             x: W / 2 + t * span - cw2 / 2,
             y: cy + t * t * 4 * curve - ch2 / 2,
             w: cw2, h: ch2,
-            rot: t * 36 // 부채살 기울기: 왼쪽 -18° ~ 오른쪽 +18°
+            rot: t * 54 // 부채살 기울기: 왼쪽 -27° ~ 오른쪽 +27°
           });
         }
       }
@@ -276,8 +276,6 @@
       var kids = Array.prototype.slice.call(cont.children);
       var tg = targets();
       cards = kids.map(function (k, i) {
-        var ang = -Math.PI / 2 + (Math.random() - 0.5) * Math.PI * 1.9;
-        var sp = SPIT_POWER * (0.6 + Math.random() * 0.5);
         k.style.pointerEvents = "none";
         k.style.opacity = "0";
         k.style.transition = "none";
@@ -298,11 +296,13 @@
             this.style.transform = "translate(" + this._fin.x + "px," + this._fin.y + "px) rotate(" + this._fin.rot + "deg)";
           });
         }
-        var t0 = Date.now() + 90 + i * 55; // 촤라락
+        var t0 = Date.now() + 90 + i * 85; // 왼쪽부터 한 장씩 챠라락
+        var tcx = tg[i].x + tg[i].w / 2, tcy = tg[i].y + tg[i].h / 2;
         return {
           el: k, x: mouthX - tg[i].w / 2, y: mouthY - tg[i].h / 2,
-          vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp,
-          rot: (Math.random() - 0.5) * 40, vr: (Math.random() - 0.5) * 420,
+          // 제 슬롯을 향해 위로 크게 포물선을 그리며 날아감(딜링 느낌)
+          vx: (tcx - mouthX) * 2.6, vy: (tcy - mouthY) * 2.6 - 430,
+          rot: (Math.random() - 0.5) * 26, vr: (Math.random() - 0.5) * 260,
           rotF: tg[i].rot, z: 5 + i,
           tx: tg[i].x, ty: tg[i].y, t0: t0, t1: t0 + 300,
           fx: 0, fy: 0, frot: 0, done: false
