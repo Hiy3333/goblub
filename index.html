@@ -21,7 +21,7 @@
     /* 하늘만 진한 남색으로(아래 지면쪽으로 갈수록 사라짐) */
     .gm-tint {
       position: absolute; inset: 0; z-index: 1; pointer-events: none;
-      background: linear-gradient(180deg, rgba(8, 14, 56, .82) 0%, rgba(8, 14, 56, .56) 45%, rgba(8, 14, 56, 0) 74%);
+      background: linear-gradient(180deg, rgba(12, 22, 66, .62) 0%, rgba(12, 22, 66, .42) 42%, rgba(12, 22, 66, 0) 72%);
       mix-blend-mode: multiply;
     }
     /* 토성 글로우 */
@@ -30,14 +30,7 @@
       border-radius: 50%; mix-blend-mode: screen;
       background: radial-gradient(circle, rgba(255, 228, 170, .55) 0%, rgba(255, 210, 135, .2) 42%, rgba(255, 200, 120, 0) 66%);
     }
-    /* 펠트 질감 3D 땅(하단 오버레이, 위쪽은 배경으로 자연스럽게 페이드) */
-    .gm-ground {
-      position: absolute; left: 0; right: 0; bottom: 0; z-index: 8; pointer-events: none;
-      width: 100%; height: 40vh; object-fit: cover; object-position: center bottom;
-      -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 36%);
-      mask-image: linear-gradient(180deg, transparent 0, #000 36%);
-    }
-    /* 전경 오브젝트(로켓): 고브럽이 뒤로 지나가면 가려지고 눈만 빼꼼 */
+    /* 전경 오브젝트(로켓): 고브럽이 뒤로 지나가면 가려짐 */
     .gm-obj {
       position: absolute; left: 0; top: 0; z-index: 12; pointer-events: none;
       filter: drop-shadow(-6px 10px 10px rgba(0, 22, 32, .38));
@@ -153,7 +146,6 @@
 
   <div class="gm-tint"></div>
   <div class="gm-glow" id="gm-glow"></div>
-  <img class="gm-ground" src="design/img/home/ground-felt.webp" alt="" draggable="false" />
   <div class="gm-shad" id="gm-shad"></div>
   <img class="gm-obj" id="gm-obj" src="design/img/home/obj-rocket.webp" alt="" draggable="false" />
 
@@ -383,7 +375,7 @@
       shad.style.transform = "translate(" + (ccx + dC * 110 - sw2 / 2) + "px," + (groundY() - sh2 / 2 - 3) + "px)";
 
       // 전경 로켓(고브럽 2배 크기 — 타고 온 우주선): 발밑 라인에 심어두기
-      var ow = isMobile() ? 110 : 245, oh = ow * 1.438;
+      var ow = isMobile() ? 100 : 190, oh = ow * 1.882;
       var ox = isMobile() ? Math.min(W * 0.72, W - ow - 6) : W * 0.70;
       obj.style.width = ow + "px";
       obj.style.transform = "translate(" + ox + "px," + (groundY() + 16 - oh) + "px) rotate(-3deg)";
