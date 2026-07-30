@@ -90,6 +90,8 @@
 
     /* 고브럽 */
     .gm-goblub { position: absolute; left: 0; top: 0; z-index: 10; width: 170px; cursor: pointer; will-change: transform; }
+    /* 첫 프레임에서 위치 잡기 전까지 숨김(로드 직후 왼쪽 위에 깜빡 보이는 것 방지) */
+    .gm-goblub, .gm-obj, .gm-shad, .gm-glow { visibility: hidden; }
     .gm-goblub img { width: 100%; height: auto; display: block; user-select: none; -webkit-user-drag: none;
       filter: drop-shadow(0 8px 9px rgba(0, 22, 32, .22)); }
     .gm-hint {
@@ -465,12 +467,22 @@
       else mode = "run";
     });
 
+    var booted = false;
     function loop() {
       var now = Date.now();
       window.requestAnimationFrame(loop);
       var dt = Math.min((now - last) / 1000, 0.05);
       last = now;
-      try { tick(now, dt); } catch (e) {}
+      try {
+        tick(now, dt);
+        if (!booted) { // 첫 프레임에서 위치가 잡힌 뒤에 보이기
+          booted = true;
+          el.style.visibility = "visible";
+          obj.style.visibility = "visible";
+          shad.style.visibility = "visible";
+          glow.style.visibility = "visible";
+        }
+      } catch (e) {}
     }
     window.requestAnimationFrame(loop);
   })();
