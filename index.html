@@ -624,8 +624,8 @@
       objshad.style.transform = "translate(" + (rcx + rdN * 90 - rsw / 2) + "px," + (groundY() + 12 - rsh / 2) + "px)";
 
       // 창문 빼꼼 원형 클립 위치(창 중심 0.65, 0.44 / 유리 지름 0.24×몸폭)
-      var pd = ow * 0.25; // 뚫린 유리 구멍을 뒤에서 완전히 덮는 크기(발사 중엔 로켓을 따라감)
-      var pcx = ox + rjx + ow * 0.65 - pd / 2, pcy = oy - rdy + oh * 0.44 - pd / 2;
+      var pd = ow * 0.28; // 유리 전체(실측 중심 0.645/0.447·지름 26.8%)를 뒤에서 완전히 덮는 크기
+      var pcx = ox + rjx + ow * 0.645 - pd / 2, pcy = oy - rdy + oh * 0.447 - pd / 2;
       cabin.style.width = pd + "px"; cabin.style.height = pd + "px";
       cabin.style.transform = "translate(" + pcx + "px," + pcy + "px)";
       peek.style.width = pd + "px"; peek.style.height = pd + "px";
