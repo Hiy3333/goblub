@@ -27,6 +27,24 @@
       filter: none; text-shadow: 0 3px 0 rgba(16, 20, 50, .6), 0 10px 24px rgba(0, 0, 0, .55);
     }
     body.clay .hero p { color: #e9e6f4; text-shadow: 0 2px 8px rgba(8, 12, 36, .75); }
+    /* 홈과 동일한 크롬: 히어로·푸터 제거, 데스크톱은 로고만 중앙, 행성 클릭 메뉴 */
+    main .hero { display: none; }
+    body.clay .site-footer { display: none !important; }
+    @media (min-width: 701px) {
+      body.clay .site-nav { display: none; }
+      body.clay .site-header { width: fit-content; max-width: none; padding: 10px 26px; }
+    }
+    .pl-hot { position: fixed; z-index: 40; border-radius: 50%; cursor: pointer; transition: box-shadow .18s; }
+    .pl-hot:hover { box-shadow: 0 0 0 3px rgba(255, 240, 190, .75), 0 0 20px rgba(255, 220, 150, .55); }
+    .pl-menu { position: fixed; z-index: 41; display: none; flex-direction: column; gap: 10px; align-items: flex-end; }
+    .pl-menu.on { display: flex; }
+    .pl-menu a { display: flex; align-items: center; gap: 10px; background: linear-gradient(180deg, #f9f0d4, #efe3bd);
+      color: #235a6b !important; padding: 11px 20px; border-radius: 14px; border: 3px solid rgba(29, 90, 107, .25);
+      box-shadow: 0 10px 22px rgba(0, 22, 32, .45); font-size: 1.05rem; white-space: nowrap;
+      opacity: 0; transform: translateX(60px) rotate(6deg); }
+    .pl-menu.on a { animation: plDeal .4s cubic-bezier(.3, 1.35, .6, 1) forwards; }
+    .pl-menu.on a:nth-child(2) { animation-delay: .1s; }
+    @keyframes plDeal { to { opacity: 1; transform: none; } }
     /* 카테고리 카드 뽕뽕 등장 */
     .card-grid .card { opacity: 0; }
     .card-grid .card.pop { animation: gbPop .5s cubic-bezier(.3, 1.6, .55, 1) forwards; }
@@ -113,6 +131,38 @@
         c.addEventListener("animationend", function () { c.classList.remove("pop"); c.classList.add("shown"); }, { once: true });
       }, 130 * i + 150);
     });
+    // 행성 클릭 메뉴(홈과 동일) — 데스크톱 전용
+    (function () {
+      if (window.innerWidth < 701) return;
+      var hot = document.createElement("div"); hot.className = "pl-hot";
+      var menu = document.createElement("div"); menu.className = "pl-menu";
+      var loggedIn = false;
+      try { var u = JSON.parse(localStorage.getItem("goblub_user")); loggedIn = !!(u && u.sub); } catch (e) {}
+      menu.innerHTML = '<a href="../apps.html"><span>📱</span>앱 다운로드</a>' +
+        '<a href="../mypage.html"><span>' + (loggedIn ? "👤" : "🔑") + '</span>' + (loggedIn ? "마이페이지" : "로그인") + '</a>';
+      document.body.appendChild(hot); document.body.appendChild(menu);
+      var SAT = { w: 1376, h: 768, x: 1151, y: 150, r: 78 };
+      function place() {
+        var W = window.innerWidth, H = window.innerHeight;
+        var s = Math.max(W / SAT.w, H / SAT.h);
+        var x = (W - SAT.w * s) / 2 + SAT.x * s, y = H - SAT.h * s + SAT.y * s;
+        var d = SAT.r * s * 2.3;
+        hot.style.width = d + "px"; hot.style.height = d + "px";
+        hot.style.left = (x - d / 2) + "px"; hot.style.top = (y - d / 2) + "px";
+        menu.style.left = Math.min(x + SAT.r * s * 0.4, W - 190) + "px";
+        menu.style.top = (y + d / 2 + 14) + "px";
+      }
+      place(); window.addEventListener("resize", place);
+      hot.addEventListener("click", function () {
+        if (menu.classList.contains("on")) menu.classList.remove("on");
+        else { menu.classList.remove("on"); void menu.offsetWidth; menu.classList.add("on"); }
+      });
+      document.addEventListener("click", function (ev) {
+        if (!menu.classList.contains("on")) return;
+        if (hot.contains(ev.target) || menu.contains(ev.target)) return;
+        menu.classList.remove("on");
+      });
+    })();
   </script>
   <script src="js/saju.js"></script>
   <script src="js/today.js?v=1"></script>
