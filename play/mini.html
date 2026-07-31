@@ -139,11 +139,16 @@
         '<a href="../apps.html"><span>📱</span>앱 다운로드</a>' +
         '<a href="../mypage.html"><span>' + (loggedIn ? "👤" : "🔑") + '</span>' + (loggedIn ? "마이페이지" : "로그인") + '</a>';
       document.body.appendChild(hot); document.body.appendChild(menu);
+      // 배경(::before, fixed inset:0)과 완전히 같은 박스를 실측해 좌표 기준으로 삼는다
+      var vp = document.createElement("div");
+      vp.style.cssText = "position:fixed;inset:0;pointer-events:none;visibility:hidden";
+      document.body.appendChild(vp);
       var SAT = { w: 1376, h: 768, x: 1151, y: 150, r: 78 };
       function place() {
-        var W = window.innerWidth, H = window.innerHeight;
+        var vb = vp.getBoundingClientRect();
+        var W = vb.width, H = vb.height;
         var s = Math.max(W / SAT.w, H / SAT.h);
-        var x = (W - SAT.w * s) / 2 + SAT.x * s, y = H - SAT.h * s + SAT.y * s;
+        var x = vb.left + (W - SAT.w * s) / 2 + SAT.x * s, y = vb.top + H - SAT.h * s + SAT.y * s;
         var d = SAT.r * s * 2.3;
         hot.style.width = d + "px"; hot.style.height = d + "px";
         hot.style.left = (x - d / 2) + "px"; hot.style.top = (y - d / 2) + "px";
@@ -151,6 +156,8 @@
         menu.style.top = (y + d / 2 + 14) + "px";
       }
       place(); window.addEventListener("resize", place);
+      setInterval(place, 1000); // 스크롤바 등 늦은 레이아웃 변화 자가 보정
+      if (/ringdebug/.test(location.search)) hot.style.boxShadow = "0 0 0 3px rgba(255,240,190,.9), 0 0 20px rgba(255,220,150,.6)";
       hot.addEventListener("click", function () {
         if (menu.classList.contains("on")) menu.classList.remove("on");
         else { menu.classList.remove("on"); void menu.offsetWidth; menu.classList.add("on"); }
