@@ -343,13 +343,6 @@
 
     // 우주선 탑승 시퀀스: in(들어감)→peek(창문 빼꼼)→out(나옴)
     var ship = null, lastShipAt = Date.now() - 6000;
-    // 첫 진입: 우주선 문 앞으로 걸어가 탑승하는 것부터 시작
-    if (!isMobile()) {
-      var doorX0 = Math.min(window.innerWidth * 0.78, window.innerWidth - 190 - 24) + 95;
-      x = doorX0 - CHAR_W / 2 - 150;
-      dir = 1; gait = "walk"; gaitUntil = Date.now() + 3000;
-      lastShipAt = Date.now() - 20000;
-    }
     var flame = document.getElementById("gm-flame");
     var cabin = document.getElementById("gm-cabin");
     var rocketFx = null; // 발사 시퀀스: up(불 뿜으며 상승)→sputter(연료 부족 픽픽)→fall(추락)→land(쿵)
@@ -445,7 +438,7 @@
       mouthCloseAt = now + 1100;
       word.style.opacity = "0";
       setTimeout(function () { if (word.style.opacity === "0") word.style.visibility = "hidden"; }, 520);
-      var h = el.offsetHeight;
+      var h = el.offsetHeight || el.offsetWidth * 560 / 600; // 로드 직후 폴백(정면 비율)
       var mouthX = x + el.offsetWidth * MOUTH_FX;
       var mouthY = groundY() - h + h * MOUTH_FY;
       var kids = Array.prototype.slice.call(cont.children);
@@ -769,6 +762,24 @@
       if (sathot.contains(ev.target) || satmenu.contains(ev.target)) return;
       satmenu.classList.remove("on");
     });
+
+    // 시작 상태: 모든 상태 선언이 끝난 뒤에 결정해야 한다
+    // 다른 페이지에서 돌아온 경우 → 허브처럼 중앙에서 카드를 뱉는 모션으로 시작
+    var cameBack = false;
+    try { cameBack = !!document.referrer && new URL(document.referrer).origin === location.origin; } catch (e) {}
+    if (!isMobile()) {
+      if (cameBack) {
+        x = (window.innerWidth - CHAR_W) / 2;
+        if (hint) hint.style.display = "none";
+        beginSpit(Date.now());
+      } else {
+        // 첫 진입: 우주선 문 앞으로 걸어가 탑승하는 것부터 시작
+        var doorX0 = Math.min(window.innerWidth * 0.78, window.innerWidth - 190 - 24) + 95;
+        x = doorX0 - CHAR_W / 2 - 150;
+        dir = 1; gait = "walk"; gaitUntil = Date.now() + 3000;
+        lastShipAt = Date.now() - 20000;
+      }
+    }
 
     var booted = false;
     function loop() {
