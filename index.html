@@ -34,7 +34,19 @@
     .gm-obj {
       position: absolute; left: 0; top: 0; z-index: 12; pointer-events: auto; cursor: pointer;
       filter: drop-shadow(-6px 10px 10px rgba(0, 22, 32, .28));
+      transition: filter .18s;
     }
+    .gm-obj:hover { /* 클릭 가능 표시: 흰 윤곽 발광 */
+      filter: drop-shadow(-6px 10px 10px rgba(0, 22, 32, .28)) drop-shadow(0 0 7px rgba(255, 255, 255, .85));
+    }
+    /* 토성 클릭 핫스팟(호버 시 테두리 링) */
+    .gm-sathot {
+      position: absolute; left: 0; top: 0; z-index: 4; border-radius: 50%; cursor: pointer;
+      transition: box-shadow .18s;
+    }
+    .gm-sathot:hover { box-shadow: 0 0 0 3px rgba(255, 240, 190, .75), 0 0 20px rgba(255, 220, 150, .55); }
+    .gm-glow.burst { animation: gm-burst 1.4s ease-out; }
+    @keyframes gm-burst { 0% { filter: brightness(1); } 30% { filter: brightness(2.1) saturate(1.15); } 100% { filter: brightness(1); } }
     /* 로켓 분사 불꽃 */
     .gm-flame { position: absolute; left: 0; top: 0; z-index: 11; pointer-events: none; display: none; }
     .gm-flame b {
@@ -46,11 +58,16 @@
     .gm-flame.sputter b { animation: gm-sputter .32s steps(2) infinite; }
     @keyframes gm-flick { from { opacity: .95; transform: scaleY(1); } to { opacity: .72; transform: scaleY(.8); } }
     @keyframes gm-sputter { 0% { opacity: .85; transform: scaleY(.85); } 50% { opacity: .12; transform: scaleY(.35); } 100% { opacity: .6; transform: scaleY(.6); } }
-    /* 우주선 창문 빼꼼(원형 클립 속 고브럽 눈) */
+    /* 우주선 창문 빼꼼(원형 클립 속 고브럽 눈) — 유리 안쪽 느낌 */
     .gm-peek {
       position: absolute; left: 0; top: 0; z-index: 13; pointer-events: none;
-      border-radius: 50%; overflow: hidden; background: #22333c;
+      border-radius: 50%; overflow: hidden; background: #17242b;
       opacity: 0; transition: opacity .28s;
+    }
+    .gm-peek::after { /* 유리 반사 + 안쪽 그림자 */
+      content: ""; position: absolute; inset: 0; border-radius: 50%;
+      background: linear-gradient(135deg, rgba(200, 228, 232, .38) 0%, rgba(200, 228, 232, .1) 26%, rgba(200, 228, 232, 0) 45%, rgba(10, 24, 32, .3) 100%);
+      box-shadow: inset 0 0 12px rgba(0, 0, 0, .6), inset 0 2px 4px rgba(0, 0, 0, .4);
     }
     .gm-peek img { position: absolute; display: block; max-width: none; filter: none;
       animation: gm-look 2.4s ease-in-out infinite; }
@@ -112,7 +129,9 @@
       text-shadow: 0 2px 8px rgba(0, 25, 35, .6);
     }
 
-    .gm-star { position: absolute; z-index: 3; color: #f7ecc8; pointer-events: none; animation: gm-tw 2.8s ease-in-out infinite; }
+    .gm-star { position: absolute; z-index: 3; color: #f7ecc8; cursor: pointer;
+      animation: gm-tw 2.8s ease-in-out infinite; transition: text-shadow .15s, opacity .2s; }
+    .gm-star:hover { text-shadow: 0 0 14px #fff7d8, 0 0 5px #ffffff; } /* 클릭 가능 표시 */
     @keyframes gm-tw { 0%,100% { opacity: .4; transform: scale(.85); } 50% { opacity: 1; transform: scale(1.1); } }
     /* 별똥별 */
     .gm-meteor {
@@ -134,8 +153,8 @@
       border-radius: 50%; overflow: hidden; pointer-events: none;
       -webkit-mask-image: radial-gradient(circle, #000 58%, transparent 96%);
       mask-image: radial-gradient(circle, #000 58%, transparent 96%); }
-    .gm-mouth img { position: absolute; width: 328.9%; max-width: none; left: -188.6%; top: -131.8%;
-      transform-origin: 72.53% 54.1%; animation: gm-spin 2.4s linear infinite; filter: none; }
+    .gm-mouth svg { display: block; width: 100%; height: 100%; filter: blur(.5px);
+      animation: gm-spin 2.6s linear infinite; }
     @keyframes gm-spin { to { transform: rotate(360deg); } }
     .gm-goblub.front .gm-mouth { display: none; }
     /* 꼬리 구슬 빛(클릭한 동안만) */
@@ -200,6 +219,7 @@
 
   <div class="gm-tint"></div>
   <div class="gm-glow" id="gm-glow"></div>
+  <div class="gm-sathot" id="gm-sathot" title=""></div>
   <div class="gm-shad" id="gm-shad"></div>
   <img class="gm-obj" id="gm-obj" src="design/img/home/obj-rocket.webp" alt="" draggable="false" />
   <div class="gm-flame" id="gm-flame"><b></b></div>
@@ -213,6 +233,13 @@
   <span class="gm-star" style="top:30%;left:6%;font-size:.6rem;animation-delay:-2.2s;">✦</span>
   <span class="gm-star" style="top:45%;left:30%;font-size:.65rem;animation-delay:-.9s;">✦</span>
   <span class="gm-star" style="top:26%;left:52%;font-size:.55rem;animation-delay:-1.5s;">✧</span>
+  <span class="gm-star" style="top:16%;left:24%;font-size:.75rem;animation-delay:-2.6s;">✦</span>
+  <span class="gm-star" style="top:40%;left:14%;font-size:.6rem;animation-delay:-.3s;">✧</span>
+  <span class="gm-star" style="top:6%;left:47%;font-size:.6rem;animation-delay:-1.1s;">✦</span>
+  <span class="gm-star" style="top:34%;left:44%;font-size:.55rem;animation-delay:-2.0s;">✧</span>
+  <span class="gm-star" style="top:14%;right:9%;font-size:.7rem;animation-delay:-.75s;">✦</span>
+  <span class="gm-star" style="top:47%;right:12%;font-size:.6rem;animation-delay:-1.9s;">✦</span>
+  <span class="gm-star" style="top:52%;left:56%;font-size:.65rem;animation-delay:-2.4s;">✧</span>
 
   <div class="gm-cards" id="gm-cards">
     <a class="gm-card" href="play/fortune-hub.html"><span class="ic" style="background:#cfe0e4">🔮</span><span class="tt">운세</span><span class="ds">사주·궁합·타로·전생·부적까지</span></a>
@@ -228,7 +255,11 @@
     <div class="gm-hint" id="gm-hint">나를 눌러봐~</div>
     <div class="bodywrap" id="gm-body">
       <img id="gm-img" src="design/img/home/gb-walk.webp" alt="고브럽" draggable="false" />
-      <div class="gm-mouth"><img src="design/img/home/gb-walk.webp" alt="" draggable="false" /></div>
+      <div class="gm-mouth"><svg viewBox="0 0 100 100" aria-hidden="true">
+        <circle cx="50" cy="50" r="50" fill="#33373b"/>
+        <path fill="none" stroke="#22272d" stroke-width="8" stroke-linecap="round" d="M51.5 50.0 L52.0 50.4 L52.4 51.0 L52.5 51.7 L52.5 52.5 L52.2 53.4 L51.6 54.1 L50.9 54.8 L49.9 55.3 L48.7 55.7 L47.5 55.7 L46.1 55.4 L44.8 54.9 L43.6 54.0 L42.6 52.8 L41.7 51.3 L41.2 49.6 L41.1 47.8 L41.3 45.9 L41.9 44.0 L43.0 42.2 L44.5 40.7 L46.3 39.4 L48.4 38.4 L50.8 37.9 L53.2 37.9 L55.7 38.5 L58.1 39.5 L60.4 41.1 L62.3 43.1 L63.8 45.5 L64.8 48.3 L65.2 51.3 L65.1 54.4 L64.2 57.4 L62.8 60.4 L60.7 63.0 L58.2 65.2 L55.1 66.9 L51.7 68.0 L48.1 68.3 L44.4 68.0 L40.7 66.8 L37.4 65.0 L34.3 62.4 L31.9 59.2 L30.0 55.6 L28.9 51.5 L28.7 47.3 L29.2 43.0 L30.7 38.9 L33.0 35.0 L36.1 31.6 L39.8 28.9 L44.1 26.9 L48.7 25.8 L53.6 25.7 L58.4 26.5 L63.1 28.3 L67.4 31.1 L71.1 34.7 L74.1 39.0 L76.1 43.9 L77.2 49.1 L77.2 54.6 L76.1 60.0 L73.9 65.2 L70.7 69.9 L66.6 73.9 L61.7 77.0 L56.2 79.2 L50.3 80.2 L44.3 80.0 L38.3 78.6 L32.7 76.1 L27.6 72.4 L23.3 67.7 L20.0 62.2 L17.8 56.1 L16.8 49.7 L17.2 43.0 L18.9 36.5 L21.9 30.4 L26.0 25.0 L31.3 20.5 L37.3 17.0 L44.0 14.8 L51.1 13.9 L58.3 14.5 L65.3 16.5 L71.9 19.9 L77.6 24.6 L82.4 30.4 L86.0 37.0 L88.2 44.4 L89.0 52.0 L88.1 59.8 L85.8 67.3 L81.9 74.2 L76.8 80.3 L70.4 85.4 L63.1 89.0 L55.2 91.2 L46.9 91.8 L38.6 90.7 L30.6 88.0 L23.3 83.7 L16.9 78.0 L11.7 71.1 L8.0 63.2 L5.8 54.6 L5.4 45.8 L6.8 37.0 L9.9 28.5 L14.7 20.8 L20.9 14.1 L28.4 8.7 L36.9 4.9 L46.0 2.9 L55.5 2.7 L64.8 4.3"/>
+        <path fill="none" stroke="#5c646e" stroke-width="4" stroke-linecap="round" opacity=".85" d="M48.5 50.0 L48.0 49.6 L47.6 49.0 L47.5 48.3 L47.5 47.5 L47.8 46.6 L48.4 45.9 L49.1 45.2 L50.1 44.7 L51.3 44.3 L52.5 44.3 L53.9 44.6 L55.2 45.1 L56.4 46.0 L57.4 47.2 L58.3 48.7 L58.8 50.4 L58.9 52.2 L58.7 54.1 L58.1 56.0 L57.0 57.8 L55.5 59.3 L53.7 60.6 L51.6 61.6 L49.2 62.1 L46.8 62.1 L44.3 61.5 L41.9 60.5 L39.6 58.9 L37.7 56.9 L36.2 54.5 L35.2 51.7 L34.8 48.7 L34.9 45.6 L35.8 42.6 L37.2 39.6 L39.3 37.0 L41.8 34.8 L44.9 33.1 L48.3 32.0 L51.9 31.7 L55.6 32.0 L59.3 33.2 L62.6 35.0 L65.7 37.6 L68.1 40.8 L70.0 44.4 L71.1 48.5 L71.3 52.7 L70.8 57.0 L69.3 61.1 L67.0 65.0 L63.9 68.4 L60.2 71.1 L55.9 73.1 L51.3 74.2 L46.4 74.3 L41.6 73.5 L36.9 71.7 L32.6 68.9 L28.9 65.3 L25.9 61.0 L23.9 56.1 L22.8 50.9 L22.8 45.4 L23.9 40.0 L26.1 34.8 L29.3 30.1 L33.4 26.1 L38.3 23.0 L43.8 20.8 L49.7 19.8 L55.7 20.0 L61.7 21.4 L67.3 23.9 L72.4 27.6 L76.7 32.3 L80.0 37.8 L82.2 43.9 L83.2 50.3 L82.8 57.0 L81.1 63.5 L78.1 69.6 L74.0 75.0 L68.7 79.5 L62.7 83.0 L56.0 85.2 L48.9 86.1 L41.7 85.5 L34.7 83.5 L28.1 80.1 L22.4 75.4 L17.6 69.6 L14.0 63.0 L11.8 55.6 L11.0 48.0 L11.9 40.2 L14.2 32.7 L18.1 25.8 L23.2 19.7 L29.6 14.6 L36.9 11.0 L44.8 8.8 L53.1 8.2 L61.4 9.3 L69.4 12.0 L76.7 16.3 L83.1 22.0 L88.3 28.9 L92.0 36.8 L94.2 45.4 L94.6 54.2 L93.2 63.0 L90.1 71.5 L85.3 79.2 L79.1 85.9 L71.6 91.3 L63.1 95.1 L54.0 97.1 L44.5 97.3 L35.2 95.7"/>
+      </svg></div>
       <div class="gm-orb"></div>
     </div>
   </div>
@@ -471,6 +502,9 @@
       var gs = sat.r * 2.9; // 토성 자체만 살짝 밝게
       glow.style.width = gs + "px"; glow.style.height = gs + "px";
       glow.style.transform = "translate(" + (sat.x - gs / 2) + "px," + (sat.y - gs / 2) + "px)";
+      var hd = sat.r * 2.3; // 토성 호버 핫스팟
+      sathot.style.width = hd + "px"; sathot.style.height = hd + "px";
+      sathot.style.transform = "translate(" + (sat.x - hd / 2) + "px," + (sat.y - hd / 2) + "px)";
       var ccx = x + el.offsetWidth / 2;
       var dN = (ccx - sat.x) / W; // 토성 기준 좌우 거리(-: 토성이 오른쪽)
       var sw2 = CHAR_W * (0.74 + Math.min(0.5, Math.abs(dN)) * 0.6) * (1 - hop / 40);
@@ -531,7 +565,7 @@
       objshad.style.transform = "translate(" + (rcx + rdN * 90 - rsw / 2) + "px," + (groundY() + 12 - rsh / 2) + "px)";
 
       // 창문 빼꼼 원형 클립 위치(창 중심 0.65, 0.44 / 유리 지름 0.24×몸폭)
-      var pd = ow * 0.24;
+      var pd = ow * 0.185; // 유리 링 안쪽에 들어가는 크기
       peek.style.width = pd + "px"; peek.style.height = pd + "px";
       peek.style.transform = "translate(" + (ox + ow * 0.65 - pd / 2) + "px," + (oy + oh * 0.44 - pd / 2) + "px)";
       // 정면 이미지의 눈알 중심(0.565, 0.155)이 창 정중앙에 오도록
@@ -622,13 +656,14 @@
       else mode = "run";
     });
 
-    // 별똥별: 3~4초에 한 번쯤 하늘을 가로질러 떨어진다
-    function spawnMeteor() {
+    // 별똥별: 3~4초에 한 번쯤 하늘을 가로질러 떨어진다 (좌표를 주면 그 자리에서 출발)
+    function spawnMeteor(fromX, fromY) {
       if (!document.body.animate) return;
       var m = document.createElement("div");
       m.className = "gm-meteor";
       var W = window.innerWidth, H = window.innerHeight;
-      var sx = W * (0.15 + Math.random() * 0.75), sy = H * (0.04 + Math.random() * 0.3);
+      var sx = fromX != null ? fromX : W * (0.15 + Math.random() * 0.75);
+      var sy = fromY != null ? fromY : H * (0.04 + Math.random() * 0.3);
       var ang = 145 + Math.random() * 20; // 왼쪽 아래로
       var rad = ang * Math.PI / 180;
       var dist = 180 + Math.random() * 220;
@@ -641,6 +676,25 @@
       a.onfinish = function () { m.remove(); };
     }
     setInterval(function () { if (!document.hidden && Math.random() < 0.8) spawnMeteor(); }, 3400);
+
+    // 별을 누르면 그 별이 별똥별처럼 떨어지고, 잠시 뒤 제자리에 다시 뜬다
+    Array.prototype.forEach.call(document.querySelectorAll(".gm-star"), function (s) {
+      s.addEventListener("click", function () {
+        if (s.style.opacity === "0") return;
+        var r = s.getBoundingClientRect();
+        spawnMeteor(r.left + r.width / 2, r.top + r.height / 2);
+        s.style.opacity = "0"; s.style.pointerEvents = "none";
+        setTimeout(function () { s.style.opacity = ""; s.style.pointerEvents = ""; }, 5000);
+      });
+    });
+
+    // 토성 핫스팟: 호버 링 + 클릭하면 반짝 플레어
+    var sathot = document.getElementById("gm-sathot");
+    sathot.addEventListener("click", function () {
+      glow.classList.remove("burst");
+      void glow.offsetWidth; // 애니메이션 재시작
+      glow.classList.add("burst");
+    });
 
     var booted = false;
     function loop() {
