@@ -10,10 +10,12 @@
   <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../css/style.css?v=cl1" />
   <style>
-    /* 밤하늘 배경(은하수+쌍둥이 달) + 가독성 오버라이드 */
-    body.clay {
+    /* 밤하늘 배경(은하수+쌍둥이 달) — 뷰포트 고정 레이어라 문서 길이와 무관하게 화면 기준 cover */
+    body.clay { background: #10173a !important; }
+    body.clay::before {
+      content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
       background: linear-gradient(rgba(10, 14, 38, .2), rgba(10, 14, 38, .2)),
-        url("../design/img/home-bg-13.webp") center bottom / cover no-repeat #10173a !important;
+        url("../design/img/home-bg-13.webp") center bottom / cover no-repeat;
     }
     body.clay .hero h1 {
       background: none; -webkit-background-clip: initial; background-clip: initial; color: #fdf3cf;
