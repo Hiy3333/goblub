@@ -10,20 +10,18 @@
   <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../css/style.css?v=cl1" />
   <style>
-    /* 버건디 하늘+살구 행성+테라코타 땅 배경 — 뷰포트 고정 레이어 */
-    body.clay { background: #47172a !important; }
+    /* 파스텔 보라 황혼+민트 고리행성+웜그레이 땅 배경 — 뷰포트 고정 레이어 */
+    body.clay { background: #4e4463 !important; }
     body.clay::before {
       content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
-      background: url("../design/img/home-bg-26.webp") center bottom / cover no-repeat;
+      background: url("../design/img/home-bg-23.webp") center bottom / cover no-repeat;
     }
-    /* 카드 색을 테라코타 땅(#b7715a) 계열 파스텔로 통일 */
-    body.clay .card.tint-coral  { background: linear-gradient(180deg, #edc5c6, #e59b9c) !important; }
-    body.clay .card.tint-yellow { background: linear-gradient(180deg, #eddac5, #e5c19b) !important; }
-    body.clay .card.tint-mint   { background: linear-gradient(180deg, #edd4c5, #e5b79b) !important; }
-    body.clay .card.tint-sky    { background: linear-gradient(180deg, #edcfc5, #e5ad9b) !important; }
-    body.clay .card.tint-purple { background: linear-gradient(180deg, #edcac5, #e5a39b) !important; }
-    body.clay .card h2 { color: #5c3226; }
-    body.clay .card p { color: #7d4f40; }
+    /* 카드 색을 웜그레이 땅(#b8aca4) 계열 부드러운 파스텔로 통일 */
+    body.clay .card.tint-coral  { background: linear-gradient(180deg, #ecdddc, #debdbc) !important; }
+    body.clay .card.tint-yellow { background: linear-gradient(180deg, #ece8dc, #ded6bc) !important; }
+    body.clay .card.tint-mint   { background: linear-gradient(180deg, #ece5dc, #ded0bc) !important; }
+    body.clay .card.tint-sky    { background: linear-gradient(180deg, #ece3dc, #decabc) !important; }
+    body.clay .card.tint-purple { background: linear-gradient(180deg, #ece0dc, #dec4bc) !important; }
     body.clay .hero h1 {
       background: none; -webkit-background-clip: initial; background-clip: initial; color: #fdf3cf;
       filter: none; text-shadow: 0 3px 0 rgba(12, 26, 44, .6), 0 10px 24px rgba(0, 0, 0, .55);
