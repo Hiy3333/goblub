@@ -16,10 +16,17 @@
       content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
       background: url("../design/img/home-bg-23.webp") center bottom / cover no-repeat;
     }
-    /* 카드는 땅 색(#b8aca4)과 동일한 한 색으로 통일 + 글자는 홈 카드 기준 */
-    body.clay .card[class*="tint-"] { background: linear-gradient(180deg, #ebe5df, #c9beb5) !important; }
-    body.clay .card h2 { color: #235a6b; }
-    body.clay .card p { color: #58818c; }
+    /* 카드 팔레트 — Daring Indigo → Plum Perfect (전 페이지 공통) */
+    body.clay .card[class*="tint-"]:nth-child(5n+1) { background: linear-gradient(180deg, #4b5d8f, #374874) !important; }
+    body.clay .card[class*="tint-"]:nth-child(5n+2) { background: linear-gradient(180deg, #5768ab, #445397) !important; }
+    body.clay .card[class*="tint-"]:nth-child(5n+3) { background: linear-gradient(180deg, #6f7ec2, #5868ae) !important; }
+    body.clay .card[class*="tint-"]:nth-child(5n+4) { background: linear-gradient(180deg, #b78bc3, #a475b1) !important; }
+    body.clay .card[class*="tint-"]:nth-child(5n+5) { background: linear-gradient(180deg, #c7a1d5, #b48ac2) !important; }
+    body.clay .card { border: 3px solid rgba(255, 255, 255, .22) !important; }
+    body.clay .card h2 { color: #fff; }
+    body.clay .card p { color: #e4dff4; }
+    body.clay .card .icon { background: rgba(255, 255, 255, .92); border-radius: 50%; padding: 6px; }
+    body.clay a.card:hover, body.clay .card[data-href]:hover { border-color: rgba(255, 255, 255, .5) !important; }
     body.clay .hero h1 {
       background: none; -webkit-background-clip: initial; background-clip: initial; color: #fdf3cf;
       filter: none; text-shadow: 0 3px 0 rgba(12, 26, 44, .6), 0 10px 24px rgba(0, 0, 0, .55);
@@ -64,9 +71,13 @@
         text-align: center; border-radius: 18px; padding: 12px; box-sizing: border-box;
         will-change: transform; transform-origin: center;
       }
-      body.fanmode .card .icon { font-size: 2.05rem; }
-      body.fanmode .card h2 { font-size: 1.42rem; line-height: 1.15; margin: 0; }
-      body.fanmode .card p { font-size: .88rem; line-height: 1.35; padding: 0 6px; word-break: keep-all; margin: 0; }
+      body.fanmode .card .icon { font-size: 2.2rem; }
+      body.fanmode .card h2 { font-size: 1.5rem; line-height: 1.15; margin: 0; }
+      body.fanmode .card p { font-size: .95rem; line-height: 1.35; padding: 0 8px; word-break: keep-all; margin: 0; }
+      /* 카드가 많은 페이지(미니 9장)는 글자를 조금 줄여 넘침 방지 */
+      body.fanmode.dense .card .icon { font-size: 1.85rem; }
+      body.fanmode.dense .card h2 { font-size: 1.24rem; }
+      body.fanmode.dense .card p { font-size: .82rem; }
     }
     /* 카테고리 카드 뽕뽕 등장 */
     .card-grid .card { opacity: 0; }

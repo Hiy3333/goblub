@@ -22,6 +22,7 @@
   var IMG_FRONT = ROOT + "/design/img/home/gb-front.webp";
 
   document.body.classList.add("fanmode");
+  if (cards.length >= 8) document.body.classList.add("dense"); // 카드가 많으면 글자 축소
 
   // ===== 고브럽 스타일(홈과 동일 값) =====
   var css = document.createElement("style");
@@ -92,8 +93,11 @@ background:radial-gradient(ellipse at center,rgba(4,10,20,.68) 0%,rgba(4,10,20,.
   // ===== 카드 부채꼴(홈 지오메트리) =====
   function targets(n) {
     var W = window.innerWidth, H = window.innerHeight;
-    var cw = Math.min(204, W * 0.165), ch = Math.round(cw * 1.34);
-    var span = Math.min(W * 0.80, 1100);
+    // 카드 수가 적을수록 크게
+    var cw = Math.min(n <= 4 ? 300 : n <= 6 ? 230 : n <= 7 ? 200 : 162,
+                      W * (n <= 4 ? 0.23 : n <= 6 ? 0.18 : n <= 7 ? 0.16 : 0.128));
+    var ch = Math.round(cw * 1.34);
+    var span = Math.min(W * (n >= 8 ? 0.9 : 0.8), 1250, W - cw - 36);
     var cy = H * 0.40, curve = H * 0.16;
     var out = [];
     for (var j = 0; j < n; j++) {

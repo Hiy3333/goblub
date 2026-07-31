@@ -230,22 +230,28 @@
       position: absolute; left: 0; top: 0; opacity: 0; pointer-events: none;
       display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
       width: 250px; height: 190px; border-radius: 18px; padding: 12px; box-sizing: border-box;
-      background: linear-gradient(180deg, #f9f0d4, #efe3bd);
-      color: #235a6b; text-align: center; border: 3px solid rgba(29, 90, 107, .25);
-      box-shadow: 0 16px 32px rgba(0, 22, 32, .48), inset 0 2px 0 rgba(255,255,255,.8);
+      color: #fff; text-align: center; border: 3px solid rgba(255, 255, 255, .22);
+      box-shadow: 0 16px 32px rgba(0, 12, 32, .5), inset 0 2px 0 rgba(255,255,255,.18);
       will-change: transform; transform-origin: center;
     }
-    body.home-moon .gm-card, body.home-moon .gm-card:hover { color: #235a6b; }
-    .gm-card:hover { border-color: rgba(29, 90, 107, .55);
-      box-shadow: 0 22px 42px rgba(0, 22, 32, .58), inset 0 2px 0 rgba(255,255,255,.8); }
+    /* 카드 팔레트 — Daring Indigo → Plum Perfect */
+    .gm-card:nth-child(5n+1) { background: linear-gradient(180deg, #4b5d8f, #374874); }
+    .gm-card:nth-child(5n+2) { background: linear-gradient(180deg, #5768ab, #445397); }
+    .gm-card:nth-child(5n+3) { background: linear-gradient(180deg, #6f7ec2, #5868ae); }
+    .gm-card:nth-child(5n+4) { background: linear-gradient(180deg, #b78bc3, #a475b1); }
+    .gm-card:nth-child(5n+5) { background: linear-gradient(180deg, #c7a1d5, #b48ac2); }
+    body.home-moon .gm-card, body.home-moon .gm-card:hover { color: #fff; }
+    .gm-card:hover { border-color: rgba(255, 255, 255, .5);
+      box-shadow: 0 22px 42px rgba(0, 12, 32, .6), inset 0 2px 0 rgba(255,255,255,.22); }
     .gm-card .ic {
       display: flex; align-items: center; justify-content: center;
-      width: 68px; height: 68px; border-radius: 50%;
-      box-shadow: inset 0 -4px 8px rgba(29, 90, 107, .14), inset 0 2px 3px rgba(255,255,255,.7);
-      font-size: 2.05rem; line-height: 1;
+      width: 76px; height: 76px; border-radius: 50%;
+      background: rgba(255, 255, 255, .92) !important;
+      box-shadow: inset 0 -4px 8px rgba(29, 40, 90, .16), inset 0 2px 3px rgba(255,255,255,.9);
+      font-size: 2.3rem; line-height: 1;
     }
-    .gm-card .tt { font-size: 1.42rem; line-height: 1.15; }
-    .gm-card .ds { font-size: .88rem; line-height: 1.35; color: #58818c; padding: 0 6px; word-break: keep-all; }
+    .gm-card .tt { font-size: 1.56rem; line-height: 1.15; }
+    .gm-card .ds { font-size: .98rem; line-height: 1.35; color: #e4dff4; padding: 0 8px; word-break: keep-all; }
     @media (max-width: 700px) {
       .gm-card { gap: 7px; padding: 10px; }
       .gm-card .ic { width: 52px; height: 52px; font-size: 1.6rem; }
@@ -301,10 +307,7 @@
   <div class="gm-cards" id="gm-cards">
     <a class="gm-card" href="play/fortune-hub.html"><span class="ic" style="background:#cfe0e4">🔮</span><span class="tt">운세</span><span class="ds">사주·궁합·타로·전생·부적까지</span></a>
     <a class="gm-card" href="play/tests.html"><span class="ic" style="background:#f3c9ac">🧠</span><span class="tt">대환장 테스트</span><span class="ds">내 유형 다 털리는 심리테스트</span></a>
-    <a class="gm-card" href="play/mini.html"><span class="ic" style="background:#e9d3a8">🎠</span><span class="tt">미니 놀이터</span><span class="ds">심심할 때 툭! 룰렛·작명·로또</span></a>
-    <a class="gm-card" href="play/letter.html"><span class="ic" style="background:#eecbc4">💌</span><span class="tt">마음 배달</span><span class="ds">고백·사과·한잔을 링크로</span></a>
-    <a class="gm-card" href="play/balance.html"><span class="ic" style="background:#cfe0e4">⚖️</span><span class="tt">밸런스 게임</span><span class="ds">극한의 양자택일 12연속</span></a>
-    <a class="gm-card" href="play/decide.html"><span class="ic" style="background:#f3c9ac">⚡</span><span class="tt">결정의 신</span><span class="ds">짜장 vs 짬뽕, 신이 정해줌</span></a>
+    <a class="gm-card" href="play/mini.html"><span class="ic" style="background:#e9d3a8">🎠</span><span class="tt">미니 놀이터</span><span class="ds">룰렛·작명·로또·밸런스·마음배달</span></a>
     <a class="gm-card" href="apps.html"><span class="ic" style="background:#e9d3a8">📱</span><span class="tt">앱 다운로드</span><span class="ds">직접 만든 앱들을 모아둔 곳</span></a>
   </div>
 
@@ -429,8 +432,12 @@
         }
       } else {
         // 고양이 타로처럼: 세로형 카드가 아크 위에서 왼쪽→오른쪽 부채꼴로 촤라락
-        var cw2 = Math.min(204, W * 0.165), ch2 = Math.round(cw2 * 1.34); // 두 줄 설명 여유 비율
-        var span = Math.min(W * 0.80, 1100);   // 부채 전체 폭(양끝 카드 중심 간)
+        // 카드 수가 적을수록 크게 — 4장이면 널찍하게
+        var cw2 = Math.min(n <= 4 ? 300 : n <= 6 ? 230 : n <= 7 ? 200 : 162,
+                           W * (n <= 4 ? 0.23 : n <= 6 ? 0.18 : n <= 7 ? 0.16 : 0.128));
+        var ch2 = Math.round(cw2 * 1.34);
+        // 부채 전체 폭 — 양끝 카드가 화면 밖으로 나가지 않게 클램프
+        var span = Math.min(W * (n >= 8 ? 0.9 : 0.8), 1250, W - cw2 - 36);
         var cy = H * 0.40, curve = H * 0.16;   // 가운데가 높고 양끝이 내려오는 호
         for (var j = 0; j < n; j++) {
           var t = j / (n - 1) - 0.5;
@@ -493,6 +500,86 @@
       cards.forEach(function (p) { p.fx = p.x; p.fy = p.y; });
     }
 
+    // ===== 넘어짐: 물고 있던 카테고리를 바닥에 쏟았다가 주섬주섬 챙긴다 =====
+    var trip = null, nextTripAt = Date.now() + 13000 + Math.random() * 9000;
+    function beginTrip(now) {
+      mode = "trip";
+      var W = window.innerWidth, h = el.offsetHeight;
+      var mouthX = x + el.offsetWidth * MOUTH_FX, mouthY = groundY() - h + h * MOUTH_FY;
+      var kids = Array.prototype.slice.call(cont.children);
+      var cw = Math.min(150, W * 0.108), ch = Math.round(cw * 1.34);
+      var items = kids.map(function (k, i) {
+        k.style.width = cw + "px"; k.style.height = ch + "px";
+        k.style.zIndex = String(5 + i);
+        k.style.transition = "none"; k.style.opacity = "0"; k.style.pointerEvents = "none";
+        k._fin = null;
+        var spread = (i - (kids.length - 1) / 2) * (cw * 0.7) + (Math.random() - 0.5) * 26;
+        var tx = Math.max(12, Math.min(W - cw - 12, x + el.offsetWidth / 2 - cw / 2 + spread + dir * 40));
+        return {
+          el: k, x: mouthX - cw / 2, y: mouthY - ch / 2,
+          vx: (tx - (mouthX - cw / 2)) * 1.5, vy: -170 - Math.random() * 130,
+          rot: (Math.random() - 0.5) * 30, vr: (Math.random() - 0.5) * 380,
+          tx: tx, ty: groundY() - ch * 0.5,
+          restRot: (Math.random() < 0.5 ? -1 : 1) * (74 + Math.random() * 26),
+          t0: now + 40 + i * 45, landed: false, gone: false, gt0: 0
+        };
+      });
+      trip = { phase: "fall", until: now + 420, items: items, cw: cw, ch: ch, mouthX: mouthX, mouthY: mouthY };
+    }
+    function updateTrip(now, dt) {
+      var t = trip;
+      if (!t) { mode = "idle"; return 0; }
+      for (var i = 0; i < t.items.length; i++) {
+        var p = t.items[i];
+        if (p.gone || now < p.t0) continue;
+        p.el.style.opacity = "1";
+        if (t.phase === "gather" && now >= p.gt0) {          // 입으로 도로 챙기기
+          var u = Math.min(1, (now - p.gt0) / 300), e = 1 - Math.pow(1 - u, 2);
+          p.el.style.transform = "translate(" + (p.x + (t.mouthX - t.cw / 2 - p.x) * e) + "px," +
+            (p.y + (t.mouthY - t.ch / 2 - p.y) * e) + "px) rotate(" + (p.restRot * (1 - e)) + "deg) scale(" + (1 - 0.75 * e) + ")";
+          p.el.style.opacity = String(1 - e);
+          if (u >= 1) { p.gone = true; p.el.style.opacity = "0"; }
+          continue;
+        }
+        if (!p.landed) {                                      // 포물선으로 쏟아짐
+          p.vy += 1500 * dt;
+          p.x += p.vx * dt; p.y += p.vy * dt;
+          p.vx *= Math.pow(0.35, dt); p.rot += p.vr * dt;
+          if (p.y >= p.ty) { p.y = p.ty; p.x = p.tx; p.landed = true; }
+        } else {                                              // 바닥에 눕는 각도로 정착
+          p.rot += (p.restRot - p.rot) * Math.min(1, dt * 9);
+        }
+        p.el.style.transform = "translate(" + p.x + "px," + p.y + "px) rotate(" + p.rot + "deg) scale(.92)";
+      }
+      var rot = 0;
+      if (t.phase === "fall") {
+        rot = 72 * (1 - Math.pow(Math.max(0, (t.until - now) / 420), 3));
+        if (now >= t.until && t.items.every(function (p) { return p.landed; })) {
+          t.phase = "rest"; t.until = now + 1100;
+          t.items.forEach(function (p) { p.el.style.pointerEvents = "auto"; }); // 누운 카드도 눌러서 갈 수 있다
+        }
+      } else if (t.phase === "rest") {
+        rot = 72;
+        if (now >= t.until) {
+          t.phase = "gather";
+          t.items.forEach(function (p, i2) { p.gt0 = now + i2 * 90; p.el.style.pointerEvents = "none"; });
+          t.until = now + t.items.length * 90 + 400;
+        }
+      } else if (t.phase === "gather") {
+        rot = 58;
+        if (now >= t.until) { t.phase = "up"; t.until = now + 380; }
+      } else {
+        rot = 58 * Math.max(0, (t.until - now) / 380);
+        if (now >= t.until) {
+          trip = null; mode = "idle";
+          gait = "walk"; gaitUntil = now + 900;
+          nextTripAt = now + 15000 + Math.random() * 12000;
+          return 0;
+        }
+      }
+      return rot;
+    }
+
     function tick(now, dt) {
       var W = window.innerWidth;
       var minX = 20, maxX = W - CHAR_W - 20;
@@ -531,10 +618,13 @@
               el.style.opacity = "0"; el.style.pointerEvents = "none";
               ship = { phase: "in", until: now + 500 };
             }
+            // 가끔 발이 걸려 넘어지며 입에 물고 있던 카테고리를 바닥에 쏟는다
+            if (sp > 0 && !cards.length && now > nextTripAt) beginTrip(now);
           }
         }
       }
       if (mode === "spit" && now > mouthCloseAt) mode = "cards";
+      var tripRot = mode === "trip" ? updateTrip(now, dt) : 0;
 
       var g = mode === "run" ? "run" : (mode === "idle" ? gait : "stand");
       var moving = g === "run" || g === "walk" || g === "dash";
@@ -588,7 +678,7 @@
       var oy = groundY() + 16 - oh;
 
       // 발사 시퀀스 진행
-      var rdy = 0, rjx = 0, rrot = -3, rsc = "";
+      var rdy = 0, rjx = 0, rrot = -3, rsc = "", rsx = 1, rsy = 1;
       if (rocketFx) {
         var ft = now - rocketFx.t0;
         if (rocketFx.phase === "up") {
@@ -610,7 +700,8 @@
         } else { // 착지 쿵 스쿼시
           var fp3 = Math.min(1, ft / 260);
           var fk = Math.sin(fp3 * Math.PI) * 0.06;
-          rsc = " scale(" + (1 + fk) + "," + (1 - fk) + ")";
+          rsx = 1 + fk; rsy = 1 - fk;
+          rsc = " scale(" + rsx + "," + rsy + ")";
           if (fp3 >= 1) { rocketFx = null; lastShipAt = now; } // 착륙 직후엔 잠시 탑승 안 함
         }
       }
@@ -637,7 +728,8 @@
       // 로켓은 transform-origin 50% 100%에서 rrot만큼 기울어 있으므로 창 중심도 같은 회전을 적용해야 맞는다
       var rr = rrot * Math.PI / 180, cosr = Math.cos(rr), sinr = Math.sin(rr);
       var pivx = ox + rjx + ow / 2, pivy = oy - rdy + oh;      // 회전 원점(로켓 하단 중앙)
-      var ddx = ow * (0.6458 - 0.5), ddy = oh * (0.4464 - 1);  // 원점 기준 창 중심
+      // 원점 기준 창 중심 — CSS transform 순서(translate→rotate→scale)에 맞춰 스케일 먼저 반영
+      var ddx = ow * (0.6458 - 0.5) * rsx, ddy = oh * (0.4464 - 1) * rsy;
       var gcx = pivx + ddx * cosr - ddy * sinr;
       var gcy = pivy + ddx * sinr + ddy * cosr;
       var pd = ow * 0.30;                                       // 선실은 구멍보다 넉넉히
@@ -658,7 +750,7 @@
 
       var face = (mode === "spit" || mode === "cards") ? 1 : dir;
       bod.style.transformOrigin = "50% 100%";
-      bod.style.transform = "rotate(" + (rock + lean) + "deg) scaleX(" + (face * (sx + step)) + ") scaleY(" + (sy - step) + ")";
+      bod.style.transform = "rotate(" + (rock + lean + tripRot) + "deg) scaleX(" + (face * (sx + step)) + ") scaleY(" + (sy - step) + ")";
 
       for (var i = 0; i < cards.length; i++) {
         var p = cards[i];
