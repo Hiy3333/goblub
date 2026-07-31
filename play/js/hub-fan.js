@@ -84,20 +84,10 @@ background:radial-gradient(ellipse at center,rgba(4,10,20,.68) 0%,rgba(4,10,20,.
     el.classList.toggle("front", !!open);
   }
 
-  var mode = "cards"; // 진입하자마자 카드가 펼쳐진 상태
+  // 허브에서는 고브럽이 걷지 않는다 — 중앙에 서서 카드를 펼쳐 둔 채 대기(걷기는 홈에서만)
   var x = 0, dir = 1;
-  var gait = "walk", gaitUntil = 0, squashT = 0, spitUntil = 0;
-  function pickGait(now) {
-    var r = Math.random();
-    if (gait === "stand") gait = r < 0.55 ? "walk" : "dash";
-    else if (r < 0.28) gait = "stand";
-    else gait = gait === "walk" ? "dash" : "walk";
-    var dur = gait === "stand" ? 500 + Math.random() * 1000
-            : gait === "dash" ? 600 + Math.random() * 900
-            : 900 + Math.random() * 1600;
-    gaitUntil = now + dur;
-    if (gait !== "stand" && Math.random() < 0.22) dir = -dir;
-  }
+  var squashT = 0;
+  var jumpT = 0, JUMP_DUR = 0.86; // 클릭하면 방방 두 번 뛴다
 
   // ===== 카드 부채꼴(홈 지오메트리) =====
   function targets(n) {
@@ -144,63 +134,38 @@ background:radial-gradient(ellipse at center,rgba(4,10,20,.68) 0%,rgba(4,10,20,.
       }
     });
   }
-  function closeCards() {
-    cards.forEach(function (k) { k.style.opacity = "0"; k.style.pointerEvents = "none"; k._fin = null; });
-    anims = [];
-    mode = "idle"; gaitUntil = 0;
-    setMouth(false);
-    el.classList.remove("orbon");
-  }
-  function beginSpit(now) {
-    mode = "spit";
-    setMouth(true);
-    el.classList.add("orbon");
-    squashT = 0.3;
-    spitUntil = now + 1100;
-    var h = el.offsetHeight;
-    dealFrom(x + el.offsetWidth * MOUTH_FX, groundY() - h + h * MOUTH_FY);
-  }
 
   // ===== 메인 루프 =====
   var last = Date.now(), booted = false;
   function tick(now, dt) {
     var W = window.innerWidth;
-    var minX = 20, maxX = W - 170 - 20;
+    x = centerX(); // 항상 화면 중앙(리사이즈에도 따라감)
 
-    if (mode === "run") {
-      var cx = centerX();
-      dir = cx > x ? 1 : -1;
-      if (Math.abs(cx - x) <= RUN_SPEED * dt + 14) { x = cx; beginSpit(now); }
-      else x += dir * RUN_SPEED * dt;
-    } else if (mode === "idle") {
-      if (now > gaitUntil) pickGait(now);
-      var sp = gait === "dash" ? 400 : gait === "walk" ? WALK_SPEED : 0;
-      x += dir * sp * dt;
-      if (x > maxX) { x = maxX; dir = -1; gait = "walk"; gaitUntil = now + 600; }
-      if (x < minX) { x = minX; dir = 1; gait = "walk"; gaitUntil = now + 600; }
+    // 클릭 점프: 방방 두 번 튀고 착지할 때마다 살짝 눌린다
+    var hop = 0, sx = 1, sy = 1;
+    if (jumpT > 0) {
+      jumpT -= dt;
+      var u = 1 - jumpT / JUMP_DUR;                 // 0 → 1
+      var arc = Math.abs(Math.sin(u * Math.PI * 2)); // 두 번의 산
+      var decay = 1 - u * 0.45;                      // 두 번째는 낮게
+      hop = arc * 46 * decay;
+      if (u < 0.06) { sx = 1 + 0.18; sy = 1 - 0.18; }              // 웅크림
+      else if (Math.abs(u - 0.5) < 0.05) { sx = 1 + 0.12; sy = 1 - 0.12; } // 중간 착지
+      else if (u > 0.94) { sx = 1 + 0.1; sy = 1 - 0.1; }           // 마지막 착지
+      else { sx = 1 - hop / 620; sy = 1 + hop / 520; }             // 공중에선 살짝 늘어남
+      if (jumpT <= 0) { jumpT = 0; squashT = 0.22; }
     }
-    if (mode === "spit" && now > spitUntil) mode = "cards";
-
-    var g = mode === "run" ? "run" : (mode === "idle" ? gait : "stand");
-    var moving = g === "run" || g === "walk" || g === "dash";
-    var wf = g === "run" ? 15 : g === "dash" ? 13 : 7;
-    var ph = now / 1000 * wf;
-    var rock = g === "run" ? Math.sin(ph) * 6
-             : g === "dash" ? Math.sin(ph) * 7
-             : g === "walk" ? Math.sin(ph) * 4
-             : Math.sin(now / 1000 * 1.4) * 1.2;
-    var lean = g === "run" ? 8 : g === "dash" ? 6 : 0;
-    var hop = (g === "run" || g === "dash") ? Math.abs(Math.sin(ph)) * 3 : 0;
-    var step = moving ? Math.sin(ph * 2) * 0.012 : 0;
+    var ph = now / 1000 * 7;
+    var rock = Math.sin(now / 1000 * 1.4) * 1.2;
+    var lean = 0, step = 0;
     var y = groundY() - el.offsetHeight - hop;
-    var sx = 1, sy = 1;
     if (squashT > 0) {
       squashT -= dt;
-      var k2 = Math.sin((1 - squashT / 0.3) * Math.PI) * 0.2;
+      var k2 = Math.sin((1 - squashT / 0.22) * Math.PI) * 0.16;
       sx = 1 + k2; sy = 1 - k2;
     }
     el.style.transform = "translate(" + x + "px, " + y + "px)";
-    var face = (mode === "spit" || mode === "cards") ? 1 : dir;
+    var face = 1;
     bod.style.transformOrigin = "50% 100%";
     bod.style.transform = "rotate(" + (rock + lean) + "deg) scaleX(" + (face * (sx + step)) + ") scaleY(" + (sy - step) + ")";
 
@@ -257,23 +222,11 @@ background:radial-gradient(ellipse at center,rgba(4,10,20,.68) 0%,rgba(4,10,20,.
     } catch (e) {}
   }
 
-  // ===== 클릭 =====
+  // ===== 클릭: 카드는 그대로 두고 고브럽만 방방 뛴다(허브에서는 카드가 사라지지 않음) =====
   el.addEventListener("click", function (e) {
     e.stopPropagation();
-    if (mode === "run" || mode === "spit") return;
-    if (mode === "cards") { closeCards(); return; }
-    mode = "run";
-  });
-  document.addEventListener("click", function (ev) {
-    if (mode !== "cards") return;
-    if (el.contains(ev.target)) return;
-    var t = ev.target;
-    while (t && t !== document.body) {
-      if (t.classList && (t.classList.contains("card") || t.classList.contains("pl-hot") ||
-        t.classList.contains("pl-menu") || t.classList.contains("site-header"))) return;
-      t = t.parentNode;
-    }
-    closeCards();
+    if (jumpT > 0) return;
+    jumpT = JUMP_DUR;
   });
 
   // ===== 시작: 중앙에서 이미 뱉어 둔 상태 =====

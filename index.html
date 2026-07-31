@@ -59,11 +59,18 @@
     .gm-flame.sputter b { animation: gm-sputter .32s steps(2) infinite; }
     @keyframes gm-flick { from { opacity: .95; transform: scaleY(1); } to { opacity: .72; transform: scaleY(.8); } }
     @keyframes gm-sputter { 0% { opacity: .85; transform: scaleY(.85); } 50% { opacity: .12; transform: scaleY(.35); } 100% { opacity: .6; transform: scaleY(.6); } }
-    /* 우주선 내부(유리 뒤 배경) — 원래 유리 톤과 같은 회청색이라 평소엔 티 안 남 */
+    /* 우주선 내부(유리 뒤 배경) — 유리 안쪽 전체가 균일한 선실색 */
     .gm-cabin {
       position: absolute; left: 0; top: 0; z-index: 11; pointer-events: none;
       border-radius: 50%;
-      background: radial-gradient(circle at 38% 30%, #b8c8ca, #6e848a 72%);
+      background: radial-gradient(circle at 40% 34%, #9fb4b8, #63787e 76%);
+    }
+    /* 유리 반사 — 로켓 위(z13)에 얹어 창 전체에 균일하게 */
+    .gm-glass {
+      position: absolute; left: 0; top: 0; z-index: 13; pointer-events: none;
+      border-radius: 50%;
+      background: linear-gradient(133deg, rgba(240, 252, 255, .42) 0%, rgba(225, 245, 250, .16) 26%, rgba(200, 230, 240, 0) 46%, rgba(12, 28, 36, .22) 100%);
+      box-shadow: inset 0 0 14px rgba(10, 24, 30, .5), inset 0 3px 5px rgba(8, 20, 26, .35);
     }
     /* 창문 빼꼼(고브럽 눈) — 로켓 유리(반투명) 뒤에서 비쳐 보인다 */
     .gm-peek {
@@ -184,7 +191,7 @@
     /* 고브럽 */
     .gm-goblub { position: absolute; left: 0; top: 0; z-index: 10; width: 170px; cursor: pointer; will-change: transform; }
     /* 첫 프레임에서 위치 잡기 전까지 숨김(로드 직후 왼쪽 위에 깜빡 보이는 것 방지) */
-    .gm-goblub, .gm-obj, .gm-shad, .gm-spark, .gm-cabin { visibility: hidden; }
+    .gm-goblub, .gm-obj, .gm-shad, .gm-spark, .gm-cabin, .gm-glass { visibility: hidden; }
     .gm-goblub .bodywrap { position: relative; width: 100%; will-change: transform; }
     .gm-goblub img { width: 100%; height: auto; display: block; user-select: none; -webkit-user-drag: none;
       filter: drop-shadow(0 8px 9px rgba(0, 22, 32, .22)); transition: filter .18s; }
@@ -274,6 +281,7 @@
   <div class="gm-shad" id="gm-objshad"></div>
   <div class="gm-cabin" id="gm-cabin"></div>
   <div class="gm-peek" id="gm-peek"><img src="design/img/home/gb-front.webp" alt="" /></div>
+  <div class="gm-glass" id="gm-glass"></div>
 
   <span class="gm-star" style="top:22%;left:14%;font-size:1.5rem;">✦</span>
   <span class="gm-star" style="top:36%;right:20%;font-size:1.2rem;animation-delay:-1.2s;">✦</span>
@@ -350,6 +358,7 @@
     var ship = null, lastShipAt = Date.now() - 6000;
     var flame = document.getElementById("gm-flame");
     var cabin = document.getElementById("gm-cabin");
+    var glass = document.getElementById("gm-glass");
     var rocketFx = null; // 발사 시퀀스: up(불 뿜으며 상승)→sputter(연료 부족 픽픽)→fall(추락)→land(쿵)
     obj.addEventListener("click", function () {
       if (rocketFx || ship) return;
@@ -624,12 +633,21 @@
       objshad.style.transform = "translate(" + (rcx + rdN * 90 - rsw / 2) + "px," + (groundY() + 12 - rsh / 2) + "px)";
 
       // 창문 빼꼼 원형 클립 위치(창 중심 0.65, 0.44 / 유리 지름 0.24×몸폭)
-      var pd = ow * 0.28; // 유리 전체(실측 중심 0.645/0.447·지름 26.8%)를 뒤에서 완전히 덮는 크기
-      var pcx = ox + rjx + ow * 0.645 - pd / 2, pcy = oy - rdy + oh * 0.447 - pd / 2;
+      // 유리 구멍 실측: 중심 0.6458/0.4464, 지름 26.56%
+      // 로켓은 transform-origin 50% 100%에서 rrot만큼 기울어 있으므로 창 중심도 같은 회전을 적용해야 맞는다
+      var rr = rrot * Math.PI / 180, cosr = Math.cos(rr), sinr = Math.sin(rr);
+      var pivx = ox + rjx + ow / 2, pivy = oy - rdy + oh;      // 회전 원점(로켓 하단 중앙)
+      var ddx = ow * (0.6458 - 0.5), ddy = oh * (0.4464 - 1);  // 원점 기준 창 중심
+      var gcx = pivx + ddx * cosr - ddy * sinr;
+      var gcy = pivy + ddx * sinr + ddy * cosr;
+      var pd = ow * 0.30;                                       // 선실은 구멍보다 넉넉히
       cabin.style.width = pd + "px"; cabin.style.height = pd + "px";
-      cabin.style.transform = "translate(" + pcx + "px," + pcy + "px)";
+      cabin.style.transform = "translate(" + (gcx - pd / 2) + "px," + (gcy - pd / 2) + "px)";
+      var gd = ow * 0.2656;                                     // 유리 반사는 구멍에 딱 맞게
+      glass.style.width = gd + "px"; glass.style.height = gd + "px";
+      glass.style.transform = "translate(" + (gcx - gd / 2) + "px," + (gcy - gd / 2) + "px)";
       peek.style.width = pd + "px"; peek.style.height = pd + "px";
-      peek.style.transform = "translate(" + pcx + "px," + pcy + "px)";
+      peek.style.transform = "translate(" + (gcx - pd / 2) + "px," + (gcy - pd / 2) + "px)";
       // 정면 이미지의 눈알 중심(0.565, 0.155)이 창 정중앙에 오도록
       var pimg = peek.firstElementChild;
       pimg.style.width = (pd * 4.47) + "px";
@@ -820,6 +838,7 @@
           objshad.style.visibility = "visible";
           spark.style.visibility = "visible";
           cabin.style.visibility = "visible";
+          glass.style.visibility = "visible";
         }
       } catch (e) {}
     }
