@@ -6,12 +6,15 @@
   var loggedIn = false;
   try { var u = JSON.parse(localStorage.getItem("goblub_user")); loggedIn = !!(u && u.sub); } catch (e) {}
 
+  // 홈에서는 goblub 로고, 그 외 페이지에서는 Home(누르면 홈으로)
+  var isHome = !!(document.body && document.body.classList.contains("home-moon"));
+  var logoHTML = isHome
+    ? '<span class="l1">g</span><span class="l2">o</span><span class="l3">b</span>' +
+      '<span class="l4">l</span><span class="l5">u</span><span class="l6">b</span>'
+    : '<span class="l1">H</span><span class="l2">o</span><span class="l3">m</span><span class="l4">e</span>';
   var headerHTML =
     '<header class="site-header">' +
-    '<a class="logo" href="' + root + '/index.html">' +
-    '<span class="l1">g</span><span class="l2">o</span><span class="l3">b</span>' +
-    '<span class="l4">l</span><span class="l5">u</span><span class="l6">b</span>' +
-    "</a>" +
+    '<a class="logo" href="' + root + '/index.html">' + logoHTML + "</a>" +
     '<nav class="site-nav">' +
     '<a href="' + root + '/index.html">홈</a>' +
     '<a href="' + root + '/apps.html">앱</a>' +

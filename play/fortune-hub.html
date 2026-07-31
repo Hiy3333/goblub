@@ -16,12 +16,10 @@
       content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
       background: url("../design/img/home-bg-22.webp") center bottom / cover no-repeat;
     }
-    /* 카드 색을 연보라 땅(#d2c7e9) 계열 파스텔로 통일 */
-    body.clay .card.tint-coral  { background: linear-gradient(180deg, #eee2f7, #d8b8ef) !important; }
-    body.clay .card.tint-yellow { background: linear-gradient(180deg, #ece2f7, #d1b8ef) !important; }
-    body.clay .card.tint-mint   { background: linear-gradient(180deg, #e9e2f7, #cab8ef) !important; }
-    body.clay .card.tint-sky    { background: linear-gradient(180deg, #e6e2f7, #c3b8ef) !important; }
-    body.clay .card.tint-purple { background: linear-gradient(180deg, #e4e2f7, #bcb8ef) !important; }
+    /* 카드는 땅 색(#d2c7e9)과 동일한 한 색으로 통일 + 글자는 홈 카드 기준 */
+    body.clay .card[class*="tint-"] { background: linear-gradient(180deg, #efe9f9, #d2c7e9) !important; }
+    body.clay .card h2 { color: #235a6b; }
+    body.clay .card p { color: #58818c; }
     body.clay .hero h1 {
       background: none; -webkit-background-clip: initial; background-clip: initial; color: #fdf3cf;
       filter: none; text-shadow: 0 3px 0 rgba(16, 20, 50, .6), 0 10px 24px rgba(0, 0, 0, .55);
@@ -149,7 +147,7 @@
   </main>
   <div id="site-footer"></div>
   <script src="../js/common.js?v=5" data-root=".."></script>
-  <script src="js/hub-fan.js?v=1"></script>
+  <script src="js/hub-fan.js?v=2" data-root=".."></script>
   <script>
     // 행성 클릭 메뉴(홈과 동일) — 데스크톱 전용
     (function () {

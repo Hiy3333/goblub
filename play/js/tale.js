@@ -52,7 +52,7 @@ padding:12px 14px;font-family:inherit;font-size:.98rem;cursor:pointer;text-align
 .tale-inp input,.tale-inp select{background:rgba(20,14,44,.95);border:1px solid rgba(150,120,230,.5);border-radius:10px;color:#efeaff;\
 padding:11px 13px;font-family:inherit;font-size:1rem;width:100%}\
 .tale-inp input:focus,.tale-inp select:focus{outline:none;border-color:#b18cff}\
-.tale-inp input.err{border-color:#ff5a5a!important;animation:tale-shakex .35s ease}\
+.tale-inp input.err,.tale-inp select.err{border-color:#ff5a5a!important;animation:tale-shakex .35s ease}\
 .tale-inp input.err::placeholder{color:#ff8a8a}\
 @keyframes tale-shakex{20%{transform:translateX(-7px)}45%{transform:translateX(6px)}70%{transform:translateX(-4px)}90%{transform:translateX(3px)}}\
 .tale-inp .row{display:flex;gap:7px}\
@@ -401,7 +401,9 @@ box-shadow:0 0 0 100vmax #040308,0 0 70px rgba(0,0,0,.8)}}";
         // 자동 포커스 안 함 — 사용자가 칸을 직접 눌러야 키보드가 올라오게
       } else if (inp.kind === "birth") {
         var pre = collected.birth || (opts.hasBirth && opts.initialBirth) || {};
-        var wrapY = sel("y"), wrapM = sel("m"), wrapD = sel("d"), wrapH = sel("h"), wrapMi = sel("mi"), wrapG = sel("g");
+        var wrapC = sel("c"), wrapY = sel("y"), wrapM = sel("m"), wrapD = sel("d"), wrapH = sel("h"), wrapMi = sel("mi"), wrapG = sel("g");
+        var row0 = document.createElement("div"); row0.className = "row";
+        row0.appendChild(wrapC.el);
         var row1 = document.createElement("div"); row1.className = "row";
         row1.appendChild(wrapY.el); row1.appendChild(wrapM.el); row1.appendChild(wrapD.el);
         var row2 = document.createElement("div"); row2.className = "row";
@@ -409,10 +411,23 @@ box-shadow:0 0 0 100vmax #040308,0 0 70px rgba(0,0,0,.8)}}";
         // 시를 모르면 분 선택 비활성화
         function syncMin() { wrapMi.el.disabled = (wrapH.el.value === ""); if (wrapMi.el.disabled) wrapMi.el.value = 0; }
         wrapH.el.addEventListener("change", syncMin); syncMin();
+        function shake(el2) { el2.classList.remove("err"); void el2.offsetWidth; el2.classList.add("err"); setTimeout(function () { el2.classList.remove("err"); }, 700); }
         var ok2 = document.createElement("button"); ok2.className = "ok"; ok2.textContent = inp.submit || "확인";
         ok2.onclick = function (e) {
           e.stopPropagation(); kickBGM();
-          var b = { y: +wrapY.el.value, m: +wrapM.el.value, d: +wrapD.el.value };
+          var iy = +wrapY.el.value, im = +wrapM.el.value, id = +wrapD.el.value;
+          var calv = wrapC.el.value; // "" 양력 | "L" 음력 | "LL" 음력 윤달
+          var b;
+          if (calv === "" ) {
+            var dt = new Date(iy, im - 1, id);
+            if (dt.getFullYear() !== iy || dt.getMonth() !== im - 1 || dt.getDate() !== id) { shake(wrapD.el); return; }
+            b = { y: iy, m: im, d: id };
+          } else {
+            if (!window.GoblubLunar) { shake(wrapC.el); return; }
+            var sol = GoblubLunar.lunarToSolar(iy, im, id, calv === "LL");
+            if (!sol) { shake(calv === "LL" ? wrapC.el : wrapD.el); return; } // 없는 윤달/없는 날
+            b = { y: sol.y, m: sol.m, d: sol.d, cal: "lunar", leap: calv === "LL", ly: iy, lm: im, ld: id };
+          }
           var hv = wrapH.el.value; b.hour = hv === "" ? null : +hv;
           b.min = b.hour == null ? 0 : (+wrapMi.el.value || 0);
           b.gender = wrapG.el.value || null;
@@ -420,12 +435,18 @@ box-shadow:0 0 0 100vmax #040308,0 0 70px rgba(0,0,0,.8)}}";
           if (opts.compute) { var r = opts.compute(b); if (r) { base = r.base; deep = r.deep; } }
           advance();
         };
-        inpEl.appendChild(row1); inpEl.appendChild(row2); inpEl.appendChild(ok2);
+        inpEl.appendChild(row0); inpEl.appendChild(row1); inpEl.appendChild(row2); inpEl.appendChild(ok2);
         function sel(kind) {
           var s = document.createElement("select"); var o;
-          if (kind === "y") { for (var y = new Date().getFullYear(); y >= 1930; y--) { o = new Option(y + "년", y); s.add(o); } s.value = pre.y || 1995; }
-          if (kind === "m") { for (var m = 1; m <= 12; m++) s.add(new Option(m + "월", m)); s.value = pre.m || 1; }
-          if (kind === "d") { for (var d = 1; d <= 31; d++) s.add(new Option(d + "일", d)); s.value = pre.d || 1; }
+          if (kind === "c") {
+            s.add(new Option("양력으로 아뢴다", ""));
+            s.add(new Option("음력으로 아뢴다", "L"));
+            s.add(new Option("음력 윤달로 아뢴다", "LL"));
+            s.value = pre.cal === "lunar" ? (pre.leap ? "LL" : "L") : "";
+          }
+          if (kind === "y") { for (var y = new Date().getFullYear(); y >= 1930; y--) { o = new Option(y + "년", y); s.add(o); } s.value = (pre.cal === "lunar" ? pre.ly : pre.y) || 1995; }
+          if (kind === "m") { for (var m = 1; m <= 12; m++) s.add(new Option(m + "월", m)); s.value = (pre.cal === "lunar" ? pre.lm : pre.m) || 1; }
+          if (kind === "d") { for (var d = 1; d <= 31; d++) s.add(new Option(d + "일", d)); s.value = (pre.cal === "lunar" ? pre.ld : pre.d) || 1; }
           if (kind === "h") { s.add(new Option("태어난 시 모름", "")); for (var h = 0; h < 24; h++) s.add(new Option(h + "시", h)); s.value = (pre.hour == null ? "" : pre.hour); }
           if (kind === "mi") { for (var mi2 = 0; mi2 < 60; mi2++) s.add(new Option(mi2 + "분", mi2)); s.value = (pre.min == null ? 0 : pre.min); }
           if (kind === "g") { s.add(new Option("성별 안 밝힘", "")); s.add(new Option("남", "M")); s.add(new Option("여", "F")); s.value = pre.gender || ""; }

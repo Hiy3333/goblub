@@ -71,13 +71,26 @@
       opacity: 0; transition: opacity .28s;
     }
     .gm-peek img { position: absolute; display: block; max-width: none; filter: none;
-      animation: gm-look 2.4s ease-in-out infinite; }
-    /* 창문 안에서 좌우 둘러보기 */
+      animation: gm-look 3.4s cubic-bezier(.34, 1.45, .6, 1) infinite; }
+    /* 창문 안에서 귀엽게 두리번: 갸웃 기울이고 콩콩 튀면서 좌우를 본다 */
     @keyframes gm-look {
-      0%, 12% { margin-left: 0; }
-      30%, 44% { margin-left: -9px; }
-      62%, 78% { margin-left: 9px; }
-      95%, 100% { margin-left: 0; }
+      0%, 10% { margin-left: 0; transform: translateY(0) rotate(0deg); }
+      16% { margin-left: -10px; transform: translateY(-3px) rotate(-7deg); }
+      20%, 34% { margin-left: -9px; transform: translateY(0) rotate(-6deg); }
+      40% { margin-left: 9px; transform: translateY(-3px) rotate(7deg); }
+      44%, 58% { margin-left: 9px; transform: translateY(0) rotate(6deg); }
+      64% { margin-left: 0; transform: translateY(-4px) rotate(0deg); }
+      68%, 100% { margin-left: 0; transform: translateY(0) rotate(0deg); }
+    }
+    /* 이따금 눈 깜빡 — 펠트색 눈꺼풀이 스르륵 */
+    .gm-peek::after {
+      content: ""; position: absolute; left: -12%; top: -110%; width: 124%; height: 106%;
+      border-radius: 0 0 50% 50%; background: linear-gradient(180deg, #8f9196, #a9abb0);
+      animation: gm-blink 3.4s infinite;
+    }
+    @keyframes gm-blink {
+      0%, 70%, 78%, 100% { transform: translateY(0); }
+      73%, 75% { transform: translateY(100%); }
     }
     .gm-goblub { transition: opacity .18s; }
     /* 토성 광원 기준 고브럽 그림자 */

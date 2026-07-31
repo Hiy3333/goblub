@@ -295,7 +295,8 @@
   <script src="js/goblub-art.js"></script>
   <script src="js/report-ui.js?v=6"></script>
   <script src="js/gwigok-audio.js?v=1"></script>
-  <script src="js/tale.js?v=25"></script>
+  <script src="js/lunar.js?v=1"></script>
+  <script src="js/tale.js?v=26"></script>
   <script>
     (function () {
       var $ = function (id) { return document.getElementById(id); };
@@ -402,7 +403,8 @@
           base: base, deep: deep, hasBirth: !!b, initialBirth: b,
           costText: costLabel(),
           compute: function (nb) {
-            var merged = b ? { y: nb.y, m: nb.m, d: nb.d, hour: nb.hour, min: nb.min || 0, gender: nb.gender || b.gender || null } : nb;
+            var merged = b ? { y: nb.y, m: nb.m, d: nb.d, hour: nb.hour, min: nb.min || 0, gender: nb.gender || b.gender || null,
+              cal: nb.cal || null, leap: nb.leap || false, ly: nb.ly, lm: nb.lm, ld: nb.ld } : nb;
             try { localStorage.setItem("goblub_birth", JSON.stringify(merged)); } catch (e) {}
             b = merged; computeFrom(merged);
             return { base: base, deep: deep };
