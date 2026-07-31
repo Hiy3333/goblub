@@ -9,6 +9,28 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../css/style.css?v=cl1" />
+  <style>
+    /* 분홍 달+바다 배경 + 가독성 오버라이드 */
+    body.clay {
+      background: linear-gradient(rgba(8, 12, 32, .2), rgba(8, 12, 32, .2)),
+        url("../design/img/home-bg-9.webp") center bottom / cover no-repeat #0e1734 !important;
+    }
+    body.clay .hero h1 {
+      background: none; -webkit-background-clip: initial; background-clip: initial; color: #ffe9df;
+      filter: none; text-shadow: 0 3px 0 rgba(14, 18, 46, .6), 0 10px 24px rgba(0, 0, 0, .55);
+    }
+    body.clay .hero p { color: #f0e7ef; text-shadow: 0 2px 8px rgba(8, 12, 36, .75); }
+    body.clay .fine-print { color: #d8d3e8; text-shadow: 0 1px 6px rgba(8, 12, 36, .7); }
+    /* 카테고리 카드 뽕뽕 등장 */
+    .card-grid .card { opacity: 0; }
+    .card-grid .card.pop { animation: gbPop .5s cubic-bezier(.3, 1.6, .55, 1) forwards; }
+    .card-grid .card.shown { opacity: 1; }
+    @keyframes gbPop {
+      0% { opacity: 0; transform: scale(.35); }
+      65% { opacity: 1; transform: scale(1.08); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+  </style>
 </head>
 <body class="clay">
   <div id="site-header"></div>
@@ -55,5 +77,14 @@
   </main>
   <div id="site-footer"></div>
   <script src="../js/common.js?v=5" data-root=".."></script>
+  <script>
+    // 카테고리 카드 뽕뽕 순차 등장
+    Array.prototype.forEach.call(document.querySelectorAll(".card-grid .card"), function (c, i) {
+      setTimeout(function () {
+        c.classList.add("pop");
+        c.addEventListener("animationend", function () { c.classList.remove("pop"); c.classList.add("shown"); }, { once: true });
+      }, 130 * i + 150);
+    });
+  </script>
 </body>
 </html>
