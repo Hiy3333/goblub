@@ -58,16 +58,17 @@
     .gm-flame.sputter b { animation: gm-sputter .32s steps(2) infinite; }
     @keyframes gm-flick { from { opacity: .95; transform: scaleY(1); } to { opacity: .72; transform: scaleY(.8); } }
     @keyframes gm-sputter { 0% { opacity: .85; transform: scaleY(.85); } 50% { opacity: .12; transform: scaleY(.35); } 100% { opacity: .6; transform: scaleY(.6); } }
-    /* 우주선 창문 빼꼼(원형 클립 속 고브럽 눈) — 유리 안쪽 느낌 */
-    .gm-peek {
-      position: absolute; left: 0; top: 0; z-index: 13; pointer-events: none;
-      border-radius: 50%; overflow: hidden; background: #17242b;
-      opacity: 0; transition: opacity .28s;
+    /* 우주선 내부(항상 유리 뒤에 보이는 어두운 선실) — 로켓 z12보다 아래 */
+    .gm-cabin {
+      position: absolute; left: 0; top: 0; z-index: 11; pointer-events: none;
+      border-radius: 50%;
+      background: radial-gradient(circle at 40% 35%, #263740, #0c151b 78%);
     }
-    .gm-peek::after { /* 유리 반사 + 안쪽 그림자 */
-      content: ""; position: absolute; inset: 0; border-radius: 50%;
-      background: linear-gradient(135deg, rgba(200, 228, 232, .38) 0%, rgba(200, 228, 232, .1) 26%, rgba(200, 228, 232, 0) 45%, rgba(10, 24, 32, .3) 100%);
-      box-shadow: inset 0 0 12px rgba(0, 0, 0, .6), inset 0 2px 4px rgba(0, 0, 0, .4);
+    /* 창문 빼꼼(고브럽 눈) — 로켓 유리(반투명) 뒤에서 비쳐 보인다 */
+    .gm-peek {
+      position: absolute; left: 0; top: 0; z-index: 11; pointer-events: none;
+      border-radius: 50%; overflow: hidden;
+      opacity: 0; transition: opacity .28s;
     }
     .gm-peek img { position: absolute; display: block; max-width: none; filter: none;
       animation: gm-look 2.4s ease-in-out infinite; }
@@ -145,7 +146,7 @@
     /* 고브럽 */
     .gm-goblub { position: absolute; left: 0; top: 0; z-index: 10; width: 170px; cursor: pointer; will-change: transform; }
     /* 첫 프레임에서 위치 잡기 전까지 숨김(로드 직후 왼쪽 위에 깜빡 보이는 것 방지) */
-    .gm-goblub, .gm-obj, .gm-shad, .gm-glow { visibility: hidden; }
+    .gm-goblub, .gm-obj, .gm-shad, .gm-glow, .gm-cabin { visibility: hidden; }
     .gm-goblub .bodywrap { position: relative; width: 100%; will-change: transform; }
     .gm-goblub img { width: 100%; height: auto; display: block; user-select: none; -webkit-user-drag: none;
       filter: drop-shadow(0 8px 9px rgba(0, 22, 32, .22)); }
@@ -190,12 +191,12 @@
       box-shadow: 0 22px 42px rgba(0, 22, 32, .58), inset 0 2px 0 rgba(255,255,255,.8); }
     .gm-card .ic {
       display: flex; align-items: center; justify-content: center;
-      width: 56px; height: 56px; border-radius: 50%;
+      width: 68px; height: 68px; border-radius: 50%;
       box-shadow: inset 0 -4px 8px rgba(29, 90, 107, .14), inset 0 2px 3px rgba(255,255,255,.7);
-      font-size: 1.7rem; line-height: 1;
+      font-size: 2.05rem; line-height: 1;
     }
-    .gm-card .tt { font-size: 1.2rem; line-height: 1.1; }
-    .gm-card .ds { font-size: .76rem; color: #58818c; }
+    .gm-card .tt { font-size: 1.42rem; line-height: 1.15; }
+    .gm-card .ds { font-size: .88rem; line-height: 1.35; color: #58818c; padding: 0 6px; word-break: keep-all; }
     @media (max-width: 700px) {
       .gm-card { gap: 7px; padding: 10px; }
       .gm-card .ic { width: 52px; height: 52px; font-size: 1.6rem; }
@@ -215,7 +216,7 @@
 
   <div class="gm-word" id="gm-word">
     <h1>고브럽</h1>
-    <p>와서 놀다 가세요 ✦</p>
+    <p>와서 놀다 가세요</p>
   </div>
 
   <div class="gm-tint"></div>
@@ -225,6 +226,7 @@
   <img class="gm-obj" id="gm-obj" src="design/img/home/obj-rocket.webp" alt="" draggable="false" />
   <div class="gm-flame" id="gm-flame"><b></b></div>
   <div class="gm-shad" id="gm-objshad"></div>
+  <div class="gm-cabin" id="gm-cabin"></div>
   <div class="gm-peek" id="gm-peek"><img src="design/img/home/gb-front.webp" alt="" /></div>
 
   <span class="gm-star" style="top:22%;left:14%;font-size:1.5rem;">✦</span>
@@ -300,7 +302,15 @@
 
     // 우주선 탑승 시퀀스: in(들어감)→peek(창문 빼꼼)→out(나옴)
     var ship = null, lastShipAt = Date.now() - 6000;
+    // 첫 진입: 우주선 문 앞으로 걸어가 탑승하는 것부터 시작
+    if (!isMobile()) {
+      var doorX0 = Math.min(window.innerWidth * 0.78, window.innerWidth - 190 - 24) + 95;
+      x = doorX0 - CHAR_W / 2 - 150;
+      dir = 1; gait = "walk"; gaitUntil = Date.now() + 3000;
+      lastShipAt = Date.now() - 20000;
+    }
     var flame = document.getElementById("gm-flame");
+    var cabin = document.getElementById("gm-cabin");
     var rocketFx = null; // 발사 시퀀스: up(불 뿜으며 상승)→sputter(연료 부족 픽픽)→fall(추락)→land(쿵)
     obj.addEventListener("click", function () {
       if (rocketFx || ship) return;
@@ -371,7 +381,7 @@
         }
       } else {
         // 고양이 타로처럼: 세로형 카드가 아크 위에서 왼쪽→오른쪽 부채꼴로 촤라락
-        var cw2 = Math.min(204, W * 0.165), ch2 = Math.round(cw2 * 1.24); // +10%
+        var cw2 = Math.min(204, W * 0.165), ch2 = Math.round(cw2 * 1.34); // 두 줄 설명 여유 비율
         var span = Math.min(W * 0.80, 1100);   // 부채 전체 폭(양끝 카드 중심 간)
         var cy = H * 0.40, curve = H * 0.16;   // 가운데가 높고 양끝이 내려오는 호
         for (var j = 0; j < n; j++) {
@@ -566,9 +576,12 @@
       objshad.style.transform = "translate(" + (rcx + rdN * 90 - rsw / 2) + "px," + (groundY() + 12 - rsh / 2) + "px)";
 
       // 창문 빼꼼 원형 클립 위치(창 중심 0.65, 0.44 / 유리 지름 0.24×몸폭)
-      var pd = ow * 0.185; // 유리 링 안쪽에 들어가는 크기
+      var pd = ow * 0.25; // 뚫린 유리 구멍을 뒤에서 완전히 덮는 크기
+      var pcx = ox + ow * 0.65 - pd / 2, pcy = oy + oh * 0.44 - pd / 2;
+      cabin.style.width = pd + "px"; cabin.style.height = pd + "px";
+      cabin.style.transform = "translate(" + pcx + "px," + pcy + "px)";
       peek.style.width = pd + "px"; peek.style.height = pd + "px";
-      peek.style.transform = "translate(" + (ox + ow * 0.65 - pd / 2) + "px," + (oy + oh * 0.44 - pd / 2) + "px)";
+      peek.style.transform = "translate(" + pcx + "px," + pcy + "px)";
       // 정면 이미지의 눈알 중심(0.565, 0.155)이 창 정중앙에 오도록
       var pimg = peek.firstElementChild;
       pimg.style.width = (pd * 4.47) + "px";
@@ -712,6 +725,7 @@
           shad.style.visibility = "visible";
           objshad.style.visibility = "visible";
           glow.style.visibility = "visible";
+          cabin.style.visibility = "visible";
         }
       } catch (e) {}
     }
