@@ -58,11 +58,11 @@
     .gm-flame.sputter b { animation: gm-sputter .32s steps(2) infinite; }
     @keyframes gm-flick { from { opacity: .95; transform: scaleY(1); } to { opacity: .72; transform: scaleY(.8); } }
     @keyframes gm-sputter { 0% { opacity: .85; transform: scaleY(.85); } 50% { opacity: .12; transform: scaleY(.35); } 100% { opacity: .6; transform: scaleY(.6); } }
-    /* 우주선 내부(항상 유리 뒤에 보이는 어두운 선실) — 로켓 z12보다 아래 */
+    /* 우주선 내부(유리 뒤 배경) — 원래 유리 톤과 같은 회청색이라 평소엔 티 안 남 */
     .gm-cabin {
       position: absolute; left: 0; top: 0; z-index: 11; pointer-events: none;
       border-radius: 50%;
-      background: radial-gradient(circle at 40% 35%, #263740, #0c151b 78%);
+      background: radial-gradient(circle at 38% 30%, #b8c8ca, #6e848a 72%);
     }
     /* 창문 빼꼼(고브럽 눈) — 로켓 유리(반투명) 뒤에서 비쳐 보인다 */
     .gm-peek {
@@ -108,6 +108,30 @@
     }
     body.home-moon .site-nav a:hover { background: rgba(255,255,255,.24); color: #fff; }
     body.home-moon .site-nav a { white-space: nowrap; }
+    /* 데스크톱: 로고만 정중앙(메뉴는 토성 클릭으로), 모바일은 기존 내비 유지 */
+    @media (min-width: 701px) {
+      body.home-moon .site-header { padding: 10px 26px; }
+      body.home-moon .site-nav { display: none; }
+    }
+    /* 토성 메뉴: 클릭하면 오른쪽에서 카드처럼 챠라락 */
+    .gm-satmenu {
+      position: absolute; left: 0; top: 0; z-index: 25; display: none;
+      flex-direction: column; gap: 10px; align-items: flex-end;
+    }
+    .gm-satmenu.on { display: flex; }
+    .gm-satmenu a {
+      display: flex; align-items: center; gap: 10px;
+      background: linear-gradient(180deg, #f9f0d4, #efe3bd);
+      padding: 11px 20px; border-radius: 14px; border: 3px solid rgba(29, 90, 107, .25);
+      box-shadow: 0 10px 22px rgba(0, 22, 32, .45); font-size: 1.08rem; white-space: nowrap;
+      opacity: 0; transform: translateX(60px) rotate(6deg);
+    }
+    .gm-satmenu a, body.home-moon .gm-satmenu a { color: #235a6b; }
+    body.home-moon .gm-satmenu a:hover { color: #235a6b; border-color: rgba(29, 90, 107, .55); }
+    .gm-satmenu.on a { animation: gm-mdeal .4s cubic-bezier(.3, 1.35, .6, 1) forwards; }
+    .gm-satmenu.on a:nth-child(2) { animation-delay: .1s; }
+    .gm-satmenu.on a:nth-child(3) { animation-delay: .2s; }
+    @keyframes gm-mdeal { to { opacity: 1; transform: translateX(0) rotate(0); } }
     @media (max-width: 700px) {
       body.home-moon .site-header { gap: 10px; padding: 7px 10px 7px 16px; }
       body.home-moon .logo { font-size: 1.25rem; }
@@ -174,20 +198,6 @@
       box-shadow: 0 8px 18px rgba(0, 22, 32, .35); animation: gm-hint 2s ease-in-out infinite;
     }
     @keyframes gm-hint { 0%,100% { transform: translate(-50%, 0); } 50% { transform: translate(-50%, -8px); } }
-    /* 3초 동안 안 누르면 머리 위에 화살표 + 눌러줘! */
-    .gm-nudge {
-      position: absolute; left: 50%; top: -110px; display: none;
-      flex-direction: column; align-items: center; gap: 3px; pointer-events: none;
-      animation: gm-nudgeb .95s ease-in-out infinite;
-    }
-    .gm-nudge span {
-      background: #ffd95e; color: #4a3a10; font-size: 1.28rem; padding: 9px 20px;
-      border-radius: 999px; white-space: nowrap;
-      box-shadow: 0 8px 18px rgba(0, 22, 32, .42);
-    }
-    .gm-nudge b { color: #ffd95e; font-size: 1.7rem; line-height: 1; font-weight: 400;
-      text-shadow: 0 3px 8px rgba(0, 22, 32, .55); }
-    @keyframes gm-nudgeb { 0%, 100% { transform: translate(-50%, 0); } 50% { transform: translate(-50%, -12px); } }
 
     /* 카드 */
     .gm-cards { position: absolute; inset: 0; z-index: 20; pointer-events: none; }
@@ -230,12 +240,16 @@
 
   <div class="gm-word" id="gm-word">
     <h1>고브럽</h1>
-    <p>와서 놀다 가세요</p>
+    <p>행운은 눌러야 나와</p>
   </div>
 
   <div class="gm-tint"></div>
   <div class="gm-glow" id="gm-glow"></div>
   <div class="gm-sathot" id="gm-sathot" title=""></div>
+  <div class="gm-satmenu" id="gm-satmenu">
+    <a href="apps.html"><span>📱</span>앱 다운로드</a>
+    <a href="mypage.html" id="gm-satlogin"><span>🔑</span>로그인</a>
+  </div>
   <div class="gm-shad" id="gm-shad"></div>
   <img class="gm-obj" id="gm-obj" src="design/img/home/obj-rocket.webp" alt="" draggable="false" />
   <div class="gm-flame" id="gm-flame"><b></b></div>
@@ -270,7 +284,6 @@
 
   <div class="gm-goblub" id="gm-goblub">
     <div class="gm-hint" id="gm-hint">나를 눌러봐~</div>
-    <div class="gm-nudge" id="gm-nudge"><span>눌러줘!</span><b>▼</b></div>
     <div class="bodywrap" id="gm-body">
       <img id="gm-img" src="design/img/home/gb-walk.webp" alt="고브럽" draggable="false" />
       <div class="gm-mouth"><svg viewBox="0 0 100 100" aria-hidden="true">
@@ -299,7 +312,7 @@
       "심심하지? 콕 눌러봐!",
       "여기야 여기~ 클릭!",
       "놀 거 잔뜩 물고 있어!",
-      "누르면 좋은 일 생김 ✦",
+      "누르면 좋은 일 생김",
       "입 벌리면 놀라지 마!"
     ];
 
@@ -312,8 +325,6 @@
     var glow = document.getElementById("gm-glow");
     var shad = document.getElementById("gm-shad");
     var obj = document.getElementById("gm-obj");
-    var nudge = document.getElementById("gm-nudge");
-    var everClicked = false, pageT0 = Date.now();
     var objshad = document.getElementById("gm-objshad");
     var peek = document.getElementById("gm-peek");
 
@@ -533,6 +544,8 @@
       var hd = sat.r * 2.3; // 토성 호버 핫스팟
       sathot.style.width = hd + "px"; sathot.style.height = hd + "px";
       sathot.style.transform = "translate(" + (sat.x - hd / 2) + "px," + (sat.y - hd / 2) + "px)";
+      // 토성 메뉴는 토성 바로 아래 오른쪽 정렬
+      satmenu.style.transform = "translate(" + Math.min(sat.x + sat.r * 0.4, W - 190) + "px," + (sat.y + hd / 2 + 14) + "px)";
       var ccx = x + el.offsetWidth / 2;
       var dN = (ccx - sat.x) / W; // 토성 기준 좌우 거리(-: 토성이 오른쪽)
       var sw2 = CHAR_W * (0.74 + Math.min(0.5, Math.abs(dN)) * 0.6) * (1 - hop / 40);
@@ -593,8 +606,8 @@
       objshad.style.transform = "translate(" + (rcx + rdN * 90 - rsw / 2) + "px," + (groundY() + 12 - rsh / 2) + "px)";
 
       // 창문 빼꼼 원형 클립 위치(창 중심 0.65, 0.44 / 유리 지름 0.24×몸폭)
-      var pd = ow * 0.25; // 뚫린 유리 구멍을 뒤에서 완전히 덮는 크기
-      var pcx = ox + ow * 0.65 - pd / 2, pcy = oy + oh * 0.44 - pd / 2;
+      var pd = ow * 0.25; // 뚫린 유리 구멍을 뒤에서 완전히 덮는 크기(발사 중엔 로켓을 따라감)
+      var pcx = ox + rjx + ow * 0.65 - pd / 2, pcy = oy - rdy + oh * 0.44 - pd / 2;
       cabin.style.width = pd + "px"; cabin.style.height = pd + "px";
       cabin.style.transform = "translate(" + pcx + "px," + pcy + "px)";
       peek.style.width = pd + "px"; peek.style.height = pd + "px";
@@ -606,11 +619,6 @@
       pimg.style.top = (-0.147 * pd) + "px";
 
       if (ship) shad.style.opacity = "0"; // 안에 들어가 있을 땐 고브럽 그림자도 숨김
-
-      // 3초간 안 누르면 머리 위 화살표 안내(탑승 중·클릭 후엔 안 보임)
-      var showNudge = !everClicked && now - pageT0 > 3000 && mode === "idle" && !ship;
-      nudge.style.display = showNudge ? "flex" : "none";
-      if (hint) hint.style.visibility = showNudge ? "hidden" : "";
 
       var face = (mode === "spit" || mode === "cards") ? 1 : dir;
       bod.style.transformOrigin = "50% 100%";
@@ -684,7 +692,6 @@
     });
 
     el.addEventListener("click", function () {
-      everClicked = true; // 눌러줘! 안내는 첫 클릭 후 영구 숨김
       if (mode === "run" || mode === "spit") return;
       if (mode === "cards") { closeCards(); return; }
       el.classList.add("orbon"); // 클릭한 동안(달리기·카드)만 꼬리 구슬이 빛남
@@ -725,12 +732,29 @@
       });
     });
 
-    // 토성 핫스팟: 호버 링 + 클릭하면 반짝 플레어
+    // 토성 핫스팟: 호버 링 + 클릭하면 반짝이며 메뉴 카드가 챠라락
     var sathot = document.getElementById("gm-sathot");
+    var satmenu = document.getElementById("gm-satmenu");
+    (function () { // 로그인 상태면 마이페이지로 표기(common.js와 동일 규칙)
+      var loggedIn = false;
+      try { var u = JSON.parse(localStorage.getItem("goblub_user")); loggedIn = !!(u && u.sub); } catch (e) {}
+      if (loggedIn) document.getElementById("gm-satlogin").innerHTML = "<span>👤</span>마이페이지";
+    })();
     sathot.addEventListener("click", function () {
       glow.classList.remove("burst");
       void glow.offsetWidth; // 애니메이션 재시작
       glow.classList.add("burst");
+      if (satmenu.classList.contains("on")) satmenu.classList.remove("on");
+      else {
+        satmenu.classList.remove("on");
+        void satmenu.offsetWidth;
+        satmenu.classList.add("on");
+      }
+    });
+    document.addEventListener("click", function (ev) {
+      if (!satmenu.classList.contains("on")) return;
+      if (sathot.contains(ev.target) || satmenu.contains(ev.target)) return;
+      satmenu.classList.remove("on");
     });
 
     var booted = false;
