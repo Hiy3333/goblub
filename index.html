@@ -24,11 +24,12 @@
       background: linear-gradient(180deg, rgba(12, 22, 66, .62) 0%, rgba(12, 22, 66, .42) 42%, rgba(12, 22, 66, 0) 72%);
       mix-blend-mode: multiply;
     }
-    /* 토성 글로우 */
-    .gm-glow {
+    /* 토성 고리를 한 바퀴 도는 반짝임(행성 뒤로 지나갈 땐 사라짐) */
+    .gm-spark {
       position: absolute; left: 0; top: 0; z-index: 2; pointer-events: none;
-      border-radius: 50%; mix-blend-mode: screen;
-      background: radial-gradient(circle, rgba(255, 228, 170, .55) 0%, rgba(255, 210, 135, .2) 42%, rgba(255, 200, 120, 0) 66%);
+      border-radius: 50%; mix-blend-mode: screen; filter: blur(.5px);
+      background: radial-gradient(circle, rgba(255, 252, 235, 1) 0%, rgba(255, 228, 165, .85) 30%, rgba(255, 212, 140, 0) 70%);
+      transition: opacity .25s;
     }
     /* 전경 오브젝트(로켓): 고브럽이 뒤로 지나가면 가려짐. 누르면 발사! */
     .gm-obj {
@@ -45,8 +46,8 @@
       transition: box-shadow .18s;
     }
     .gm-sathot:hover { box-shadow: 0 0 0 3px rgba(255, 240, 190, .75), 0 0 20px rgba(255, 220, 150, .55); }
-    .gm-glow.burst { animation: gm-burst 1.4s ease-out; }
-    @keyframes gm-burst { 0% { filter: brightness(1); } 30% { filter: brightness(2.1) saturate(1.15); } 100% { filter: brightness(1); } }
+    .gm-spark.burst { animation: gm-burst 1.4s ease-out; }
+    @keyframes gm-burst { 0% { filter: brightness(1) blur(.5px); } 30% { filter: brightness(2.4) blur(.5px); } 100% { filter: brightness(1) blur(.5px); } }
     /* 로켓 분사 불꽃 */
     .gm-flame { position: absolute; left: 0; top: 0; z-index: 11; pointer-events: none; display: none; }
     .gm-flame b {
@@ -108,7 +109,7 @@
       position: absolute; top: 16px; left: 50%; transform: translateX(-50%);
       z-index: 30; display: flex; align-items: center; gap: 22px; width: auto; max-width: none;
       margin: 0; padding: 9px 12px 9px 22px;
-      background: rgba(12, 52, 64, .62); border-radius: 999px;
+      background: rgba(10, 16, 22, .38); border-radius: 999px; /* 중립 반투명 — 어느 하늘에서든 배경색이 배어남 */
       box-shadow: 0 10px 26px rgba(0, 20, 30, .35), inset 0 1px 0 rgba(255,255,255,.14);
       backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
     }
@@ -183,7 +184,7 @@
     /* 고브럽 */
     .gm-goblub { position: absolute; left: 0; top: 0; z-index: 10; width: 170px; cursor: pointer; will-change: transform; }
     /* 첫 프레임에서 위치 잡기 전까지 숨김(로드 직후 왼쪽 위에 깜빡 보이는 것 방지) */
-    .gm-goblub, .gm-obj, .gm-shad, .gm-glow, .gm-cabin { visibility: hidden; }
+    .gm-goblub, .gm-obj, .gm-shad, .gm-spark, .gm-cabin { visibility: hidden; }
     .gm-goblub .bodywrap { position: relative; width: 100%; will-change: transform; }
     .gm-goblub img { width: 100%; height: auto; display: block; user-select: none; -webkit-user-drag: none;
       filter: drop-shadow(0 8px 9px rgba(0, 22, 32, .22)); }
@@ -257,7 +258,7 @@
   </div>
 
   <div class="gm-tint"></div>
-  <div class="gm-glow" id="gm-glow"></div>
+  <div class="gm-spark" id="gm-spark"></div>
   <div class="gm-sathot" id="gm-sathot" title=""></div>
   <div class="gm-satmenu" id="gm-satmenu">
     <a href="apps.html"><span>📱</span>앱 다운로드</a>
@@ -335,7 +336,7 @@
     var hint = document.getElementById("gm-hint");
     var word = document.getElementById("gm-word");
     var cont = document.getElementById("gm-cards");
-    var glow = document.getElementById("gm-glow");
+    var spark = document.getElementById("gm-spark");
     var shad = document.getElementById("gm-shad");
     var obj = document.getElementById("gm-obj");
     var objshad = document.getElementById("gm-objshad");
@@ -542,11 +543,18 @@
       }
       el.style.transform = "translate(" + x + "px, " + y + "px)";
 
-      // 토성 글로우 + 광원 기준 그림자(방향·거리 따라 위치/크기 변화)
+      // 토성 고리를 도는 반짝임 + 광원 기준 그림자
       var sat = saturnPos();
-      var gs = sat.r * 2.9; // 토성 자체만 살짝 밝게
-      glow.style.width = gs + "px"; glow.style.height = gs + "px";
-      glow.style.transform = "translate(" + (sat.x - gs / 2) + "px," + (sat.y - gs / 2) + "px)";
+      var ss = sat.r / 78;
+      var th = now / 650; // 약 4초에 한 바퀴
+      var ca = Math.cos(-0.42), sa2 = Math.sin(-0.42); // 고리 기울기 -24°
+      var ex = 77 * ss * Math.cos(th), ey = 16 * ss * Math.sin(th);
+      var spx = sat.x + ex * ca - ey * sa2, spy = sat.y + ex * sa2 + ey * ca;
+      var behind = Math.sin(th) < 0 && Math.abs(ex) < 45 * ss; // 행성 뒤로 지나가는 구간
+      var sd = sat.r * 0.34;
+      spark.style.width = sd + "px"; spark.style.height = sd + "px";
+      spark.style.opacity = behind ? "0" : "1";
+      spark.style.transform = "translate(" + (spx - sd / 2) + "px," + (spy - sd / 2) + "px)";
       var hd = sat.r * 2.3; // 토성 호버 핫스팟
       sathot.style.width = hd + "px"; sathot.style.height = hd + "px";
       sathot.style.transform = "translate(" + (sat.x - hd / 2) + "px," + (sat.y - hd / 2) + "px)";
@@ -747,9 +755,9 @@
       if (loggedIn) document.getElementById("gm-satlogin").innerHTML = "<span>👤</span>마이페이지";
     })();
     sathot.addEventListener("click", function () {
-      glow.classList.remove("burst");
-      void glow.offsetWidth; // 애니메이션 재시작
-      glow.classList.add("burst");
+      spark.classList.remove("burst");
+      void spark.offsetWidth; // 애니메이션 재시작
+      spark.classList.add("burst");
       if (satmenu.classList.contains("on")) satmenu.classList.remove("on");
       else {
         satmenu.classList.remove("on");
@@ -764,11 +772,22 @@
     });
 
     // 시작 상태: 모든 상태 선언이 끝난 뒤에 결정해야 한다
-    // 다른 페이지에서 돌아온 경우 → 허브처럼 중앙에서 카드를 뱉는 모션으로 시작
+    // 페이지를 떠날 때 걷던 위치를 남긴다(행성 간 이동 시 이어 걷기)
+    window.addEventListener("pagehide", function () {
+      try { sessionStorage.setItem("goblub_walk", JSON.stringify({ x: x, dir: dir, t: Date.now() })); } catch (e) {}
+    });
+    var savedWalk = null;
+    try { var sw0 = JSON.parse(sessionStorage.getItem("goblub_walk")); if (sw0 && Date.now() - sw0.t < 60000) savedWalk = sw0; } catch (e) {}
     var cameBack = false;
     try { cameBack = !!document.referrer && new URL(document.referrer).origin === location.origin; } catch (e) {}
     if (!isMobile()) {
-      if (cameBack) {
+      if (savedWalk) {
+        // 다른 행성에서 돌아옴: 배경만 바뀐 듯 같은 위치에서 그대로 걷는다
+        x = Math.max(20, Math.min(window.innerWidth - CHAR_W - 20, savedWalk.x));
+        dir = savedWalk.dir === -1 ? -1 : 1;
+        gait = "walk"; gaitUntil = Date.now() + 1200;
+      } else if (cameBack) {
+        // 사이트 내 다른 페이지(고브럽 없는 페이지)에서 돌아옴: 중앙에서 카드 뱉기
         x = (window.innerWidth - CHAR_W) / 2;
         if (hint) hint.style.display = "none";
         beginSpit(Date.now());
@@ -795,7 +814,7 @@
           obj.style.visibility = "visible";
           shad.style.visibility = "visible";
           objshad.style.visibility = "visible";
-          glow.style.visibility = "visible";
+          spark.style.visibility = "visible";
           cabin.style.visibility = "visible";
         }
       } catch (e) {}

@@ -283,6 +283,11 @@ background:radial-gradient(ellipse at center,rgba(4,10,20,.68) 0%,rgba(4,10,20,.
   dealFrom(x + FRONT_W * MOUTH_FX, groundY() - h0 + h0 * MOUTH_FY);
   window.requestAnimationFrame(loop);
 
+  // 페이지를 떠날 때 걷던 위치를 남긴다(홈으로 돌아가면 같은 자리에서 이어 걷기)
+  window.addEventListener("pagehide", function () {
+    try { sessionStorage.setItem("goblub_walk", JSON.stringify({ x: x, dir: dir, t: Date.now() })); } catch (e) {}
+  });
+
   // 리사이즈: 착지 카드 재배치
   window.addEventListener("resize", function () {
     var tg = targets(cards.length);
