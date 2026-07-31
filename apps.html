@@ -10,13 +10,20 @@
   <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/style.css?v=cl1" />
   <style>
-    /* 물의 행성+분홍 사막 배경 — 뷰포트 고정 레이어라 문서 길이와 무관하게 화면 기준 cover */
-    body.clay { background: #101a3c !important; }
+    /* 차콜 인디고+물의 행성+로즈핑크 땅 배경 — 뷰포트 고정 레이어 */
+    body.clay { background: #1c2026 !important; }
     body.clay::before {
       content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
-      background: linear-gradient(rgba(10, 14, 36, .18), rgba(10, 14, 36, .18)),
-        url("design/img/home-bg-2.webp") center bottom / cover no-repeat;
+      background: url("design/img/home-bg-28.webp") center bottom / cover no-repeat;
     }
+    /* 카드 색을 로즈핑크 땅(#dea3a0) 계열 파스텔로 통일 */
+    body.clay .card.tint-coral  { background: linear-gradient(180deg, #f5d8df, #efacba) !important; }
+    body.clay .card.tint-yellow { background: linear-gradient(180deg, #f5e1d8, #efc1ac) !important; }
+    body.clay .card.tint-mint   { background: linear-gradient(180deg, #f5ded8, #efb8ac) !important; }
+    body.clay .card.tint-sky    { background: linear-gradient(180deg, #f5dad8, #efafac) !important; }
+    body.clay .card.tint-purple { background: linear-gradient(180deg, #f5d8db, #efacb2) !important; }
+    body.clay .card h2 { color: #6b3540; }
+    body.clay .card p { color: #8a5560; }
     body.clay .hero h1 {
       background: none; -webkit-background-clip: initial; background-clip: initial; color: #fdf3cf;
       filter: none; text-shadow: 0 3px 0 rgba(14, 18, 46, .6), 0 10px 24px rgba(0, 0, 0, .55);

@@ -10,13 +10,20 @@
   <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../css/style.css?v=cl1" />
   <style>
-    /* 오로라 밤하늘 배경 — 뷰포트 고정 레이어라 문서 길이와 무관하게 화면 기준 cover */
-    body.clay { background: #10233a !important; }
+    /* 버건디 하늘+살구 행성+테라코타 땅 배경 — 뷰포트 고정 레이어 */
+    body.clay { background: #47172a !important; }
     body.clay::before {
       content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
-      background: linear-gradient(rgba(10, 18, 34, .18), rgba(10, 18, 34, .18)),
-        url("../design/img/home-bg-5.webp") center bottom / cover no-repeat;
+      background: url("../design/img/home-bg-26.webp") center bottom / cover no-repeat;
     }
+    /* 카드 색을 테라코타 땅(#b7715a) 계열 파스텔로 통일 */
+    body.clay .card.tint-coral  { background: linear-gradient(180deg, #edc5c6, #e59b9c) !important; }
+    body.clay .card.tint-yellow { background: linear-gradient(180deg, #eddac5, #e5c19b) !important; }
+    body.clay .card.tint-mint   { background: linear-gradient(180deg, #edd4c5, #e5b79b) !important; }
+    body.clay .card.tint-sky    { background: linear-gradient(180deg, #edcfc5, #e5ad9b) !important; }
+    body.clay .card.tint-purple { background: linear-gradient(180deg, #edcac5, #e5a39b) !important; }
+    body.clay .card h2 { color: #5c3226; }
+    body.clay .card p { color: #7d4f40; }
     body.clay .hero h1 {
       background: none; -webkit-background-clip: initial; background-clip: initial; color: #fdf3cf;
       filter: none; text-shadow: 0 3px 0 rgba(12, 26, 44, .6), 0 10px 24px rgba(0, 0, 0, .55);

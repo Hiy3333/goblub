@@ -10,13 +10,18 @@
   <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../css/style.css?v=cl1" />
   <style>
-    /* 밤하늘 배경(은하수+쌍둥이 달) — 뷰포트 고정 레이어라 문서 길이와 무관하게 화면 기준 cover */
-    body.clay { background: #10173a !important; }
+    /* 밤하늘 배경(남색 밤+보름달+연보라 땅) — 뷰포트 고정 레이어 */
+    body.clay { background: #181d3c !important; }
     body.clay::before {
       content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
-      background: linear-gradient(rgba(10, 14, 38, .2), rgba(10, 14, 38, .2)),
-        url("../design/img/home-bg-13.webp") center bottom / cover no-repeat;
+      background: url("../design/img/home-bg-22.webp") center bottom / cover no-repeat;
     }
+    /* 카드 색을 연보라 땅(#d2c7e9) 계열 파스텔로 통일 */
+    body.clay .card.tint-coral  { background: linear-gradient(180deg, #eee2f7, #d8b8ef) !important; }
+    body.clay .card.tint-yellow { background: linear-gradient(180deg, #ece2f7, #d1b8ef) !important; }
+    body.clay .card.tint-mint   { background: linear-gradient(180deg, #e9e2f7, #cab8ef) !important; }
+    body.clay .card.tint-sky    { background: linear-gradient(180deg, #e6e2f7, #c3b8ef) !important; }
+    body.clay .card.tint-purple { background: linear-gradient(180deg, #e4e2f7, #bcb8ef) !important; }
     body.clay .hero h1 {
       background: none; -webkit-background-clip: initial; background-clip: initial; color: #fdf3cf;
       filter: none; text-shadow: 0 3px 0 rgba(16, 20, 50, .6), 0 10px 24px rgba(0, 0, 0, .55);
