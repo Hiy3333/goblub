@@ -187,7 +187,11 @@
     .gm-goblub, .gm-obj, .gm-shad, .gm-spark, .gm-cabin { visibility: hidden; }
     .gm-goblub .bodywrap { position: relative; width: 100%; will-change: transform; }
     .gm-goblub img { width: 100%; height: auto; display: block; user-select: none; -webkit-user-drag: none;
-      filter: drop-shadow(0 8px 9px rgba(0, 22, 32, .22)); }
+      filter: drop-shadow(0 8px 9px rgba(0, 22, 32, .22)); transition: filter .18s; }
+    /* 클릭 가능 표시: 우주선·토성처럼 호버 시 흰 윤곽 발광 */
+    .gm-goblub:hover img {
+      filter: drop-shadow(0 8px 9px rgba(0, 22, 32, .22)) drop-shadow(0 0 8px rgba(255, 255, 255, .85));
+    }
     /* 입 소용돌이 회전(옆모습으로 걸을 때만) — 소용돌이 중심(0.7253,0.541), 이빨 밖 반경 15.2%만 클립 */
     .gm-mouth { position: absolute; left: 57.33%; top: 39.22%; width: 30.4%; height: 29.75%;
       border-radius: 50%; overflow: hidden; pointer-events: none;

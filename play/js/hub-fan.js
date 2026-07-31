@@ -28,7 +28,8 @@
   css.textContent = "\
 .hg-goblub{position:fixed;left:0;top:0;z-index:4;width:170px;cursor:pointer;will-change:transform;visibility:hidden;transition:opacity .18s}\
 .hg-goblub .bodywrap{position:relative;width:100%;will-change:transform}\
-.hg-goblub img{width:100%;height:auto;display:block;user-select:none;-webkit-user-drag:none;filter:drop-shadow(0 8px 9px rgba(0,22,32,.22))}\
+.hg-goblub img{width:100%;height:auto;display:block;user-select:none;-webkit-user-drag:none;filter:drop-shadow(0 8px 9px rgba(0,22,32,.22));transition:filter .18s}\
+.hg-goblub:hover img{filter:drop-shadow(0 8px 9px rgba(0,22,32,.22)) drop-shadow(0 0 8px rgba(255,255,255,.85))}\
 .hg-mouth{position:absolute;left:57.33%;top:39.22%;width:30.4%;height:29.75%;border-radius:50%;overflow:hidden;pointer-events:none;\
 -webkit-mask-image:radial-gradient(circle,#000 58%,transparent 96%);mask-image:radial-gradient(circle,#000 58%,transparent 96%)}\
 .hg-mouth svg{display:block;width:100%;height:100%;filter:blur(.5px);animation:hg-spin 2.6s linear infinite}\
