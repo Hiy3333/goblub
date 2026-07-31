@@ -174,6 +174,20 @@
       box-shadow: 0 8px 18px rgba(0, 22, 32, .35); animation: gm-hint 2s ease-in-out infinite;
     }
     @keyframes gm-hint { 0%,100% { transform: translate(-50%, 0); } 50% { transform: translate(-50%, -8px); } }
+    /* 3초 동안 안 누르면 머리 위에 화살표 + 눌러줘! */
+    .gm-nudge {
+      position: absolute; left: 50%; top: -110px; display: none;
+      flex-direction: column; align-items: center; gap: 3px; pointer-events: none;
+      animation: gm-nudgeb .95s ease-in-out infinite;
+    }
+    .gm-nudge span {
+      background: #ffd95e; color: #4a3a10; font-size: 1.28rem; padding: 9px 20px;
+      border-radius: 999px; white-space: nowrap;
+      box-shadow: 0 8px 18px rgba(0, 22, 32, .42);
+    }
+    .gm-nudge b { color: #ffd95e; font-size: 1.7rem; line-height: 1; font-weight: 400;
+      text-shadow: 0 3px 8px rgba(0, 22, 32, .55); }
+    @keyframes gm-nudgeb { 0%, 100% { transform: translate(-50%, 0); } 50% { transform: translate(-50%, -12px); } }
 
     /* 카드 */
     .gm-cards { position: absolute; inset: 0; z-index: 20; pointer-events: none; }
@@ -256,6 +270,7 @@
 
   <div class="gm-goblub" id="gm-goblub">
     <div class="gm-hint" id="gm-hint">나를 눌러봐~</div>
+    <div class="gm-nudge" id="gm-nudge"><span>눌러줘!</span><b>▼</b></div>
     <div class="bodywrap" id="gm-body">
       <img id="gm-img" src="design/img/home/gb-walk.webp" alt="고브럽" draggable="false" />
       <div class="gm-mouth"><svg viewBox="0 0 100 100" aria-hidden="true">
@@ -297,6 +312,8 @@
     var glow = document.getElementById("gm-glow");
     var shad = document.getElementById("gm-shad");
     var obj = document.getElementById("gm-obj");
+    var nudge = document.getElementById("gm-nudge");
+    var everClicked = false, pageT0 = Date.now();
     var objshad = document.getElementById("gm-objshad");
     var peek = document.getElementById("gm-peek");
 
@@ -590,6 +607,11 @@
 
       if (ship) shad.style.opacity = "0"; // 안에 들어가 있을 땐 고브럽 그림자도 숨김
 
+      // 3초간 안 누르면 머리 위 화살표 안내(탑승 중·클릭 후엔 안 보임)
+      var showNudge = !everClicked && now - pageT0 > 3000 && mode === "idle" && !ship;
+      nudge.style.display = showNudge ? "flex" : "none";
+      if (hint) hint.style.visibility = showNudge ? "hidden" : "";
+
       var face = (mode === "spit" || mode === "cards") ? 1 : dir;
       bod.style.transformOrigin = "50% 100%";
       bod.style.transform = "rotate(" + (rock + lean) + "deg) scaleX(" + (face * (sx + step)) + ") scaleY(" + (sy - step) + ")";
@@ -662,6 +684,7 @@
     });
 
     el.addEventListener("click", function () {
+      everClicked = true; // 눌러줘! 안내는 첫 클릭 후 영구 숨김
       if (mode === "run" || mode === "spit") return;
       if (mode === "cards") { closeCards(); return; }
       el.classList.add("orbon"); // 클릭한 동안(달리기·카드)만 꼬리 구슬이 빛남
