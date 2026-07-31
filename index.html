@@ -129,9 +129,10 @@
       text-shadow: 0 2px 8px rgba(0, 25, 35, .6);
     }
 
-    .gm-star { position: absolute; z-index: 3; color: #f7ecc8; cursor: pointer;
+    .gm-star { position: absolute; z-index: 3; color: #fff3c4; cursor: pointer;
+      text-shadow: 0 0 10px rgba(255, 240, 190, .9), 0 0 4px #ffffff; /* 누를 수 있는 별만 상시 발광 */
       animation: gm-tw 2.8s ease-in-out infinite; transition: text-shadow .15s, opacity .2s; }
-    .gm-star:hover { text-shadow: 0 0 14px #fff7d8, 0 0 5px #ffffff; } /* 클릭 가능 표시 */
+    .gm-star:hover { text-shadow: 0 0 20px #fff7d8, 0 0 8px #ffffff, 0 0 3px #ffffff; }
     @keyframes gm-tw { 0%,100% { opacity: .4; transform: scale(.85); } 50% { opacity: 1; transform: scale(1.1); } }
     /* 별똥별 */
     .gm-meteor {
@@ -226,20 +227,20 @@
   <div class="gm-shad" id="gm-objshad"></div>
   <div class="gm-peek" id="gm-peek"><img src="design/img/home/gb-front.webp" alt="" /></div>
 
-  <span class="gm-star" style="top:22%;left:14%;font-size:1rem;">✦</span>
-  <span class="gm-star" style="top:36%;right:20%;font-size:.8rem;animation-delay:-1.2s;">✦</span>
-  <span class="gm-star" style="top:12%;left:38%;font-size:.7rem;animation-delay:-.6s;">✦</span>
-  <span class="gm-star" style="top:8%;left:64%;font-size:.85rem;animation-delay:-1.8s;">✦</span>
-  <span class="gm-star" style="top:30%;left:6%;font-size:.6rem;animation-delay:-2.2s;">✦</span>
-  <span class="gm-star" style="top:45%;left:30%;font-size:.65rem;animation-delay:-.9s;">✦</span>
-  <span class="gm-star" style="top:26%;left:52%;font-size:.55rem;animation-delay:-1.5s;">✧</span>
-  <span class="gm-star" style="top:16%;left:24%;font-size:.75rem;animation-delay:-2.6s;">✦</span>
-  <span class="gm-star" style="top:40%;left:14%;font-size:.6rem;animation-delay:-.3s;">✧</span>
-  <span class="gm-star" style="top:6%;left:47%;font-size:.6rem;animation-delay:-1.1s;">✦</span>
-  <span class="gm-star" style="top:34%;left:44%;font-size:.55rem;animation-delay:-2.0s;">✧</span>
-  <span class="gm-star" style="top:14%;right:9%;font-size:.7rem;animation-delay:-.75s;">✦</span>
-  <span class="gm-star" style="top:47%;right:12%;font-size:.6rem;animation-delay:-1.9s;">✦</span>
-  <span class="gm-star" style="top:52%;left:56%;font-size:.65rem;animation-delay:-2.4s;">✧</span>
+  <span class="gm-star" style="top:22%;left:14%;font-size:1.5rem;">✦</span>
+  <span class="gm-star" style="top:36%;right:20%;font-size:1.2rem;animation-delay:-1.2s;">✦</span>
+  <span class="gm-star" style="top:12%;left:38%;font-size:1.05rem;animation-delay:-.6s;">✦</span>
+  <span class="gm-star" style="top:8%;left:64%;font-size:1.25rem;animation-delay:-1.8s;">✦</span>
+  <span class="gm-star" style="top:30%;left:6%;font-size:.95rem;animation-delay:-2.2s;">✦</span>
+  <span class="gm-star" style="top:45%;left:30%;font-size:1rem;animation-delay:-.9s;">✦</span>
+  <span class="gm-star" style="top:26%;left:52%;font-size:.85rem;animation-delay:-1.5s;">✧</span>
+  <span class="gm-star" style="top:16%;left:24%;font-size:1.1rem;animation-delay:-2.6s;">✦</span>
+  <span class="gm-star" style="top:40%;left:14%;font-size:.95rem;animation-delay:-.3s;">✧</span>
+  <span class="gm-star" style="top:6%;left:47%;font-size:.95rem;animation-delay:-1.1s;">✦</span>
+  <span class="gm-star" style="top:34%;left:44%;font-size:.85rem;animation-delay:-2.0s;">✧</span>
+  <span class="gm-star" style="top:14%;right:9%;font-size:1.05rem;animation-delay:-.75s;">✦</span>
+  <span class="gm-star" style="top:47%;right:12%;font-size:.95rem;animation-delay:-1.9s;">✦</span>
+  <span class="gm-star" style="top:52%;left:56%;font-size:1rem;animation-delay:-2.4s;">✧</span>
 
   <div class="gm-cards" id="gm-cards">
     <a class="gm-card" href="play/fortune-hub.html"><span class="ic" style="background:#cfe0e4">🔮</span><span class="tt">운세</span><span class="ds">사주·궁합·타로·전생·부적까지</span></a>
