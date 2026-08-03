@@ -46,3 +46,26 @@
     else loadScript(root + "/play/js/goblub-art.js", initBuddy);
   });
 })();
+
+// ===== 준비 중 안내 토스트 (앱 다운로드 등) =====
+(function () {
+  var st = document.createElement("style");
+  st.textContent = ".gb-toast{position:fixed;left:50%;bottom:44px;transform:translateX(-50%) translateY(14px);z-index:99999;background:linear-gradient(180deg,#f9f0d4,#efe3bd);color:#235a6b;border:3px solid rgba(29,90,107,.28);border-radius:16px;padding:13px 22px;font-family:'Jua','Malgun Gothic',sans-serif;font-size:1.05rem;box-shadow:0 14px 30px rgba(0,22,32,.45);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;white-space:nowrap}.gb-toast.on{opacity:1;transform:translateX(-50%) translateY(0)}";
+  document.head.appendChild(st);
+  var el = null, timer = null;
+  window.goblubToast = function (msg) {
+    if (!el) { el = document.createElement("div"); el.className = "gb-toast"; document.body.appendChild(el); }
+    el.textContent = msg;
+    void el.offsetWidth;
+    el.classList.add("on");
+    clearTimeout(timer);
+    timer = setTimeout(function () { el.classList.remove("on"); }, 1900);
+  };
+  // data-soon 이 붙은 요소는 이동하지 않고 안내만 띄운다
+  document.addEventListener("click", function (e) {
+    var t = e.target.closest ? e.target.closest("[data-soon]") : null;
+    if (!t) return;
+    e.preventDefault(); e.stopPropagation();
+    window.goblubToast(t.getAttribute("data-soon") || "준비 중이에요!");
+  }, true);
+})();

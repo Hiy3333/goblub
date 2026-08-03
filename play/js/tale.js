@@ -5,7 +5,7 @@
 //   onEnter(collected) → { name, focus, focusLabel, birth?, base, deep }
 (function () {
   var IMG = "img/tale/";
-  var IMGV = "?v=7";                    // 이미지 캐시버스트(귀곡 8초 무한루프 idle)
+  var IMGV = "?v=8";                    // 이미지 캐시버스트(귀곡 8초 무한루프 idle)
   var RITUAL_VID = IMG + "ritual.mp4?v=3";
   var GAN_H = { 갑: "甲", 을: "乙", 병: "丙", 정: "丁", 무: "戊", 기: "己", 경: "庚", 신: "辛", 임: "壬", 계: "癸" };
   var JI_H = { 자: "子", 축: "丑", 인: "寅", 묘: "卯", 진: "辰", 사: "巳", 오: "午", 미: "未", 신: "申", 유: "酉", 술: "戌", 해: "亥" };
@@ -180,58 +180,61 @@ box-shadow:0 0 0 100vmax #040308,0 0 70px rgba(0,0,0,.8)}}";
     var script = [
       { id: 0, bg: "black", gob: true, name: "고브럽", cls: "n-gob", text: "……너, 진짜 사주가 보고 싶은 거야?" },
       { id: 1, name: "고브럽", cls: "n-gob", text: "내가 아는 분이 있어.\n훨씬… 깊게 보셔. 대신—" },
-      { id: 2, name: "고브럽", cls: "n-gob", text: "[아주 무서운 곳]으로 가야 해.\n…각오됐어?", choices: [
+      { id: 2, name: "고브럽", cls: "n-gob", text: "[아주 무서운 곳]으로 가야 해.\n\n가면 하나만 지켜.\n[뒤를 돌아보지 마라.]\n\n…각오됐어?", choices: [
         { label: "🌀 보러 간다", goto: 3 },
         { label: "🫣 아직은… 무서워", exit: true }
       ]},
       { id: 3, fx: "swallow", name: "", cls: "n-nar", text: "" },
       { id: 4, bg: "black", name: "", cls: "n-nar", text: "……\n차가운 흙냄새." },
-      // ===== 곡산 오르는 길 (부적 숲 → 장승 → 돌아봄 → 도망 → 움막) =====
-      { id: 5, vbg: "walk1", vbgOnce: true, name: "", cls: "n-nar",
-        text: "산에 들 땐 하나만 지키면 된다 했다.\n\n[뒤를 돌아보지 마라.]" },
-      { id: 6, name: "", cls: "n-nar", text: "가지마다 부적이 매달려 있다.\n바람도 없는데… 저 혼자 흔들린다." },
-      { id: 7, name: "", cls: "n-nar", text: "장승 하나가 길목을 지킨다.\n얼굴에 부적이 덕지덕지 붙어 있다.\n\n…웃고 있다." },
-      { id: 8, vbg: "walk2", vbgOnce: true, name: "", cls: "n-nar",
-        text: "멀리, 불빛 하나.\n저기가 맞을 것이다.", choices: [
-        { label: "🕯 불빛을 향해 걷는다", goto: 9 }
+      // ===== 곡산 오르는 길 (깨어남 → 부적 숲 → 장승 → 돌아봄 → 도망 → 움막) =====
+      { id: 5, vbg: "wake", vbgOnce: true, name: "", cls: "n-nar", text: "…눈을 떴다." },
+      { id: 6, name: "", cls: "n-nar", text: "낯선 숲.\n여기가… 어디지?" },
+      { id: 7, vbg: "walk1", vbgOnce: true, name: "", cls: "n-nar",
+        text: "…아, 그러고 보니.\n고브럽이 그랬다.\n\n[뒤를 돌아보지 마라.]" },
+      { id: 8, name: "", cls: "n-nar", text: "가지마다 부적이 매달려 있다.\n바람도 없는데… 저 혼자 흔들린다." },
+      { id: 9, name: "", cls: "n-nar", text: "장승 하나가 길목을 지킨다.\n얼굴에 부적이 덕지덕지 붙어 있다.\n\n…웃고 있다." },
+      { id: 10, name: "", cls: "n-nar", text: "저 멀리, 불빛 하나.\n저기가 맞을 것이다.", choices: [
+        { label: "🕯 불빛을 향해 걷는다", goto: 11 }
       ]},
-      { id: 9, name: "", cls: "n-nar", text: "딸랑—\n방울 소리가 내 걸음에 맞춰 따라온다.\n\n멈췄다. 그것도, 반 박자 늦게." },
-      { id: 10, name: "", cls: "n-nar", text: "…등 뒤에서, 바스락.", choices: [
-        { label: "👀 참지 못하고 뒤를 돌아본다", goto: 11 }
+      { id: 11, vbg: "walk2", vbgOnce: true, name: "", cls: "n-nar",
+        text: "딸랑—\n방울 소리가 내 걸음에 맞춰 따라온다.\n\n멈췄다. 그것도, 반 박자 늦게." },
+      { id: 12, name: "", cls: "n-nar", text: "…등 뒤에서, 바스락.", choices: [
+        { label: "👀 참지 못하고 뒤를 돌아본다", goto: 13 }
       ]},
-      { id: 11, vbg: "lookback", vbgOnce: true, name: "", cls: "n-nar",
-        text: "길 한가운데.\n\n…아까는, 저기 없었다." },
-      { id: 12, name: "", cls: "n-nar", text: "웃던 얼굴이\n이제 나를 본다." },
-      { id: 13, vbg: "flee", vbgOnce: true, name: "", cls: "n-nar",
-        text: "한 걸음… 두 걸음…\n\n뛰었다.\n따라오는 소리는 들리지 않았다.\n그게 더 무서웠다." },
-      { id: 14, vbg: "hut", vbgOnce: true, name: "", cls: "n-nar",
-        text: "낡은 움막.\n입구는 삼베 천으로 막혀 있다.\n\n천 너머에 불빛 두 점이, 나란히." },
-      { id: 15, name: "???", cls: "n-unk", text: "……밖은 위험하다.\n들어와라.", choices: [
-        { label: "⛺ 천을 걷고 들어간다", goto: 16 }
+      { id: 13, vbg: "lookback", vbgOnce: true, name: "", cls: "n-nar", text: "……!" },
+      { id: 14, name: "", cls: "n-nar", text: "길 한가운데.\n…아까는, 저기 없었다." },
+      { id: 15, name: "", cls: "n-nar", text: "웃던 얼굴이\n이제 나를 본다." },
+      { id: 16, vbg: "flee", vbgOnce: true, name: "", cls: "n-nar", text: "한 걸음… 두 걸음…" },
+      { id: 17, name: "", cls: "n-nar", text: "뛰었다.\n따라오는 소리는 들리지 않았다.\n그게 더 무서웠다." },
+      { id: 18, vbg: "hut", vbgOnce: true, name: "", cls: "n-nar",
+        text: "낡은 움막.\n입구는 삼베 천으로 막혀 있다." },
+      { id: 19, name: "", cls: "n-nar", text: "천 너머에 불빛 두 점이,\n나란히 이쪽을 향해 있다." },
+      { id: 20, name: "???", cls: "n-unk", text: "……밖은 위험하다.\n들어와라.", choices: [
+        { label: "⛺ 천을 걷고 들어간다", goto: 21 }
       ]},
-      { id: 16, vbg: "gwigok_idle", name: "귀곡", cls: "n-gwi",
+      { id: 21, vbg: "gwigok_idle", name: "귀곡", cls: "n-gwi",
         text: "…돌아봤구나.\n그럼 그것도 네 얼굴을 봤겠지.\n\n(문 쪽을 힐끗 본다)\n……앉거라. 문은 닫아두마." },
       // 이름 입력
-      { id: 17, name: "귀곡", cls: "n-gwi", text: "산 자여. 네 이름을 이 천막에\n똑똑히 남겨라.",
+      { id: 22, name: "귀곡", cls: "n-gwi", text: "산 자여. 네 이름을 이 천막에\n똑똑히 남겨라.",
         input: { kind: "text", key: "name", placeholder: "이름 (또는 불리고 싶은 이름)", maxlen: 12, submit: "🖊 이름을 새긴다" } },
       // 생년월일 입력
-      { id: 18, name: "귀곡", cls: "n-gwi", text: function () { return (collected.name ? collected.name + "… " : "") + "언제 이 세상에 왔느냐.\n한 치도 틀리지 말고 아뢰라."; },
+      { id: 23, name: "귀곡", cls: "n-gwi", text: function () { return (collected.name ? collected.name + "… " : "") + "언제 이 세상에 왔느냐.\n한 치도 틀리지 말고 아뢰라."; },
         input: { kind: "birth", key: "birth", submit: "🔮 명(命)을 아뢴다" } },
       // 콜드리딩 (생년월일 확정 후 재계산된 base/deep 사용)
-      { id: 19, name: "귀곡", cls: "n-gwi", text: function () { var c = coldRead(); return c.ilju ? ("[" + hj(c.ilju) + "(" + c.ilju + ")] 일주.\n" + c.strengthLine) : c.strengthLine; } },
-      { id: 20, name: "귀곡", cls: "n-gwi", text: function () { return coldRead().missLine; } },
-      { id: 21, name: "귀곡", cls: "n-gwi", text: "내 이름은 [귀곡(鬼哭)].\n산 자의 팔자를 읽는 저승의 사자다." },
+      { id: 24, name: "귀곡", cls: "n-gwi", text: function () { var c = coldRead(); return c.ilju ? ("[" + hj(c.ilju) + "(" + c.ilju + ")] 일주.\n" + c.strengthLine) : c.strengthLine; } },
+      { id: 25, name: "귀곡", cls: "n-gwi", text: function () { return coldRead().missLine; } },
+      { id: 26, name: "귀곡", cls: "n-gwi", text: "내 이름은 [귀곡(鬼哭)].\n산 자의 팔자를 읽는 저승의 사자다." },
       // 궁금한 것(초점) 선택
-      { id: 22, name: "귀곡", cls: "n-gwi", text: "무엇이 그리 궁금하여\n저승 문턱까지 넘어왔느냐?", choices: [
-        { label: FOCI[0].label, setFocus: 0, goto: 24 },
-        { label: FOCI[1].label, setFocus: 1, goto: 24 },
-        { label: FOCI[2].label, setFocus: 2, goto: 24 },
-        { label: FOCI[3].label, setFocus: 3, goto: 24 },
-        { label: "✍️ 직접 물어보겠소", goto: 23 }
+      { id: 27, name: "귀곡", cls: "n-gwi", text: "무엇이 그리 궁금하여\n저승 문턱까지 넘어왔느냐?", choices: [
+        { label: FOCI[0].label, setFocus: 0, goto: 29 },
+        { label: FOCI[1].label, setFocus: 1, goto: 29 },
+        { label: FOCI[2].label, setFocus: 2, goto: 29 },
+        { label: FOCI[3].label, setFocus: 3, goto: 29 },
+        { label: "✍️ 직접 물어보겠소", goto: 28 }
       ]},
-      { id: 23, name: "귀곡", cls: "n-gwi", text: "…말해 보아라.\n무엇이 네 밤잠을 앗아갔느냐.",
-        input: { kind: "text", key: "focusFree", placeholder: "궁금한 것을 적어라 (예: 그 사람과 이어질까)", maxlen: 40, submit: "🕯 마음을 아뢴다" }, goto: 24 },
-      { id: 24, name: "귀곡", cls: "n-gwi",
+      { id: 28, name: "귀곡", cls: "n-gwi", text: "…말해 보아라.\n무엇이 네 밤잠을 앗아갔느냐.",
+        input: { kind: "text", key: "focusFree", placeholder: "궁금한 것을 적어라 (예: 그 사람과 이어질까)", maxlen: 40, submit: "🕯 마음을 아뢴다" }, goto: 29 },
+      { id: 29, name: "귀곡", cls: "n-gwi",
         text: function () {
           // 같은 폰으로 여러 명이 볼 수 있으니 '또 왔구나' 같은 재방문 대사는 쓰지 않는다
           if (opts.costText) return "네 팔자를 뼛속까지 들춰주마.\n대신 [" + opts.costText + "]을 바쳐야 한다.\n…자세히 알고 싶으냐?";
@@ -239,10 +242,10 @@ box-shadow:0 0 0 100vmax #040308,0 0 70px rgba(0,0,0,.8)}}";
         },
         choices: [
           { label: "🩸 낱낱이 보여주시오", enter: true },
-          { label: "❓ …두렵소. 잠시만.", goto: 25 }
+          { label: "❓ …두렵소. 잠시만.", goto: 30 }
         ]
       },
-      { id: 25, name: "귀곡", cls: "n-gwi", text: "두려움도 네 팔자의 일부다.\n…준비되거든, 내 눈을 마주쳐라.", choices: [
+      { id: 30, name: "귀곡", cls: "n-gwi", text: "두려움도 네 팔자의 일부다.\n…준비되거든, 내 눈을 마주쳐라.", choices: [
         { label: "🩸 …보여주시오", enter: true }
       ]}
     ];
