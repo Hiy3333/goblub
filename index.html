@@ -24,13 +24,6 @@
       background: linear-gradient(180deg, rgba(12, 22, 66, .62) 0%, rgba(12, 22, 66, .42) 42%, rgba(12, 22, 66, 0) 72%);
       mix-blend-mode: multiply;
     }
-    /* 토성 고리를 한 바퀴 도는 반짝임(행성 뒤로 지나갈 땐 사라짐) */
-    .gm-spark {
-      position: absolute; left: 0; top: 0; z-index: 2; pointer-events: none;
-      border-radius: 50%; mix-blend-mode: screen; filter: blur(.5px);
-      background: radial-gradient(circle, rgba(255, 252, 235, 1) 0%, rgba(255, 228, 165, .85) 30%, rgba(255, 212, 140, 0) 70%);
-      transition: opacity .25s;
-    }
     /* 전경 오브젝트(로켓): 고브럽이 뒤로 지나가면 가려짐. 누르면 발사! */
     .gm-obj {
       position: absolute; left: 0; top: 0; z-index: 12; pointer-events: auto; cursor: pointer;
@@ -52,8 +45,12 @@
       50% { box-shadow: 0 0 20px 5px rgba(255, 222, 150, .9), 0 0 46px 16px rgba(255, 222, 150, .38); }
     }
     .gm-satring.hot { animation-duration: 1.1s; }
-    .gm-spark.burst { animation: gm-burst 1.4s ease-out; }
-    @keyframes gm-burst { 0% { filter: brightness(1) blur(.5px); } 30% { filter: brightness(2.4) blur(.5px); } 100% { filter: brightness(1) blur(.5px); } }
+    .gm-satring.burst { animation: gm-satburst 1.2s ease-out; }
+    @keyframes gm-satburst {
+      0% { box-shadow: 0 0 12px 3px rgba(255, 222, 150, .7); }
+      30% { box-shadow: 0 0 40px 14px rgba(255, 235, 190, 1), 0 0 80px 30px rgba(255, 222, 150, .55); }
+      100% { box-shadow: 0 0 12px 3px rgba(255, 222, 150, .5); }
+    }
     /* 로켓 분사 불꽃 */
     .gm-flame { position: absolute; left: 0; top: 0; z-index: 11; pointer-events: none; display: none; }
     .gm-flame b {
@@ -197,7 +194,7 @@
     /* 고브럽 */
     .gm-goblub { position: absolute; left: 0; top: 0; z-index: 10; width: 170px; cursor: pointer; will-change: transform; }
     /* 첫 프레임에서 위치 잡기 전까지 숨김(로드 직후 왼쪽 위에 깜빡 보이는 것 방지) */
-    .gm-goblub, .gm-obj, .gm-shad, .gm-spark, .gm-cabin, .gm-glass, .gm-satring { visibility: hidden; }
+    .gm-goblub, .gm-obj, .gm-shad, .gm-cabin, .gm-glass, .gm-satring { visibility: hidden; }
     .gm-goblub .bodywrap { position: relative; width: 100%; will-change: transform; }
     .gm-goblub img { width: 100%; height: auto; display: block; user-select: none; -webkit-user-drag: none;
       filter: drop-shadow(0 8px 9px rgba(0, 22, 32, .22)); transition: filter .18s; }
@@ -236,28 +233,22 @@
       position: absolute; left: 0; top: 0; opacity: 0; pointer-events: none;
       display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
       width: 250px; height: 190px; border-radius: 18px; padding: 12px; box-sizing: border-box;
-      color: #fff; text-align: center; border: 3px solid rgba(255, 255, 255, .22);
-      box-shadow: 0 16px 32px rgba(0, 12, 32, .5), inset 0 2px 0 rgba(255,255,255,.18);
+      background: linear-gradient(180deg, #f9f0d4, #efe3bd);
+      color: #235a6b; text-align: center; border: 3px solid rgba(29, 90, 107, .25);
+      box-shadow: 0 16px 32px rgba(0, 22, 32, .48), inset 0 2px 0 rgba(255,255,255,.8);
       will-change: transform; transform-origin: center;
     }
-    /* 카드 팔레트 — Daring Indigo → Plum Perfect */
-    .gm-card:nth-child(5n+1) { background: linear-gradient(180deg, #4b5d8f, #374874); }
-    .gm-card:nth-child(5n+2) { background: linear-gradient(180deg, #5768ab, #445397); }
-    .gm-card:nth-child(5n+3) { background: linear-gradient(180deg, #6f7ec2, #5868ae); }
-    .gm-card:nth-child(5n+4) { background: linear-gradient(180deg, #b78bc3, #a475b1); }
-    .gm-card:nth-child(5n+5) { background: linear-gradient(180deg, #c7a1d5, #b48ac2); }
-    body.home-moon .gm-card, body.home-moon .gm-card:hover { color: #fff; }
-    .gm-card:hover { border-color: rgba(255, 255, 255, .5);
-      box-shadow: 0 22px 42px rgba(0, 12, 32, .6), inset 0 2px 0 rgba(255,255,255,.22); }
+    body.home-moon .gm-card, body.home-moon .gm-card:hover { color: #235a6b; }
+    .gm-card:hover { border-color: rgba(29, 90, 107, .55);
+      box-shadow: 0 22px 42px rgba(0, 22, 32, .58), inset 0 2px 0 rgba(255,255,255,.8); }
     .gm-card .ic {
       display: flex; align-items: center; justify-content: center;
       width: 76px; height: 76px; border-radius: 50%;
-      background: rgba(255, 255, 255, .92) !important;
-      box-shadow: inset 0 -4px 8px rgba(29, 40, 90, .16), inset 0 2px 3px rgba(255,255,255,.9);
+      box-shadow: inset 0 -4px 8px rgba(29, 90, 107, .14), inset 0 2px 3px rgba(255,255,255,.7);
       font-size: 2.3rem; line-height: 1;
     }
     .gm-card .tt { font-size: 1.56rem; line-height: 1.15; }
-    .gm-card .ds { font-size: .98rem; line-height: 1.35; color: #e4dff4; padding: 0 8px; word-break: keep-all; }
+    .gm-card .ds { font-size: .98rem; line-height: 1.35; color: #58818c; padding: 0 8px; word-break: keep-all; }
     @media (max-width: 700px) {
       .gm-card { gap: 7px; padding: 10px; }
       .gm-card .ic { width: 52px; height: 52px; font-size: 1.6rem; }
@@ -281,7 +272,6 @@
   </div>
 
   <div class="gm-tint"></div>
-  <div class="gm-spark" id="gm-spark"></div>
   <div class="gm-satring" id="gm-satring"></div>
   <div class="gm-sathot" id="gm-sathot" title=""></div>
   <div class="gm-satmenu" id="gm-satmenu">
@@ -359,7 +349,6 @@
     var hint = document.getElementById("gm-hint");
     var word = document.getElementById("gm-word");
     var cont = document.getElementById("gm-cards");
-    var spark = document.getElementById("gm-spark");
     var shad = document.getElementById("gm-shad");
     var obj = document.getElementById("gm-obj");
     var objshad = document.getElementById("gm-objshad");
@@ -403,7 +392,7 @@
     function isMobile() { return window.innerWidth < 700; } // 모바일: 중앙 고정, 걷기 없음
 
     // moon-5.webp(1376×768) 속 토성 중심(1151,150) — cover 배치를 화면 좌표로 환산
-    var SAT = { w: 1376, h: 768, x: 1151, y: 150, r: 78 };
+    var SAT = { w: 1376, h: 768, x: 1131, y: 181, r: 82 }; // 복숭아빛 가스행성(실측 중심·본체 반경 71)
     var vpBox = document.createElement("div");   // 배경(fixed inset:0)과 같은 박스 — 스크롤바 편차 제거
     vpBox.style.cssText = "position:fixed;inset:0;pointer-events:none;visibility:hidden";
     document.body.appendChild(vpBox);
@@ -444,12 +433,11 @@
         }
       } else {
         // 고양이 타로처럼: 세로형 카드가 아크 위에서 왼쪽→오른쪽 부채꼴로 촤라락
-        // 카드 수가 적을수록 크게 — 4장이면 널찍하게
-        var cw2 = Math.min(n <= 4 ? 300 : n <= 6 ? 230 : n <= 7 ? 200 : 162,
-                           W * (n <= 4 ? 0.23 : n <= 6 ? 0.18 : n <= 7 ? 0.16 : 0.128));
+        // 카드끼리 항상 약간(18%) 겹치도록 — 그 조건에서 화면 폭이 허락하는 최대 크기
+        var OV = 0.82;                                   // 이웃 카드 중심 간격 = 카드폭 × OV
+        var cw2 = Math.min(320, (W - 40) / (OV * (n - 1) + 1));
         var ch2 = Math.round(cw2 * 1.34);
-        // 부채 전체 폭 — 양끝 카드가 화면 밖으로 나가지 않게 클램프
-        var span = Math.min(W * (n >= 8 ? 0.9 : 0.8), 1250, W - cw2 - 36);
+        var span = cw2 * OV * (n - 1);                   // 부채 전체 폭(양끝 카드 중심 간)
         var cy = H * 0.40, curve = H * 0.16;   // 가운데가 높고 양끝이 내려오는 호
         for (var j = 0; j < n; j++) {
           var t = j / (n - 1) - 0.5;
@@ -664,21 +652,11 @@
 
       // 토성 고리를 도는 반짝임 + 광원 기준 그림자
       var sat = saturnPos();
-      var ss = sat.r / 78;
-      var th = now / 650; // 약 4초에 한 바퀴
-      var ca = Math.cos(-0.42), sa2 = Math.sin(-0.42); // 고리 기울기 -24°
-      var ex = 77 * ss * Math.cos(th), ey = 16 * ss * Math.sin(th);
-      var spx = sat.x + ex * ca - ey * sa2, spy = sat.y + ex * sa2 + ey * ca;
-      var behind = Math.sin(th) < 0 && Math.abs(ex) < 45 * ss; // 행성 뒤로 지나가는 구간
-      var sd = sat.r * 0.34;
-      spark.style.width = sd + "px"; spark.style.height = sd + "px";
-      spark.style.opacity = behind ? "0" : "1";
-      spark.style.transform = "translate(" + (spx - sd / 2) + "px," + (spy - sd / 2) + "px)";
       var hd = sat.r * 2.3; // 토성 호버 핫스팟
       sathot.style.width = hd + "px"; sathot.style.height = hd + "px";
       sathot.style.transform = "translate(" + (sat.x - hd / 2) + "px," + (sat.y - hd / 2) + "px)";
-      // 토성 본체 테두리 발광(실측 중심 1152,152 · 반경 42)
-      var ss2 = sat.r / 78, rw = 42 * 2 * ss2, rh = 42 * 2 * ss2;
+      // 행성 테두리 발광(본체 반경 70)
+      var ss2 = sat.r / 82, rw = 71 * 2 * ss2, rh = 71 * 2 * ss2;
       satring.style.width = rw + "px"; satring.style.height = rh + "px";
       satring.style.transform = "translate(" + (sat.x - rw / 2) + "px," + (sat.y - rh / 2) + "px)";
       // 토성 메뉴는 토성 바로 아래 오른쪽 정렬
@@ -892,9 +870,9 @@
       if (loggedIn) document.getElementById("gm-satlogin").innerHTML = "<span>👤</span>마이페이지";
     })();
     sathot.addEventListener("click", function () {
-      spark.classList.remove("burst");
-      void spark.offsetWidth; // 애니메이션 재시작
-      spark.classList.add("burst");
+      satring.classList.remove("burst");
+      void satring.offsetWidth; // 애니메이션 재시작
+      satring.classList.add("burst");
       if (satmenu.classList.contains("on")) satmenu.classList.remove("on");
       else {
         satmenu.classList.remove("on");
@@ -951,7 +929,6 @@
           obj.style.visibility = "visible";
           shad.style.visibility = "visible";
           objshad.style.visibility = "visible";
-          spark.style.visibility = "visible";
           satring.style.visibility = "visible";
           cabin.style.visibility = "visible";
           glass.style.visibility = "visible";
