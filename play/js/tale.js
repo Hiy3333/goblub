@@ -5,7 +5,7 @@
 //   onEnter(collected) → { name, focus, focusLabel, birth?, base, deep }
 (function () {
   var IMG = "img/tale/";
-  var IMGV = "?v=6";                    // 이미지 캐시버스트(귀곡 8초 무한루프 idle)
+  var IMGV = "?v=7";                    // 이미지 캐시버스트(귀곡 8초 무한루프 idle)
   var RITUAL_VID = IMG + "ritual.mp4?v=3";
   var GAN_H = { 갑: "甲", 을: "乙", 병: "丙", 정: "丁", 무: "戊", 기: "己", 경: "庚", 신: "辛", 임: "壬", 계: "癸" };
   var JI_H = { 자: "子", 축: "丑", 인: "寅", 묘: "卯", 진: "辰", 사: "巳", 오: "午", 미: "未", 신: "申", 유: "酉", 술: "戌", 해: "亥" };
@@ -186,30 +186,31 @@ box-shadow:0 0 0 100vmax #040308,0 0 70px rgba(0,0,0,.8)}}";
       ]},
       { id: 3, fx: "swallow", name: "", cls: "n-nar", text: "" },
       { id: 4, bg: "black", name: "", cls: "n-nar", text: "……\n차가운 흙냄새." },
-      { id: 5, vbg: "forest", name: "", cls: "n-nar", text: "…눈을 떴다.\n여기가, 어디지?", choices: [
-        { label: "👈 왼쪽을 둘러본다", goto: 6 },
-        { label: "👉 오른쪽을 둘러본다", goto: 7 }
-      ]},
-      { id: 6, vbg: "look_left", vbgOnce: true, name: "", cls: "n-nar", text: "뒤틀린 나무들 사이로\n안개가… 기어 다닌다.", goto: 8 },
-      { id: 7, vbg: "look_right", vbgOnce: true, name: "", cls: "n-nar", text: "까마귀 한 마리가 소리 없이\n이쪽을 내려다보고 있다.\n…눈이 마주쳤다.", goto: 8 },
-      { id: 8, name: "", cls: "n-nar", text: "…멀리, 불빛 하나가 흔들린다.", choices: [
+      // ===== 곡산 오르는 길 (부적 숲 → 장승 → 돌아봄 → 도망 → 움막) =====
+      { id: 5, vbg: "walk1", vbgOnce: true, name: "", cls: "n-nar",
+        text: "산에 들 땐 하나만 지키면 된다 했다.\n\n[뒤를 돌아보지 마라.]" },
+      { id: 6, name: "", cls: "n-nar", text: "가지마다 부적이 매달려 있다.\n바람도 없는데… 저 혼자 흔들린다." },
+      { id: 7, name: "", cls: "n-nar", text: "장승 하나가 길목을 지킨다.\n얼굴에 부적이 덕지덕지 붙어 있다.\n\n…웃고 있다." },
+      { id: 8, vbg: "walk2", vbgOnce: true, name: "", cls: "n-nar",
+        text: "멀리, 불빛 하나.\n저기가 맞을 것이다.", choices: [
         { label: "🕯 불빛을 향해 걷는다", goto: 9 }
       ]},
-      { id: 9, vbg: "path", name: "", cls: "n-nar", text: "발걸음을 옮긴다.\n숲이 등 뒤에서 닫히는 기분이다." },
+      { id: 9, name: "", cls: "n-nar", text: "딸랑—\n방울 소리가 내 걸음에 맞춰 따라온다.\n\n멈췄다. 그것도, 반 박자 늦게." },
       { id: 10, name: "", cls: "n-nar", text: "…등 뒤에서, 바스락.", choices: [
-        { label: "👀 뒤를 돌아본다", goto: 11 },
-        { label: "🏃 무시하고 걷는다", goto: 12 }
+        { label: "👀 참지 못하고 뒤를 돌아본다", goto: 11 }
       ]},
-      { id: 11, bg: "black", gob: true, gobPeek: true, name: "고브럽", cls: "n-gob",
-        text: "…나야.\n혼자 보내면 안 될 것 같아서.\n\n(낯익은 보라색 눈이 어둠 속에서 껌뻑인다)", goto: 13 },
-      { id: 12, name: "", cls: "n-nar", text: "숨을 죽이고 발걸음을 서두른다.", goto: 13 },
-      { id: 13, bg: "tent", name: "", cls: "n-nar", text: "낡은 천막.\n틈새로 촛불이 새어 나온다." },
-      { id: 14, name: "???", cls: "n-unk", text: "……밖은 위험하다.\n들어와라.", choices: [
-        { label: "⛺ 들어간다", goto: 16 },
-        { label: "😮‍💨 숨을 고른다", goto: 15 }
+      { id: 11, vbg: "lookback", vbgOnce: true, name: "", cls: "n-nar",
+        text: "길 한가운데.\n\n…아까는, 저기 없었다." },
+      { id: 12, name: "", cls: "n-nar", text: "웃던 얼굴이\n이제 나를 본다." },
+      { id: 13, vbg: "flee", vbgOnce: true, name: "", cls: "n-nar",
+        text: "한 걸음… 두 걸음…\n\n뛰었다.\n따라오는 소리는 들리지 않았다.\n그게 더 무서웠다." },
+      { id: 14, vbg: "hut", vbgOnce: true, name: "", cls: "n-nar",
+        text: "낡은 움막.\n입구는 삼베 천으로 막혀 있다.\n\n천 너머에 불빛 두 점이, 나란히." },
+      { id: 15, name: "???", cls: "n-unk", text: "……밖은 위험하다.\n들어와라.", choices: [
+        { label: "⛺ 천을 걷고 들어간다", goto: 16 }
       ]},
-      { id: 15, name: "", cls: "n-nar", text: "크게 숨을 들이쉰다.\n…가자.", goto: 16 },
-      { id: 16, vbg: "gwigok_idle", name: "귀곡", cls: "n-gwi", text: "…앉거라.\n먼 길 오느라 혼이 다 시렸겠구나." },
+      { id: 16, vbg: "gwigok_idle", name: "귀곡", cls: "n-gwi",
+        text: "…돌아봤구나.\n그럼 그것도 네 얼굴을 봤겠지.\n\n(문 쪽을 힐끗 본다)\n……앉거라. 문은 닫아두마." },
       // 이름 입력
       { id: 17, name: "귀곡", cls: "n-gwi", text: "산 자여. 네 이름을 이 천막에\n똑똑히 남겨라.",
         input: { kind: "text", key: "name", placeholder: "이름 (또는 불리고 싶은 이름)", maxlen: 12, submit: "🖊 이름을 새긴다" } },
