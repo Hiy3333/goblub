@@ -54,7 +54,7 @@
     /* 행성 테두리가 스스로 빛난다 — 클릭 가능 표시 */
     :root { --plc: 255, 217, 138; }
     .pl-hot { position: fixed; z-index: 40; border-radius: 50%; cursor: pointer; }
-    /* 초승달은 원형 링 대신 달 모양 그대로 빛난다 */
+    /* 행성 실루엣에서 만든 빛 — 행성 바로 바깥이 그 모양대로 빛난다 */
     .pl-ring { position: fixed; z-index: 3; pointer-events: none;
       background: url("../design/img/glow-mini.png") center / 100% 100% no-repeat;
       animation: plRing 2.6s ease-in-out infinite; }
@@ -163,7 +163,7 @@
       var vp = document.createElement("div");
       vp.style.cssText = "position:fixed;inset:0;pointer-events:none;visibility:hidden";
       document.body.appendChild(vp);
-      var SAT = { w: 1376, h: 768, x: 1151, y: 190, r: 45, rx: 78, ry: 78 }; // 공통 규격(초승달은 발광 박스가 더 넓다)
+      var SAT = { w: 1376, h: 768, x: 1151, y: 190, r: 45, rx: 78, ry: 78 }; // 발광 박스(행성 중심 ±78) · 클릭 반경 45
       function place() {
         var vb = vp.getBoundingClientRect();
         var W = vb.width, H = vb.height;
