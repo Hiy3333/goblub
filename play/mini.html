@@ -51,15 +51,16 @@
       body.clay .logo span { text-shadow: 0 1px 2px rgba(90, 100, 170, .25); }
       main { padding-top: 90px; }
     }
-    /* 행성 클릭 유도 — 행성 색에 맞춘 불빛이 커졌다 줄었다 */
+    /* 행성 테두리가 스스로 빛난다 — 클릭 가능 표시 */
     :root { --plc: 255, 217, 138; }
-    .pl-hot { position: fixed; z-index: 40; border-radius: 50%; cursor: pointer;
-      animation: plPulse 2.6s ease-in-out infinite; }
-    @keyframes plPulse {
-      0%, 100% { box-shadow: 0 0 0 2px rgba(var(--plc), .32), 0 0 18px 3px rgba(var(--plc), .22); }
-      50% { box-shadow: 0 0 0 8px rgba(var(--plc), .14), 0 0 40px 13px rgba(var(--plc), .45); }
+    .pl-hot { position: fixed; z-index: 40; border-radius: 50%; cursor: pointer; }
+    .pl-ring { position: fixed; z-index: 3; pointer-events: none; border-radius: 50%;
+      animation: plRing 2.6s ease-in-out infinite; }
+    @keyframes plRing {
+      0%, 100% { box-shadow: 0 0 9px 1px rgba(var(--plc), .5), 0 0 20px 5px rgba(var(--plc), .2); }
+      50% { box-shadow: 0 0 20px 5px rgba(var(--plc), .9), 0 0 46px 16px rgba(var(--plc), .38); }
     }
-    .pl-hot:hover { animation-duration: 1.1s; }
+    .pl-hot:hover ~ .pl-ring, .pl-ring.hot { animation-duration: 1.1s; }
     .pl-menu { position: fixed; z-index: 41; display: none; flex-direction: column; gap: 10px; align-items: flex-end; }
     .pl-menu.on { display: flex; }
     .pl-menu a { display: flex; align-items: center; gap: 10px; background: linear-gradient(180deg, #f9f0d4, #efe3bd);
@@ -151,12 +152,16 @@
       menu.innerHTML = '<a href="../index.html"><span>🌙</span>홈으로</a>' +
         '<a href="../apps.html"><span>📱</span>앱 다운로드</a>' +
         '<a href="../mypage.html"><span>' + (loggedIn ? "👤" : "🔑") + '</span>' + (loggedIn ? "마이페이지" : "로그인") + '</a>';
+      var ring = document.createElement("div"); ring.className = "pl-ring";
+      document.body.appendChild(ring);
       document.body.appendChild(hot); document.body.appendChild(menu);
+      hot.addEventListener("mouseenter", function () { ring.classList.add("hot"); });
+      hot.addEventListener("mouseleave", function () { ring.classList.remove("hot"); });
       // 배경(::before, fixed inset:0)과 완전히 같은 박스를 실측해 좌표 기준으로 삼는다
       var vp = document.createElement("div");
       vp.style.cssText = "position:fixed;inset:0;pointer-events:none;visibility:hidden";
       document.body.appendChild(vp);
-      var SAT = { w: 1376, h: 768, x: 1151, y: 150, r: 78 };
+      var SAT = { w: 1376, h: 768, x: 1160, y: 152, r: 43, rx: 34, ry: 38 }; // 실측 행성 중심·반경
       function place() {
         var vb = vp.getBoundingClientRect();
         var W = vb.width, H = vb.height;
@@ -165,6 +170,9 @@
         var d = SAT.r * s * 2.3;
         hot.style.width = d + "px"; hot.style.height = d + "px";
         hot.style.left = (x - d / 2) + "px"; hot.style.top = (y - d / 2) + "px";
+        var rw = SAT.rx * 2 * s, rh = SAT.ry * 2 * s;   // 행성 테두리에 딱 맞는 발광 링
+        ring.style.width = rw + "px"; ring.style.height = rh + "px";
+        ring.style.left = (x - rw / 2) + "px"; ring.style.top = (y - rh / 2) + "px";
         menu.style.left = Math.min(x + SAT.r * s * 0.4, W - 190) + "px";
         menu.style.top = (y + d / 2 + 14) + "px";
       }
