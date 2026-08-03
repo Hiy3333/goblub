@@ -454,6 +454,7 @@
 
     function beginSpit(now) {
       mode = "spit";
+      cancelTrip(now); scheduleNextTrip(now);   // 넘어짐 잔여 상태 정리 + 타이머 재예약
       setMouth(true);
       squashT = 0.3;
       mouthCloseAt = now + 1100;
@@ -502,6 +503,16 @@
 
     // ===== 넘어짐: 물고 있던 카테고리를 바닥에 쏟았다가 주섬주섬 챙긴다 =====
     var trip = null, nextTripAt = Date.now() + 4000; // 첫 넘어짐은 4초 뒤 확정, 이후엔 랜덤 텀
+    function scheduleNextTrip(now) { nextTripAt = now + 15000 + Math.random() * 12000; }
+    // 넘어져 있는 도중에 클릭 등으로 빠져나갈 때 — 쏟아둔 카드를 치우고 타이머도 다시 잡는다
+    function cancelTrip(now) {
+      if (!trip) return;
+      trip.items.forEach(function (p) {
+        p.el.style.opacity = "0"; p.el.style.pointerEvents = "none"; p.el.style.transform = "";
+      });
+      trip = null;
+      scheduleNextTrip(now);
+    }
     function beginTrip(now) {
       mode = "trip";
       var W = window.innerWidth, h = el.offsetHeight;
@@ -577,7 +588,7 @@
         if (now >= t.until) {
           trip = null; mode = "idle";
           gait = "walk"; gaitUntil = now + 900;
-          nextTripAt = now + 15000 + Math.random() * 12000;
+          scheduleNextTrip(now);
           return 0;
         }
       }
@@ -800,6 +811,7 @@
       cards = [];
       word.style.visibility = "visible"; word.style.opacity = "1";
       mode = "idle"; gaitUntil = 0;
+      scheduleNextTrip(Date.now());   // 닫자마자 곧바로 넘어지지 않게
       setMouth(isMobile());
       el.classList.remove("orbon"); // 산책으로 돌아가면 구슬 빛 끔
       if (hint) hint.style.display = ""; // 돌아오면 멘트 다시
@@ -820,6 +832,7 @@
     el.addEventListener("click", function () {
       if (mode === "run" || mode === "spit") return;
       if (mode === "cards") { closeCards(); return; }
+      if (mode === "trip") cancelTrip(Date.now());   // 넘어져 있던 중이면 쏟은 카드부터 치우고 일어난다
       el.classList.add("orbon"); // 클릭한 동안(달리기·카드)만 꼬리 구슬이 빛남
       if (hint) hint.style.display = "none";
       if (isMobile()) { beginSpit(Date.now()); } // 모바일은 그 자리에서 바로
