@@ -66,7 +66,7 @@ background:radial-gradient(ellipse at center,rgba(4,10,20,.68) 0%,rgba(4,10,20,.
   var WALK_SPEED = 200, RUN_SPEED = 1250;
   var WALK_W = 170, FRONT_W = 186;
   var MOUTH_FX = 0.593, MOUTH_FY = 0.539;
-  var SAT = { w: 1376, h: 768, x: 1151, y: 150, r: 78 };
+  var SAT = { w: 1376, h: 768, x: 1151, y: 190, r: 78 }; // 전 페이지 공통 규격
   function groundY() { return window.innerHeight * 0.94 - 75; }
   function centerX() { return (window.innerWidth - el.offsetWidth) / 2; }
   function saturnPos() {
