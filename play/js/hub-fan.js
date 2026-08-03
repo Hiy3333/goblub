@@ -22,7 +22,7 @@
   var IMG_FRONT = ROOT + "/design/img/home/gb-front.webp";
 
   document.body.classList.add("fanmode");
-  if ((window.innerWidth - 40) / (0.82 * (cards.length - 1) + 1) < 205) document.body.classList.add("dense"); // 카드가 작아지면 글자 축소
+  if (Math.min(240, window.innerWidth * 0.17, (window.innerWidth - 40) / (0.92 * (cards.length - 1) + 1)) < 190) document.body.classList.add("dense"); // 카드가 작아지면 글자 축소
 
   // ===== 고브럽 스타일(홈과 동일 값) =====
   var css = document.createElement("style");
@@ -93,9 +93,9 @@ background:radial-gradient(ellipse at center,rgba(4,10,20,.68) 0%,rgba(4,10,20,.
   // ===== 카드 부채꼴(홈 지오메트리) =====
   function targets(n) {
     var W = window.innerWidth, H = window.innerHeight;
-    // 카드끼리 항상 약간(18%) 겹치도록 — 그 조건에서 화면 폭이 허락하는 최대 크기
-    var OV = 0.82;
-    var cw = Math.min(320, (W - 40) / (OV * (n - 1) + 1));
+    // 카드끼리 아주 약간(8%)만 겹치도록 — 크기는 적당히 작게
+    var OV = 0.92;
+    var cw = Math.min(240, W * 0.17, (W - 40) / (OV * (n - 1) + 1));
     var ch = Math.round(cw * 1.34);
     var span = cw * OV * (n - 1);
     var cy = H * 0.40, curve = H * 0.16;

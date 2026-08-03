@@ -392,7 +392,7 @@
     function isMobile() { return window.innerWidth < 700; } // 모바일: 중앙 고정, 걷기 없음
 
     // moon-5.webp(1376×768) 속 토성 중심(1151,150) — cover 배치를 화면 좌표로 환산
-    var SAT = { w: 1376, h: 768, x: 1131, y: 181, r: 82 }; // 복숭아빛 가스행성(실측 중심·본체 반경 71)
+    var SAT = { w: 1376, h: 768, x: 1151, y: 151, r: 78 }; // 복숭아빛 가스행성(다른 페이지와 동일 크기·위치)
     var vpBox = document.createElement("div");   // 배경(fixed inset:0)과 같은 박스 — 스크롤바 편차 제거
     vpBox.style.cssText = "position:fixed;inset:0;pointer-events:none;visibility:hidden";
     document.body.appendChild(vpBox);
@@ -433,9 +433,9 @@
         }
       } else {
         // 고양이 타로처럼: 세로형 카드가 아크 위에서 왼쪽→오른쪽 부채꼴로 촤라락
-        // 카드끼리 항상 약간(18%) 겹치도록 — 그 조건에서 화면 폭이 허락하는 최대 크기
-        var OV = 0.82;                                   // 이웃 카드 중심 간격 = 카드폭 × OV
-        var cw2 = Math.min(320, (W - 40) / (OV * (n - 1) + 1));
+        // 카드끼리 아주 약간(8%)만 겹치도록 — 크기는 적당히 작게
+        var OV = 0.92;                                   // 이웃 카드 중심 간격 = 카드폭 × OV
+        var cw2 = Math.min(240, W * 0.17, (W - 40) / (OV * (n - 1) + 1));
         var ch2 = Math.round(cw2 * 1.34);
         var span = cw2 * OV * (n - 1);                   // 부채 전체 폭(양끝 카드 중심 간)
         var cy = H * 0.40, curve = H * 0.16;   // 가운데가 높고 양끝이 내려오는 호
@@ -656,7 +656,7 @@
       sathot.style.width = hd + "px"; sathot.style.height = hd + "px";
       sathot.style.transform = "translate(" + (sat.x - hd / 2) + "px," + (sat.y - hd / 2) + "px)";
       // 행성 테두리 발광(본체 반경 70)
-      var ss2 = sat.r / 82, rw = 71 * 2 * ss2, rh = 71 * 2 * ss2;
+      var ss2 = sat.r / 78, rw = 42 * 2 * ss2, rh = 42 * 2 * ss2;
       satring.style.width = rw + "px"; satring.style.height = rh + "px";
       satring.style.transform = "translate(" + (sat.x - rw / 2) + "px," + (sat.y - rh / 2) + "px)";
       // 토성 메뉴는 토성 바로 아래 오른쪽 정렬
