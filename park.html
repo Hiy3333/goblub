@@ -13,14 +13,20 @@
     html, body { margin: 0; height: 100%; overflow: hidden;
       font-family: 'Jua', 'Malgun Gothic', sans-serif; background: #7fc45a; }
 
-    /* 지도 — 배경(fixed inset:0)과 좌표 기준을 일치시킨다 */
-    .pk-map {
-      position: fixed; inset: 0; z-index: 0;
+    /* 뒤 채움 — 지도를 꽉 채워 흐리게 깔아 여백이 비어 보이지 않게 */
+    .pk-back {
+      position: fixed; inset: -30px; z-index: 0;
       background: url("design/img/park-map.webp") center center / cover no-repeat;
+      filter: blur(26px) saturate(.85) brightness(.82);
+    }
+    /* 지도 — 어느 화면비에서도 잘리지 않게 전체를 담는다 */
+    .pk-map {
+      position: fixed; inset: 0; z-index: 1;
+      background: url("design/img/park-map.webp") center center / contain no-repeat;
     }
     /* 위아래 살짝 어둡게 — 로고와 안내가 묻히지 않게 */
     .pk-vig {
-      position: fixed; inset: 0; z-index: 1; pointer-events: none;
+      position: fixed; inset: 0; z-index: 2; pointer-events: none;
       background: linear-gradient(180deg, rgba(20,50,25,.22) 0%, transparent 22%,
                   transparent 68%, rgba(20,50,25,.30) 100%);
     }
@@ -48,10 +54,8 @@
       animation: pkGlow 2.6s ease-in-out infinite;
     }
     @keyframes pkGlow {
-      0%, 100% { box-shadow: 0 0 0 3px rgba(255, 255, 255, .55), 0 0 0 6px rgba(120, 80, 40, .18),
-                             0 0 22px 7px rgba(255, 232, 150, .40); }
-      50% { box-shadow: 0 0 0 8px rgba(255, 255, 255, .30), 0 0 0 12px rgba(120, 80, 40, .10),
-                        0 0 46px 18px rgba(255, 226, 120, .72); }
+      0%, 100% { box-shadow: 0 0 16px 4px rgba(255, 240, 170, .18); }
+      50% { box-shadow: 0 0 34px 12px rgba(255, 232, 140, .40); }
     }
     .pk-hot:hover ~ .pk-glow, .pk-glow.on { animation-duration: 1.1s; }
 
@@ -99,6 +103,13 @@
       border: 8px solid transparent; border-top-color: #fff8e6;
     }
 
+    /* 기구에 탄 꼬마 고브럽들 */
+    .pk-rider {
+      position: fixed; left: 0; top: 0; z-index: 8; pointer-events: none; will-change: transform;
+      filter: drop-shadow(0 2px 3px rgba(20, 50, 25, .45));
+    }
+    .pk-rider img { display: block; width: 100%; height: auto; -webkit-user-drag: none; }
+
     /* 모바일: 지도가 좁아 누르기 어려우니 아래에 목록을 깔아준다 */
     .pk-list { display: none; }
     @media (max-width: 700px) {
@@ -120,16 +131,13 @@
   </style>
 </head>
 <body>
+  <div class="pk-back"></div>
   <div class="pk-map"></div>
   <div class="pk-vig"></div>
 
   <a class="pk-head" href="index.html" title="달나라 홈으로">
     <span style="color:#ff6b6b">g</span><span style="color:#ffd166">o</span><span style="color:#6bcB77">b</span><span style="color:#4d96ff">l</span><span style="color:#c77dff">u</span><span style="color:#ff9770">b</span>
   </a>
-
-  <!-- 입구 안내 고브럽 -->
-  <div class="pk-guide" id="pk-guide"><img src="design/img/home/gb-front.webp" alt="고브럽" /></div>
-  <div class="pk-bubble" id="pk-bubble">놀이기구를 눌러 봐!</div>
 
   <!-- 모바일용 바로가기 -->
   <nav class="pk-list">
@@ -142,21 +150,18 @@
     // 지도 원본(1376×768) 기준 좌표 — 실측값
     var MAP = { w: 1376, h: 768 };
     var RIDES = [
-      { key: "fortune", x: 300,  y: 152, r: 80, icon: "🎡", name: "운세",           desc: "사주 · 궁합 · 타로 · 전생", href: "play/fortune-hub.html" },
-      { key: "tests",   x: 1043, y: 165, r: 98, icon: "🎢", name: "대환장 테스트",   desc: "내 유형 다 털리는 심리테스트", href: "play/tests.html" },
-      { key: "mini",    x: 683,  y: 302, r: 82, icon: "🎠", name: "미니 놀이터",     desc: "룰렛 · 질문카드 · 작명 · 마음배달", href: "play/mini.html" },
-      { key: "mini2",   x: 1078, y: 478, r: 88, icon: "🚗", name: "미니 놀이터 2",   desc: "팡팡 · 반응속도 · 로또 · 밸런스", href: "play/mini2.html" },
-      { key: "apps",    x: 292,  y: 488, r: 78, icon: "🎁", name: "앱 다운로드",     desc: "직접 만든 앱들을 모아둔 곳", soon: "📱 앱은 아직 준비 중이에요!" }
+      { key: "fortune", x: 340,  y: 150, r: 118, icon: "🎡", name: "운세",           desc: "사주 · 궁합 · 타로 · 전생", href: "play/fortune-hub.html" },
+      { key: "tests",   x: 1055, y: 175, r: 130, icon: "🎢", name: "대환장 테스트",   desc: "내 유형 다 털리는 심리테스트", href: "play/tests.html" },
+      { key: "mini",    x: 680,  y: 330, r: 100, icon: "🎠", name: "미니 놀이터",     desc: "룰렛 · 질문카드 · 작명 · 마음배달", href: "play/mini.html" },
+      { key: "mini2",   x: 1075, y: 490, r: 108, icon: "🚗", name: "미니 놀이터 2",   desc: "팡팡 · 반응속도 · 로또 · 밸런스", href: "play/mini2.html" },
+      { key: "apps",    x: 292,  y: 488, r: 82, icon: "🎁", name: "앱 다운로드",     desc: "직접 만든 앱들을 모아둔 곳", soon: "📱 앱은 아직 준비 중이에요!" }
     ];
-    var GATE = { x: 684, y: 625 };   // 입구(고브럽이 서는 자리)
 
     // 배경과 완전히 같은 박스를 실측해 좌표 기준으로 삼는다(스크롤바 편차 제거)
     var vp = document.createElement("div");
     vp.style.cssText = "position:fixed;inset:0;pointer-events:none;visibility:hidden";
     document.body.appendChild(vp);
 
-    var guide = document.getElementById("pk-guide");
-    var bubble = document.getElementById("pk-bubble");
     var rows = document.getElementById("pk-rows");
     var items = [];
 
@@ -196,7 +201,7 @@
     function place() {
       var b = vp.getBoundingClientRect();
       var W = b.width, H = b.height;
-      var s = Math.max(W / MAP.w, H / MAP.h);          // background-size: cover
+      var s = Math.min(W / MAP.w, H / MAP.h);          // background-size: contain
       var ox = b.left + (W - MAP.w * s) / 2;
       var oy = b.top + (H - MAP.h * s) / 2;            // background-position: center center
       function px(x, y) { return [ox + x * s, oy + y * s]; }
@@ -219,30 +224,103 @@
                              Math.min(b.left + W - sw / 2 - 8, p[0])) + "px";
       });
 
-      var g = px(GATE.x, GATE.y);
-      var gw = Math.max(96, 168 * s);
-      guide.style.width = gw + "px";
-      guide.style.left = (g[0] - gw / 2) + "px";
-      guide.style.top = (g[1] - gw * 0.52) + "px";
-      bubble.style.left = g[0] + "px";
-      bubble.style.top = (g[1] - gw * 0.62) + "px";
+      window.PK_VIEW = { ox: ox, oy: oy, s: s };
+      if (window.PK_RIDERS) window.PK_RIDERS.layout();
     }
     place();
     window.addEventListener("resize", place);
     setInterval(place, 1000);   // 늦은 레이아웃 변화 자가 보정
+    window.PK_PLACE = place;
+  })();
+  </script>
 
-    setTimeout(function () { bubble.classList.add("on"); }, 700);
-    var TIPS = ["놀이기구를 눌러 봐!", "관람차에선 앞날이 보인대", "회전목마는 몇 바퀴든 공짜야",
-                "롤러코스터… 각오는 했지?", "기념품 가게는 아직 준비 중이야"];
-    var ti = 0;
-    setInterval(function () {
-      bubble.classList.remove("on");
-      setTimeout(function () {
-        ti = (ti + 1) % TIPS.length;
-        bubble.textContent = TIPS[ti];
-        bubble.classList.add("on");
-      }, 450);
-    }, 5200);
+  <script>
+  /* ===== 기구에 탄 꼬마 고브럽들 ===== */
+  (function () {
+    var IMG = "design/img/home/gb-front.webp";
+    // 회색 고브럽을 색색으로 — sepia로 색을 입힌 뒤 색상만 돌린다
+    var TINTS = [12, 45, 95, 150, 195, 250, 300, 335];
+    function tint(deg) { return "sepia(1) saturate(3.2) hue-rotate(" + deg + "deg) brightness(1.02)"; }
+
+    var riders = [];
+    function make(kind, i, size) {
+      var d = document.createElement("div");
+      d.className = "pk-rider";
+      d.innerHTML = '<img src="' + IMG + '" alt="" />';
+      d.firstChild.style.filter = tint(TINTS[(i * 3 + kind.length) % TINTS.length]);
+      document.body.appendChild(d);
+      return { el: d, size: size, i: i };
+    }
+
+    // 지도 원본 좌표 기준 배치
+    var WHEEL   = { cx: 308,  cy: 145, rx: 100, ry: 120, n: 8,  period: 30, size: 34 };
+    var CARO    = { cx: 680,  cy: 368, rx: 80,  ry: 19,  n: 5,  period: 11, size: 32 };
+    var BUMPER  = { cx: 1090, cy: 545, rx: 72,  ry: 26,  n: 4,               size: 32 };
+    // 롤러코스터 선로를 따라 찍은 점들
+    var TRACK = [[900,275],[960,265],[1020,255],[1075,248],[1130,243],[1180,232],
+                 [1215,203],[1222,170],[1205,145],[1170,132],[1130,136],[1090,150]];
+    var COASTER = { n: 3, period: 8, size: 30, gap: 0.05 };
+
+    var W = [], C = [], B = [], T = [];
+    for (var i = 0; i < WHEEL.n; i++)   W.push(make("wheel", i, WHEEL.size));
+    for (i = 0; i < CARO.n; i++)        C.push(make("caro", i, CARO.size));
+    for (i = 0; i < BUMPER.n; i++)      B.push(make("bump", i, BUMPER.size));
+    for (i = 0; i < COASTER.n; i++)     T.push(make("coast", i, COASTER.size));
+
+    function trackAt(u) {                      // 0~1 → 선로 위 좌표
+      u = Math.max(0, Math.min(0.9999, u));
+      var f = u * (TRACK.length - 1), k = Math.floor(f), t = f - k;
+      var a = TRACK[k], b = TRACK[Math.min(TRACK.length - 1, k + 1)];
+      return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
+    }
+
+    function set(r, mx, my, extra) {
+      var v = window.PK_VIEW; if (!v) return;
+      var sz = r.size * v.s;
+      r.el.style.width = sz + "px";
+      r.el.style.transform = "translate(" + (v.ox + mx * v.s - sz / 2) + "px," +
+        (v.oy + my * v.s - sz * 0.62) + "px)" + (extra || "");
+    }
+
+    var t0 = Date.now();
+    function tick() {
+      var v = window.PK_VIEW;
+      if (v) {
+        var t = (Date.now() - t0) / 1000;
+
+        // 관람차 — 천천히 한 바퀴
+        for (var i = 0; i < W.length; i++) {
+          var a = (t / WHEEL.period + i / W.length) * Math.PI * 2;
+          set(W[i], WHEEL.cx + Math.cos(a) * WHEEL.rx, WHEEL.cy + Math.sin(a) * WHEEL.ry);
+        }
+        // 회전목마 — 돌면서 위아래로
+        for (i = 0; i < C.length; i++) {
+          var b = (t / CARO.period + i / C.length) * Math.PI * 2;
+          var bob = Math.sin(b * 3) * 5;
+          set(C[i], CARO.cx + Math.cos(b) * CARO.rx, CARO.cy + Math.sin(b) * CARO.ry + bob);
+        }
+        // 범퍼카 — 제멋대로 부딪히며 돌아다님
+        for (i = 0; i < B.length; i++) {
+          var p = t * (0.55 + i * 0.13) + i * 1.7;
+          var x = BUMPER.cx + Math.sin(p) * BUMPER.rx * (0.55 + 0.4 * Math.cos(p * 0.7 + i));
+          var y = BUMPER.cy + Math.cos(p * 1.3 + i) * BUMPER.ry;
+          set(B[i], x, y, " rotate(" + (Math.sin(p * 2) * 9) + "deg)");
+        }
+        // 롤러코스터 — 선로를 타고 달린다
+        for (i = 0; i < T.length; i++) {
+          var u = (t / COASTER.period - i * COASTER.gap) % 1;
+          if (u < 0) u += 1;
+          var q = trackAt(u);
+          var fade = Math.min(1, u / 0.06, (1 - u) / 0.06);
+          T[i].el.style.opacity = Math.max(0, fade);
+          set(T[i], q[0], q[1]);
+        }
+      }
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+
+    window.PK_RIDERS = { layout: function () {} };
   })();
   </script>
 </body>
