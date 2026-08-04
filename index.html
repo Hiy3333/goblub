@@ -59,8 +59,9 @@
     /* 로켓 몸통에 새긴 이름 — 로켓 기울기·착지 반동을 그대로 따라간다 */
     .gm-rname {
       position: absolute; left: 0; top: 0; z-index: 14; pointer-events: none; white-space: nowrap;
-      color: #fdf3e0; font-family: 'Jua', 'Malgun Gothic', sans-serif; letter-spacing: .5px;
-      text-shadow: 0 1px 2px rgba(20, 50, 60, .55), 0 0 6px rgba(255, 240, 210, .35);
+      color: #fdf3e0; font-family: 'Jua', 'Malgun Gothic', sans-serif;
+      writing-mode: vertical-rl; text-orientation: upright; letter-spacing: 2px; line-height: 1;
+      text-shadow: 0 1px 2px rgba(20, 50, 60, .6), 0 0 6px rgba(255, 240, 210, .3);
     }
     .gm-satring.burst { animation: gm-satburst 1.2s ease-out; }
     @keyframes gm-satburst {
@@ -309,6 +310,8 @@
       <!-- 뒤쪽 반원만 고리로 남기고, 앞쪽은 고리 대신 CLICK 글자가 행성을 두른다 -->
       <path d="M 6,78 A 72,24 0 0 1 150,78" fill="none" stroke="#ffe6c8" stroke-width="4.5"
             stroke-linecap="round" mask="url(#gm-behind)" opacity=".9" />
+      <path d="M 6,78 A 72,24 0 0 0 150,78" fill="none" stroke="#ffe6c8" stroke-width="5"
+            stroke-linecap="round" stroke-dasharray="26 108" />
       <text fill="#ffeed8" font-family="Jua, 'Malgun Gothic', sans-serif" font-size="30"
             letter-spacing="1.5" font-weight="700" stroke="#7a4a32" stroke-width="1.1" paint-order="stroke">
         <textPath href="#gm-ringfront" startOffset="50%" text-anchor="middle" dominant-baseline="middle">CLICK</textPath>
@@ -794,9 +797,9 @@
       glass.style.transform = "translate(" + (gcx - gd / 2) + "px," + (gcy - gd / 2) + "px)";
       peek.style.width = pd + "px"; peek.style.height = pd + "px";
       peek.style.transform = "translate(" + (gcx - pd / 2) + "px," + (gcy - pd / 2) + "px)";
-      // 몸통 이름표 — 창 아래 몸통 중앙
-      var nx = ow * (0.585 - 0.5) * rsx, ny = oh * (0.635 - 1) * rsy;
-      rname.style.fontSize = (ow * 0.108) + "px";
+      // 몸통 이름표 — 창 왼쪽에 세로쓰기
+      var nx = ow * (0.395 - 0.5) * rsx, ny = oh * (0.475 - 1) * rsy;
+      rname.style.fontSize = (ow * 0.082) + "px";
       rname.style.transform = "translate(" + (pivx + nx * cosr - ny * sinr) + "px," +
         (pivy + nx * sinr + ny * cosr) + "px) translate(-50%,-50%) rotate(" + rrot + "deg)";
       // 정면 이미지의 눈알 중심(0.565, 0.155)이 창 정중앙에 오도록
