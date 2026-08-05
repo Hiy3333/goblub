@@ -97,6 +97,25 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
 .dl .k{flex:0 0 62px;color:var(--gold);font-size:.85rem}
 .dl .v{flex:1;font-size:.87rem;line-height:1.75;color:#cfdcec}
 
+/* ── 관측소 조수 부엉이 ── */
+.owlbox{margin-top:16px;border-radius:18px;overflow:hidden;position:relative;
+  border:1px solid var(--line);box-shadow:0 14px 34px rgba(0,10,24,.45);background:#0a1424}
+.owlbox video,.owlbox img{display:block;width:100%;height:auto}
+.owlcap{position:absolute;left:0;right:0;bottom:0;margin:0;padding:26px 14px 10px;
+  text-align:center;font-size:.88rem;color:#ffeec2;pointer-events:none;
+  background:linear-gradient(180deg,transparent,rgba(8,14,24,.85))}
+
+#scOwl .vidwrap{margin-top:10px;border-radius:20px;overflow:hidden;position:relative;
+  border:1px solid var(--line);box-shadow:0 18px 40px rgba(0,8,20,.5);background:#08111e}
+#scOwl video{display:block;width:100%;height:auto}
+#scOwl .cap{text-align:center;color:var(--ink-soft);font-size:.9rem;margin-top:12px}
+
+.owlnote{display:flex;gap:12px;align-items:center;margin-top:10px;
+  background:rgba(18,34,52,.66);border:1px solid var(--line);border-radius:16px;padding:12px 14px}
+.owlnote img{width:86px;height:86px;border-radius:12px;flex:0 0 auto;object-fit:cover}
+.owlnote p{margin:0;font-size:.88rem;line-height:1.75;color:#dbe6f5}
+.owlnote b{color:var(--gold);font-weight:400}
+
 .namebox{margin-top:14px;background:rgba(40,32,60,.6);border:1px solid rgba(190,170,255,.28);
   border-radius:16px;padding:14px 15px;text-align:center}
 .namebox p{margin:0 0 10px;font-size:.9rem;color:#d9cffb;line-height:1.75}
@@ -132,6 +151,13 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
       <p>두 사람의 사주에서 별을 꺼내 하나로 잇습니다.<br />점수 대신, 세상에 없던 별자리 하나가 남습니다.</p>
     </div>
 
+    <!-- 관측소 조수 부엉이 — 신청서가 올 때까지 꾸벅꾸벅 -->
+    <div class="owlbox">
+      <video id="owl-idle" muted loop playsinline autoplay preload="auto"
+        poster="img/stars/owl-poster.webp" src="img/stars/owl-idle.mp4"></video>
+      <p class="owlcap">🦉 관측소 조수 '부엉' — 오늘 밤도 당직입니다</p>
+    </div>
+
     <div class="order">
       <h2>✦ 관측 신청서</h2>
       <p class="sub">두 분의 생일을 적어 주시면 그 밤하늘을 그려 드려요</p>
@@ -157,7 +183,15 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
     </div>
   </div>
 
-  <!-- ② 하늘 + 결과 -->
+  <!-- ② 부엉이 출동 (영상) -->
+  <div class="screen" id="scOwl">
+    <div class="vidwrap">
+      <video id="owl-vid" muted playsinline preload="auto"></video>
+    </div>
+    <p class="cap" id="owl-cap">부엉이가 신청서를 접수했습니다…</p>
+  </div>
+
+  <!-- ③ 하늘 + 결과 -->
   <div class="screen" id="scSky">
     <div class="sky">
       <canvas id="cv" width="1440" height="1360"></canvas>
@@ -176,6 +210,12 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
 
       <div class="card"><h4>이 배열이 말하는 것</h4><p id="r-desc"></p></div>
       <div class="card"><h4>흐려지기 쉬운 곳</h4><p id="r-care"></p></div>
+
+      <!-- 부엉이의 관측 수첩 -->
+      <div class="owlnote">
+        <img src="img/stars/owl-write.webp" alt="수첩에 받아 적는 부엉이" />
+        <p id="owl-note"></p>
+      </div>
 
       <div class="namebox" id="r-namebox" style="display:none">
         <p>이 배열은 어떤 성도(星圖)에도 없습니다.<br />이름은 두 분이 지어 주세요.</p>
@@ -207,8 +247,11 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
 <script src="js/feed.js?v=4"></script>
 <script>
 var $=function(id){return document.getElementById(id);};
-var scIntro=$("scIntro"), scSky=$("scSky"), cv=$("cv"), ctx=cv.getContext("2d");
+var scIntro=$("scIntro"), scOwl=$("scOwl"), scSky=$("scSky"), cv=$("cv"), ctx=cv.getContext("2d");
 var data=null, last=null, star=null, anim=null;
+var OWL_FLY="img/stars/owl-fly.mp4", OWL_LOOK="img/stars/owl-look.mp4";
+// 출동 영상 미리 받아 두기 (실패해도 그냥 하늘로 넘어간다)
+try{ fetch(OWL_FLY).catch(function(){}); fetch(OWL_LOOK).catch(function(){}); }catch(e){}
 
 /* ── 입력 ── */
 function fillSelects(p){
@@ -246,8 +289,40 @@ $("btn-go").onclick=function(){
   last={rA:rA,rB:rB,ba:ba,bb:bb,s:s};
   star=Stars.pick(s,rA,rB);
   if(window.GoblubFeed) GoblubFeed.grant("gunghap");
-  reveal();
+  playOwl();
 };
+
+/* ── 부엉이 출동 — 신청서를 들고 망원경으로, 렌즈 속으로 ── */
+var owlPhase="intro";
+function playOwl(){
+  owlPhase="owl";
+  scIntro.classList.remove("on"); scOwl.classList.add("on");
+  window.scrollTo(0,0);
+  var v=$("owl-vid"), cap=$("owl-cap"), stepped=false;
+  try{ $("owl-idle").pause(); }catch(e){}
+  function toSky(){
+    if(owlPhase!=="owl") return;
+    owlPhase="sky";
+    try{ v.pause(); v.removeAttribute("src"); v.load(); }catch(e){}
+    scOwl.classList.remove("on");
+    reveal();
+  }
+  function playClip(src, capText, onEnd){
+    cap.textContent=capText;
+    var started=false;
+    v.onplaying=function(){ started=true; };
+    v.onended=onEnd; v.onerror=onEnd;
+    v.src=src;
+    var p=v.play(); if(p&&p.catch) p.catch(onEnd);
+    setTimeout(function(){ if(!started && v.paused && !v.ended) onEnd(); }, 6000);
+  }
+  playClip(OWL_FLY, "부엉이가 신청서를 접수했습니다…", function(){
+    if(stepped) return; stepped=true;
+    playClip(OWL_LOOK, "망원경을 두 분의 하늘에 맞추는 중…", toSky);
+  });
+  // 무슨 일이 있어도 16초 안에는 하늘로
+  setTimeout(toSky, 16000);
+}
 
 /* ── 하늘 그리기 ────────────────────────────────────────────── */
 var PAD=58, NAMEZONE=96, S=cv.width/720;      // S = 해상도 배율(720 기준), 아래 NAMEZONE 은 이름 자리
@@ -453,7 +528,7 @@ function reveal(){
   scIntro.classList.remove("on"); scSky.classList.add("on");
   window.scrollTo(0,0);
   BACK=null;                                  // 새 관측마다 배경판을 새로 그린다
-  $("skycap").textContent="별을 잇는 중…";
+  $("skycap").textContent="🦉 부엉이가 별을 잇는 중…";
   $("skycap").classList.add("on");
   $("panel").classList.remove("on");
   var t0=Date.now(), done=false;
@@ -477,6 +552,8 @@ function fillPanel(){
   $("r-obs").textContent=star.obsText;
   $("r-desc").textContent=star.desc;
   $("r-care").textContent=star.care;
+  $("owl-note").innerHTML='<b>부엉의 관측 수첩</b> — 오늘 밤 「'+star.name+'」 '+
+    star.mag+'등성을 새로 받아 적었습니다. 다음 관측도 부엉이 맡을게요!';
 
   var tA=Saju.pillarText(last.rA.pillars.day), tB=Saju.pillarText(last.rB.pillars.day);
   $("r-pair").innerHTML=
@@ -528,9 +605,11 @@ $("btn-save").onclick=function(){
 
 $("btn-retry").onclick=function(){
   if(anim) cancelAnimationFrame(anim);
-  scSky.classList.remove("on"); scIntro.classList.add("on");
+  owlPhase="intro";
+  scSky.classList.remove("on"); scOwl.classList.remove("on"); scIntro.classList.add("on");
   $("st-text").style.display="none"; $("st-status").style.display="none";
   $("btn-report").disabled=false;
+  try{ $("owl-idle").play(); }catch(e){}     // 부엉이는 다시 당직으로
   window.scrollTo(0,0);
 };
 
