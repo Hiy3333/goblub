@@ -126,6 +126,17 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
   border:1px solid var(--line);box-shadow:0 18px 40px rgba(0,8,20,.5);background:#08111e}
 #scOwl video{display:block;width:100%;height:auto}
 #scOwl .cap{text-align:center;color:var(--ink-soft);font-size:.9rem;margin-top:12px}
+/* 고개 까딱 뒤 뜨는 확인 팝업 */
+.owlask{position:absolute;inset:0;z-index:4;display:none;flex-direction:column;
+  align-items:center;justify-content:center;gap:14px;background:rgba(5,10,20,.45)}
+.owlask p{margin:0;background:#fff8e6;color:#3a3020;border-radius:16px;
+  padding:12px 20px;font-size:1.05rem;box-shadow:0 8px 20px rgba(0,10,24,.4)}
+.owlask button{padding:11px 36px;border:0;border-radius:999px;cursor:pointer;
+  font-family:inherit;font-size:1rem;color:#16243a;
+  background:linear-gradient(180deg,#ffeec2,#ffd98a);
+  box-shadow:0 10px 24px rgba(255,215,140,.35);
+  animation:owlPulse2 1.6s ease-in-out infinite}
+@keyframes owlPulse2{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
 
 .owlnote{display:flex;gap:12px;align-items:center;margin-top:10px;
   background:rgba(18,34,52,.66);border:1px solid var(--line);border-radius:16px;padding:12px 14px}
@@ -209,6 +220,10 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
   <div class="screen" id="scOwl">
     <div class="vidwrap">
       <video id="owl-vid" playsinline preload="auto"></video>
+      <div class="owlask" id="owl-ask">
+        <p>좋아! 별 보러 가볼까~? ⭐</p>
+        <button id="owl-goask" type="button">확인</button>
+      </div>
     </div>
     <p class="cap" id="owl-cap">부엉이가 신청서를 접수했습니다…</p>
   </div>
@@ -347,13 +362,7 @@ $("btn-go").onclick=function(){
   last={rA:rA,rB:rB,ba:ba,bb:bb,s:s};
   star=Stars.pick(s,rA,rB);
   if(window.GoblubFeed) GoblubFeed.grant("gunghap");
-  // 날아가기 전에 부엉이가 한마디
-  var sayEl=$("owl-say");
-  sayEl.innerHTML="좋아! 별 보러 가볼까~? ⭐";
-  sayEl.style.display="block";
-  var goBtn=$("btn-go"); goBtn.disabled=true;
-  window.scrollTo(0,0);
-  setTimeout(function(){ goBtn.disabled=false; playOwl(); }, 1300);
+  playOwl();   // 고개 까딱까지 재생 → "별 보러 가볼까~?" 확인 팝업에서 멈춘다
 };
 
 // 생년월일 적고 엔터를 눌러도 바로 관측 시작
@@ -390,12 +399,31 @@ function playOwl(){
     });
     setTimeout(function(){ if(!started && v.paused && !v.ended) onEnd(); }, 6000);
   }
-  playClip(OWL_FLY, "부엉이가 관측 언덕으로 출발했습니다…", function(){
+  /* 출동 영상은 고개를 까딱하는 1.5초에서 멈추고 확인 팝업을 띄운다.
+     「확인」을 눌러야 이륙~언덕 관측이 이어진다. */
+  var NOD_AT=1.3, asked=false, confirmed=false;
+  var ask=$("owl-ask"), askBtn=$("owl-goask");
+  ask.style.display="none";
+  v.ontimeupdate=function(){
+    if(!asked && v.currentTime>=NOD_AT){
+      asked=true;
+      try{ v.pause(); v.currentTime=1.5; }catch(e){}   // 까딱 끝난 프레임에 스냅
+      ask.style.display="flex";
+    }
+  };
+  askBtn.onclick=function(){
+    if(confirmed) return; confirmed=true;
+    ask.style.display="none";
+    cap.textContent="부엉이가 관측 언덕으로 출발했습니다…";
+    var p=v.play(); if(p&&p.catch) p.catch(function(){});
+    setTimeout(toSky, 16000);                          // 전체 상한은 확인 뒤부터
+  };
+  playClip(OWL_FLY, "부엉이가 신청서를 확인하는 중…", function(){
     if(stepped) return; stepped=true;
+    v.ontimeupdate=null; ask.style.display="none";
     playClip(OWL_LOOK, "망원경을 두 분의 하늘에 맞추는 중…", toSky);
   });
-  // 무슨 일이 있어도 16초 안에는 하늘로
-  setTimeout(toSky, 16000);
+  // 팝업 전에 영상이 죽으면 playClip의 폴백(onerror·6초 미시작)이 알아서 진행한다
 }
 
 /* ── 하늘 그리기 ────────────────────────────────────────────── */
