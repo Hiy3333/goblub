@@ -526,7 +526,9 @@
       mag: mag, magText: MAG[mag],
       colorA: OHC[domA], colorB: OHC[domB], ohA: domA, ohB: domB,
       obs: obs,
-      obsText: obs.season + " " + obs.hour + ", " + obs.dir + " 하늘에서 가장 높이 뜹니다"
+      obsText: obs.season + " " + obs.hour + ", " +
+        (obs.dir === "하늘 한가운데" ? "하늘 한가운데에서" : obs.dir + " 하늘에서") +
+        " 가장 높이 뜹니다"
     };
   }
 
