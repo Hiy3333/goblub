@@ -2,6 +2,7 @@
 // 계산은 사이트의 만세력 엔진이 하고, 이 함수는 그 결과를 검증해 Gemini에 해석만 맡긴다.
 // API 키는 Vercel 환경변수 GEMINI_API_KEY 에만 존재한다.
 import { streamGemini, geminiConfigured } from "../lib/gemini.js";
+import { aiGuard } from "../lib/ratelimit.js";
 
 const ALLOWED_ORIGINS = [
   "https://goblub-2.vercel.app",
@@ -85,6 +86,7 @@ export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(204).end();
   if (req.method !== "POST") return res.status(405).json({ error: "method_not_allowed" });
   if (!geminiConfigured()) return res.status(501).json({ error: "not_configured" });
+  if (!(await aiGuard(req, res, "saju"))) return;   // 서버측 레이트리밋(IP당 분당/일당)
 
   const saju = req.body && req.body.saju;
   if (!validate(saju)) return res.status(400).json({ error: "bad_payload" });

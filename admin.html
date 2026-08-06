@@ -119,6 +119,17 @@
       </div>
       <p id="dash-err"></p>
 
+      <h2>AI 사용량 <span id="ai-limits" style="color:var(--acc);font-size:.8em"></span></h2>
+      <div class="panel">
+        <div style="overflow-x:auto">
+          <table>
+            <thead><tr><th>날짜</th><th>총 호출</th><th>예상 비용</th><th>거절(429)</th><th class="hide-m">내역</th></tr></thead>
+            <tbody id="ai-body"><tr><td colspan="5" class="empty">불러오는 중…</td></tr></tbody>
+          </table>
+        </div>
+        <p class="hint">비용은 호출 수 × 추정 단가(Flash ₩2~12 · Pro ₩35~120)로 계산한 대략치입니다 · 거절 = 서버 레이트리밋이 막은 요청 수</p>
+      </div>
+
       <h2>Users <span id="u-count" style="color:var(--acc)"></span></h2>
       <div class="panel">
         <div class="toolbar">
@@ -170,6 +181,27 @@
         return (d.getMonth() + 1) + "/" + d.getDate() + " " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);
       }
 
+      // AI 사용량 — 추정 단가(원/회). 모델·프롬프트 바뀌면 여기만 갱신.
+      var AI_COST = { gunghap: 5, saju: 12, report: 35, pastlife: 120, naming: 35, gwigok: 3, decide: 2, lotto: 2 };
+      var AI_LABEL = { gunghap: "별자리", saju: "사주", report: "명부", pastlife: "전생", naming: "작명", gwigok: "귀곡", decide: "결정", lotto: "로또" };
+      function loadAi() {
+        call({ action: "ai" }, function (j) {
+          if (!j || !j.ok) return;
+          $("ai-limits").textContent = "· IP당 분당 " + j.limits.perMin + "회 / 하루 " + j.limits.perDay + "회 제한";
+          var rows = Object.keys(j.usage || {}).map(function (d) {
+            var u = j.usage[d] || {};
+            var cost = 0, det = [];
+            Object.keys(AI_COST).forEach(function (k) {
+              if (u[k]) { cost += u[k] * AI_COST[k]; det.push(AI_LABEL[k] + " " + u[k]); }
+            });
+            return "<tr><td>" + d.slice(4, 6) + "/" + d.slice(6, 8) + "</td><td>" + (u._total || 0) +
+              "</td><td>약 ₩" + cost.toLocaleString() + "</td><td>" + (u._denied || 0) +
+              "</td><td class=\"hide-m\">" + (det.join(" · ") || "–") + "</td></tr>";
+          });
+          $("ai-body").innerHTML = rows.join("") || '<tr><td colspan="5" class="empty">기록 없음</td></tr>';
+        });
+      }
+
       function loadStats() {
         call({ action: "stats" }, function (j) {
           $("st-total").textContent = j.total;
@@ -215,7 +247,7 @@
       function openConsole() {
         $("login-view").style.display = "none";
         $("console-view").style.display = "block";
-        loadStats(); loadUsers();
+        loadStats(); loadUsers(); loadAi();
       }
       function logout() {
         cred = null;
@@ -265,7 +297,7 @@
         }
       });
       $("u-search").oninput = renderUsers;
-      $("btn-refresh").onclick = function () { loadStats(); loadUsers(); };
+      $("btn-refresh").onclick = function () { loadStats(); loadUsers(); loadAi(); };
       $("btn-logout").onclick = logout;
 
       // 시계

@@ -1,5 +1,6 @@
 // 고브럽 작명소 — 카테고리·키워드로 이름을 지어주는 AI 프록시.
 import { streamGemini, geminiConfigured } from "../lib/gemini.js";
+import { aiGuard } from "../lib/ratelimit.js";
 
 const ALLOWED_ORIGINS = [
   "https://goblub-2.vercel.app",
@@ -45,6 +46,7 @@ export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(204).end();
   if (req.method !== "POST") return res.status(405).json({ error: "method_not_allowed" });
   if (!geminiConfigured()) return res.status(501).json({ error: "not_configured" });
+  if (!(await aiGuard(req, res, "naming"))) return;   // 서버측 레이트리밋(IP당 분당/일당)
 
   const n = req.body && req.body.naming;
   const kw = n && n.keywords;

@@ -1,6 +1,7 @@
 // 고브럽 로또 도사 — 역대 당첨 통계 요약을 받아 유쾌한 분석 + 추천 조합을 스트리밍.
 // 주의: 로또는 매 회차 독립 추첨이라 어떤 조합도 확률이 같음 — 프롬프트에 고지 의무를 강제(재미 콘텐츠).
 import { streamGemini, geminiConfigured } from "../lib/gemini.js";
+import { aiGuard } from "../lib/ratelimit.js";
 
 const ALLOWED_ORIGINS = [
   "https://goblub-2.vercel.app",
@@ -52,6 +53,7 @@ export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(204).end();
   if (req.method !== "POST") return res.status(405).json({ error: "method_not_allowed" });
   if (!geminiConfigured()) return res.status(501).json({ error: "not_configured" });
+  if (!(await aiGuard(req, res, "lotto"))) return;   // 서버측 레이트리밋(IP당 분당/일당)
 
   const stats = req.body && req.body.stats;
   if (!validate(stats)) return res.status(400).json({ error: "bad_payload" });

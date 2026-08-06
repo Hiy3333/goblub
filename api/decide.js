@@ -1,5 +1,6 @@
 // 결정의 신 — A vs B 고민을 단호하게 판결해주는 AI 프록시.
 import { streamGemini, geminiConfigured } from "../lib/gemini.js";
+import { aiGuard } from "../lib/ratelimit.js";
 
 const ALLOWED_ORIGINS = [
   "https://goblub-2.vercel.app",
@@ -44,6 +45,7 @@ export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(204).end();
   if (req.method !== "POST") return res.status(405).json({ error: "method_not_allowed" });
   if (!geminiConfigured()) return res.status(501).json({ error: "not_configured" });
+  if (!(await aiGuard(req, res, "decide"))) return;   // 서버측 레이트리밋(IP당 분당/일당)
 
   const d = req.body && req.body.decide;
   const ok = (s, min) => typeof s === "string" && s.trim().length >= (min ?? 1) && s.length <= 200;

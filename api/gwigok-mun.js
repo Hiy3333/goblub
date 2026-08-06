@@ -3,6 +3,7 @@
 //   { dream: { text, ilju? } }     → 간밤의 장부(해몽)
 //   { tarot: { worry?, card, keyword, orient } } → 고양이 타로
 import { streamGemini, geminiConfigured } from "../lib/gemini.js";
+import { aiGuard } from "../lib/ratelimit.js";
 
 const ALLOWED_ORIGINS = [
   "https://goblub-2.vercel.app",
@@ -177,6 +178,7 @@ export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(204).end();
   if (req.method !== "POST") return res.status(405).json({ error: "method_not_allowed" });
   if (!geminiConfigured()) return res.status(501).json({ error: "not_configured" });
+  if (!(await aiGuard(req, res, "gwigok"))) return;   // 서버측 레이트리밋(IP당 분당/일당)
 
   const spec = build(req.body || {});
   if (!spec) return res.status(400).json({ error: "bad_payload" });

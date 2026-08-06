@@ -2,6 +2,7 @@
 // 계산은 사이트의 만세력 엔진(saju.js + saju-deep.js)이 하고, 이 함수는 파트별 집필만 맡긴다.
 // 4개 파트(p1·p2·l1·l2)를 클라이언트가 순차 호출해 1만자급 리포트를 완성한다.
 import { streamGemini, geminiConfigured } from "../lib/gemini.js";
+import { aiGuard } from "../lib/ratelimit.js";
 
 const ALLOWED_ORIGINS = [
   "https://goblub-2.vercel.app",
@@ -177,6 +178,7 @@ export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(204).end();
   if (req.method !== "POST") return res.status(405).json({ error: "method_not_allowed" });
   if (!geminiConfigured()) return res.status(501).json({ error: "not_configured" });
+  if (!(await aiGuard(req, res, "report"))) return;   // 서버측 레이트리밋(IP당 분당/일당)
 
   const saju = req.body && req.body.saju;
   const part = req.body && req.body.part;

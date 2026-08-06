@@ -1,6 +1,7 @@
 // 고브럽 도사 — AI 궁합 리포트 프록시.
 // 두 사람의 사주(엔진 계산)와 궁합 점수를 검증해 Gemini에 해석만 맡긴다.
 import { streamGemini, geminiConfigured } from "../lib/gemini.js";
+import { aiGuard } from "../lib/ratelimit.js";
 
 const ALLOWED_ORIGINS = [
   "https://goblub-2.vercel.app",
@@ -71,6 +72,7 @@ export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(204).end();
   if (req.method !== "POST") return res.status(405).json({ error: "method_not_allowed" });
   if (!geminiConfigured()) return res.status(501).json({ error: "not_configured" });
+  if (!(await aiGuard(req, res, "gunghap"))) return;   // 서버측 레이트리밋(IP당 분당/일당)
 
   const gunghap = req.body && req.body.gunghap;
   if (!validate(gunghap)) return res.status(400).json({ error: "bad_payload" });
