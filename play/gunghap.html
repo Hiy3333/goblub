@@ -347,8 +347,19 @@ $("btn-go").onclick=function(){
   last={rA:rA,rB:rB,ba:ba,bb:bb,s:s};
   star=Stars.pick(s,rA,rB);
   if(window.GoblubFeed) GoblubFeed.grant("gunghap");
-  playOwl();
+  // 날아가기 전에 부엉이가 한마디
+  var sayEl=$("owl-say");
+  sayEl.innerHTML="좋아! 별 보러 가볼까~? ⭐";
+  sayEl.style.display="block";
+  var goBtn=$("btn-go"); goBtn.disabled=true;
+  window.scrollTo(0,0);
+  setTimeout(function(){ goBtn.disabled=false; playOwl(); }, 1300);
 };
+
+// 생년월일 적고 엔터를 눌러도 바로 관측 시작
+document.querySelector(".order").addEventListener("keydown", function(e){
+  if(e.key==="Enter"){ e.preventDefault(); $("btn-go").click(); }
+});
 
 /* ── 부엉이 출동 — 신청서를 들고 망원경으로, 렌즈 속으로 ── */
 var owlPhase="intro";
@@ -672,7 +683,8 @@ $("btn-retry").onclick=function(){
   scSky.classList.remove("on"); scOwl.classList.remove("on"); scIntro.classList.add("on");
   $("st-text").style.display="none"; $("st-status").style.display="none";
   $("btn-report").disabled=false;
-  // 부엉이는 이미 깨어 있으니 마지막(초롱초롱) 프레임 그대로 둔다
+  // 부엉이는 이미 깨어 있으니 마지막(초롱초롱) 프레임 그대로 두고, 말풍선만 새로
+  $("owl-say").innerHTML="다른 분들의 하늘도 봐 줄게! 🌟<br /><b>생년월일을 적어 줘!</b>";
   window.scrollTo(0,0);
 };
 
