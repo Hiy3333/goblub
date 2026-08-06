@@ -186,7 +186,7 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
   <!-- ② 부엉이 출동 (영상) -->
   <div class="screen" id="scOwl">
     <div class="vidwrap">
-      <video id="owl-vid" muted playsinline preload="auto"></video>
+      <video id="owl-vid" playsinline preload="auto"></video>
     </div>
     <p class="cap" id="owl-cap">부엉이가 신청서를 접수했습니다…</p>
   </div>
@@ -313,10 +313,15 @@ function playOwl(){
     v.onplaying=function(){ started=true; };
     v.onended=onEnd; v.onerror=onEnd;
     v.src=src;
-    var p=v.play(); if(p&&p.catch) p.catch(onEnd);
+    v.muted=false;                              // 클릭 뒤라 소리 재생 가능
+    var p=v.play();
+    if(p&&p.catch) p.catch(function(){          // 소리가 막히면 음소거로 한 번 더
+      v.muted=true;
+      var q=v.play(); if(q&&q.catch) q.catch(onEnd);
+    });
     setTimeout(function(){ if(!started && v.paused && !v.ended) onEnd(); }, 6000);
   }
-  playClip(OWL_FLY, "부엉이가 신청서를 접수했습니다…", function(){
+  playClip(OWL_FLY, "부엉이가 관측 언덕으로 출발했습니다…", function(){
     if(stepped) return; stepped=true;
     playClip(OWL_LOOK, "망원경을 두 분의 하늘에 맞추는 중…", toSky);
   });
