@@ -17,7 +17,7 @@
     '<a class="logo" href="' + root + '/index.html">' + logoHTML + "</a>" +
     '<nav class="site-nav">' +
     '<a href="' + root + '/index.html">홈</a>' +
-    '<a href="' + root + '/apps.html">앱</a>' +
+    '<a href="#" data-soon="📱 앱은 아직 준비 중이에요!">앱</a>' +
     '<a href="' + root + '/mypage.html">' + (loggedIn ? "마이페이지" : "로그인") + "</a>" +
     "</nav>" +
     "</header>";
