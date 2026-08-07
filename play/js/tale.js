@@ -549,7 +549,18 @@ box-shadow:0 0 0 100vmax #040308,0 0 70px rgba(0,0,0,.8)}}";
       if (!canTap || !cur) return;
       advance();
     });
-    root.querySelector(".t-skip").onclick = function () { if (ritualDone) end("enter"); else end("skip"); };
+    root.querySelector(".t-skip").onclick = function () {
+      if (ritualDone) { end("enter"); return; }
+      // 이야기(영상) 구간에서 건너뛰면 이야기를 끝내는 게 아니라
+      // 귀곡을 처음 마주하는 이름 입력 장면(22)으로 점프한다.
+      if (cur && cur.id < 22) {
+        kickBGM();
+        setBgVideo("gwigok_idle");   // 22번엔 배경 지정이 없으니 움막 영상을 직접 깐다
+        show(22);
+        return;
+      }
+      end("skip");
+    };
     root.querySelector(".t-mute").onclick = function () {
       muted = !muted; kickBGM();
       if (bgm) bgm.mute(muted);
