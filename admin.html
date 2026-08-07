@@ -9,20 +9,12 @@
     :root {
       --bg: #0e1320; --panel: #161d2e; --panel2: #1b2436; --line: #263048;
       --txt: #d9e1f2; --dim: #7c88a6; --acc: #4f8cff; --ok: #2ecc8f; --warn: #ff5470; --amber: #f2b33d;
+      --side: 224px;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { background: var(--bg); color: var(--txt); min-height: 100vh;
       font-family: "Segoe UI", "Malgun Gothic", system-ui, sans-serif; font-size: 14px; }
     a { color: var(--acc); text-decoration: none; }
-    .wrap { max-width: 1080px; margin: 0 auto; padding: 0 20px 60px; }
-
-    /* 상단 바 */
-    .topbar { display: flex; align-items: center; justify-content: space-between;
-      padding: 14px 20px; border-bottom: 1px solid var(--line); background: var(--panel);
-      position: sticky; top: 0; z-index: 10; }
-    .topbar .brand { font-weight: 700; letter-spacing: 2px; font-size: 15px; }
-    .topbar .brand b { color: var(--acc); }
-    .topbar .who { color: var(--dim); font-size: 12px; display: flex; gap: 12px; align-items: center; }
 
     /* 로그인 */
     .login-box { max-width: 360px; margin: 12vh auto 0; background: var(--panel);
@@ -39,9 +31,43 @@
     .login-box button:disabled { opacity: .5; cursor: default; }
     #login-err { color: var(--warn); font-size: 12px; margin-top: 12px; min-height: 1.2em; }
 
-    /* 대시보드 */
+    /* ── 사이드바 레이아웃 ── */
+    .shell { display: flex; min-height: 100vh; }
+    .side { width: var(--side); flex: none; background: var(--panel); border-right: 1px solid var(--line);
+      display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; }
+    .side .prof { padding: 20px 18px 16px; border-bottom: 1px solid var(--line); }
+    .side .prof .brand { font-weight: 700; letter-spacing: 2px; font-size: 14px; }
+    .side .prof .brand b { color: var(--acc); }
+    .side .prof .who { display: flex; align-items: center; gap: 10px; margin-top: 14px; }
+    .side .prof .ava { width: 38px; height: 38px; border-radius: 50%; background: var(--panel2);
+      border: 1px solid var(--line); display: flex; align-items: center; justify-content: center; font-size: 17px; }
+    .side .prof .nm { font-size: 13px; font-weight: 600; }
+    .side .prof .rl { color: var(--dim); font-size: 11px; }
+    .side nav { flex: 1; padding: 10px 10px; overflow-y: auto; }
+    .side nav button { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left;
+      background: none; border: 0; color: var(--dim); padding: 11px 12px; border-radius: 8px;
+      font-size: 13.5px; cursor: pointer; font-family: inherit; margin-bottom: 2px; }
+    .side nav button:hover { background: var(--panel2); color: var(--txt); }
+    .side nav button.on { background: rgba(79, 140, 255, .12); color: var(--acc); font-weight: 600; }
+    .side .foot { padding: 12px 10px 16px; border-top: 1px solid var(--line); }
+    .side .foot button { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left;
+      background: none; border: 0; color: var(--dim); padding: 10px 12px; border-radius: 8px;
+      font-size: 13px; cursor: pointer; font-family: inherit; }
+    .side .foot button:hover { background: var(--panel2); color: var(--txt); }
+
+    .main { flex: 1; min-width: 0; padding: 0 26px 60px; }
+    .mhead { display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 0 14px; border-bottom: 1px solid var(--line); margin-bottom: 20px;
+      position: sticky; top: 0; background: var(--bg); z-index: 5; }
+    .mhead h1 { font-size: 17px; }
+    .mhead .who { color: var(--dim); font-size: 12px; display: flex; gap: 12px; align-items: center; }
+
+    .view { display: none; }
+    .view.on { display: block; }
+
     h2 { font-size: 13px; letter-spacing: 1.5px; color: var(--dim); text-transform: uppercase;
-      margin: 30px 0 12px; font-weight: 600; }
+      margin: 26px 0 12px; font-weight: 600; }
+    h2:first-child { margin-top: 0; }
     .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
     .stat { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; }
     .stat .n { font-size: 24px; font-weight: 700; font-variant-numeric: tabular-nums; }
@@ -49,15 +75,16 @@
     .stat.hot .n { color: var(--acc); }
 
     .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 16px; }
-    .toolbar { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; }
-    .toolbar input { flex: 1; background: var(--bg); border: 1px solid var(--line); border-radius: 6px;
-      color: var(--txt); padding: 8px 12px; font-size: 13px; font-family: inherit; }
+    .toolbar { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; flex-wrap: wrap; }
+    .toolbar input[type="text"] { flex: 1; min-width: 180px; background: var(--bg); border: 1px solid var(--line);
+      border-radius: 6px; color: var(--txt); padding: 8px 12px; font-size: 13px; font-family: inherit; }
     .toolbar input:focus { outline: none; border-color: var(--acc); }
     .btn { background: var(--panel2); border: 1px solid var(--line); border-radius: 6px; color: var(--txt);
       padding: 7px 14px; font-size: 12.5px; cursor: pointer; font-family: inherit; white-space: nowrap; }
     .btn:hover { border-color: var(--acc); }
     .btn.ok { color: var(--ok); }
     .btn.warn { color: var(--warn); }
+    .btn.gold { background: var(--amber); color: #1c1608; border: 0; font-weight: 600; }
     .btn:disabled { opacity: .45; cursor: default; }
 
     table { width: 100%; border-collapse: collapse; font-size: 13px; }
@@ -73,18 +100,38 @@
     .tag.ban { background: rgba(255, 84, 112, .15); color: var(--warn); }
     .tag.gem { background: rgba(242, 179, 61, .15); color: var(--amber); }
     .banned td { opacity: .45; }
+    .pv { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px;
+      border-radius: 50%; background: #fff; color: #1a73e8; font-weight: 700; font-size: 12px; }
 
-    .feed { list-style: none; max-height: 340px; overflow-y: auto; }
+    .pager { display: flex; align-items: center; gap: 6px; justify-content: flex-end; margin-top: 12px; flex-wrap: wrap; }
+    .pager .pg { min-width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--line);
+      background: var(--panel2); color: var(--txt); cursor: pointer; font-family: inherit; font-size: 12.5px; }
+    .pager .pg.on { background: var(--amber); color: #1c1608; border: 0; font-weight: 700; }
+    .pager .pg:disabled { opacity: .35; cursor: default; }
+    .pager .sz { color: var(--dim); font-size: 12px; margin-right: auto; }
+
+    .feed { list-style: none; max-height: 380px; overflow-y: auto; }
     .feed li { display: flex; gap: 10px; align-items: baseline; padding: 8px 6px;
       border-bottom: 1px solid rgba(38, 48, 72, .55); font-size: 13px; }
     .feed .k { flex: none; width: 96px; font-size: 11.5px; font-weight: 600; }
     .feed .k.signup { color: var(--ok); } .feed .k.unlock { color: var(--acc); }
-    .feed .k.grant { color: var(--amber); } .feed .k.ban { color: var(--warn); } .feed .k.unban { color: var(--dim); }
+    .feed .k.grant { color: var(--amber); } .feed .k.pgrant { color: var(--amber); }
+    .feed .k.prevoke { color: var(--warn); }
+    .feed .k.ban { color: var(--warn); } .feed .k.unban { color: var(--dim); }
     .feed .tm { margin-left: auto; color: var(--dim); font-size: 11.5px; flex: none; }
     .empty { color: var(--dim); padding: 14px 6px; }
     #dash-err { color: var(--warn); font-size: 12.5px; margin: 10px 0 0; min-height: 1.2em; }
     .hint { color: var(--dim); font-size: 11.5px; margin-top: 10px; line-height: 1.6; }
-    @media (max-width: 640px) { .hide-m { display: none; } }
+
+    @media (max-width: 760px) {
+      .shell { flex-direction: column; }
+      .side { width: 100%; height: auto; position: static; }
+      .side nav { display: flex; overflow-x: auto; padding: 6px; }
+      .side nav button { white-space: nowrap; width: auto; }
+      .side .prof .who, .side .foot { display: none; }
+      .main { padding: 0 14px 50px; }
+      .hide-m { display: none; }
+    }
   </style>
 </head>
 <body>
@@ -104,95 +151,140 @@
 
   <!-- 콘솔 -->
   <div id="console-view" style="display:none">
-    <div class="topbar">
-      <span class="brand">⬡ GOBLUB <b>ADMIN</b> CONSOLE</span>
-      <span class="who"><span id="clock"></span><button class="btn" id="btn-refresh">새로고침</button><button class="btn" id="btn-logout">로그아웃</button></span>
-    </div>
-    <div class="wrap">
-      <h2>Overview</h2>
-      <div class="stat-grid">
-        <div class="stat hot"><div class="n" id="st-total">–</div><div class="l">총 가입자</div></div>
-        <div class="stat"><div class="n" id="st-today">–</div><div class="l">오늘 가입</div></div>
-        <div class="stat"><div class="n" id="st-week">–</div><div class="l">최근 7일 가입</div></div>
-        <div class="stat"><div class="n" id="st-unlock-today">–</div><div class="l">오늘 리포트 발급</div></div>
-        <div class="stat"><div class="n" id="st-unlock-week">–</div><div class="l">7일 리포트 발급</div></div>
-      </div>
-      <p id="dash-err"></p>
-
-      <h2>AI 사용량 <span id="ai-limits" style="color:var(--acc);font-size:.8em"></span></h2>
-      <div class="panel">
-        <div style="overflow-x:auto">
-          <table>
-            <thead><tr><th>날짜</th><th>총 호출</th><th>예상 비용</th><th>거절(429)</th><th class="hide-m">내역</th></tr></thead>
-            <tbody id="ai-body"><tr><td colspan="5" class="empty">불러오는 중…</td></tr></tbody>
-          </table>
-        </div>
-        <p class="hint">비용은 호출 수 × 추정 단가(Flash ₩2~12 · Pro ₩35~120)로 계산한 대략치입니다 · 거절 = 서버 레이트리밋이 막은 요청 수</p>
-      </div>
-
-      <h2>매출 (젬리)</h2>
-      <div class="panel">
-        <div class="stat-grid" style="margin-bottom:12px">
-          <div class="stat hot"><div class="n" id="sl-today">–</div><div class="l">오늘 사용 젬리</div></div>
-          <div class="stat"><div class="n" id="sl-week">–</div><div class="l">최근 7일 사용 젬리</div></div>
-        </div>
-        <div style="overflow-x:auto">
-          <table>
-            <thead><tr><th>콘텐츠</th><th>누적 사용 횟수</th><th>누적 사용 젬리</th></tr></thead>
-            <tbody id="sl-body"><tr><td colspan="3" class="empty">불러오는 중…</td></tr></tbody>
-          </table>
-        </div>
-        <p class="hint">유료 콘텐츠에서 젬리가 차감될 때마다 집계됩니다 · 아직 유료 차감 기능이 붙기 전이면 비어 있는 게 정상입니다</p>
-      </div>
-
-      <h2>공지사항</h2>
-      <div class="panel">
-        <div style="display:grid;gap:8px;margin-bottom:14px">
-          <input type="text" id="n-title" placeholder="제목 (60자 이내)" maxlength="60"
-            style="background:var(--bg);border:1px solid var(--line);border-radius:6px;color:var(--txt);padding:9px 12px;font-size:13px;font-family:inherit" />
-          <textarea id="n-body" rows="4" placeholder="내용 (1000자 이내, 줄바꿈 그대로 표시됩니다)" maxlength="1000"
-            style="background:var(--bg);border:1px solid var(--line);border-radius:6px;color:var(--txt);padding:9px 12px;font-size:13px;font-family:inherit;resize:vertical"></textarea>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
-            <label style="color:var(--dim);font-size:12.5px">노출:
-              <select id="n-mode" style="background:var(--bg);border:1px solid var(--line);border-radius:6px;color:var(--txt);padding:7px 10px;font-family:inherit">
-                <option value="once">사용자당 한 번만</option>
-                <option value="always">방문할 때마다</option>
-              </select>
-            </label>
-            <label style="color:var(--dim);font-size:12.5px">종료일(선택):
-              <input type="date" id="n-until"
-                style="background:var(--bg);border:1px solid var(--line);border-radius:6px;color:var(--txt);padding:6px 10px;font-family:inherit" />
-            </label>
-            <button class="btn ok" id="n-save">공지 등록</button>
-            <span id="n-msg" style="color:var(--dim);font-size:12px"></span>
+    <div class="shell">
+      <aside class="side">
+        <div class="prof">
+          <div class="brand">⬡ GOBLUB <b>ADMIN</b></div>
+          <div class="who">
+            <div class="ava">👤</div>
+            <div><div class="nm">관리자</div><div class="rl">admin</div></div>
           </div>
         </div>
-        <div style="overflow-x:auto">
-          <table>
-            <thead><tr><th>제목</th><th class="hide-m">노출</th><th class="hide-m">종료일</th><th>상태</th><th>관리</th></tr></thead>
-            <tbody id="n-body-list"><tr><td colspan="5" class="empty">불러오는 중…</td></tr></tbody>
-          </table>
+        <nav id="side-nav">
+          <button data-v="dash" class="on">📊 대시보드</button>
+          <button data-v="users">👥 가입 회원 관리</button>
+          <button data-v="sales">💰 매출 · 젬리</button>
+          <button data-v="ai">🤖 AI 사용량</button>
+          <button data-v="notice">📢 공지사항</button>
+        </nav>
+        <div class="foot">
+          <button id="btn-refresh">🔄 새로고침</button>
+          <button id="btn-logout">↩ 로그아웃</button>
         </div>
-        <p class="hint">등록하면 고브럽 홈에 팝업으로 뜹니다 · "한 번만"은 사용자가 닫으면 그 공지는 다시 안 보입니다 · 끄면 즉시 내려갑니다(반영까지 최대 1분)</p>
-      </div>
+      </aside>
 
-      <h2>Users <span id="u-count" style="color:var(--acc)"></span></h2>
-      <div class="panel">
-        <div class="toolbar">
-          <input type="text" id="u-search" placeholder="이메일·이름 검색…" />
+      <div class="main">
+        <div class="mhead">
+          <h1 id="m-title">대시보드</h1>
+          <span class="who"><span id="clock"></span></span>
         </div>
-        <div style="overflow-x:auto">
-          <table>
-            <thead><tr><th>회원</th><th class="hide-m">가입</th><th class="hide-m">경로</th><th class="hide-m">최근 접속</th><th>대기 젬리<br /><span style="font-weight:400">(놀이)</span></th><th>유료 젬리</th><th>유료 젬리 지급·회수</th><th>놀이 젬리 지급</th><th>관리</th></tr></thead>
-            <tbody id="u-body"><tr><td colspan="9" class="empty">불러오는 중…</td></tr></tbody>
-          </table>
-        </div>
-        <p class="hint">지급한 젬리는 해당 유저가 <b>다음 로그인 시</b> 지갑에 들어갑니다 · 강퇴된 계정은 다음 로그인부터 차단됩니다</p>
-      </div>
+        <p id="dash-err"></p>
 
-      <h2>Activity</h2>
-      <div class="panel">
-        <ul class="feed" id="ev-list"><li class="empty">불러오는 중…</li></ul>
+        <!-- 대시보드 -->
+        <section class="view on" id="v-dash">
+          <div class="stat-grid">
+            <div class="stat hot"><div class="n" id="st-total">–</div><div class="l">총 가입자</div></div>
+            <div class="stat"><div class="n" id="st-today">–</div><div class="l">오늘 가입</div></div>
+            <div class="stat"><div class="n" id="st-week">–</div><div class="l">최근 7일 가입</div></div>
+            <div class="stat"><div class="n" id="st-unlock-today">–</div><div class="l">오늘 리포트 발급</div></div>
+            <div class="stat"><div class="n" id="st-unlock-week">–</div><div class="l">7일 리포트 발급</div></div>
+          </div>
+          <h2>Activity</h2>
+          <div class="panel">
+            <ul class="feed" id="ev-list"><li class="empty">불러오는 중…</li></ul>
+          </div>
+        </section>
+
+        <!-- 가입 회원 관리 -->
+        <section class="view" id="v-users">
+          <div class="panel">
+            <div class="toolbar">
+              <input type="text" id="u-search" placeholder="이메일·닉네임 검색…" />
+              <span id="u-count" style="color:var(--dim);font-size:12.5px"></span>
+              <button class="btn gold" id="u-csv">⬇ 엑셀 내보내기</button>
+            </div>
+            <div style="overflow-x:auto">
+              <table>
+                <thead><tr>
+                  <th>가입일</th><th>경로</th><th>이메일</th><th>닉네임</th>
+                  <th class="hide-m">최근 접속</th>
+                  <th>대기 젬리<br /><span style="font-weight:400">(놀이)</span></th>
+                  <th>잔여 유료 젬리</th><th>유료 젬리 지급·회수</th>
+                  <th class="hide-m">놀이 젬리 지급</th><th>관리</th>
+                </tr></thead>
+                <tbody id="u-body"><tr><td colspan="10" class="empty">불러오는 중…</td></tr></tbody>
+              </table>
+            </div>
+            <div class="pager" id="u-pager"></div>
+            <p class="hint">놀이 젬리는 해당 유저가 <b>다음 로그인 시</b> 지갑에 들어갑니다 · 유료 젬리는 서버 잔액이 즉시 바뀝니다 · 강퇴된 계정은 다음 로그인부터 차단됩니다</p>
+          </div>
+        </section>
+
+        <!-- 매출 -->
+        <section class="view" id="v-sales">
+          <div class="stat-grid" style="margin-bottom:12px">
+            <div class="stat hot"><div class="n" id="sl-today">–</div><div class="l">오늘 사용 젬리</div></div>
+            <div class="stat"><div class="n" id="sl-week">–</div><div class="l">최근 7일 사용 젬리</div></div>
+          </div>
+          <div class="panel">
+            <div style="overflow-x:auto">
+              <table>
+                <thead><tr><th>콘텐츠</th><th>누적 사용 횟수</th><th>누적 사용 젬리</th></tr></thead>
+                <tbody id="sl-body"><tr><td colspan="3" class="empty">불러오는 중…</td></tr></tbody>
+              </table>
+            </div>
+            <p class="hint">유료 콘텐츠에서 젬리가 차감될 때마다 집계됩니다 · 아직 유료 차감 기능이 붙기 전이면 비어 있는 게 정상입니다</p>
+          </div>
+        </section>
+
+        <!-- AI 사용량 -->
+        <section class="view" id="v-ai">
+          <h2 style="margin-top:0">최근 7일 <span id="ai-limits" style="color:var(--acc);text-transform:none"></span></h2>
+          <div class="panel">
+            <div style="overflow-x:auto">
+              <table>
+                <thead><tr><th>날짜</th><th>총 호출</th><th>예상 비용</th><th>거절(429)</th><th class="hide-m">내역</th></tr></thead>
+                <tbody id="ai-body"><tr><td colspan="5" class="empty">불러오는 중…</td></tr></tbody>
+              </table>
+            </div>
+            <p class="hint">비용은 호출 수 × 추정 단가(Flash ₩2~12 · Pro ₩35~120)로 계산한 대략치입니다 · 거절 = 서버 레이트리밋이 막은 요청 수</p>
+          </div>
+        </section>
+
+        <!-- 공지사항 -->
+        <section class="view" id="v-notice">
+          <div class="panel" style="margin-bottom:16px">
+            <div style="display:grid;gap:8px">
+              <input type="text" id="n-title" placeholder="제목 (60자 이내)" maxlength="60"
+                style="background:var(--bg);border:1px solid var(--line);border-radius:6px;color:var(--txt);padding:9px 12px;font-size:13px;font-family:inherit" />
+              <textarea id="n-body" rows="4" placeholder="내용 (1000자 이내, 줄바꿈 그대로 표시됩니다)" maxlength="1000"
+                style="background:var(--bg);border:1px solid var(--line);border-radius:6px;color:var(--txt);padding:9px 12px;font-size:13px;font-family:inherit;resize:vertical"></textarea>
+              <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+                <label style="color:var(--dim);font-size:12.5px">노출:
+                  <select id="n-mode" style="background:var(--bg);border:1px solid var(--line);border-radius:6px;color:var(--txt);padding:7px 10px;font-family:inherit">
+                    <option value="once">사용자당 한 번만</option>
+                    <option value="always">방문할 때마다</option>
+                  </select>
+                </label>
+                <label style="color:var(--dim);font-size:12.5px">종료일(선택):
+                  <input type="date" id="n-until"
+                    style="background:var(--bg);border:1px solid var(--line);border-radius:6px;color:var(--txt);padding:6px 10px;font-family:inherit" />
+                </label>
+                <button class="btn ok" id="n-save">공지 등록</button>
+                <span id="n-msg" style="color:var(--dim);font-size:12px"></span>
+              </div>
+            </div>
+          </div>
+          <div class="panel">
+            <div style="overflow-x:auto">
+              <table>
+                <thead><tr><th>제목</th><th class="hide-m">노출</th><th class="hide-m">종료일</th><th>상태</th><th>관리</th></tr></thead>
+                <tbody id="n-body-list"><tr><td colspan="5" class="empty">불러오는 중…</td></tr></tbody>
+              </table>
+            </div>
+            <p class="hint">등록하면 고브럽 홈에 팝업으로 뜹니다 · "한 번만"은 사용자가 닫으면 그 공지는 다시 안 보입니다 · 끄면 즉시 내려갑니다(반영까지 최대 1분)</p>
+          </div>
+        </section>
       </div>
     </div>
   </div>
@@ -203,6 +295,7 @@
       var API = (/\.vercel\.app$/.test(location.hostname) ? location.origin : "https://goblub-2.vercel.app") + "/api/admin";
       var cred = null;
       var allUsers = [];
+      var uPage = 1, U_PER = 15;
 
       try { cred = JSON.parse(sessionStorage.getItem("gb_admin") || "null"); } catch (e) {}
 
@@ -226,8 +319,147 @@
         var d = new Date(t);
         return (d.getMonth() + 1) + "/" + d.getDate() + " " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);
       }
+      function fmtDate(t) {
+        if (!t) return "–";
+        var d = new Date(t);
+        return d.getFullYear() + "." + ("0" + (d.getMonth() + 1)).slice(-2) + "." + ("0" + d.getDate()).slice(-2) +
+          " " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);
+      }
+      function esc(s) { return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
 
-      // AI 사용량 — 추정 단가(원/회). 모델·프롬프트 바뀌면 여기만 갱신.
+      /* ── 화면 전환 ── */
+      var VIEWS = {
+        dash: { title: "대시보드", load: loadStats },
+        users: { title: "가입 회원 관리", load: loadUsers },
+        sales: { title: "매출 · 젬리", load: loadSales },
+        ai: { title: "AI 사용량", load: loadAi },
+        notice: { title: "공지사항", load: loadNotices }
+      };
+      var curView = "dash";
+      function showView(v) {
+        if (!VIEWS[v]) return;
+        curView = v;
+        document.querySelectorAll(".view").forEach(function (s) { s.classList.remove("on"); });
+        $("v-" + v).classList.add("on");
+        document.querySelectorAll("#side-nav button").forEach(function (b) {
+          b.classList.toggle("on", b.getAttribute("data-v") === v);
+        });
+        $("m-title").textContent = VIEWS[v].title;
+        VIEWS[v].load();
+      }
+      $("side-nav").addEventListener("click", function (e) {
+        var b = e.target.closest("button"); if (b) showView(b.getAttribute("data-v"));
+      });
+
+      /* ── 대시보드 ── */
+      function loadStats() {
+        call({ action: "stats" }, function (j) {
+          $("st-total").textContent = j.total;
+          $("st-today").textContent = j.signupToday;
+          $("st-week").textContent = j.signup7;
+          $("st-unlock-today").textContent = j.unlockToday;
+          $("st-unlock-week").textContent = j.unlock7;
+          var names = { signup: "SIGNUP", unlock: "REPORT", grant: "GRANT", pgrant: "P-GRANT", prevoke: "P-REVOKE", ban: "BAN", unban: "UNBAN" };
+          $("ev-list").innerHTML = (j.events || []).map(function (e) {
+            return '<li><span class="k ' + e.t + '">' + (names[e.t] || e.t.toUpperCase()) + "</span>" +
+              "<span>" + (e.email || "") + (e.n ? ' <span class="tag gem">' + (e.n > 0 ? "+" : "") + e.n + "</span>" : "") + "</span>" +
+              '<span class="tm">' + fmt(e.at) + "</span></li>";
+          }).join("") || '<li class="empty">아직 활동이 없습니다.</li>';
+        });
+      }
+
+      /* ── 가입 회원 관리 ── */
+      function filteredUsers() {
+        var q = ($("u-search").value || "").toLowerCase();
+        return allUsers.filter(function (u) {
+          return !q || (u.email || "").toLowerCase().indexOf(q) >= 0 || (u.name || "").toLowerCase().indexOf(q) >= 0;
+        });
+      }
+      function renderUsers() {
+        var list = filteredUsers();
+        var pages = Math.max(1, Math.ceil(list.length / U_PER));
+        if (uPage > pages) uPage = pages;
+        var slice = list.slice((uPage - 1) * U_PER, uPage * U_PER);
+        $("u-count").textContent = "총 " + allUsers.length + "명" + (list.length !== allUsers.length ? " · 검색 " + list.length + "명" : "");
+        $("u-body").innerHTML = slice.map(function (u) {
+          return '<tr class="' + (u.banned ? "banned" : "") + '">' +
+            "<td>" + fmtDate(u.created) + "</td>" +
+            '<td><span class="pv" title="' + (u.provider || "구글") + '">G</span></td>' +
+            "<td>" + esc(u.email || "–") + (u.banned ? '<span class="tag ban">BANNED</span>' : "") + "</td>" +
+            "<td>" + esc(u.name || "–") + "</td>" +
+            '<td class="hide-m">' + fmt(u.seen) + "</td>" +
+            "<td>" + (u.gems || 0) + "</td>" +
+            '<td><span class="tag gem">' + (u.pgems || 0) + "</span></td>" +
+            '<td><input class="g" type="number" min="1" placeholder="개수" data-psub="' + u.sub + '" /> ' +
+            '<button class="btn ok btn-pgive" data-sub="' + u.sub + '">지급</button> ' +
+            '<button class="btn warn btn-ptake" data-sub="' + u.sub + '">회수</button></td>' +
+            '<td class="hide-m"><input class="g" type="number" min="1" placeholder="개수" data-sub="' + u.sub + '" /> ' +
+            '<button class="btn ok btn-grant" data-sub="' + u.sub + '">지급</button></td>' +
+            "<td>" + (u.banned
+              ? '<button class="btn ok btn-unban" data-sub="' + u.sub + '">해제</button>'
+              : '<button class="btn warn btn-ban" data-sub="' + u.sub + '" data-em="' + esc(u.email || "") + '">강퇴</button>') + "</td>" +
+            "</tr>";
+        }).join("") || '<tr><td colspan="10" class="empty">회원이 없습니다.</td></tr>';
+
+        // 페이지네이션
+        var pg = ['<span class="sz">페이지당 ' + U_PER + '명</span>'];
+        function pbtn(label, page, dis, on) {
+          return '<button class="pg' + (on ? " on" : "") + '" data-pg="' + page + '"' + (dis ? " disabled" : "") + ">" + label + "</button>";
+        }
+        pg.push(pbtn("«", 1, uPage === 1));
+        pg.push(pbtn("‹", uPage - 1, uPage === 1));
+        var from = Math.max(1, uPage - 3), to = Math.min(pages, from + 6);
+        from = Math.max(1, to - 6);
+        for (var p = from; p <= to; p++) pg.push(pbtn(p, p, false, p === uPage));
+        pg.push(pbtn("›", uPage + 1, uPage === pages));
+        pg.push(pbtn("»", pages, uPage === pages));
+        $("u-pager").innerHTML = pg.join("");
+      }
+      $("u-pager").addEventListener("click", function (e) {
+        var b = e.target.closest("button.pg");
+        if (!b || b.disabled) return;
+        uPage = +b.getAttribute("data-pg") || 1;
+        renderUsers();
+      });
+      function loadUsers() {
+        call({ action: "users" }, function (j) { allUsers = j.users || []; renderUsers(); });
+      }
+      $("u-search").oninput = function () { uPage = 1; renderUsers(); };
+
+      // 엑셀(CSV) 내보내기 — 현재 검색 결과 전체
+      $("u-csv").onclick = function () {
+        var rows = [["가입일", "가입방법", "이메일", "닉네임", "최근접속", "대기젬리(놀이)", "잔여유료젬리", "상태"]];
+        filteredUsers().forEach(function (u) {
+          rows.push([fmtDate(u.created), u.provider || "구글", u.email || "", u.name || "",
+            fmtDate(u.seen), u.gems || 0, u.pgems || 0, u.banned ? "강퇴" : "정상"]);
+        });
+        var csv = "﻿" + rows.map(function (r) {
+          return r.map(function (c) { return '"' + String(c).replace(/"/g, '""') + '"'; }).join(",");
+        }).join("\r\n");
+        var a = document.createElement("a");
+        a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+        var d = new Date();
+        a.download = "goblub-members-" + d.getFullYear() + ("0" + (d.getMonth() + 1)).slice(-2) + ("0" + d.getDate()).slice(-2) + ".csv";
+        a.click();
+        setTimeout(function () { URL.revokeObjectURL(a.href); }, 2000);
+      };
+
+      /* ── 매출 ── */
+      function loadSales() {
+        call({ action: "sales" }, function (j) {
+          if (!j || !j.ok) return;
+          var days = Object.keys(j.daily || {});
+          var week = 0; days.forEach(function (d) { week += j.daily[d] || 0; });
+          $("sl-today").textContent = (j.daily[days[0]] || 0).toLocaleString();
+          $("sl-week").textContent = week.toLocaleString();
+          $("sl-body").innerHTML = (j.rows || []).map(function (r) {
+            return "<tr><td>" + esc(r.content) + "</td><td>" + r.cnt.toLocaleString() +
+              "</td><td>" + r.gems.toLocaleString() + "</td></tr>";
+          }).join("") || '<tr><td colspan="3" class="empty">아직 매출 기록이 없습니다.</td></tr>';
+        });
+      }
+
+      /* ── AI 사용량 ── */
       var AI_COST = { gunghap: 5, saju: 12, report: 35, pastlife: 120, naming: 35, gwigok: 3, decide: 2, lotto: 2 };
       var AI_LABEL = { gunghap: "별자리", saju: "사주", report: "명부", pastlife: "전생", naming: "작명", gwigok: "귀곡", decide: "결정", lotto: "로또" };
       function loadAi() {
@@ -248,23 +480,7 @@
         });
       }
 
-      // ---- 매출 (젬리) ----
-      function loadSales() {
-        call({ action: "sales" }, function (j) {
-          if (!j || !j.ok) return;
-          var days = Object.keys(j.daily || {});
-          var week = 0; days.forEach(function (d) { week += j.daily[d] || 0; });
-          $("sl-today").textContent = (j.daily[days[0]] || 0).toLocaleString();
-          $("sl-week").textContent = week.toLocaleString();
-          $("sl-body").innerHTML = (j.rows || []).map(function (r) {
-            return "<tr><td>" + esc(r.content) + "</td><td>" + r.cnt.toLocaleString() +
-              "</td><td>" + r.gems.toLocaleString() + "</td></tr>";
-          }).join("") || '<tr><td colspan="3" class="empty">아직 매출 기록이 없습니다.</td></tr>';
-        });
-      }
-
-      // ---- 공지 관리 ----
-      function esc(s) { return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+      /* ── 공지 ── */
       function renderNotices(list) {
         $("n-body-list").innerHTML = (list || []).map(function (n) {
           return "<tr" + (n.on ? "" : ' style="opacity:.45"') + "><td>" + esc(n.title) + "</td>" +
@@ -291,57 +507,11 @@
           }, function (msg) { b.disabled = false; $("n-msg").textContent = msg; });
       };
 
-      function loadStats() {
-        call({ action: "stats" }, function (j) {
-          $("st-total").textContent = j.total;
-          $("st-today").textContent = j.signupToday;
-          $("st-week").textContent = j.signup7;
-          $("st-unlock-today").textContent = j.unlockToday;
-          $("st-unlock-week").textContent = j.unlock7;
-          var names = { signup: "SIGNUP", unlock: "REPORT", grant: "GRANT", ban: "BAN", unban: "UNBAN" };
-          $("ev-list").innerHTML = (j.events || []).map(function (e) {
-            return '<li><span class="k ' + e.t + '">' + (names[e.t] || e.t.toUpperCase()) + "</span>" +
-              "<span>" + (e.email || "") + (e.n ? ' <span class="tag gem">+' + e.n + "</span>" : "") + "</span>" +
-              '<span class="tm">' + fmt(e.at) + "</span></li>";
-          }).join("") || '<li class="empty">아직 활동이 없습니다.</li>';
-        });
-      }
-
-      function renderUsers() {
-        var q = ($("u-search").value || "").toLowerCase();
-        var list = allUsers.filter(function (u) {
-          return !q || (u.email || "").toLowerCase().indexOf(q) >= 0 || (u.name || "").toLowerCase().indexOf(q) >= 0;
-        });
-        $("u-count").textContent = "(" + allUsers.length + ")";
-        $("u-body").innerHTML = list.map(function (u) {
-          return '<tr class="' + (u.banned ? "banned" : "") + '">' +
-            "<td>" + (u.email || "–") + (u.banned ? '<span class="tag ban">BANNED</span>' : "") +
-            '<span class="name">' + (u.name || "") + "</span></td>" +
-            '<td class="hide-m">' + fmt(u.created) + "</td>" +
-            '<td class="hide-m">' + (u.provider || "구글") + "</td>" +
-            '<td class="hide-m">' + fmt(u.seen) + "</td>" +
-            "<td>" + (u.gems || 0) + "</td>" +
-            '<td><span class="tag gem">' + (u.pgems || 0) + "</span></td>" +
-            '<td><input class="g" type="number" min="1" placeholder="개수" data-psub="' + u.sub + '" /> ' +
-            '<button class="btn ok btn-pgive" data-sub="' + u.sub + '">지급</button> ' +
-            '<button class="btn warn btn-ptake" data-sub="' + u.sub + '">회수</button></td>' +
-            '<td><input class="g" type="number" min="1" placeholder="개수" data-sub="' + u.sub + '" /> ' +
-            '<button class="btn ok btn-grant" data-sub="' + u.sub + '">지급</button></td>' +
-            "<td>" + (u.banned
-              ? '<button class="btn ok btn-unban" data-sub="' + u.sub + '">해제</button>'
-              : '<button class="btn warn btn-ban" data-sub="' + u.sub + '" data-em="' + (u.email || "") + '">강퇴</button>') + "</td>" +
-            "</tr>";
-        }).join("") || '<tr><td colspan="9" class="empty">회원이 없습니다.</td></tr>';
-      }
-
-      function loadUsers() {
-        call({ action: "users" }, function (j) { allUsers = j.users || []; renderUsers(); });
-      }
-
+      /* ── 콘솔 열기/닫기 ── */
       function openConsole() {
         $("login-view").style.display = "none";
         $("console-view").style.display = "block";
-        loadStats(); loadUsers(); loadAi(); loadSales(); loadNotices();
+        showView("dash");
       }
       function logout() {
         cred = null;
@@ -369,7 +539,7 @@
       $("btn-login").onclick = doLogin;
       $("in-pw").addEventListener("keydown", function (e) { if (e.key === "Enter") doLogin(); });
 
-      // ---- 액션 ----
+      // ---- 표 안 버튼(위임) ----
       document.addEventListener("click", function (e) {
         var t = e.target;
         if (t.classList.contains("btn-grant")) {
@@ -379,7 +549,7 @@
           t.disabled = true;
           call({ action: "grant", sub: t.getAttribute("data-sub"), amount: n }, function () {
             t.disabled = false; inp.value = "";
-            loadUsers(); loadStats();
+            loadUsers();
           });
         }
         if (t.classList.contains("btn-pgive") || t.classList.contains("btn-ptake")) {
@@ -390,7 +560,7 @@
           t.disabled = true;
           call({ action: "pgems", sub: t.getAttribute("data-sub"), amount: pn }, function () {
             t.disabled = false; pinp.value = "";
-            loadUsers(); loadStats();
+            loadUsers();
           }, function (msg) { t.disabled = false; alert(msg); });
         }
         if (t.classList.contains("btn-ntoggle")) {
@@ -402,14 +572,14 @@
         }
         if (t.classList.contains("btn-ban")) {
           if (!confirm((t.getAttribute("data-em") || "이 회원") + " 을(를) 강퇴할까요?\n다음 로그인부터 차단됩니다.")) return;
-          call({ action: "ban", sub: t.getAttribute("data-sub") }, function () { loadUsers(); loadStats(); });
+          call({ action: "ban", sub: t.getAttribute("data-sub") }, function () { loadUsers(); });
         }
         if (t.classList.contains("btn-unban")) {
-          call({ action: "unban", sub: t.getAttribute("data-sub") }, function () { loadUsers(); loadStats(); });
+          call({ action: "unban", sub: t.getAttribute("data-sub") }, function () { loadUsers(); });
         }
       });
-      $("u-search").oninput = renderUsers;
-      $("btn-refresh").onclick = function () { loadStats(); loadUsers(); loadAi(); loadSales(); loadNotices(); };
+
+      $("btn-refresh").onclick = function () { VIEWS[curView].load(); };
       $("btn-logout").onclick = logout;
 
       // 시계
