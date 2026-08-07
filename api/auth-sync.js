@@ -1,6 +1,8 @@
 // 구글 로그인 회원 동기화 — 로그인 성공 시 클라이언트가 호출.
 // 회원 등록/갱신, 강퇴(밴) 여부, 관리자가 지급한 대기 젬리 수령을 처리한다.
+// paidGems: 서버 원장(pg:{sub})의 유료 젬리 잔액 — 표시용으로 함께 내려준다.
 import { kv, kvPipe, kvConfigured, verifyGoogleToken } from "../lib/kv.js";
+import { paidBalance } from "../lib/gems.js";
 
 const ALLOWED_ORIGINS = [
   "https://goblub-2.vercel.app",
@@ -53,7 +55,9 @@ export default async function handler(req, res) {
       if (pendingGems > 0) u.gems = 0;
       await kv("SET", key, JSON.stringify(u));
     }
-    return res.status(200).json({ ok: true, banned: false, pendingGems });
+    let paidGems = 0;
+    try { paidGems = await paidBalance(g.sub); } catch {}
+    return res.status(200).json({ ok: true, banned: false, pendingGems, paidGems });
   } catch (e) {
     return res.status(502).json({ error: "kv_error" });
   }

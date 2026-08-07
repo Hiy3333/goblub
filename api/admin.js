@@ -1,8 +1,11 @@
 // goblub 관리자 API — 아이디/암호(SHA-256 해시 검증) 또는 구글 ID 토큰(관리자 이메일)으로 인증.
 // 암호 평문은 저장소에 없다: sha256("아이디:암호") 해시만 보관. ADMIN_ID/ADMIN_PW 환경변수가 있으면 그것이 우선.
-// actions: stats(요약+최근 이벤트) / users(회원 목록) / grant(젬리 지급) / ban / unban
+// actions: stats(요약+최근 이벤트) / users(회원 목록) / grant(놀이 젬리 지급) / ban / unban
+//          ai(AI 사용량) / pgems(유료 젬리 지급·회수) / sales(콘텐츠별 매출)
+//          nlist / nsave / ntoggle / ndel (공지 관리)
 import crypto from "crypto";
 import { kv, kvPipe, kvConfigured, verifyGoogleToken, isAdmin } from "../lib/kv.js";
+import { adjustPaidGems, paidBalance } from "../lib/gems.js";
 
 const ADMIN_HASH = "f8b746bc5853eadc1941562b3e8f46194b9ea419d08d0512fb8e2b8573338295";
 
@@ -104,11 +107,15 @@ export default async function handler(req, res) {
       if (!subs.length) return res.status(200).json({ ok: true, users: [] });
       const capped = subs.slice(0, 500);
       const raws = await kvPipe(capped.map((s) => ["GET", "u:" + s]));
+      const pbals = await kvPipe(capped.map((s) => ["GET", "pg:" + s]));   // 유료 젬리 잔액
+      const pmap = {};
+      capped.forEach((s, i) => { pmap[s] = +pbals[i] || 0; });
       const users = raws
         .map((r2) => { try { return r2 ? JSON.parse(r2) : null; } catch { return null; } })
         .filter(Boolean)
         .sort((a, b) => (b.seen || 0) - (a.seen || 0))
-        .map((u) => ({ sub: u.sub, email: u.email, name: u.name, created: u.created, seen: u.seen, gems: u.gems || 0, banned: !!u.banned }));
+        .map((u) => ({ sub: u.sub, email: u.email, name: u.name, created: u.created, seen: u.seen,
+                       gems: u.gems || 0, pgems: pmap[u.sub] || 0, provider: "구글", banned: !!u.banned }));
       return res.status(200).json({ ok: true, users, truncated: subs.length > 500 });
     }
 
@@ -138,6 +145,62 @@ export default async function handler(req, res) {
         ["LTRIM", "ev", 0, 499],
       ]);
       return res.status(200).json({ ok: true, banned: u.banned });
+    }
+
+    if (action === "pgems") {
+      // 유료 젬리 지급(+)/회수(-) — 서버 원장(pg:{sub})을 즉시 조정. 대기 개념 없음.
+      const sub = String((req.body && req.body.sub) || "");
+      const n = Math.floor(Number(req.body && req.body.amount));
+      if (!sub || sub.length > 64) return res.status(400).json({ error: "bad_sub" });
+      if (!Number.isFinite(n) || n === 0 || Math.abs(n) > 100000) return res.status(400).json({ error: "bad_amount" });
+      const raw = await kv("GET", "u:" + sub);
+      if (!raw) return res.status(404).json({ error: "no_user" });
+      let email = ""; try { email = JSON.parse(raw).email || ""; } catch {}
+      const r2 = await adjustPaidGems(sub, n, "admin");
+      await kvPipe([
+        ["LPUSH", "ev", JSON.stringify({ t: n > 0 ? "pgrant" : "prevoke", email, n: r2.applied, at: Date.now() })],
+        ["LTRIM", "ev", 0, 499],
+      ]);
+      return res.status(200).json({ ok: true, pgems: r2.balance, applied: r2.applied });
+    }
+
+    if (action === "sales") {
+      // 콘텐츠별 누적 사용 횟수·젬리 (spendPaidGems 가 적재) + 최근 7일 일자별 젬리
+      const idx = (await kv("SMEMBERS", "sales:idx")) || [];
+      const days = [0, 1, 2, 3, 4, 5, 6].map(kstDay);
+      const cmds = [];
+      idx.forEach((c) => { cmds.push(["GET", "sales:cnt:" + c], ["GET", "sales:gems:" + c]); });
+      days.forEach((d) => cmds.push(["GET", "sales:day:" + d]));
+      const r2 = cmds.length ? await kvPipe(cmds) : [];
+      const rows = idx.map((c, i) => ({ content: c, cnt: +r2[i * 2] || 0, gems: +r2[i * 2 + 1] || 0 }))
+        .sort((a, b) => b.gems - a.gems);
+      const daily = {};
+      days.forEach((d, i) => { daily[d] = +r2[idx.length * 2 + i] || 0; });
+      return res.status(200).json({ ok: true, rows, daily });
+    }
+
+    /* ── 공지 관리 — "notices" 키에 JSON 배열로 보관 (최대 20건) ── */
+    if (action === "nlist") {
+      let list = []; try { list = JSON.parse((await kv("GET", "notices")) || "[]"); } catch {}
+      return res.status(200).json({ ok: true, notices: list });
+    }
+    if (action === "nsave" || action === "ntoggle" || action === "ndel") {
+      let list = []; try { list = JSON.parse((await kv("GET", "notices")) || "[]"); } catch {}
+      if (action === "nsave") {
+        const title = String((req.body && req.body.title) || "").trim().slice(0, 60);
+        const body = String((req.body && req.body.body) || "").trim().slice(0, 1000);
+        const mode = (req.body && req.body.mode) === "always" ? "always" : "once";
+        const until = String((req.body && req.body.until) || "").trim().slice(0, 10); // "2026-08-31" 또는 ""
+        if (!title || !body) return res.status(400).json({ error: "bad_notice" });
+        list.unshift({ id: Date.now().toString(36), title, body, mode, until, on: true, at: Date.now() });
+        list = list.slice(0, 20);
+      } else {
+        const id = String((req.body && req.body.id) || "");
+        if (action === "ntoggle") { const it = list.find((x) => x.id === id); if (it) it.on = !it.on; }
+        else list = list.filter((x) => x.id !== id);
+      }
+      await kv("SET", "notices", JSON.stringify(list));
+      return res.status(200).json({ ok: true, notices: list });
     }
 
     return res.status(400).json({ error: "bad_action" });

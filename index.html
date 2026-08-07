@@ -1007,5 +1007,63 @@
     window.requestAnimationFrame(loop);
   })();
   </script>
+
+  <script>
+  /* ===== 공지 팝업 — admin에서 등록한 공지를 홈에서 띄운다 =====
+     mode "once"  : 닫으면 그 공지는 다시 안 뜸 (localStorage 기록)
+     mode "always": 노출 기간 동안 방문할 때마다 뜸 */
+  (function () {
+    var API = (/\.vercel\.app$/.test(location.hostname) ? location.origin : "https://goblub-2.vercel.app");
+    fetch(API + "/api/notice").then(function (r) { return r.json(); }).then(function (j) {
+      var list = (j && j.notices) || [];
+      var pick = null;
+      for (var i = 0; i < list.length; i++) {
+        var n = list[i];
+        if (n.mode === "once") {
+          try { if (localStorage.getItem("gb_ntc_" + n.id)) continue; } catch (e) {}
+        }
+        pick = n; break;                       // 최신(맨 앞) 공지 하나만
+      }
+      if (!pick) return;
+
+      var st = document.createElement("style");
+      st.textContent =
+        ".gb-ntc-dim{position:fixed;inset:0;z-index:99990;background:rgba(4,8,18,.62);" +
+        "backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);opacity:0;transition:opacity .3s}" +
+        ".gb-ntc-dim.on{opacity:1}" +
+        ".gb-ntc{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(.94);z-index:99991;" +
+        "width:min(88vw,380px);background:linear-gradient(180deg,#141f33,#0e1728);color:#e8f0fb;" +
+        "border:1px solid rgba(255,217,138,.4);border-radius:20px;padding:22px 20px 16px;" +
+        "box-shadow:0 24px 60px rgba(0,8,20,.7),0 0 40px rgba(255,217,138,.08);" +
+        "font-family:'Jua','Malgun Gothic',sans-serif;opacity:0;transition:opacity .3s,transform .3s}" +
+        ".gb-ntc.on{opacity:1;transform:translate(-50%,-50%) scale(1)}" +
+        ".gb-ntc .tt{font-size:1.15rem;color:#ffe6a8;margin:0 0 10px;text-align:center}" +
+        ".gb-ntc .bd{font-size:.94rem;line-height:1.8;white-space:pre-line;color:#d9e4f3;" +
+        "max-height:46vh;overflow-y:auto;margin:0 0 16px}" +
+        ".gb-ntc .cl{display:block;width:100%;padding:12px;border:0;border-radius:12px;cursor:pointer;" +
+        "font-family:inherit;font-size:1rem;color:#16243a;" +
+        "background:linear-gradient(180deg,#ffeec2,#ffd98a)}";
+      document.head.appendChild(st);
+
+      var dim = document.createElement("div"); dim.className = "gb-ntc-dim";
+      var box = document.createElement("div"); box.className = "gb-ntc";
+      var tt = document.createElement("p"); tt.className = "tt"; tt.textContent = "📢 " + pick.title;
+      var bd = document.createElement("p"); bd.className = "bd"; bd.textContent = pick.body;
+      var cl = document.createElement("button"); cl.className = "cl"; cl.type = "button";
+      cl.textContent = pick.mode === "once" ? "확인했어요" : "닫기";
+      box.appendChild(tt); box.appendChild(bd); box.appendChild(cl);
+      document.body.appendChild(dim); document.body.appendChild(box);
+      requestAnimationFrame(function () { dim.classList.add("on"); box.classList.add("on"); });
+
+      function close() {
+        if (pick.mode === "once") { try { localStorage.setItem("gb_ntc_" + pick.id, "1"); } catch (e) {} }
+        dim.classList.remove("on"); box.classList.remove("on");
+        setTimeout(function () { dim.remove(); box.remove(); }, 320);
+      }
+      cl.onclick = close;
+      dim.onclick = close;
+    }).catch(function () {});
+  })();
+  </script>
 </body>
 </html>
