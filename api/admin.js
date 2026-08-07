@@ -34,9 +34,28 @@ export default async function handler(req, res) {
     res.setHeader("Access-Control-Allow-Origin", origin);
     res.setHeader("Vary", "Origin");
   }
-  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
   if (req.method === "OPTIONS") return res.status(204).end();
+
+  /* GET = 공개 공지 조회 (인증 불필요) — 홈 팝업이 읽는다.
+     Vercel 무료 플랜의 함수 12개 제한 때문에 별도 api/notice.js 대신 여기에 얹고,
+     vercel.json rewrite 로 /api/notice → /api/admin 을 연결한다. */
+  if (req.method === "GET") {
+    if (!kvConfigured()) return res.status(200).json({ notices: [] });
+    try {
+      let list = []; try { list = JSON.parse((await kv("GET", "notices")) || "[]"); } catch {}
+      const todayKst = new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10);
+      const active = list
+        .filter((n) => n.on && (!n.until || n.until >= todayKst))
+        .map((n) => ({ id: n.id, title: n.title, body: n.body, mode: n.mode }));
+      res.setHeader("Cache-Control", "s-maxage=60, stale-while-revalidate=300");
+      return res.status(200).json({ notices: active });
+    } catch {
+      return res.status(200).json({ notices: [] });
+    }
+  }
+
   if (req.method !== "POST") return res.status(405).json({ error: "method_not_allowed" });
   if (!kvConfigured()) return res.status(501).json({ error: "not_configured" });
 
