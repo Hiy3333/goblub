@@ -189,7 +189,7 @@
             <div class="stat"><div class="n" id="st-unlock-today">–</div><div class="l">오늘 리포트 발급</div></div>
             <div class="stat"><div class="n" id="st-unlock-week">–</div><div class="l">7일 리포트 발급</div></div>
           </div>
-          <h2>Activity</h2>
+          <h2>Activity <button class="btn gold" id="ev-csv" style="float:right;margin-top:-6px">⬇ 엑셀 내보내기</button></h2>
           <div class="panel">
             <ul class="feed" id="ev-list"><li class="empty">불러오는 중…</li></ul>
           </div>
@@ -227,6 +227,7 @@
             <div class="stat"><div class="n" id="sl-week">–</div><div class="l">최근 7일 사용 젬리</div></div>
           </div>
           <div class="panel">
+            <div class="toolbar" style="justify-content:flex-end"><button class="btn gold" id="sl-csv">⬇ 엑셀 내보내기</button></div>
             <div style="overflow-x:auto">
               <table>
                 <thead><tr><th>콘텐츠</th><th>누적 사용 횟수</th><th>누적 사용 젬리</th></tr></thead>
@@ -239,7 +240,7 @@
 
         <!-- AI 사용량 -->
         <section class="view" id="v-ai">
-          <h2 style="margin-top:0">최근 7일 <span id="ai-limits" style="color:var(--acc);text-transform:none"></span></h2>
+          <h2 style="margin-top:0">최근 7일 <span id="ai-limits" style="color:var(--acc);text-transform:none"></span><button class="btn gold" id="ai-csv" style="float:right;margin-top:-6px">⬇ 엑셀 내보내기</button></h2>
           <div class="panel">
             <div style="overflow-x:auto">
               <table>
@@ -276,6 +277,7 @@
             </div>
           </div>
           <div class="panel">
+            <div class="toolbar" style="justify-content:flex-end"><button class="btn gold" id="n-csv">⬇ 엑셀 내보내기</button></div>
             <div style="overflow-x:auto">
               <table>
                 <thead><tr><th>제목</th><th class="hide-m">노출</th><th class="hide-m">종료일</th><th>상태</th><th>관리</th></tr></thead>
@@ -296,6 +298,7 @@
       var cred = null;
       var allUsers = [];
       var uPage = 1, U_PER = 15;
+      var lastEvents = [], lastSales = null, lastAi = null, lastNotices = [];
 
       try { cred = JSON.parse(sessionStorage.getItem("gb_admin") || "null"); } catch (e) {}
 
@@ -325,6 +328,19 @@
         return d.getFullYear() + "." + ("0" + (d.getMonth() + 1)).slice(-2) + "." + ("0" + d.getDate()).slice(-2) +
           " " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);
       }
+      // 공용 CSV 다운로드 — BOM 포함(엑셀 한글 안전)
+      function csvDown(name, rows) {
+        var csv = "\uFEFF" + rows.map(function (r) {
+          return r.map(function (c) { return '"' + String(c == null ? "" : c).replace(/"/g, '""') + '"'; }).join(",");
+        }).join("\r\n");
+        var a = document.createElement("a");
+        a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+        var d = new Date();
+        a.download = "goblub-" + name + "-" + d.getFullYear() + ("0" + (d.getMonth() + 1)).slice(-2) + ("0" + d.getDate()).slice(-2) + ".csv";
+        a.click();
+        setTimeout(function () { URL.revokeObjectURL(a.href); }, 2000);
+      }
+
       function esc(s) { return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
 
       /* ── 화면 전환 ── */
@@ -359,6 +375,7 @@
           $("st-week").textContent = j.signup7;
           $("st-unlock-today").textContent = j.unlockToday;
           $("st-unlock-week").textContent = j.unlock7;
+          lastEvents = j.events || [];
           var names = { signup: "SIGNUP", unlock: "REPORT", grant: "GRANT", pgrant: "P-GRANT", prevoke: "P-REVOKE", ban: "BAN", unban: "UNBAN" };
           $("ev-list").innerHTML = (j.events || []).map(function (e) {
             return '<li><span class="k ' + e.t + '">' + (names[e.t] || e.t.toUpperCase()) + "</span>" +
@@ -433,21 +450,59 @@
           rows.push([fmtDate(u.created), u.provider || "구글", u.email || "", u.name || "",
             fmtDate(u.seen), u.gems || 0, u.pgems || 0, u.banned ? "강퇴" : "정상"]);
         });
-        var csv = "﻿" + rows.map(function (r) {
-          return r.map(function (c) { return '"' + String(c).replace(/"/g, '""') + '"'; }).join(",");
-        }).join("\r\n");
-        var a = document.createElement("a");
-        a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
-        var d = new Date();
-        a.download = "goblub-members-" + d.getFullYear() + ("0" + (d.getMonth() + 1)).slice(-2) + ("0" + d.getDate()).slice(-2) + ".csv";
-        a.click();
-        setTimeout(function () { URL.revokeObjectURL(a.href); }, 2000);
+        csvDown("members", rows);
+      };
+
+      // 활동 로그 내보내기
+      $("ev-csv").onclick = function () {
+        var rows = [["시각", "유형", "이메일", "수량"]];
+        lastEvents.forEach(function (e) { rows.push([fmtDate(e.at), e.t, e.email || "", e.n == null ? "" : e.n]); });
+        csvDown("activity", rows);
+      };
+
+      // 매출 내보내기 — 콘텐츠별 + 일자별
+      $("sl-csv").onclick = function () {
+        if (!lastSales) return;
+        var rows = [["콘텐츠", "누적 사용 횟수", "누적 사용 젬리"]];
+        (lastSales.rows || []).forEach(function (r) { rows.push([r.content, r.cnt, r.gems]); });
+        rows.push([""]);
+        rows.push(["날짜", "사용 젬리"]);
+        Object.keys(lastSales.daily || {}).forEach(function (d) {
+          rows.push([d.slice(0, 4) + "-" + d.slice(4, 6) + "-" + d.slice(6, 8), lastSales.daily[d] || 0]);
+        });
+        csvDown("sales", rows);
+      };
+
+      // AI 사용량 내보내기
+      $("ai-csv").onclick = function () {
+        if (!lastAi) return;
+        var rows = [["날짜", "총 호출", "예상 비용(원)", "거절(429)", "내역"]];
+        Object.keys(lastAi.usage || {}).forEach(function (d) {
+          var u = lastAi.usage[d] || {};
+          var cost = 0, det = [];
+          Object.keys(AI_COST).forEach(function (k) {
+            if (u[k]) { cost += u[k] * AI_COST[k]; det.push(AI_LABEL[k] + " " + u[k]); }
+          });
+          rows.push([d.slice(0, 4) + "-" + d.slice(4, 6) + "-" + d.slice(6, 8),
+            u._total || 0, cost, u._denied || 0, det.join(" · ")]);
+        });
+        csvDown("ai-usage", rows);
+      };
+
+      // 공지 내보내기
+      $("n-csv").onclick = function () {
+        var rows = [["제목", "내용", "노출", "종료일", "상태", "등록일"]];
+        lastNotices.forEach(function (n) {
+          rows.push([n.title, n.body, n.mode === "always" ? "매번" : "한 번만", n.until || "", n.on ? "노출 중" : "꺼짐", fmtDate(n.at)]);
+        });
+        csvDown("notices", rows);
       };
 
       /* ── 매출 ── */
       function loadSales() {
         call({ action: "sales" }, function (j) {
           if (!j || !j.ok) return;
+          lastSales = j;
           var days = Object.keys(j.daily || {});
           var week = 0; days.forEach(function (d) { week += j.daily[d] || 0; });
           $("sl-today").textContent = (j.daily[days[0]] || 0).toLocaleString();
@@ -465,6 +520,7 @@
       function loadAi() {
         call({ action: "ai" }, function (j) {
           if (!j || !j.ok) return;
+          lastAi = j;
           $("ai-limits").textContent = "· IP당 분당 " + j.limits.perMin + "회 / 하루 " + j.limits.perDay + "회 제한";
           var rows = Object.keys(j.usage || {}).map(function (d) {
             var u = j.usage[d] || {};
@@ -482,6 +538,7 @@
 
       /* ── 공지 ── */
       function renderNotices(list) {
+        lastNotices = list || [];
         $("n-body-list").innerHTML = (list || []).map(function (n) {
           return "<tr" + (n.on ? "" : ' style="opacity:.45"') + "><td>" + esc(n.title) + "</td>" +
             '<td class="hide-m">' + (n.mode === "always" ? "매번" : "한 번만") + "</td>" +
