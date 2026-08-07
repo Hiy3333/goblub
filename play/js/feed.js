@@ -24,6 +24,7 @@
     chatroom: { label: "💬 단톡방 캐릭터", url: "chatroom.html" },
     foodtype: { label: "🍜 음식형 인간", url: "foodtype.html" },
     decide: { label: "⚡ 결정의 신", url: "decide.html" },
+    meme: { label: "📖 밈 사전", url: "meme.html" },
     tarot: { label: "🐱 고양이 타로", url: "cat-tarot.html" },
     cookie: { label: "🥠 오늘의 포춘쿠키", url: "cookie.html" },
     letter: { label: "💌 마음 배달", url: "letter.html" },
