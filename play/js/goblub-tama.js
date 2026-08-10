@@ -216,7 +216,7 @@
     if (s.gone) return;
     var msg = null;
     if (a === "feed") {
-      if (s.hunger >= 96) { render(); say("배불러~ 그만! 🫃"); return; }
+      if (s.hunger >= 96) { render(); say("배불러~ 그만! 😌"); return; }
       s.hunger = clamp(s.hunger + 30); s.lastFeed = now(); anim("nom"); fx("🍬");
       if (window.GoblubFeed && GoblubFeed.state().pending > 0) {
         var r = GoblubFeed.feedOne();
@@ -234,7 +234,7 @@
         : "잘 잤다! 간밤에 '" + pick(["구름빵 먹는 꿈", "전생에 왕이었던 꿈", "별을 삼키는 꿈", "네가 쓰다듬어주는 꿈", "로또 1등 꿈(재미로!)", "온 세상 나쁜 기분을 먹어치우는 꿈"]) + "'을 꿨대 ✨";
     } else if (a === "clean") {
       if (!s.poop && s.clean >= 96) { render(); say("이미 반짝반짝해요! ✨"); return; }
-      s.poop = false; s.clean = 100; fx("🫧", 40); setTimeout(function () { fx("✨", 56); }, 150);
+      s.poop = false; s.clean = 100; fx("💦", 40); setTimeout(function () { fx("✨", 56); }, 150);
       msg = "뽀득뽀득— 개운해! ✨";
     } else if (a === "emotion") {
       if (now() - (s.lastEmotion || 0) < 20 * 60000) { render(); say("아직 배불러— 잠시 후에 또 먹여줘! 🤤"); return; }

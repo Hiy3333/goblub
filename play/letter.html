@@ -125,7 +125,7 @@
 
   </main>
   <div id="site-footer"></div>
-  <script src="../js/common.js?v=10" data-root=".."></script>
+  <script src="../js/common.js?v=11" data-root=".."></script>
   <script src="js/feed.js?v=6"></script>
   <script src="js/goblub-art.js"></script>
   <script>
@@ -162,14 +162,14 @@
           steps: ["menu", "date", "time", "gauge", "reply"],
           menuQ: "🍴 뭐 먹으러 갈까?", menuLine: "🍴 메뉴",
           gauge: { name: "💘 호감도 게이지", ask: "이 데이트, 기대치는 얼마?",
-            bands: [[20,"🫥 아직 간 보는 중"],[45,"😊 은근 기대되는데?"],[70,"😆 벌써 설레기 시작"],[95,"🫀 심장 과부하 주의"],[100,"💥 심쿵 임계점 돌파!"]] },
-          replies: ["완전 기대돼, 늦지 마! 💚","좋아, 근데 네가 사는 거다? 😏","가는 길에 심장 챙겨 와, 떨어질 수도 있음 🫀","늦으면 벌금 만원이다 ⏰"] },
+            bands: [[20,"😶 아직 간 보는 중"],[45,"😊 은근 기대되는데?"],[70,"😆 벌써 설레기 시작"],[95,"💓 심장 과부하 주의"],[100,"💥 심쿵 임계점 돌파!"]] },
+          replies: ["완전 기대돼, 늦지 마! 💚","좋아, 근데 네가 사는 거다? 😏","가는 길에 심장 챙겨 와, 떨어질 수도 있음 💓","늦으면 벌금 만원이다 ⏰"] },
         apology: { emoji: "🍎", label: "사과하기", q: "내 사과 받아줄래?",
           yes: "사과 받을게 🍎", no: "안 받아", success: "사과 수락! 🍎",
           steps: ["cond", "gauge", "reply"],
           gauge: { name: "🧊 삐짐 해동 게이지", ask: "꽁했던 마음, 얼마나 녹았어?",
             bands: [[20,"🧊 아직 냉동실이야"],[45,"🍧 겉만 살짝 녹음"],[70,"💧 거의 다 녹았어"],[95,"♨️ 몽글몽글 해동 완료"],[100,"♨️ 완전 해동 + 마음 보글보글"]] },
-          replies: ["이번만 특별히 봐준다 😤","조건 꼭 지켜라? 안 지키면 2배 🧾","사실 나도 좀 미안했어… 🥲","다음에 또 그러면 국물도 없다 🍜"] },
+          replies: ["이번만 특별히 봐준다 😤","조건 꼭 지켜라? 안 지키면 2배 🧾","사실 나도 좀 미안했어… 😅","다음에 또 그러면 국물도 없다 🍜"] },
         drink: { emoji: "🍻", label: "술 한잔", q: "오늘 나랑 한잔 어때?",
           yes: "콜! 🍻", no: "안 마셔", success: "술 약속 성사! 🍻",
           steps: ["menu", "date", "time", "gauge", "reply"],
@@ -324,7 +324,7 @@
         var no = $("no"), yes = $("yes"), yn = $("yn");
         var TRIGGER = 140, SAFE = 120, fixed = false;
         var dodge = 0, lastDodge = 0, eaten = false;
-        var TAUNTS = { 2: "🫢 앗, 버튼이 미끄러졌네?", 3: "😏 어딜 도망가~",
+        var TAUNTS = { 2: "🙊 앗, 버튼이 미끄러졌네?", 3: "😏 어딜 도망가~",
           5: "🤣 벌써 5번째… 포기하면 편해요", 7: "😮‍💨 고브럽: 나 슬슬 배고픈데…",
           9: "👀 고브럽이 '" + t.no + "' 버튼을 노려보기 시작했다…" };
         function taunt(msg) {

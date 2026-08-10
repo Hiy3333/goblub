@@ -182,7 +182,7 @@ box-shadow:0 0 0 100vmax #040308,0 0 70px rgba(0,0,0,.8)}}";
       { id: 1, name: "고브럽", cls: "n-gob", text: "내가 아는 분이 있어.\n훨씬… 깊게 보셔. 대신—" },
       { id: 2, name: "고브럽", cls: "n-gob", text: "[아주 무서운 곳]으로 가야 해.\n\n가면 하나만 지켜.\n[뒤를 돌아보지 마라.]\n\n…각오됐어?", choices: [
         { label: "🌀 보러 간다", goto: 3 },
-        { label: "🫣 아직은… 무서워", exit: true }
+        { label: "😨 아직은… 무서워", exit: true }
       ]},
       { id: 3, fx: "swallow", name: "", cls: "n-nar", text: "" },
       { id: 4, bg: "black", name: "", cls: "n-nar", text: "……\n차가운 흙냄새." },

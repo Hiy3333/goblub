@@ -78,6 +78,9 @@
     }
 
     renderStart();
+    // 공유 링크(#결과키)로 들어온 경우 각 테스트가 결과 화면을 직접 그릴 수 있도록
+    // 같은 api 를 돌려준다. 기존 호출부는 반환값을 안 써도 그대로 동작한다.
+    return { restart: renderStart, shareLink: shareLink };
   }
 
   // 이산 결과 최고점 키(동점이면 order 앞선 키 우선). 순수 함수.

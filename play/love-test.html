@@ -21,15 +21,15 @@
     <section class="panel"><div id="quiz"></div></section>
   </main>
   <div id="site-footer"></div>
-  <script src="../js/common.js?v=10" data-root=".."></script>
+  <script src="../js/common.js?v=11" data-root=".."></script>
   <script src="js/feed.js?v=6"></script>
-  <script src="js/quiz.js?v=3"></script>
+  <script src="js/quiz.js?v=4"></script>
   <script src="js/sharecard.js"></script>
   <script>
     var CELLS = {
       mildang:  { emoji:"🎭", name:"밀당세포 우세형", short:"밀당세포", tags:["밀당의고수","여유로운척","답장은계산","티안내기달인"], desc:"좋아하면서도 절대 티 안 내죠. 여유로운 미소 뒤에서 답장 타이밍을 계산하는 당신… 근데 상대도 밀당 중이면 둘 다 평생 썸만 탑니다.", match:"tsundere", clash:"jikjin" },
       jikjin:   { emoji:"🚀", name:"직진세포 우세형", short:"직진세포", tags:["좋으면돌격","고백선빵","화끈본능","재고안따짐"], desc:"좋으면 바로 고백, 재고 따지는 시간에 이미 손 잡고 있음. 화끈해서 좋지만 상대가 아직 준비 안 됐을 땐 혼자 앞서가다 넘어지기도 합니다.", match:"mosol",    clash:"mildang" },
-      jipchak:  { emoji:"🔗", name:"집착세포 우세형", short:"집착세포", tags:["사랑하면올인","읽씹은고문","애정과다","24시간연결"], desc:"사랑하면 올인, 읽씹 3분만 넘어가도 심장이 쿵. 애정이 넘치는 건 매력이지만 가끔은 상대에게 숨 쉴 틈도 좀 줘야 오래갑니다.", match:"heonsin",  clash:"jikjin" },
+      jipchak:  { emoji:"🔗", name:"집착세포 우세형", short:"집착세포", tags:["사랑하면올인","읽씹은고문","애정과다","24시간연결"], desc:"사랑하면 올인, 읽씹 3분만 넘어가도 심장이 쿵. 애정이 넘치는 건 매력이지만 가끔은 상대에게 숨 쉴 틈도 좀 줘야 오래갑니다.", match:"heonsin",  clash:"mosol" },
       mosol:    { emoji:"🌱", name:"모솔세포 우세형", short:"모솔세포", tags:["상상은결혼까지","실전은0","설렘만렙","표현법몰라"], desc:"머릿속 시뮬레이션은 이미 결혼까지 갔는데 현실은 대화 시작도 못 함. 상상력 하나는 국가대표급이니 이제 실전 배치만 하면 됩니다.", match:"jikjin",   clash:"jipchak" },
       tsundere: { emoji:"🐱", name:"츤데레세포 우세형", short:"츤데레세포", tags:["좋아할수록퉁명","속마음은반대","냉정한척","다들킴"], desc:"좋아할수록 말이 퉁명스러워지는 신기한 회로. 본인은 '냉정한 척'이라 믿지만 주변 사람들은 이미 다 눈치챘습니다.", match:"mildang", clash:"heonsin" },
       heonsin:  { emoji:"💝", name:"헌신세포 우세형", short:"헌신세포", tags:["다퍼주는사랑","상대가1순위","기념일수호신","나도좀챙겨"], desc:"사랑하면 다 퍼주는 타입, 상대 기념일이 내 기념일보다 중요. 마음은 참 예쁜데, 나 자신도 좀 챙기면서 사랑해도 됩니다.", match:"jipchak",  clash:"tsundere" }
@@ -114,7 +114,11 @@
     }
 
     function renderResult(totals, el, api) {
-      var key = topCell(totals, api.picks);
+      showCell(topCell(totals, api.picks), el, api, true);
+    }
+
+    // setHash=true 는 방금 푼 사람, false 는 공유 링크로 결과만 보러 온 사람.
+    function showCell(key, el, api, setHash) {
       var r = CELLS[key];
       var tagsHtml = '<div class="tags">' + r.tags.map(function (t) { return '<span class="tag">#' + t + '</span>'; }).join("") + '</div>';
 
@@ -132,16 +136,30 @@
         palette: "coral", emoji: r.emoji, badge: "연애세포 테스트 결과", title: r.name,
         lines: [r.desc, "#" + r.tags.slice(0, 3).join(" #")]
       }));
-      el.querySelector("#qz-retry").onclick = api.restart;
+      if (setHash) history.replaceState(null, "", location.pathname + "#" + key);
+      el.querySelector("#qz-retry").onclick = function () {
+        history.replaceState(null, "", location.pathname);
+        api.restart();
+      };
+      // 결과가 담긴 주소를 공유해야 받는 사람이 내 세포를 본다. api.shareLink 는
+      // location.href 를 쓰므로 해시를 먼저 붙여두면 그대로 실려 나간다.
       el.querySelector("#qz-share").onclick = function () { api.shareLink(el.querySelector("#qz-share")); };
-      if (window.GoblubFeed && GoblubFeed.record) GoblubFeed.record("love", { emoji: r.emoji, title: (r.short || r.name), tags: r.tags });
+      // 남의 결과를 열어본 것뿐이니 내 프로필 카드에 기록하면 안 된다.
+      if (setHash && window.GoblubFeed && GoblubFeed.record) {
+        GoblubFeed.record("love", { emoji: r.emoji, title: (r.short || r.name), tags: r.tags });
+      }
     }
 
-    Quiz.init(document.getElementById("quiz"), {
+    var quizEl = document.getElementById("quiz");
+    var api = Quiz.init(quizEl, {
       emoji: "💘", title: "연애세포 테스트",
       intro: "당신의 연애를 좌우하는 6가지 세포. 12가지 상황 속 선택으로 내 안의 우세 세포를 찾아봐요!",
       feedSrc: "love", questions: QUESTIONS, renderResult: renderResult
     });
+
+    // 공유 링크 진입 — 없는 키면 조용히 인트로 그대로 둔다.
+    var hashKey = decodeURIComponent((location.hash || "").replace("#", ""));
+    if (CELLS[hashKey]) showCell(hashKey, quizEl, api, false);
   </script>
 </body>
 </html>
