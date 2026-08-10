@@ -3,15 +3,19 @@
 //   emoji, title, intro,                        // 시작 화면
 //   feedSrc,                                     // (선택) 결과 도달 시 GoblubFeed.grant(feedSrc)
 //   questions: [{ q, choices: [{ text, scores:{키:점수} }] }],
-//   renderResult: function(totals, el, api)      // 테스트별 커스텀 결과. api={restart, shareLink}
+//   renderResult: function(totals, el, api)      // 테스트별 커스텀 결과.
+//                                                // api={restart, shareLink, picks}
+//                                                // picks = 고른 보기 index 배열(문항 순서대로).
+//                                                //   동점을 공정하게 가르는 데 쓴다 — 총점만으로는
+//                                                //   앞순서 키가 항상 이기므로 결과가 쏠린다.
 // }
 (function () {
   function init(el, config) {
-    var idx = 0, totals = {};
+    var idx = 0, totals = {}, picks = [];
     function addScores(s) { for (var k in s) totals[k] = (totals[k] || 0) + s[k]; }
 
     function renderStart() {
-      idx = 0; totals = {};
+      idx = 0; totals = {}; picks = [];
       el.innerHTML =
         '<span class="result-emoji">' + config.emoji + "</span>" +
         '<h2 style="text-align:center">' + config.title + "</h2>" +
@@ -32,7 +36,9 @@
       el.innerHTML = html;
       Array.prototype.forEach.call(el.querySelectorAll(".choice-btn"), function (btn) {
         btn.onclick = function () {
-          addScores(q.choices[+btn.dataset.i].scores);
+          var ci = +btn.dataset.i;
+          addScores(q.choices[ci].scores);
+          picks.push(ci);
           idx++;
           if (idx < config.questions.length) renderQ();
           else finish();
@@ -42,7 +48,7 @@
 
     function finish() {
       if (window.GoblubFeed && config.feedSrc) GoblubFeed.grant(config.feedSrc);
-      config.renderResult(totals, el, { restart: renderStart, shareLink: shareLink });
+      config.renderResult(totals, el, { restart: renderStart, shareLink: shareLink, picks: picks.slice() });
     }
 
     function shareLink(btn) {

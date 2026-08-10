@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>연애세포 테스트 — goblub</title>
-  <meta name="description" content="10가지 상황으로 보는 나의 연애 세포 — 밀당·직진·집착·모솔·츤데레·헌신" />
+  <meta name="description" content="12가지 상황으로 보는 나의 연애 세포 — 밀당·직진·집착·모솔·츤데레·헌신" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
@@ -23,7 +23,7 @@
   <div id="site-footer"></div>
   <script src="../js/common.js?v=7" data-root=".."></script>
   <script src="js/feed.js?v=6"></script>
-  <script src="js/quiz.js"></script>
+  <script src="js/quiz.js?v=2"></script>
   <script src="js/sharecard.js"></script>
   <script>
     var CELLS = {
@@ -36,61 +36,85 @@
     };
     var ORDER = ["mildang","jikjin","jipchak","mosol","tsundere","heonsin"];
 
+    // 12문항 × 4보기 = 48칸. 세포마다 정확히 8번씩 등장하도록 배치(문항별로 2세포씩 제외).
     var QUESTIONS = [
-      { q: "수상한 앱 알림: '짝사랑 상대가 3시간 뒤 당신에 대한 기억을 전부 잃습니다.' 지금 나는?", choices: [
-        { text: "신발도 짝짝이로 신고 이미 뛰쳐나감 — 고백은 지금뿐", scores: { jikjin: 2 } },
-        { text: "오히려 좋아. 기억 리셋되면 첫인상부터 다시 설계한다", scores: { mildang: 2 } },
-        { text: "고백 대사 시뮬레이션 돌리다가 3시간 순삭", scores: { mosol: 2 } },
-        { text: "'잃든가 말든가' 중얼거리며 알림만 서른 번 확인", scores: { tsundere: 2 } } ] },
-      { q: "썸 상대가 좀비가 됐다. 근데 이상하게 나만 보면 얌전해진다. 당신의 선택은?", choices: [
-        { text: "매일 도시락(?) 싸들고 곁을 지킴 — 좀비여도 내 사람", scores: { heonsin: 2 } },
-        { text: "물리기 전에 고백부터. '좀비인 너도 좋아!'", scores: { jikjin: 2 } },
-        { text: "오히려 좋아… 이제 아무도 못 뺏어가", scores: { jipchak: 2 } },
-        { text: "일부러 하루는 안 가봄. 좀비도 애가 타야 하는 법", scores: { mildang: 2 } } ] },
-      { q: "연애의 신 등장. '짝사랑 속마음 1분 열람권 vs 내 매력 2배 물약, 하나만 골라라.'", choices: [
-        { text: "열람권! 1분 안에 스크롤 광클해서 통째로 외운다", scores: { jipchak: 2 } },
-        { text: "속마음 봤다가 상처받을까 봐… 둘 다 정중히 거절", scores: { mosol: 2 } },
-        { text: "물약 원샷하고 그 길로 직진", scores: { jikjin: 2 } },
-        { text: "'딱히 필요 없거든?' 하며 물약을 슬쩍 주머니에", scores: { tsundere: 2 } } ] },
-      { q: "데이트 중 갑자기 세상의 시간이 멈췄다. 나만 움직일 수 있다!", choices: [
-        { text: "멈춘 상대 얼굴에 드는 햇빛을 손으로 가려주며 기다림", scores: { heonsin: 2 } },
-        { text: "이때다! 상대 폰을 열어 내 카톡방 지분율 확인", scores: { jipchak: 2 } },
-        { text: "지금은 안 떨려! 멈춘 상대 앞에서 고백 리허설 27회", scores: { mosol: 2 } },
-        { text: "시간이 풀리기 직전, 멀리서 쿨하게 걸어오는 각도 세팅", scores: { mildang: 2 } } ] },
-      { q: "짝사랑 상대가 내 폰을 주웠다. 배경화면이 하필 그 사람 사진. 현장 발각!", choices: [
-        { text: "'동명이인이야.' 세상 무심한 얼굴로 폰만 회수", scores: { tsundere: 2 } },
-        { text: "배경화면이 문제가 아니다. 전용 폴더 200장을 들켰는지가 관건", scores: { jipchak: 2 } },
-        { text: "그 자리에서 영혼 이탈. 귀가 후 이사 매물 검색", scores: { mosol: 2 } },
-        { text: "'어 맞아, 너야. 그래서 말인데 나랑 사귈래?'", scores: { jikjin: 2 } } ] },
-      { q: "연애세포 정기검진 결과가 나왔다. 의사 고브럽이 처방전을 내민다. 내 처방은?", choices: [
-        { text: "'적당히 튕기기' 스킬 — 이미 만렙이라 정중히 반납", scores: { mildang: 2 } },
-        { text: "'퍼주기 억제제' — 처방받고 나오는 길에 상대 것까지 결제", scores: { heonsin: 2 } },
-        { text: "'일단 사람 만나기' 기초 수강권 3개월", scores: { mosol: 2 } },
-        { text: "'솔직해지는 약' — 복용 거부하고 병원에도 츤츤거림", scores: { tsundere: 2 } } ] },
-      { q: "100일 기념일. 연인이 준 선물이 '반품 불가 초대형 곰인형(내 얼굴 프린팅)'이다.", choices: [
-        { text: "감동의 눈물… 나도 월급 갈아서 보답 선물 3종 세트 준비", scores: { heonsin: 2 } },
-        { text: "'이딴 걸 왜 사?' 하면서 평생 소장 + 매일 끌어안고 잠듦", scores: { tsundere: 2 } },
-        { text: "좋은 아이디어다. 나도 상대 얼굴 프린팅 이불 제작 주문", scores: { jipchak: 2 } },
-        { text: "고맙지만 리액션은 70%만. 다음 선물이 더 커져야 하니까", scores: { mildang: 2 } } ] },
-      { q: "연인 폰에 '헬스장 김코치❤️' 라는 이름이 떠 있다. 나의 대응은?", choices: [
-        { text: "3분 만에 김코치 SNS·나이·담당 지점까지 특정 완료", scores: { jipchak: 2 } },
-        { text: "그 자리에서 화면 가리키며 '이거 뭐야?' 정면 돌파", scores: { jikjin: 2 } },
-        { text: "'안 궁금해.' (그날 밤 침대에서 천장만 3시간 응시)", scores: { tsundere: 2 } },
-        { text: "…까지 상상하다 현타. 나는 아직 연인이 없다", scores: { mosol: 2 } } ] },
-      { q: "외계인이 지구 연애 문화 조사를 위해 나를 납치했다. '사랑이 무엇인가?' 내 대답은?", choices: [
-        { text: "'다 퍼주고도 더 못 줘서 미안한 것'", scores: { heonsin: 2 } },
-        { text: "'줄다리기. 당길 때와 풀 때를 아는 예술'", scores: { mildang: 2 } },
-        { text: "'생각나면 이미 그 사람 앞에 서 있는 것'", scores: { jikjin: 2 } },
-        { text: "'저도… 책으로만 배웠습니다(안경 고쳐 씀)'", scores: { mosol: 2 } } ] },
-      { q: "인생 연애 시뮬레이션 게임이 끝났다. 엔딩 크레딧에 뜬 내 플레이 기록은?", choices: [
-        { text: "'최단 루트 클리어 — 만남에서 고백까지 3일'", scores: { jikjin: 2 } },
-        { text: "'호감도 조절의 장인 — 세이브/로드 200회'", scores: { mildang: 2 } },
-        { text: "'호감도 999 초과로 시스템 오류 발생'", scores: { jipchak: 2 } },
-        { text: "'선물하기 버튼 과다 사용으로 파산 엔딩'", scores: { heonsin: 2 } } ] }
+      { q: "💬 카톡 답장이 왔다", choices: [
+        { text: "읽자마자 바로 답장", scores: { jikjin: 2 } },
+        { text: "5분 기다렸다 보낸다", scores: { mildang: 2 } },
+        { text: "답장 오기 전에 이미 서른 번 확인함", scores: { jipchak: 2 } },
+        { text: "초안을 세 번 고쳐 쓴다", scores: { mosol: 2 } } ] },
+      { q: "📱 상대가 스토리를 올렸다", choices: [
+        { text: "좋아요 눌렀다 취소했다 다시 누른다", scores: { mosol: 2 } },
+        { text: "봤지만 좋아요는 안 누른다", scores: { mildang: 2 } },
+        { text: "\"관심 없는데\" 하며 세 번 돌려본다", scores: { tsundere: 2 } },
+        { text: "바로 DM을 보낸다", scores: { jikjin: 2 } } ] },
+      { q: "🍽️ 첫 데이트 메뉴를 고른다", choices: [
+        { text: "상대 취향으로 전부 맞춘다", scores: { heonsin: 2 } },
+        { text: "\"난 아무거나\" (사실 싫어하는 게 많다)", scores: { tsundere: 2 } },
+        { text: "인스타 뒤져서 취향 파악 완료", scores: { jipchak: 2 } },
+        { text: "3일 전부터 후기를 정독한다", scores: { mosol: 2 } } ] },
+      { q: "🎂 상대 생일이 다가온다", choices: [
+        { text: "\"생일이었어?\" (선물은 이미 샀다)", scores: { tsundere: 2 } },
+        { text: "한 달 전부터 준비한다", scores: { heonsin: 2 } },
+        { text: "살짝 늦게 축하해서 존재감을 남긴다", scores: { mildang: 2 } },
+        { text: "당일 아침에 꽃 들고 등장", scores: { jikjin: 2 } } ] },
+      { q: "😴 새벽 2시, 상대가 \"자?\" 하고 보냈다", choices: [
+        { text: "왜 하필 이 시간에 보냈는지 분석한다", scores: { jipchak: 2 } },
+        { text: "\"무슨 일 있어? 지금 갈까?\"", scores: { heonsin: 2 } },
+        { text: "\"왜\" (한 글자)", scores: { tsundere: 2 } },
+        { text: "바로 전화를 건다", scores: { jikjin: 2 } } ] },
+      { q: "🚶 길에서 상대를 우연히 마주쳤다", choices: [
+        { text: "못 본 척 지나간다", scores: { mosol: 2 } },
+        { text: "\"야!!\" 하고 뛰어간다", scores: { jikjin: 2 } },
+        { text: "마침 들고 있던 음료를 건넨다", scores: { heonsin: 2 } },
+        { text: "\"여긴 웬일이야\" (일부러 왔다)", scores: { tsundere: 2 } } ] },
+      { q: "💔 상대가 다른 사람 얘기를 꺼냈다", choices: [
+        { text: "\"잘 됐네\" (표정이 굳는다)", scores: { tsundere: 2 } },
+        { text: "관심 없는 척 화제를 돌린다", scores: { mildang: 2 } },
+        { text: "잘되라고 응원해준다 (속으로 운다)", scores: { heonsin: 2 } },
+        { text: "이름 듣자마자 검색을 시작한다", scores: { jipchak: 2 } } ] },
+      { q: "📸 둘이 찍은 사진이 생겼다", choices: [
+        { text: "상대가 잘 나온 걸로만 고른다", scores: { heonsin: 2 } },
+        { text: "배경화면 했다가 들킬까 봐 바꾼다", scores: { mosol: 2 } },
+        { text: "바로 프로필 사진으로 건다", scores: { jikjin: 2 } },
+        { text: "폴더를 만들어 정리한다", scores: { jipchak: 2 } } ] },
+      { q: "🎧 상대가 좋아하는 노래를 알려줬다", choices: [
+        { text: "다음에 아는 척 흘린다", scores: { mildang: 2 } },
+        { text: "플레이리스트를 통째로 외운다", scores: { heonsin: 2 } },
+        { text: "100번 듣는다", scores: { mosol: 2 } },
+        { text: "\"내 취향은 아닌데\" (매일 듣는다)", scores: { tsundere: 2 } } ] },
+      { q: "🌧️ 비가 오는데 상대가 우산이 없다", choices: [
+        { text: "우산 있는데 없는 척한다", scores: { mildang: 2 } },
+        { text: "말을 못 걸고 옆에서 같이 젖는다", scores: { mosol: 2 } },
+        { text: "내 우산 주고 나는 뛴다", scores: { heonsin: 2 } },
+        { text: "일부러 우산 하나만 챙겨 나왔다", scores: { jipchak: 2 } } ] },
+      { q: "🔔 읽었는데 답장이 없다", choices: [
+        { text: "프로필 사진이 바뀌었나 확인한다", scores: { jipchak: 2 } },
+        { text: "내가 뭘 잘못 썼나 스크롤을 올린다", scores: { mosol: 2 } },
+        { text: "나도 안 읽은 척한다", scores: { mildang: 2 } },
+        { text: "\"바빠?\" 하고 하나 더 보낸다", scores: { jikjin: 2 } } ] },
+      { q: "💍 상대가 \"우리 무슨 사이야?\"라고 물었다", choices: [
+        { text: "\"사귀자\"", scores: { jikjin: 2 } },
+        { text: "\"몰라\" (심장은 폭발 중)", scores: { tsundere: 2 } },
+        { text: "\"너는 어떻게 생각하는데?\"", scores: { mildang: 2 } },
+        { text: "드디어 확실히 정할 수 있겠다", scores: { jipchak: 2 } } ] }
     ];
 
+    // 동점이면 Quiz.top 은 ORDER 앞쪽 키(밀당)를 무조건 고른다. 동점이 3번에 1번꼴로
+    // 나오는 구조라 그대로 두면 밀당 24% / 헌신 11% 로 결과가 쏠린다.
+    // → 고른 보기 조합으로 가른다. 같은 답이면 항상 같은 결과라 결과 링크도 그대로 동작.
+    function topCell(totals, picks) {
+      var mx = -Infinity;
+      ORDER.forEach(function (k) { var v = totals[k] || 0; if (v > mx) mx = v; });
+      var tied = ORDER.filter(function (k) { return (totals[k] || 0) === mx; });
+      if (tied.length === 1) return tied[0];
+      var h = 7;
+      (picks || []).forEach(function (p, i) { h = (h * 131 + (p + 1) * (i + 5)) % 1000003; });
+      return tied[h % tied.length];
+    }
+
     function renderResult(totals, el, api) {
-      var key = Quiz.top(totals, ORDER);
+      var key = topCell(totals, api.picks);
       var r = CELLS[key];
       var tagsHtml = '<div class="tags">' + r.tags.map(function (t) { return '<span class="tag">#' + t + '</span>'; }).join("") + '</div>';
 
@@ -115,7 +139,7 @@
 
     Quiz.init(document.getElementById("quiz"), {
       emoji: "💘", title: "연애세포 테스트",
-      intro: "당신의 연애를 좌우하는 6가지 세포. 10가지 상황 속 선택으로 내 안의 우세 세포를 찾아봐요!",
+      intro: "당신의 연애를 좌우하는 6가지 세포. 12가지 상황 속 선택으로 내 안의 우세 세포를 찾아봐요!",
       feedSrc: "love", questions: QUESTIONS, renderResult: renderResult
     });
   </script>
