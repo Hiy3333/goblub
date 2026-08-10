@@ -24,8 +24,18 @@
       el.querySelector("#qz-start").onclick = renderQ;
     }
 
+    // 어느 문항에서 이탈하는지 보려면 문항마다 도달을 남겨야 한다.
+    function track(name, props) {
+      if (!window.gbTrack) return;
+      props = props || {};
+      props.test = config.feedSrc || config.title;
+      window.gbTrack(name, props);
+    }
+
     function renderQ() {
       var q = config.questions[idx];
+      if (idx === 0) track("test_start", { total: config.questions.length });
+      track("question_view", { index: idx + 1, total: config.questions.length });
       var pct = Math.round(idx / config.questions.length * 100);
       var html =
         '<div class="progress-track"><div class="progress-fill" style="width:' + pct + '%"></div></div>' +
@@ -49,6 +59,9 @@
     function finish() {
       if (window.GoblubFeed && config.feedSrc) GoblubFeed.grant(config.feedSrc);
       config.renderResult(totals, el, { restart: renderStart, shareLink: shareLink, picks: picks.slice() });
+      // 결과 유형은 테스트마다 판정 로직이 달라서, 화면에 찍힌 이름을 그대로 집계한다.
+      var nameEl = el.querySelector(".result-name");
+      track("test_complete", { result: nameEl ? nameEl.textContent.trim() : "(미상)" });
     }
 
     function shareLink(btn) {

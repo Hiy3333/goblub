@@ -17,6 +17,48 @@
   document.head.appendChild(s);
 })();
 
+// ===== 사용 지표(Amplitude) =====
+// gbTrack(이름, 속성) 은 SDK 로드 전에 불러도 안전하다 — 큐에 쌓았다가 준비되면 흘려보낸다.
+// SDK 가 아예 안 뜨더라도 호출부는 그냥 조용히 지나간다.
+(function () {
+  var AMP_KEY = "39faff975e6b6d83de9a1dee44c42a6c";
+  var queue = [], ready = false;
+
+  function flush() {
+    if (!ready || !window.amplitude) return;
+    while (queue.length) {
+      var e = queue.shift();
+      try { window.amplitude.track(e[0], e[1]); } catch (err) {}
+    }
+  }
+  window.gbTrack = function (name, props) {
+    queue.push([name, props || {}]);
+    if (queue.length > 200) queue.shift();   // SDK 차단 시 무한 적재 방지
+    flush();
+  };
+
+  // 로컬(file://)은 집계 제외 — 개발 중 클릭이 실제 지표를 오염시키지 않게
+  if (!AMP_KEY || location.protocol === "file:") return;
+
+  var s = document.createElement("script");
+  s.src = "https://cdn.amplitude.com/libs/analytics-browser-2.45.0-min.js.gz";
+  s.async = true;
+  s.onload = function () {
+    if (!window.amplitude) return;
+    try {
+      window.amplitude.init(AMP_KEY, {
+        autocapture: {
+          pageViews: true, sessions: true, attribution: true,
+          formInteractions: false, fileDownloads: false, elementInteractions: false
+        }
+      });
+      ready = true;
+      flush();
+    } catch (err) {}
+  };
+  document.head.appendChild(s);
+})();
+
 // goblub 공용 헤더/푸터 삽입
 (function () {
   var root = (document.currentScript && document.currentScript.dataset.root) || ".";

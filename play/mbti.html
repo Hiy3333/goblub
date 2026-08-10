@@ -85,7 +85,7 @@
 
   </main>
   <div id="site-footer"></div>
-  <script src="../js/common.js?v=8" data-root=".."></script>
+  <script src="../js/common.js?v=9" data-root=".."></script>
   <script src="js/feed.js?v=6"></script>
   <script>
     (function () {
@@ -269,8 +269,18 @@
           .catch(function () { prompt("복사해 주세요:", text); });
       }
 
+      // 어느 문항에서 이탈하는지 보려면 문항마다 도달을 남겨야 한다.
+      function track(name, props) {
+        if (!window.gbTrack) return;
+        props = props || {};
+        props.test = "mbti";
+        window.gbTrack(name, props);
+      }
+
       function renderQ() {
         var q = QUESTIONS[idx];
+        if (idx === 0) track("test_start", { total: QUESTIONS.length });
+        track("question_view", { index: idx + 1, total: QUESTIONS.length, qid: q.id });
         $("q-fill").style.width = Math.round(idx / QUESTIONS.length * 100) + "%";
         var v = $("q-visual");
         v.textContent = q.visual;
@@ -309,6 +319,8 @@
         window.__resultType = type;
         if (setHash && window.GoblubFeed) GoblubFeed.grant("mbti");
         if (window.GoblubFeed && GoblubFeed.record) GoblubFeed.record("mbti", { emoji: r.emoji, title: type + " · " + r.title, tags: [] });
+        // setHash=false 는 링크로 들어온 결과 열람이라 '완주'로 세면 안 된다.
+        if (setHash) track("test_complete", { result: type });
       }
 
       $("btn-start").onclick = function () { idx = 0; scores = {}; renderQ(); show("quiz"); };
@@ -323,6 +335,7 @@
 
       $("r-link").onclick = function () {
         var url = location.origin + location.pathname + "#" + window.__resultType;
+        track("result_action", { action: navigator.share ? "share" : "copy_link", result: window.__resultType });
         if (navigator.share) {
           navigator.share({ title: "대환장 상황극 MBTI — 나는 " + window.__resultType, url: url })
             .catch(function () {});
@@ -338,6 +351,7 @@
 
       $("r-save").onclick = function () {
         var type = window.__resultType;
+        track("result_action", { action: "save_image", result: type });
         var r = RESULTS[type];
         var c = document.createElement("canvas");
         c.width = 720; c.height = 1280;
