@@ -729,6 +729,8 @@ body.clay .hero h1 {
   filter: drop-shadow(0 3px 0 rgba(255,255,255,.85)) drop-shadow(0 9px 14px rgba(140,115,210,.3));
   text-shadow: none;
 }
+/* 이모지는 그라데이션 클립에서 제외 — 안 그러면 색이 지워져 네모(두부)로 보임 */
+body.clay .hero h1 .e { -webkit-text-fill-color: initial; color: initial; }
 body.clay .hero p { color: var(--cl-ink-soft); }
 
 /* 카드·패널·앱카드: 말랑 클레이 */
