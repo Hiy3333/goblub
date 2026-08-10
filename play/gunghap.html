@@ -104,6 +104,13 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
 .owlcap{position:absolute;left:0;right:0;bottom:0;margin:0;padding:26px 14px 10px;
   text-align:center;font-size:.88rem;color:#ffeec2;pointer-events:none;
   background:linear-gradient(180deg,transparent,rgba(8,14,24,.85))}
+/* 연출 넘어가기 — 영상 오른쪽 위. 두 번째로 보는 사람을 붙잡아 두지 않는다 */
+.skipbtn{position:absolute;right:10px;top:10px;z-index:5;
+  padding:7px 14px;border:1px solid rgba(255,255,255,.28);border-radius:999px;cursor:pointer;
+  font-family:inherit;font-size:.84rem;color:#eaf2ff;
+  background:rgba(8,16,30,.55);backdrop-filter:blur(6px);
+  transition:background .15s,border-color .15s}
+.skipbtn:hover{background:rgba(20,34,58,.8);border-color:rgba(255,255,255,.5)}
 /* 깨우기 버튼 — 부엉이가 꾸벅 멈춘 순간에 뜬다 */
 .owlwake{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);z-index:3;
   display:none;padding:12px 24px;border:0;border-radius:999px;cursor:pointer;
@@ -183,6 +190,7 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
     <div class="owlbox">
       <video id="owl-idle" muted playsinline autoplay preload="auto"
         poster="img/stars/owl-poster.webp" src="img/stars/owl-idle.mp4"></video>
+      <button class="skipbtn" id="skip-intro" type="button">건너뛰기 ›</button>
       <button class="owlwake" id="owl-wake" type="button">🌙 올빼미를 깨운다</button>
       <div class="owlsay" id="owl-say">
         앗… 깜빡 졸았네! 🦉<br />별 보러 온 거지?<br />
@@ -220,6 +228,7 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
   <div class="screen" id="scOwl">
     <div class="vidwrap">
       <video id="owl-vid" playsinline preload="auto"></video>
+      <button class="skipbtn" id="skip-owl" type="button">건너뛰기 ›</button>
       <div class="owlask" id="owl-ask">
         <p>좋아! 별 보러 가볼까~? ⭐</p>
         <button id="owl-goask" type="button">확인</button>
@@ -320,6 +329,7 @@ fillSelects("a"); fillSelects("b");
     try{ iv.pause(); }catch(e){}
     say.style.display="block"; cap0.style.display="none";
     order.style.display="block";
+    $("skip-intro").style.display="none";   // 신청서가 떴으면 넘어갈 곳이 없다
   }
   function wake(skip){
     if(woken) return; woken=true;
@@ -333,6 +343,11 @@ fillSelects("a"); fillSelects("b");
     setTimeout(awake, 4500);                  // 안전망
   }
   wk.onclick=function(){ wake(false); };
+  // 넘어가기 — 깨우는 연출을 건너뛰고 바로 생년월일 신청서로
+  $("skip-intro").onclick=function(){
+    wake(true);
+    if(order.scrollIntoView) order.scrollIntoView({behavior:"smooth", block:"center"});
+  };
   // 영상이 안 뜨거나 자동재생이 막힌 환경이면 연출 건너뛰고 바로 신청서
   setTimeout(function(){ if(!woken && iv.currentTime<0.3) wake(true); }, 4000);
 })();
@@ -381,6 +396,9 @@ function playOwl(){
   function toSky(){
     if(owlPhase!=="owl") return;
     owlPhase="sky";
+    stepped=true;                                   // 남은 콜백이 다음 클립을 틀지 않게
+    v.ontimeupdate=v.onended=v.onerror=v.onplaying=null;
+    $("skip-owl").style.display="none";
     try{ v.pause(); v.removeAttribute("src"); v.load(); }catch(e){}
     scOwl.classList.remove("on");
     reveal();
@@ -404,6 +422,10 @@ function playOwl(){
   var NOD_AT=1.3, asked=false, confirmed=false;
   var ask=$("owl-ask"), askBtn=$("owl-goask");
   ask.style.display="none";
+  // 넘어가기 — 출동 연출을 건너뛰고 바로 별을 잇는 장면으로
+  var skip=$("skip-owl");
+  skip.style.display="block";
+  skip.onclick=function(){ ask.style.display="none"; toSky(); };
   v.ontimeupdate=function(){
     if(!asked && v.currentTime>=NOD_AT){
       asked=true;
