@@ -1,3 +1,22 @@
+// ===== 오류 수집(Sentry) =====
+// sentry.io 프로젝트 설정 → Client Keys(DSN) 값을 아래에 붙여넣으면 켜진다. 비어 있으면 아무것도 안 함.
+(function () {
+  var SENTRY_DSN = "";
+  if (!SENTRY_DSN || location.protocol === "file:") return;
+  var s = document.createElement("script");
+  s.src = "https://browser.sentry-cdn.com/9.46.0/bundle.min.js";
+  s.crossOrigin = "anonymous";
+  s.onload = function () {
+    if (!window.Sentry) return;
+    Sentry.init({
+      dsn: SENTRY_DSN,
+      environment: location.hostname,   // github.io / vercel.app 구분용
+      sampleRate: 1.0
+    });
+  };
+  document.head.appendChild(s);
+})();
+
 // goblub 공용 헤더/푸터 삽입
 (function () {
   var root = (document.currentScript && document.currentScript.dataset.root) || ".";
