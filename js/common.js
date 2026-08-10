@@ -1,7 +1,7 @@
 // ===== 오류 수집(Sentry) =====
 // sentry.io 프로젝트 설정 → Client Keys(DSN) 값을 아래에 붙여넣으면 켜진다. 비어 있으면 아무것도 안 함.
 (function () {
-  var SENTRY_DSN = "";
+  var SENTRY_DSN = "https://7df6fb30d466067833814aaf6fb5d24c@o4511885094158336.ingest.us.sentry.io/4511885166641152";
   if (!SENTRY_DSN || location.protocol === "file:") return;
   var s = document.createElement("script");
   s.src = "https://browser.sentry-cdn.com/9.46.0/bundle.min.js";
@@ -11,7 +11,23 @@
     Sentry.init({
       dsn: SENTRY_DSN,
       environment: location.hostname,   // github.io / vercel.app 구분용
-      sampleRate: 1.0
+      sampleRate: 1.0,
+      // 무료 플랜은 월 5,000건이라 잡음이 할당량을 먹으면 정작 볼 걸 못 본다.
+      // 아래는 우리 코드 문제가 아닌, 확장·광고차단기·브라우저 자체가 만드는 것들.
+      ignoreErrors: [
+        "ResizeObserver loop limit exceeded",
+        "ResizeObserver loop completed with undelivered notifications",
+        "Non-Error promise rejection captured",
+        "Failed to fetch",
+        "NetworkError when attempting to fetch resource",
+        "Load failed",
+        "AbortError"
+      ],
+      denyUrls: [
+        /extensions\//i, /^chrome:\/\//i, /^chrome-extension:\/\//i,
+        /^moz-extension:\/\//i, /^safari-extension:\/\//i,
+        /googletagmanager\.com/i, /amplitude\.com/i
+      ]
     });
   };
   document.head.appendChild(s);
