@@ -302,62 +302,118 @@
       g.restore();
     }
 
+    // 세로형 로켓 — 한 줄에 창문 2개, 인원이 늘면 줄이 아래로 붙어 길어진다
+    function shipMetrics(n) {
+      var rows = Math.ceil(n / 2);
+      var W = 300, noseH = 140, rowH = 128, padTop = 78, padBot = 56, finH = 118;
+      var bodyH = padTop + rows * rowH + padBot;
+      return { W: W, noseH: noseH, bodyH: bodyH, finH: finH, rows: rows, rowH: rowH,
+               padTop: padTop, H: noseH + bodyH + finH };
+    }
+    // 좌석 k(0-base)의 로컬 좌표 — 위에서부터 왼쪽·오른쪽 순
+    function seatPos(k, m) {
+      var row = Math.floor(k / 2), col = k % 2;
+      return { x: (col ? 1 : -1) * m.W * .20,
+               y: -m.H / 2 + m.noseH + m.padTop + row * m.rowH + m.rowH / 2,
+               r: m.W * .145 };
+    }
+
     function drawShip(camX, scale, n, t) {
       if (!ship) return;
       var sx = (ship.x - camX) * scale + VW / 2;
-      var H = ship.h, W = ship.w, cy = VH * .5;
-      g.save(); g.translate(sx, cy); g.scale(scale, scale);
-      // 선체
+      var m = ship.m, W = m.W, H = m.H;
+      g.save(); g.translate(sx, VH * .5); g.scale(scale, scale);
+
+      var bodyTop = -H / 2 + m.noseH, bodyBot = bodyTop + m.bodyH;
+
+      // 꼬리 날개 3개 (뒤 → 앞 순서로 겹치게)
+      function fin(dir) {
+        g.beginPath();
+        g.moveTo(dir * W * .34, bodyBot - m.finH * .55);
+        g.quadraticCurveTo(dir * W * .74, bodyBot - m.finH * .1, dir * W * .60, bodyBot + m.finH * .42);
+        g.quadraticCurveTo(dir * W * .46, bodyBot + m.finH * .2, dir * W * .30, bodyBot + m.finH * .16);
+        g.closePath();
+        g.fillStyle = dir < 0 ? "#a4522f" : "#bd6438"; g.fill();
+        g.strokeStyle = "#8a4326"; g.lineWidth = 3; g.stroke();
+      }
+      fin(-1); fin(1);
+      g.beginPath();                                   // 가운데 뒷날개
+      g.moveTo(-W * .12, bodyBot - 6); g.lineTo(W * .12, bodyBot - 6);
+      g.lineTo(W * .09, bodyBot + m.finH * .5); g.lineTo(-W * .09, bodyBot + m.finH * .5);
+      g.closePath(); g.fillStyle = "#96492b"; g.fill();
+      g.strokeStyle = "#7d3c22"; g.lineWidth = 3; g.stroke();
+
+      // 동체
       g.beginPath();
-      g.moveTo(W * .5, 0);
-      g.quadraticCurveTo(W * .34, -H * .5, -W * .2, -H * .5);
-      g.lineTo(-W * .46, -H * .34);
-      g.quadraticCurveTo(-W * .58, 0, -W * .46, H * .34);
-      g.lineTo(-W * .2, H * .5);
-      g.quadraticCurveTo(W * .34, H * .5, W * .5, 0);
+      g.moveTo(-W * .5, bodyTop + 10);
+      g.quadraticCurveTo(-W * .5, bodyBot, -W * .34, bodyBot);
+      g.lineTo(W * .34, bodyBot);
+      g.quadraticCurveTo(W * .5, bodyBot, W * .5, bodyTop + 10);
       g.closePath();
-      var sg = g.createLinearGradient(0, -H * .5, 0, H * .5);
-      sg.addColorStop(0, "#e8eefc"); sg.addColorStop(.5, "#b9c6e4"); sg.addColorStop(1, "#7d8bb0");
-      g.fillStyle = sg; g.fill();
-      g.strokeStyle = "#5d6888"; g.lineWidth = 4; g.stroke();
-      // 엔진 불꽃
-      var fl = (0.7 + Math.random() * .5) * W * .35;
-      var fg2 = g.createLinearGradient(-W * .48, 0, -W * .48 - fl, 0);
-      fg2.addColorStop(0, "rgba(255,214,120,.95)"); fg2.addColorStop(1, "rgba(255,80,40,0)");
-      g.fillStyle = fg2;
-      g.beginPath(); g.moveTo(-W * .46, -H * .12);
-      g.lineTo(-W * .46 - fl, 0); g.lineTo(-W * .46, H * .12); g.closePath(); g.fill();
-      // 창문 — 참가자 수만큼 세로로
+      var bg2 = g.createLinearGradient(-W * .5, 0, W * .5, 0);
+      bg2.addColorStop(0, "#6d9793"); bg2.addColorStop(.32, "#8fb3ae");
+      bg2.addColorStop(.72, "#77a19c"); bg2.addColorStop(1, "#5d8480");
+      g.fillStyle = bg2; g.fill();
+      g.strokeStyle = "#4f736f"; g.lineWidth = 4; g.stroke();
+
+      // 노즈콘
+      g.beginPath();
+      g.moveTo(-W * .5, bodyTop + 10);
+      g.quadraticCurveTo(-W * .46, -H / 2 + m.noseH * .12, 0, -H / 2);
+      g.quadraticCurveTo(W * .46, -H / 2 + m.noseH * .12, W * .5, bodyTop + 10);
+      g.closePath();
+      var ng = g.createLinearGradient(-W * .5, 0, W * .5, 0);
+      ng.addColorStop(0, "#dfd2b6"); ng.addColorStop(.35, "#f3ecda"); ng.addColorStop(1, "#cfc0a3");
+      g.fillStyle = ng; g.fill();
+      g.strokeStyle = "#b0a086"; g.lineWidth = 4; g.stroke();
+
+      // 선체명
+      g.fillStyle = "rgba(255,255,255,.92)";
+      g.font = "600 30px 'Jua', sans-serif";
+      g.textAlign = "center"; g.textBaseline = "middle";
+      g.fillText("고브럽 1호", 0, bodyTop + m.padTop * .48);
+
+      // 창문
       ship.seats.forEach(function (seat, k) {
-        var wy = -H * .5 + H * (k + 1) / (n + 1);
-        var wr = Math.min(H / (n + 2) * .42, W * .12);
-        g.beginPath(); g.arc(0, wy, wr, 0, 6.284);
-        g.fillStyle = "#12203c"; g.fill();
-        g.strokeStyle = "#eef3ff"; g.lineWidth = 4; g.stroke();
-        if (seat.idx >= 0 && !seat.blown) {          // 탑승한 고브럽 — 신난 얼굴
-          g.save(); g.beginPath(); g.arc(0, wy, wr - 3, 0, 6.284); g.clip();
-          g.beginPath(); g.arc(0, wy + wr * .28, wr * .78, 0, 6.284);
+        var s = seatPos(k, m);
+        g.beginPath(); g.arc(s.x, s.y, s.r + 9, 0, 6.284);      // 크림색 테
+        g.fillStyle = "#f0e8d6"; g.fill();
+        g.strokeStyle = "#cbbda2"; g.lineWidth = 3; g.stroke();
+        g.beginPath(); g.arc(s.x, s.y, s.r, 0, 6.284);
+        g.fillStyle = seat.blown ? "#180c10" : "#8b9aa8"; g.fill();
+        if (seat.blown) {
+          g.strokeStyle = "#ff8a5c"; g.lineWidth = 4; g.stroke();
+        } else if (seat.idx >= 0) {                              // 탑승 — 신난 얼굴
+          g.save(); g.beginPath(); g.arc(s.x, s.y, s.r - 2, 0, 6.284); g.clip();
+          var bo = Math.sin(t / 150 + k) * s.r * .09;
+          g.beginPath(); g.arc(s.x, s.y + s.r * .34 + bo, s.r * .82, 0, 6.284);
           g.fillStyle = SKIN[seat.idx % SKIN.length]; g.fill();
-          var bounce = Math.sin(t / 150 + k) * wr * .07;
-          g.fillStyle = "#1b2440";                    // 웃는 눈 ^ ^
-          g.lineWidth = wr * .13; g.strokeStyle = "#1b2440"; g.lineCap = "round";
-          g.beginPath();
-          g.moveTo(-wr * .3, wy + bounce); g.lineTo(-wr * .16, wy - wr * .12 + bounce);
-          g.lineTo(-wr * .02, wy + bounce);
-          g.moveTo(wr * .06, wy + bounce); g.lineTo(wr * .2, wy - wr * .12 + bounce);
-          g.lineTo(wr * .34, wy + bounce);
+          g.strokeStyle = "#1b2440"; g.lineWidth = s.r * .13; g.lineCap = "round";
+          g.beginPath();                                          // ^ ^ 웃는 눈
+          g.moveTo(s.x - s.r * .40, s.y + bo); g.lineTo(s.x - s.r * .24, s.y - s.r * .16 + bo);
+          g.lineTo(s.x - s.r * .08, s.y + bo);
+          g.moveTo(s.x + s.r * .08, s.y + bo); g.lineTo(s.x + s.r * .24, s.y - s.r * .16 + bo);
+          g.lineTo(s.x + s.r * .40, s.y + bo);
           g.stroke();
           g.restore();
         }
-        if (seat.blown) {                             // 터진 창 — 그을음
-          g.beginPath(); g.arc(0, wy, wr - 2, 0, 6.284);
-          g.fillStyle = "#1a0d12"; g.fill();
-          g.strokeStyle = "#ff8a5c"; g.lineWidth = 3; g.stroke();
-        }
-        g.globalAlpha = .35;
-        g.beginPath(); g.arc(-wr * .3, wy - wr * .34, wr * .3, 0, 6.284);
+        g.globalAlpha = .3;                                       // 유리 반사
+        g.beginPath(); g.arc(s.x - s.r * .34, s.y - s.r * .38, s.r * .3, 0, 6.284);
         g.fillStyle = "#ffffff"; g.fill(); g.globalAlpha = 1;
       });
+
+      // 튕겨 나온 고브럽 — 창문에서 오른쪽으로 날아간다
+      if (ship.eject) {
+        var e = ship.eject, s2 = seatPos(e.k, m);
+        g.save();
+        g.translate(s2.x + e.dx, s2.y + e.dy);
+        g.rotate(e.rot);
+        var ES = 120;
+        var eimg = sprites[SKIN[e.idx % SKIN.length]];
+        if (eimg && eimg.complete && eimg.naturalWidth)
+          g.drawImage(eimg, -ES / 2, -ES * .58, ES, ES * (196 / 240));
+        g.restore();
+      }
       g.restore();
     }
 
@@ -705,8 +761,8 @@
       // 👾 보스는 70% 지점. 몸통 박치기 10번이면 죽고 자리에 소용돌이를 남긴다
       boss = { x: BOSS_P * TRACK, hp: BOSS_HP, flash: 0, dead: false, deadT: 0 };
       vortex = null;
-      // 🚀 결승선 우주선 — 창문이 참가자 수만큼. 인원이 늘면 위아래로 길어진다
-      ship = { x: TRACK + 520, w: 470, h: 190 + n * 78, seats: [] };
+      // 🚀 결승선 로켓 — 한 줄에 창문 2개, 인원이 늘면 줄이 아래로 붙는다
+      ship = { x: TRACK + 560, m: shipMetrics(n), seats: [], eject: null };
       for (var sI = 0; sI < n; sI++) ship.seats.push({ idx: -1, blown: false });
       // ⭐ 부스트 별 · 🕳 블랙홀 — 보스 앞 구간에만 (뒤 구간은 짧아서 못 씀)
       orbs = [];
@@ -944,21 +1000,29 @@
       (function boarding(now) {
         var k = Math.min(1, (now - bt0) / 1600);
         // 우주선 전체가 화면에 담기게 배율을 맞춘다
-        var wantZ = Math.min(1.1, VW * .62 / ship.w);
+        var wantZ = Math.min(1.0, VH * .86 / ship.m.H);
         cam.z += (wantZ - cam.z) * .06;
         cam.x += (ship.x - cam.x) * .06;
         bits.forEach(function (b) { b.x += b.vx; b.y += b.vy; b.vy += .35; b.life -= .022; });
         bits = bits.filter(function (b) { return b.life > 0; });
+        if (ship.eject) {                       // 오른쪽으로 튕겨 날아간다
+          var e = ship.eject;
+          e.dx += e.vx; e.dy += e.vy; e.vy += .5; e.rot += .16;
+        }
         draw(now, n, cam.x, cam.z, 0);
         if (k >= 1 && !blown) {
           blown = true; bt0 = now;             // 폭발 시점부터 다시 잰다
           var seat = ship.seats[loseRank - 1];
           seat.blown = true; loser.sad = true; loser.boarded = false;
+          // 걸린 칸에서 오른쪽으로 튕겨 나온다
+          ship.eject = { k: loseRank - 1, idx: runners.indexOf(loser),
+                         dx: 0, dy: 0, vx: 9 + Math.random() * 4, vy: -7, rot: 0 };
           var wrap2 = $("track-wrap");
           wrap2.classList.add("shake");
           setTimeout(function () { wrap2.classList.remove("shake"); }, 320);
-          for (var b2 = 0; b2 < 46; b2++) bits.push({ x: ship.x, y: VH * .5,
-            vx: -(2 + Math.random() * 14), vy: (Math.random() - .5) * 16, life: 1,
+          var sp2 = seatPos(loseRank - 1, ship.m);
+          for (var b2 = 0; b2 < 46; b2++) bits.push({ x: ship.x + sp2.x, y: VH * .5 + sp2.y,
+            vx: 1 + Math.random() * 15, vy: (Math.random() - .5) * 16, life: 1,
             c: b2 % 3 === 0 ? "#ffd479" : b2 % 3 === 1 ? "#ff8a5c" : "#e8eefc" });
           $("hud-left").textContent = "💥 " + loser.name + " 좌석 폭발!";
         }
