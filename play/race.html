@@ -70,6 +70,8 @@
     .hud { display:flex; justify-content:space-between; align-items:center; gap:10px;
       max-width:620px; margin:0 auto; padding:0 4px; color:var(--ink-soft); font-size:.9rem; }
     .hud .big { color:var(--ink); font-size:1.02rem; }
+    .hud .mutebtn { border:1.5px solid var(--line); background:transparent; border-radius:999px;
+      padding:2px 10px; cursor:pointer; font-size:1rem; color:inherit; line-height:1.4; }
 
     .rank { max-width:620px; margin:12px auto 0; display:none; }
     .rank .r { display:flex; align-items:center; gap:10px; padding:8px 12px; margin-bottom:6px;
@@ -110,6 +112,7 @@
       <div class="hud" id="hud" style="display:none">
         <span id="hud-left">🏁 출발 준비</span>
         <span class="big" id="hud-right"></span>
+        <button class="mutebtn" id="btn-mute" type="button" aria-label="소리 켜기/끄기">🔊</button>
       </div>
       <div class="track-wrap" id="track-wrap">
         <canvas id="cv" width="1240" height="800"></canvas>
@@ -216,6 +219,49 @@
       return img;
     }
     SKIN.forEach(bake);
+
+    /* ── 효과음 — 파일 없이 Web Audio 로 합성. 🔊 버튼으로 끌 수 있다 ── */
+    var AC = null, master = null, muted = false;
+    function audioInit() {
+      if (AC) return;
+      try {
+        AC = new (window.AudioContext || window.webkitAudioContext)();
+        master = AC.createGain(); master.gain.value = .5; master.connect(AC.destination);
+      } catch (e) { AC = null; }
+    }
+    function tone(freq, type, dur, vol, slideTo) {
+      if (!AC || muted) return;
+      var o = AC.createOscillator(), gn = AC.createGain();
+      o.type = type; o.frequency.setValueAtTime(freq, AC.currentTime);
+      if (slideTo) o.frequency.exponentialRampToValueAtTime(slideTo, AC.currentTime + dur);
+      gn.gain.setValueAtTime(vol, AC.currentTime);
+      gn.gain.exponentialRampToValueAtTime(.001, AC.currentTime + dur);
+      o.connect(gn); gn.connect(master);
+      o.start(); o.stop(AC.currentTime + dur);
+    }
+    function hiss(dur, vol, cut) {
+      if (!AC || muted) return;
+      var len = Math.max(1, Math.floor(AC.sampleRate * dur));
+      var buf = AC.createBuffer(1, len, AC.sampleRate), d = buf.getChannelData(0);
+      for (var i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+      var src = AC.createBufferSource(); src.buffer = buf;
+      var f = AC.createBiquadFilter(); f.type = "lowpass"; f.frequency.value = cut || 1000;
+      var gn = AC.createGain();
+      gn.gain.setValueAtTime(vol, AC.currentTime);
+      gn.gain.exponentialRampToValueAtTime(.001, AC.currentTime + dur);
+      src.connect(f); f.connect(gn); gn.connect(master); src.start();
+    }
+    var sfx = {
+      thump: function () { tone(62, "sine", .16, .5); setTimeout(function () { tone(48, "sine", .2, .38); }, 140); },
+      hit: function () { hiss(.12, .5, 700); tone(95, "triangle", .16, .32, 55); },
+      crackle: function () { hiss(.05, .3, 2600); },
+      whoosh: function () { tone(560, "sine", .55, .3, 85); },
+      pop: function () { tone(300, "triangle", .12, .32, 540); },
+      boom: function () { hiss(.7, .85, 320); tone(72, "sine", .6, .55, 34); }
+    };
+    $("btn-mute").onclick = function () {
+      muted = !muted; this.textContent = muted ? "🔇" : "🔊";
+    };
 
     /* ── 월드 / 카메라 ───────────────────────────── */
     var cv = $("cv"), g = cv.getContext("2d");
@@ -470,6 +516,24 @@
         g.beginPath(); g.arc(sp2.x - sp2.r * .34, sp2.y - sp2.r * .4, sp2.r * .27, 0, 6.284);
         g.fillStyle = "#ffffff"; g.fill(); g.globalAlpha = 1;
       });
+
+      // 도화선 — 불꽃이 창문을 하나씩 훑고 지나가다 걸린 좌석에서 멈춘다
+      if (ship.fuse) {
+        var f = ship.fuse, fs = seatPos(f.k, m);
+        var prev = f.k > 0 ? seatPos(f.k - 1, m) : { x: -m.W * .19, y: -H / 2 + m.noseH * .5 };
+        var fx2 = prev.x + (fs.x - prev.x) * f.seg;
+        var fy2 = prev.y + (fs.y - prev.y) * f.seg;
+        // 지나온 자국
+        g.strokeStyle = "rgba(255,150,60,.5)"; g.lineWidth = 5; g.lineCap = "round";
+        g.beginPath(); g.moveTo(prev.x, prev.y); g.lineTo(fx2, fy2); g.stroke();
+        // 불꽃
+        var fr = 15 + Math.random() * 9;
+        var fgl = g.createRadialGradient(fx2, fy2, 2, fx2, fy2, fr * 2.2);
+        fgl.addColorStop(0, "rgba(255,246,200,.95)"); fgl.addColorStop(.45, "rgba(255,170,60,.7)");
+        fgl.addColorStop(1, "rgba(255,90,30,0)");
+        g.fillStyle = fgl; g.beginPath(); g.arc(fx2, fy2, fr * 2.2, 0, 6.284); g.fill();
+        g.fillStyle = "#fff8dc"; g.beginPath(); g.arc(fx2, fy2, fr * .5, 0, 6.284); g.fill();
+      }
 
       // 튕겨 나온 고브럽 — 창문에서 오른쪽으로 날아간다
       if (ship.eject) {
@@ -809,8 +873,11 @@
       var wrap = $("track-wrap");
       wrap.classList.remove("final");
       document.body.classList.add("theater");   // 레이스 동안 전체 화면
+      audioInit();
+      if (AC && AC.resume) AC.resume();
 
       var n = names.length;
+      var loseRankSel = Math.min(+$("pick-rank").value || n, n);
       // 공정성: 물리는 순위를 모른 채 정직하게 굴리고, 이름만 레인에 무작위로 꽂는다.
       // 레인마다 유불리가 있어도 각 이름이 그 레인에 갈 확률이 1/n 이라 결과는 균등하다.
       var lane = names.slice();
@@ -831,7 +898,7 @@
       boss = { x: BOSS_P * TRACK, hp: BOSS_HP, flash: 0, cd: 0, dead: false, deadT: 0 };
       vortex = null;
       // 🚀 결승선 로켓 — 한 줄에 창문 2개, 인원이 늘면 줄이 아래로 붙는다
-      ship = { x: TRACK + 560, m: shipMetrics(n), seats: [], eject: null };
+      ship = { x: TRACK + 560, m: shipMetrics(n), seats: [], eject: null, fuse: null };
       for (var sI = 0; sI < n; sI++) ship.seats.push({ idx: -1, blown: false });
       // ⭐ 부스트 별 · 🕳 블랙홀 — 보스 앞 구간에만 (뒤 구간은 짧아서 못 씀)
       orbs = [];
@@ -854,20 +921,23 @@
         $("hud-left").textContent = ci < 3 ? "🏁 출발 준비" : "🏁 출발!";
         ci++;
         if (ci < steps.length) return setTimeout(cd, 800);
-        setTimeout(function () { cbox.classList.remove("on"); run(n); }, 700);
+        setTimeout(function () { cbox.classList.remove("on"); run(n, loseRankSel); }, 700);
       })();
     }
 
-    function run(n) {
+    function run(n, loseRank) {
       var wrap = $("track-wrap");
       var t0 = performance.now(), last = t0, done = 0, finalOn = false, prevLead = -1;
       var arrived = [];                     // 도착 순서대로 쌓인다 — 이게 곧 최종 순위
       var flash = "", flashT = 0;           // 부스트·블랙홀 알림이 잠깐 머물게
       var camPrev = 0;
+      var simEl = 0, timeScale = 1, slowNote = false, nextBeat = 700, slowUsed = 0;
 
       function tick(now) {
-        var dt = Math.min(48, now - last); last = now;
-        var el = now - t0;
+        var rawDt = Math.min(48, now - last); last = now;
+        var dt = rawDt * timeScale;              // 슬로모션은 시뮬레이션 시간만 늦춘다
+        simEl += dt;
+        var el = simEl, realEl = now - t0;
 
         var leadPre = 0;
         runners.forEach(function (r) { if (r.p > leadPre) leadPre = r.p; });
@@ -953,6 +1023,7 @@
             if (boss.cd <= 0) {
               boss.cd = 340;
               boss.hp--; boss.flash = 7;
+              sfx.hit();
               wrap.classList.add("shake");
               setTimeout(function () { wrap.classList.remove("shake"); }, 280);
               flash = "💥 " + rn.name + " 박치기! 남은 체력 " + Math.max(0, boss.hp); flashT = 900;
@@ -967,7 +1038,7 @@
           }
           rn.prevX = wx;                       // 다음 프레임의 통과 판정 기준
           if (rn.p >= 1) {
-            rn.p = 1; rn.done = true; done++; rn.rank = done; arrived.push(i);
+            rn.p = 1; rn.done = true; done++; rn.rank = done; rn.finT = el; arrived.push(i);
             ship.seats[rn.rank - 1].idx = i;   // 도착 순서대로 창문에 앉는다
             rn.boarded = true;
             flash = "🚀 " + rn.name + " 탑승 (" + rn.rank + "등)"; flashT = 1000;
@@ -979,6 +1050,7 @@
           boss.deadT += dt;
           if (!vortex && boss.deadT > 620) {
             vortex = { x: BOSS_P * TRACK, t: 0, swallowed: false, releaseAt: 0, queue: [] };
+            sfx.whoosh();
             flash = "🌀 소용돌이가 열렸다!"; flashT = 1500;
           }
         }
@@ -1010,6 +1082,7 @@
               var ro = runners[out];
               ro.sucked = false; ro.suckT = 0; ro.p = BOSS_P + .004;
               flash = "🌀 " + ro.name + " 탈출!"; flashT = 900;
+              sfx.pop();
               for (var e2 = 0; e2 < 18; e2++) bits.push({ x: BOSS_P * TRACK, y: laneY(out, n),
                 vx: 2 + Math.random() * 10, vy: (Math.random() - .5) * 10, life: 1,
                 c: e2 % 2 ? "#cdb0ff" : "#ffffff" });
@@ -1018,6 +1091,30 @@
           }
         }
 
+        // ── 포토피니시 슬로모션: 걸릴 등수의 경계 다툼이 결승 직전 박빙이면 시간이 늘어진다
+        var slow = false, fA = null, fB = null;
+        if (done < loseRank && leadPre > .955 && slowUsed < 2200) {
+          var ord2 = runners.map(function (r, i2) { return { i: i2, done: r.done, rank: r.rank, p: r.p }; })
+            .sort(function (a, b) {
+              var ka = a.done ? a.rank : 1000 + (1 - a.p);
+              var kb = b.done ? b.rank : 1000 + (1 - b.p);
+              return ka - kb;
+            });
+          var occ = ord2[loseRank - 1];
+          var cand = [];
+          if (loseRank - 2 >= 0) cand.push(ord2[loseRank - 2]);
+          if (loseRank < ord2.length) cand.push(ord2[loseRank]);
+          cand = cand.filter(function (c) { return c && !c.done; });
+          if (occ && !occ.done && cand.length) {
+            cand.sort(function (a, b) { return Math.abs(a.p - occ.p) - Math.abs(b.p - occ.p); });
+            if (Math.abs(occ.p - cand[0].p) < .022) { slow = true; fA = occ; fB = cand[0]; }
+          }
+        }
+        if (slow) slowUsed += rawDt;                 // 총 2.2초까지만 — 매판 늘어지면 특별함이 사라진다
+        timeScale += ((slow ? .35 : 1) - timeScale) * Math.min(1, rawDt / 140);
+        if (slow && !slowNote) { slowNote = true; flash = "📸 포토피니시 각!"; flashT = 1400; }
+        if (!slow) slowNote = false;
+
         // 카메라 — 1위를 기준으로 잡고, 꼴찌까지 담기도록 벌어질수록 축소한다
         var xs = runners.map(function (r) { return r.p * TRACK; });
         var leadX = Math.max.apply(null, xs), tailX = Math.min.apply(null, xs);
@@ -1025,15 +1122,20 @@
         // 1위와 꼴찌 사이가 화면 가로의 64% 안에 들어오게 배율을 정한다
         var wantZ = Math.max(.32, Math.min(1.45, VW * .64 / spread));
         // 보스전엔 간격 기반 배율을 쓰지 않는다 — 튕길 때마다 간격이 널뛰어 줌이 출렁인다
-        if (!bossFight) cam.z += (wantZ - cam.z) * Math.min(1, dt / 300);
+        if (!bossFight) cam.z += (wantZ - cam.z) * Math.min(1, rawDt / 300);
         // 1위를 가로 72% 지점에 둔다 — 앞은 결승선, 뒤는 추격자들이 보이게
         var wantX = leadX - VW * .22 / cam.z;
         // 보스전엔 카메라를 보스 기준으로 고정 — 튕겨다니는 1위를 쫓으면 화면이 출렁인다
         if (bossFight) {
-          wantZ = .82; cam.z += (wantZ - cam.z) * Math.min(1, dt / 300);
+          wantZ = .82; cam.z += (wantZ - cam.z) * Math.min(1, rawDt / 300);
           wantX = BOSS_P * TRACK - VW * .16;
         }
-        cam.x += (wantX - cam.x) * Math.min(1, dt / 170);
+        // 슬로모션 중엔 경계 다툼 두 명을 정면으로 크게
+        if (slow && fA && fB) {
+          cam.z += (1.35 - cam.z) * Math.min(1, rawDt / 220);
+          wantX = ((fA.p + fB.p) / 2) * TRACK;
+        }
+        cam.x += (wantX - cam.x) * Math.min(1, rawDt / 170);
 
         // 체감 속도 = 카메라가 실제로 지나간 월드 거리 (급변하지 않게 평활화)
         var inst = dt > 0 ? Math.abs(cam.x - camPrev) / (dt / 1000) : 0;
@@ -1045,6 +1147,11 @@
         var liveOrd = runners.map(function (r, i) { return { i: i, p: r.p }; })
           .sort(function (a, b) { return b.p - a.p; });
         if (liveOrd[0].i !== prevLead) { prevLead = liveOrd[0].i; }
+        // 심장박동 — 결승이 가까울수록 빨라진다 (실제 시간 기준)
+        if (realEl >= nextBeat && done < n && leadPre > .5) {
+          sfx.thump();
+          nextBeat = realEl + (980 - 620 * Math.min(1, leadPre));
+        }
         if (flashT > 0) flashT -= dt;
         $("hud-left").textContent = flashT > 0 ? flash : "🥇 " + runners[liveOrd[0].i].name;
         $("hud-right").textContent = done + " / " + n + " 도착";
@@ -1096,8 +1203,29 @@
           e.dx += e.vx; e.dy += e.vy; e.vy += .5; e.rot += .16;
         }
         draw(now, n, cam.x, cam.z, 0);
-        if (k >= 1 && !blown) {
-          blown = true; bt0 = now;             // 폭발 시점부터 다시 잰다
+        // 2초가 지나면 도화선에 불이 붙어 창문을 하나씩 훑는다
+        if (k >= 1 && !ship.fuse && !blown) {
+          ship.fuse = { k: 0, seg: 0, holdAt: 0 };
+          $("hud-left").textContent = "🔥 도화선에 불이 붙었다…";
+        }
+        var ready = false;
+        if (ship.fuse && !blown) {
+          var f2 = ship.fuse;
+          if (f2.k < loseRank - 1) {                     // 걸린 좌석까지 훑고 간다
+            // 좌석이 몇 개든 훑는 데 약 1.6초(96프레임)가 걸리게 정규화
+            f2.seg += (loseRank - 1) / 96;
+            if (Math.random() < .4) sfx.crackle();
+            if (f2.seg >= 1) { f2.seg = 0; f2.k++; }
+          } else if (f2.seg < 1) {
+            f2.seg = Math.min(1, f2.seg + .05);
+            if (Math.random() < .4) sfx.crackle();
+          } else {                                        // 걸린 좌석 앞에서 1초 정적
+            if (!f2.holdAt) { f2.holdAt = now; $("hud-left").textContent = "…"; }
+            if (now - f2.holdAt >= 1000) ready = true;
+          }
+        }
+        if (ready && !blown) {
+          blown = true; bt0 = now; ship.fuse = null; sfx.boom();
           var seat = ship.seats[loseRank - 1];
           seat.blown = true; loser.sad = true; loser.boarded = false;
           // 걸린 칸에서 오른쪽으로 튕겨 나온다
