@@ -191,12 +191,15 @@
     /* ── 월드 / 카메라 ───────────────────────────── */
     var cv = $("cv"), g = cv.getContext("2d");
     var VW = cv.width, VH = cv.height;
-    var TRACK = 7600;                      // 월드 트랙 길이
+    var TRACK = 12000;                     // 월드 트랙 길이 — 길수록 배경이 빨리 흐른다
     var GROUND = VH - 150;
-    var cam = { x: 0, z: 1 };              // z = 배율(팩이 붙으면 확대)
-    var runners = [], rocks = [], bits = [], orbs = [], farStars = [], midStars = [];
-    for (var i = 0; i < 130; i++) farStars.push({ x: Math.random() * TRACK * 1.3, y: Math.random() * VH, r: Math.random() * 1.8 + .5 });
-    for (var i2 = 0; i2 < 26; i2++) midStars.push({ x: Math.random() * TRACK * 1.3, y: Math.random() * (VH * .7), r: Math.random() * 26 + 10, h: Math.random() });
+    var cam = { x: 0, z: 1, v: 0 };        // z = 배율, v = 실제 이동 속도(월드 px/s)
+    var runners = [], rocks = [], bits = [], orbs = [], farStars = [], midStars = [], fgDust = [];
+    var SPAN = TRACK * 1.3;
+    for (var i = 0; i < 190; i++) farStars.push({ x: Math.random() * SPAN, y: Math.random() * VH, r: Math.random() * 1.8 + .5 });
+    for (var i2 = 0; i2 < 30; i2++) midStars.push({ x: Math.random() * SPAN, y: Math.random() * (VH * .7), r: Math.random() * 26 + 10, h: Math.random() });
+    // 전경 먼지 — 카메라보다 빨리 흘러 화면 앞을 스쳐 지나간다. 속도감의 8할
+    for (var i3 = 0; i3 < 34; i3++) fgDust.push({ x: Math.random() * SPAN, y: Math.random() * VH, r: Math.random() * 3.4 + 1.6 });
 
     function laneY(i, n) { var top = 210, bot = GROUND - 20; return n === 1 ? (top + bot) / 2 : top + (bot - top) * i / (n - 1); }
 
@@ -209,32 +212,43 @@
       var neb = g.createRadialGradient(VW * .7, VH * .3, 30, VW * .7, VH * .3, VW * .8);
       neb.addColorStop(0, "rgba(120,90,220,.24)"); neb.addColorStop(1, "rgba(120,90,220,0)");
       g.fillStyle = neb; g.fillRect(0, 0, VW, VH);
-      // 먼 별 0.12x
+      // sp = 0~1 로 정규화한 체감 속도. 모든 레이어가 이걸 따라 늘어난다
+      var sp = Math.min(1, speed / 900);
+      // 먼 별 0.18x — 빠를수록 점이 선으로 늘어난다
+      var tail = 3 + sp * 26;
       farStars.forEach(function (s) {
-        var x = ((s.x - camX * .12) % (TRACK * 1.3) + TRACK * 1.3) % (TRACK * 1.3);
-        if (x > VW + 10) return;
+        var x = ((s.x - camX * .18) % SPAN + SPAN) % SPAN;
+        if (x > VW + tail) return;
         g.globalAlpha = .75; g.fillStyle = "#dbe7ff";
-        g.fillRect(x, s.y, s.r, s.r);
+        g.fillRect(x, s.y, s.r + tail * .5, s.r);
       });
-      // 중간 행성 0.35x
+      // 중간 행성 0.45x
       midStars.forEach(function (s) {
-        var x = ((s.x - camX * .35) % (TRACK * 1.3) + TRACK * 1.3) % (TRACK * 1.3);
+        var x = ((s.x - camX * .45) % SPAN + SPAN) % SPAN;
         if (x > VW + 80 || x < -80) return;
         g.globalAlpha = .5;
         g.beginPath(); g.arc(x, s.y, s.r, 0, 6.284);
         g.fillStyle = s.h > .5 ? "#4b5aa8" : "#7a4f9c"; g.fill();
       });
       g.globalAlpha = 1;
-      // 스피드 라인 — 속도에 비례해 진해진다
-      var sl = Math.min(1, speed / 260);
-      for (var k = 0; k < 26; k++) {
+      // 스피드 라인 1.7x
+      for (var k = 0; k < 34; k++) {
         var ly = (k * 977) % VH;
-        var lx = ((k * 421) - camX * 1.6) % (VW + 400);
-        if (lx < -400) lx += VW + 400;
-        g.globalAlpha = .10 + sl * .3;
+        var lx = ((k * 421) - camX * 1.7) % (VW + 500);
+        if (lx < -500) lx += VW + 500;
+        g.globalAlpha = .08 + sp * .34;
         g.fillStyle = "#bcd4ff";
-        g.fillRect(lx, ly, 70 + sl * 190, 2);
+        g.fillRect(lx, ly, 60 + sp * 320, 2);
       }
+      // 전경 먼지 2.4x — 화면 앞을 스쳐 지나간다
+      fgDust.forEach(function (d) {
+        var x = ((d.x - camX * 2.4) % SPAN + SPAN) % SPAN;
+        if (x > VW + 90) return;
+        g.globalAlpha = .16 + sp * .5;
+        g.fillStyle = "#e6efff";
+        g.fillRect(x, d.y, d.r + sp * 74, d.r);
+      });
+      g.globalAlpha = 1;
       g.globalAlpha = 1;
     }
 
@@ -493,7 +507,7 @@
       }
 
       runners = lane.map(function (nm) {
-        return { name: nm, p: 0, rank: 0, done: false, spin: 0,
+        return { name: nm, p: 0, prevX: 0, rank: 0, done: false, spin: 0,
                  slowT: 0, dashT: 0, holeT: 0,        // 운석 감속 / 별 질주 / 블랙홀 정지
                  innate: .99 + Math.random() * .02,   // 타고난 속도차(아주 작게)
                  phase: Math.random() * 6.28, freq: .0009 + Math.random() * .0020 };
@@ -529,6 +543,7 @@
       var t0 = performance.now(), last = t0, done = 0, finalOn = false, prevLead = -1;
       var arrived = [];                     // 도착 순서대로 쌓인다 — 이게 곧 최종 순위
       var flash = "", flashT = 0;           // 부스트·블랙홀 알림이 잠깐 머물게
+      var camPrev = 0;
 
       function tick(now) {
         var dt = Math.min(48, now - last); last = now;
@@ -563,10 +578,11 @@
               setTimeout(function () { wrap.classList.remove("shake"); }, 280);
             }
           });
-          // ⭐ 별 / 🕳 블랙홀 — 같은 레인을 지나가면 걸린다
+          // ⭐ 별 / 🕳 블랙홀 — 같은 레인에서 '지나쳤는지'로 판정한다.
+          // 고정 반경으로 보면 3배속 질주 중엔 한 프레임에 건너뛰어 그냥 통과해 버린다.
           orbs.forEach(function (o) {
             if (o.got || o.lane !== i) return;
-            if (Math.abs(o.x - wx) > 52) return;
+            if (!(rn.prevX <= o.x && wx >= o.x)) return;
             o.got = true;
             if (o.hole) {
               rn.holeT = 2000;                     // 2초 갇혔다가 빠져나온다
@@ -595,6 +611,7 @@
           var wob = 1 + Math.sin(el * rn.freq + rn.phase) * .60;
           var rubber = 1 + CATCHUP * Math.max(0, leadP - rn.p);   // 뒤처질수록 빨라짐
           rn.p = Math.min(1, rn.p + BASE_V * rn.innate * wob * mul * rubber * dt);
+          rn.prevX = wx;                       // 다음 프레임의 통과 판정 기준
           if (rn.p >= 1) { rn.p = 1; rn.done = true; done++; rn.rank = done; arrived.push(i); }
         });
 
@@ -609,7 +626,11 @@
         var wantX = leadX - VW * .22 / cam.z;
         cam.x += (wantX - cam.x) * Math.min(1, dt / 170);
 
-        var speed = (dt > 0) ? cam.z * 320 : 0;
+        // 체감 속도 = 카메라가 실제로 지나간 월드 거리 (급변하지 않게 평활화)
+        var inst = dt > 0 ? Math.abs(cam.x - camPrev) / (dt / 1000) : 0;
+        camPrev = cam.x;
+        cam.v += (inst - cam.v) * .12;
+        var speed = cam.v;
         if (!finalOn && done === n - 1) { finalOn = true; wrap.classList.add("final"); }
 
         var liveOrd = runners.map(function (r, i) { return { i: i, p: r.p }; })
