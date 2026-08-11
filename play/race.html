@@ -448,9 +448,12 @@
       var ord = runners.map(function (r, i) {
         return { i: i, key: r.done ? r.rank : runners.length + (1 - r.p) };
       }).sort(function (a, b) { return a.key - b.key; });
+      // 한 칸 높이를 실측한다 — 고정값을 쓰면 글꼴·배율에 따라 사이가 벌어진다
+      var first = box.children[0];
+      var step = first ? first.offsetHeight + 4 : 26;   // +4 = .live 의 gap
       ord.forEach(function (o, place) {
         var el = box.children[o.i];
-        el.style.transform = "translateY(" + (place - o.i) * 26 + "px)";
+        el.style.transform = "translateY(" + (place - o.i) * step + "px)";
         el.querySelector(".pos").textContent = place + 1;
         el.classList.toggle("lead", place === 0);
       });
