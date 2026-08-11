@@ -254,7 +254,9 @@
     function drawRunner(rn, i, n, sx, scale, t) {
       var y = laneY(i, n);
       var sy = (y - VH / 2) * scale + VH / 2;
-      var size = 142 * scale;
+      // 크게 축소돼도 캐릭터·이름은 알아볼 수 있는 크기를 지킨다
+      var size = Math.max(74, 142 * scale);
+      var tscale = Math.max(.62, scale);
       var bob = Math.sin(t / 78 + i * 1.7) * 7 * scale;
       g.save();
       g.translate(sx, sy + bob);
@@ -311,14 +313,14 @@
       g.globalAlpha = 1;
 
       // 이름표
-      g.font = "600 " + Math.round(24 * scale) + "px 'Jua', sans-serif";
+      g.font = "600 " + Math.round(24 * tscale) + "px 'Jua', sans-serif";
       g.textAlign = "center"; g.textBaseline = "middle";
       var label = rn.name.length > 5 ? rn.name.slice(0, 5) + "…" : rn.name;
       var tw = g.measureText(label).width;
       g.fillStyle = "rgba(6,12,26,.72)";
-      g.fillRect(sx - tw / 2 - 9 * scale, sy - size * .74 - 15 * scale, tw + 18 * scale, 27 * scale);
+      g.fillRect(sx - tw / 2 - 9 * tscale, sy - size * .74 - 15 * tscale, tw + 18 * tscale, 27 * tscale);
       g.fillStyle = SKIN[i % SKIN.length];
-      g.fillText(label, sx, sy - size * .74 - 2 * scale);
+      g.fillText(label, sx, sy - size * .74 - 2 * tscale);
     }
 
     function draw(t, n, camX, scale, speed) {
@@ -596,17 +598,18 @@
           if (rn.p >= 1) { rn.p = 1; rn.done = true; done++; rn.rank = done; arrived.push(i); }
         });
 
-        // 카메라 — 팩을 화면에 담되, 붙을수록 확대(막판 접전이 저절로 클로즈업)
+        // 카메라 — 1위를 기준으로 잡고, 꼴찌까지 담기도록 벌어질수록 축소한다
         var xs = runners.map(function (r) { return r.p * TRACK; });
-        var lo = Math.min.apply(null, xs), hi = Math.max.apply(null, xs);
-        if (hi > TRACK - VW * .5) hi = Math.max(hi, TRACK);       // 결승선도 담는다
-        var span = Math.max(520, hi - lo + 420);
-        var wantZ = Math.max(.62, Math.min(1.5, VW / span));
-        cam.z += (wantZ - cam.z) * Math.min(1, dt / 260);
-        var wantX = (lo + hi) / 2;
-        cam.x += (wantX - cam.x) * Math.min(1, dt / 150);
+        var leadX = Math.max.apply(null, xs), tailX = Math.min.apply(null, xs);
+        var spread = Math.max(260, leadX - tailX);
+        // 1위와 꼴찌 사이가 화면 가로의 64% 안에 들어오게 배율을 정한다
+        var wantZ = Math.max(.32, Math.min(1.45, VW * .64 / spread));
+        cam.z += (wantZ - cam.z) * Math.min(1, dt / 300);
+        // 1위를 가로 72% 지점에 둔다 — 앞은 결승선, 뒤는 추격자들이 보이게
+        var wantX = leadX - VW * .22 / cam.z;
+        cam.x += (wantX - cam.x) * Math.min(1, dt / 170);
 
-        var speed = (dt > 0) ? (VW / span) * 240 : 0;
+        var speed = (dt > 0) ? cam.z * 320 : 0;
         if (!finalOn && done === n - 1) { finalOn = true; wrap.classList.add("final"); }
 
         var liveOrd = runners.map(function (r, i) { return { i: i, p: r.p }; })
