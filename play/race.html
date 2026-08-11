@@ -186,7 +186,7 @@
     var pick = $("pick-rank");
     function syncRanks() {
       var n = Math.max(MIN, rows().length);
-      var keep = +pick.value || n;
+      var keep = pick.value || String(n);
       pick.innerHTML = "";
       for (var r = 1; r <= n; r++) {
         var o = document.createElement("option");
@@ -194,7 +194,10 @@
         o.textContent = r === 1 ? "🥇 1등" : r === n ? "🔥 꼴찌(" + r + "등)" : r + "등";
         pick.appendChild(o);
       }
-      pick.value = Math.min(keep, n);
+      var ro = document.createElement("option");            // 맨 아래 랜덤
+      ro.value = "random"; ro.textContent = "🎲 랜덤 (몇 등일지 비밀)";
+      pick.appendChild(ro);
+      pick.value = keep === "random" ? "random" : String(Math.min(+keep || n, n));
     }
     window.__syncRanks = syncRanks;
     for (var q = 0; q < 4; q++) addRow("");
@@ -856,7 +859,7 @@
        공정성: 물리는 순위를 모른 채 정직하게 굴리고 이름만 레인에 무작위로
        꽂는다. 어떤 레인이 유리하든 각 이름이 그 레인에 갈 확률이 1/n 이라
        몇 등이 걸리든 확률은 균등하다.                                  */
-    var busy = false, raf = 0;
+    var busy = false, raf = 0, loseRankNow = 1, randomPick = false, pendingRank = "";
     var BASE_V = 1 / 12500;              // 방해가 없을 때의 기준 속도
     var CATCHUP = 4.0;                   // 뒤처질수록 빨라지는 정도(마리오카트식 추격)
 
@@ -877,7 +880,14 @@
       if (AC && AC.resume) AC.resume();
 
       var n = names.length;
-      var loseRankSel = Math.min(+$("pick-rank").value || n, n);
+      // 걸릴 등수는 출발할 때 한 번만 정한다. 랜덤이면 여기서 뽑고,
+      // 결과 화면까지 같은 값을 쓴다(다시 읽으면 재추첨돼 버린다).
+      var sel = $("pick-rank").value;
+      loseRankNow = sel === "random"
+        ? 1 + Math.floor(Math.random() * n)
+        : Math.min(+sel || n, n);
+      randomPick = sel === "random";
+      var loseRankSel = loseRankNow;
       // 공정성: 물리는 순위를 모른 채 정직하게 굴리고, 이름만 레인에 무작위로 꽂는다.
       // 레인마다 유불리가 있어도 각 이름이 그 레인에 갈 확률이 1/n 이라 결과는 균등하다.
       var lane = names.slice();
@@ -1172,12 +1182,13 @@
       wrap.classList.add("shake");
       setTimeout(function () { wrap.classList.remove("shake"); }, 320);
 
-      var loseRank = Math.min(+$("pick-rank").value || n, n);
+      var loseRank = loseRankNow;
       var pickIdx = arrived[loseRank - 1];
       var loser = runners[pickIdx];
 
-      // 순위표는 바로 띄우고, 우주선 연출이 끝난 뒤 패자를 공개한다
-      $("rank").innerHTML = arrived.map(function (idx, place) {
+      // 순위표는 도화선이 터진 뒤에 공개한다. 먼저 띄우면 걸린 사람이
+      // 표에 미리 표시돼 도화선의 긴장이 통째로 사라진다(랜덤 모드면 특히).
+      pendingRank = arrived.map(function (idx, place) {
         var r = place + 1, isPick = r === loseRank;
         var medal = r === 1 ? "🥇" : r === 2 ? "🥈" : r === 3 ? "🥉" : r + "위";
         return '<div class="r' + (isPick ? " loser" : "") + '">' +
@@ -1185,7 +1196,6 @@
           '<span class="nm">' + runners[idx].name.replace(/[<>&]/g, "") + "</span>" +
           '<span class="tag">' + (isPick ? "걸림" : "") + "</span></div>";
       }).join("");
-      $("rank").style.display = "block";
       $("hud-left").textContent = "🚀 전원 탑승 — 출발 준비";
 
       // 카메라를 우주선으로 옮기며 잠깐 다 같이 신나 하다가, 걸린 창문이 펑 터진다
@@ -1281,7 +1291,9 @@
         g.fillText("우주선은 떠났습니다…", VW / 2, VH * .91);
         g.globalAlpha = 1;
         if (k < 1) return requestAnimationFrame(zoom);
-        $("winner-tag").textContent = "🔥 " + loseRank + "등 — 걸렸습니다";
+        $("rank").innerHTML = pendingRank;
+        $("rank").style.display = "block";
+        $("winner-tag").textContent = (randomPick ? "🎲 랜덤 → " : "🔥 ") + loseRank + "등 — 걸렸습니다";
         $("winner-who").textContent = loser.name;
         $("winner").style.display = "block";
         void $("winner").offsetWidth; $("winner").classList.add("pop");
@@ -1304,6 +1316,7 @@
       document.body.classList.remove("theater");
       $("setup").style.display = ""; $("hud").style.display = "none";
       $("winner").style.display = "none"; $("rank").style.display = "none";
+      $("rank").innerHTML = ""; pendingRank = "";
       $("live").innerHTML = ""; $("count").classList.remove("on");
       $("btn-go").style.display = ""; $("btn-go").disabled = false;
       $("btn-again").style.display = "none"; $("btn-edit").style.display = "none";
