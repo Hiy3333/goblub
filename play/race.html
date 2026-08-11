@@ -261,7 +261,16 @@
       if (rn.spin) g.rotate(rn.spin);
       if (rn.done && rn.rank === n && mode === "last") g.globalAlpha = .5;
 
-      var dashing = rn.dashT > 0;
+      // 블랙홀에 갇힌 동안 — 쪼그라들며 빙글빙글, 빠져나올 때 되돌아온다
+      if (rn.holeT > 0) {
+        var hp = rn.holeT / 2000;                        // 1 → 0
+        var shrink = .42 + Math.abs(hp - .5) * 1.16;     // 가운데서 가장 작아짐
+        g.rotate((1 - hp) * 9);
+        g.scale(shrink, shrink);
+        g.globalAlpha = .55 + (1 - Math.abs(hp - .5) * 2) * -.25 + .25;
+      }
+
+      var dashing = rn.dashT > 0 && rn.holeT <= 0;
       if (dashing) {
         // 질주 잔상 — 뒤로 세 겹
         for (var a = 1; a <= 3; a++) {
@@ -280,14 +289,16 @@
         }
       }
 
-      // 제트 분사 — 뒤쪽으로 (부스트 중엔 길고 뜨겁게)
-      var fl = (0.6 + Math.random() * .55) * size * (dashing ? 1.5 : .5);
-      var fg = g.createLinearGradient(-size * .42, 0, -size * .42 - fl, 0);
-      fg.addColorStop(0, "rgba(255,214,120,.95)"); fg.addColorStop(.5, "rgba(255,130,60,.6)");
-      fg.addColorStop(1, "rgba(255,80,40,0)");
-      g.fillStyle = fg;
-      g.beginPath(); g.moveTo(-size * .4, -size * .13);
-      g.lineTo(-size * .4 - fl, 0); g.lineTo(-size * .4, size * .13); g.closePath(); g.fill();
+      // 제트 분사 — 뒤쪽으로 (부스트 중엔 길고 뜨겁게, 블랙홀 안에선 꺼진다)
+      if (!(rn.holeT > 0)) {
+        var fl = (0.6 + Math.random() * .55) * size * (dashing ? 1.5 : .5);
+        var fg = g.createLinearGradient(-size * .42, 0, -size * .42 - fl, 0);
+        fg.addColorStop(0, "rgba(255,214,120,.95)"); fg.addColorStop(.5, "rgba(255,130,60,.6)");
+        fg.addColorStop(1, "rgba(255,80,40,0)");
+        g.fillStyle = fg;
+        g.beginPath(); g.moveTo(-size * .4, -size * .13);
+        g.lineTo(-size * .4 - fl, 0); g.lineTo(-size * .4, size * .13); g.closePath(); g.fill();
+      }
 
       var img = sprites[SKIN[i % SKIN.length]];
       if (img && img.complete && img.naturalWidth) {
@@ -346,9 +357,38 @@
         g.beginPath(); g.moveTo(sx, sy - r.r * scale); g.lineTo(sx + 9, sy - (r.r + 58) * scale); g.stroke();
       });
 
+      // 🕳 블랙홀 — 먹히면 2초 정지
+      orbs.forEach(function (o) {
+        if (o.got || !o.hole) return;
+        var sx = (o.x - camX) * scale + VW / 2;
+        if (sx < -80 || sx > VW + 80) return;
+        var y = laneY(o.lane, n), sy = (y - VH / 2) * scale + VH / 2;
+        o.t += .05;
+        var R = 40 * scale;
+        g.save(); g.translate(sx, sy);
+        var ag = g.createRadialGradient(0, 0, R * .3, 0, 0, R * 1.9);
+        ag.addColorStop(0, "rgba(150,90,255,.75)"); ag.addColorStop(.55, "rgba(90,50,180,.35)");
+        ag.addColorStop(1, "rgba(60,30,140,0)");
+        g.fillStyle = ag; g.beginPath(); g.arc(0, 0, R * 1.9, 0, 6.284); g.fill();
+        g.rotate(o.t);                                  // 빨려드는 소용돌이
+        for (var a2 = 0; a2 < 3; a2++) {
+          g.beginPath();
+          for (var s2 = 0; s2 <= 30; s2++) {
+            var th = s2 / 30 * 4.2 + a2 * 2.09, rr = R * 1.55 * (1 - s2 / 30);
+            g[s2 ? "lineTo" : "moveTo"](Math.cos(th) * rr, Math.sin(th) * rr * .62);
+          }
+          g.strokeStyle = "rgba(198,166,255," + (.55 - a2 * .12) + ")";
+          g.lineWidth = 3.2 * scale; g.stroke();
+        }
+        g.beginPath(); g.ellipse(0, 0, R * .52, R * .34, 0, 0, 6.284);
+        g.fillStyle = "#05020f"; g.fill();
+        g.strokeStyle = "rgba(214,186,255,.9)"; g.lineWidth = 2.4 * scale; g.stroke();
+        g.restore();
+      });
+
       // ⭐ 부스트 별
       orbs.forEach(function (o) {
-        if (o.got) return;
+        if (o.got || o.hole) return;
         var sx = (o.x - camX) * scale + VW / 2;
         if (sx < -60 || sx > VW + 60) return;
         var y = laneY(o.lane, n), sy = (y - VH / 2) * scale + VH / 2;
@@ -421,7 +461,8 @@
        도중의 흔들림·주춤은 결승선 앞에서 (1-f²)로 잦아든다.
        → 선두는 계속 바뀌지만 도착 순서는 반드시 뽑은 대로.            */
     var busy = false, raf = 0;
-    var FIRST_AT = 19000, STEP_T = 1000;
+    var BASE_V = 1 / 17500;              // 방해가 없을 때의 기준 속도
+    var CATCHUP = 4.0;                   // 뒤처질수록 빨라지는 정도(마리오카트식 추격)
 
     function start() {
       var names = readItems();
@@ -438,26 +479,31 @@
       if (wrap.scrollIntoView) wrap.scrollIntoView({ behavior: "smooth", block: "center" });
 
       var n = names.length;
-      var order = names.map(function (_, i) { return i; });
-      for (var j = order.length - 1; j > 0; j--) {
+      // 공정성: 물리는 순위를 모른 채 정직하게 굴리고, 이름만 레인에 무작위로 꽂는다.
+      // 레인마다 유불리가 있어도 각 이름이 그 레인에 갈 확률이 1/n 이라 결과는 균등하다.
+      var lane = names.slice();
+      for (var j = lane.length - 1; j > 0; j--) {
         var k = Math.floor(Math.random() * (j + 1));
-        var tmp = order[j]; order[j] = order[k]; order[k] = tmp;
+        var tmp = lane[j]; lane[j] = lane[k]; lane[k] = tmp;
       }
-      var finishRank = [];
-      order.forEach(function (idx, place) { finishRank[idx] = place + 1; });
 
-      runners = names.map(function (nm, i) {
-        return { name: nm, p: 0, rank: 0, done: false, pen: 0, spin: 0, boost: 0, dashT: 0,
-                 finishAt: FIRST_AT + (finishRank[i] - 1) * STEP_T,
-                 phase: Math.random() * 6.28, amp: .055 + Math.random() * .035 };
+      runners = lane.map(function (nm) {
+        return { name: nm, p: 0, rank: 0, done: false, spin: 0,
+                 slowT: 0, dashT: 0, holeT: 0,        // 운석 감속 / 별 질주 / 블랙홀 정지
+                 innate: .99 + Math.random() * .02,   // 타고난 속도차(아주 작게)
+                 phase: Math.random() * 6.28, freq: .0009 + Math.random() * .0020 };
       });
       rocks = []; bits = [];
-      // ⭐ 부스트 별 — 트랙 곳곳 랜덤 레인에. 먼저 지나가는 사람이 먹는다
+      // ⭐ 부스트 별 · 🕳 블랙홀 — 트랙 곳곳 랜덤 레인에. 먼저 닿는 사람이 걸린다
       orbs = [];
-      for (var op = .13; op < .84; op += .055 + Math.random() * .045) {
-        orbs.push({ x: op * TRACK, lane: Math.floor(Math.random() * n), t: Math.random() * 6.28, got: false });
+      for (var op = .12; op < .86; op += .05 + Math.random() * .04) {
+        orbs.push({ x: op * TRACK, lane: Math.floor(Math.random() * n),
+                    t: Math.random() * 6.28, got: false,
+                    hole: Math.random() < .30 });     // 열에 셋은 블랙홀
       }
-      buildLive(names); updateLive();
+      // 배지는 반드시 레인 순서(runners 와 같은 인덱스)로 만들어야 한다.
+      // 입력 순서(names)로 만들면 이름·색·등수가 서로 어긋난다.
+      buildLive(lane); updateLive();
       cam.x = 0; cam.z = 1;
 
       // 3 · 2 · 1 · GO
@@ -469,19 +515,21 @@
         $("hud-left").textContent = ci < 3 ? "🏁 출발 준비" : "🏁 출발!";
         ci++;
         if (ci < steps.length) return setTimeout(cd, 800);
-        setTimeout(function () { cbox.classList.remove("on"); run(n, finishRank, names); }, 700);
+        setTimeout(function () { cbox.classList.remove("on"); run(n); }, 700);
       })();
     }
 
-    function run(n, finishRank, names) {
+    function run(n) {
       var wrap = $("track-wrap");
       var t0 = performance.now(), last = t0, done = 0, finalOn = false, prevLead = -1;
+      var arrived = [];                     // 도착 순서대로 쌓인다 — 이게 곧 최종 순위
+      var flash = "", flashT = 0;           // 부스트·블랙홀 알림이 잠깐 머물게
 
       function tick(now) {
         var dt = Math.min(48, now - last); last = now;
         var el = now - t0;
 
-        if (Math.random() < .07 && el < FIRST_AT - 2200) {
+        if (Math.random() < .07 && el < 30000) {
           var lead = Math.max.apply(null, runners.map(function (r) { return r.p; }));
           rocks.push({ x: lead * TRACK + 300 + Math.random() * 900, y: -60,
             r: 16 + Math.random() * 20, rot: 0, vy: 6 + Math.random() * 5 });
@@ -491,6 +539,9 @@
         bits.forEach(function (b) { b.x += b.vx; b.y += b.vy; b.vy += .35; b.life -= .022; });
         bits = bits.filter(function (b) { return b.life > 0; });
 
+        var leadP = 0;
+        runners.forEach(function (r) { if (r.p > leadP) leadP = r.p; });
+
         runners.forEach(function (rn, i) {
           if (rn.done) return;
           if (rn.spin) rn.spin = Math.abs(rn.spin) < .05 ? 0 : rn.spin * .9;
@@ -499,7 +550,7 @@
             if (r.hit) return;
             if (Math.abs(r.x - wx) < 46 + r.r && Math.abs(r.y - wy) < 46 + r.r) {
               r.hit = 1;
-              rn.pen = Math.min(.055, rn.pen + .035);
+              rn.slowT = Math.max(rn.slowT, 650);    // 뒤로 밀리진 않고 잠깐 느려진다
               rn.spin = (Math.random() < .5 ? -1 : 1) * 1.6;
               for (var b = 0; b < 12; b++) bits.push({ x: r.x, y: r.y, vx: (Math.random() - .5) * 9,
                 vy: -Math.random() * 6, life: 1, c: b % 2 ? "#ffb15e" : "#8c7059" });
@@ -507,26 +558,39 @@
               setTimeout(function () { wrap.classList.remove("shake"); }, 280);
             }
           });
-          // ⭐ 별 먹기 — 같은 레인을 지나가면 획득
+          // ⭐ 별 / 🕳 블랙홀 — 같은 레인을 지나가면 걸린다
           orbs.forEach(function (o) {
             if (o.got || o.lane !== i) return;
             if (Math.abs(o.x - wx) > 52) return;
             o.got = true;
-            rn.dashT = 1300;                       // 1.3초간 치고 나간다
-            for (var b = 0; b < 16; b++) bits.push({ x: o.x, y: wy, vx: (Math.random() - .5) * 11,
-              vy: -Math.random() * 7, life: 1, c: b % 2 ? "#fff3b0" : "#ffd479" });
-            $("hud-left").textContent = "⭐ " + rn.name + " 부스트!";
+            if (o.hole) {
+              rn.holeT = 2000;                     // 2초 갇혔다가 빠져나온다
+              flash = "🕳 " + rn.name + " 빨려들어감!"; flashT = 1400;
+              for (var h = 0; h < 14; h++) bits.push({ x: o.x, y: wy, vx: (Math.random() - .5) * 7,
+                vy: -Math.random() * 5, life: 1, c: h % 2 ? "#b78cff" : "#5b3fa8" });
+            } else {
+              rn.dashT = 1300;                     // 1.3초간 3배속 질주
+              flash = "⭐ " + rn.name + " 부스트!"; flashT = 1200;
+              for (var b = 0; b < 16; b++) bits.push({ x: o.x, y: wy, vx: (Math.random() - .5) * 11,
+                vy: -Math.random() * 7, life: 1, c: b % 2 ? "#fff3b0" : "#ffd479" });
+            }
           });
-          if (rn.dashT > 0) { rn.dashT -= dt; rn.boost = Math.min(.075, rn.boost + dt * 0.00019); }
-          else rn.boost *= Math.pow(.977, dt / 16.67);
 
-          rn.pen *= Math.pow(.986, dt / 16.67);
-          var f = el / rn.finishAt;
-          var fade = Math.max(0, 1 - f * f);
-          var wave = Math.sin(el / 500 + rn.phase) * rn.amp * fade;
-          // 부스트도 fade 를 곱해 결승선 앞에서 사라진다 → 도착 순서는 예정대로
-          rn.p = Math.max(0, Math.min(1, f + wave + rn.boost * fade - rn.pen * fade));
-          if (rn.p >= 1) { rn.p = 1; rn.done = true; done++; rn.rank = done; }
+          // 속도만 오르내린다 — 위치는 절대 뒤로 가지 않는다
+          if (rn.holeT > 0) rn.holeT -= dt;
+          if (rn.dashT > 0) rn.dashT -= dt;
+          if (rn.slowT > 0) rn.slowT -= dt;
+
+          var mul;
+          if (rn.holeT > 0) mul = 0;                            // 블랙홀 = 완전 정지
+          else if (rn.dashT > 0) mul = 3;                       // 별 = 3배속
+          else if (rn.slowT > 0) mul = .4;                      // 운석 = 잠깐 둔해짐
+          else mul = 1;
+          // 물결은 속도에만 얹는다(항상 양수) → 위치는 절대 뒤로 가지 않는다
+          var wob = 1 + Math.sin(el * rn.freq + rn.phase) * .60;
+          var rubber = 1 + CATCHUP * Math.max(0, leadP - rn.p);   // 뒤처질수록 빨라짐
+          rn.p = Math.min(1, rn.p + BASE_V * rn.innate * wob * mul * rubber * dt);
+          if (rn.p >= 1) { rn.p = 1; rn.done = true; done++; rn.rank = done; arrived.push(i); }
         });
 
         // 카메라 — 팩을 화면에 담되, 붙을수록 확대(막판 접전이 저절로 클로즈업)
@@ -545,41 +609,38 @@
         var liveOrd = runners.map(function (r, i) { return { i: i, p: r.p }; })
           .sort(function (a, b) { return b.p - a.p; });
         if (liveOrd[0].i !== prevLead) { prevLead = liveOrd[0].i; }
-        $("hud-left").textContent = "🥇 " + runners[liveOrd[0].i].name;
+        if (flashT > 0) flashT -= dt;
+        $("hud-left").textContent = flashT > 0 ? flash : "🥇 " + runners[liveOrd[0].i].name;
         $("hud-right").textContent = done + " / " + n + " 도착";
         updateLive();
 
         draw(el, n, cam.x, cam.z, speed);
 
         if (done < n) raf = requestAnimationFrame(tick);
-        else finish(finishRank, names, n);
+        else finish(arrived, n);
       }
       raf = requestAnimationFrame(tick);
     }
 
-    function finish(finishRank, names, n) {
+    // 순위는 실제 도착 순서 그대로. 이름이 레인에 무작위로 꽂혀 있으므로 확률은 균등하다.
+    function finish(arrived, n) {
       var wrap = $("track-wrap");
       wrap.classList.remove("final");
       wrap.classList.add("shake");
       setTimeout(function () { wrap.classList.remove("shake"); }, 320);
 
-      var loserIdx = 0, firstIdx = 0;
-      for (var i = 0; i < n; i++) { if (finishRank[i] === n) loserIdx = i; if (finishRank[i] === 1) firstIdx = i; }
-      var pick = mode === "last" ? loserIdx : firstIdx;
-
+      var pick = mode === "last" ? arrived[n - 1] : arrived[0];
       $("winner-tag").textContent = mode === "last" ? "🔥 꼴찌 — 걸렸습니다" : "👑 1등";
-      $("winner-who").textContent = names[pick];
+      $("winner-who").textContent = runners[pick].name;
       $("winner").style.display = "block";
       void $("winner").offsetWidth; $("winner").classList.add("pop");
 
-      var sorted = names.map(function (nm, i) { return { nm: nm, r: finishRank[i] }; })
-        .sort(function (a, b) { return a.r - b.r; });
-      $("rank").innerHTML = sorted.map(function (s) {
-        var isLast = s.r === n;
-        var medal = s.r === 1 ? "🥇" : s.r === 2 ? "🥈" : s.r === 3 ? "🥉" : s.r + "위";
+      $("rank").innerHTML = arrived.map(function (idx, place) {
+        var r = place + 1, isLast = r === n;
+        var medal = r === 1 ? "🥇" : r === 2 ? "🥈" : r === 3 ? "🥉" : r + "위";
         return '<div class="r' + (isLast && mode === "last" ? " loser" : "") + '">' +
           '<span class="no">' + medal + "</span>" +
-          '<span class="nm">' + s.nm.replace(/[<>&]/g, "") + "</span>" +
+          '<span class="nm">' + runners[idx].name.replace(/[<>&]/g, "") + "</span>" +
           '<span class="tag">' + (isLast ? "꼴찌" : "") + "</span></div>";
       }).join("");
       $("rank").style.display = "block";
@@ -589,7 +650,7 @@
       $("btn-again").style.display = ""; $("btn-edit").style.display = "";
       busy = false;
       if (window.GoblubFeed) GoblubFeed.grant("race");
-      if (window.gbTrack) window.gbTrack("minigame_play", { game: "race", players: n, mode: mode, result: names[pick] });
+      if (window.gbTrack) window.gbTrack("minigame_play", { game: "race", players: n, mode: mode, result: runners[pick].name });
     }
 
     $("btn-go").onclick = function () { if (!busy) start(); };
