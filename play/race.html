@@ -22,8 +22,10 @@
     #btn-add { width:100%; margin:4px 0; }
     #btn-add:disabled { opacity:.45; cursor:default; }
     .err-msg { text-align:center; color:var(--coral); font-weight:bold; margin:8px 0; }
-    .mode-row { display:flex; gap:8px; justify-content:center; margin-bottom:12px; }
-    .mode-row button.on { background:var(--sky); color:#0d1730; border-color:var(--sky); }
+    .pick-row { display:flex; gap:8px; align-items:center; justify-content:center; margin:0 0 14px; }
+    .pick-row select { font-family:inherit; font-size:1.02rem; padding:8px 12px;
+      border:2px solid var(--line); border-radius:10px; background:var(--surface); color:var(--ink); }
+    .pick-row span { color:var(--ink-soft); }
 
     .track-wrap { position:relative; margin:14px auto 6px; width:100%; max-width:620px;
       border-radius:18px; overflow:hidden; background:#04060f;
@@ -83,10 +85,10 @@
     <section class="panel">
       <div id="setup">
         <h2 style="text-align:center">달릴 사람을 넣으세요</h2>
-        <div class="mode-row">
-          <button class="btn-ghost on" id="mode-last" type="button">🔥 꼴찌가 걸림</button>
-          <button class="btn-ghost" id="mode-first" type="button">👑 1등만 뽑기</button>
-        </div>
+        <p class="pick-row">
+          <select id="pick-rank" aria-label="걸릴 등수"></select>
+          <span>가 걸립니다</span>
+        </p>
         <div id="item-list"></div>
         <button class="btn-ghost" id="btn-add" type="button">＋ 참가자 추가</button>
         <p class="fine-print" style="text-align:center; margin:2px 0 0">이름을 하나씩 (2~8명)</p>
@@ -125,7 +127,6 @@
     var $ = function (id) { return document.getElementById(id); };
     var MIN = 2, MAX = 8;
     var SKIN = ["#ffd479", "#8fe0a6", "#8fc4ff", "#ff9aa8", "#d3a8ff", "#7fdede", "#ffb185", "#f5a9d0"];
-    var mode = "last";
 
     /* ── 참가자 입력 ─────────────────────────────── */
     var list = $("item-list");
@@ -137,6 +138,7 @@
         r.querySelector(".item-del").disabled = n <= MIN;
       });
       $("btn-add").disabled = n >= MAX;
+      if (window.__syncRanks) window.__syncRanks();   // 인원이 바뀌면 등수 목록도 따라간다
     }
     function addRow(val) {
       if (rows().length >= MAX) return;
@@ -162,11 +164,26 @@
       return out;
     }
     $("btn-add").onclick = function () { addRow(""); };
-    for (var q = 0; q < 4; q++) addRow("");
     function showErr(m) { var e = $("err"); e.textContent = m; e.style.display = "block"; }
     function hideErr() { $("err").style.display = "none"; }
-    $("mode-last").onclick = function () { mode = "last"; this.classList.add("on"); $("mode-first").classList.remove("on"); };
-    $("mode-first").onclick = function () { mode = "first"; this.classList.add("on"); $("mode-last").classList.remove("on"); };
+
+    // 걸릴 등수 — 참가자 수에 맞춰 자동으로 채운다(없는 등수를 못 고르게)
+    var pick = $("pick-rank");
+    function syncRanks() {
+      var n = Math.max(MIN, rows().length);
+      var keep = +pick.value || n;
+      pick.innerHTML = "";
+      for (var r = 1; r <= n; r++) {
+        var o = document.createElement("option");
+        o.value = r;
+        o.textContent = r === 1 ? "🥇 1등" : r === n ? "🔥 꼴찌(" + r + "등)" : r + "등";
+        pick.appendChild(o);
+      }
+      pick.value = Math.min(keep, n);
+    }
+    window.__syncRanks = syncRanks;
+    for (var q = 0; q < 4; q++) addRow("");
+    syncRanks();
 
     /* ── 캐릭터 이미지 — 고브럽 SVG 를 색만 갈아 끼워 굽는다 ── */
     var sprites = {};
@@ -202,6 +219,147 @@
     for (var i3 = 0; i3 < 34; i3++) fgDust.push({ x: Math.random() * SPAN, y: Math.random() * VH, r: Math.random() * 3.4 + 1.6 });
 
     function laneY(i, n) { var top = 210, bot = GROUND - 20; return n === 1 ? (top + bot) / 2 : top + (bot - top) * i / (n - 1); }
+
+    /* ── 보스 · 소용돌이 · 우주선 ─────────────────── */
+    var BOSS_P = .70, BOSS_HP = 10;
+    var boss = null, vortex = null, ship = null;
+
+    function drawBoss(camX, scale, t) {
+      if (!boss) return;
+      var sx = (boss.x - camX) * scale + VW / 2;
+      if (sx < -700 || sx > VW + 700) return;
+      var cy = VH * .5, R = VH * .46 * (boss.dead ? Math.max(0, 1 - boss.deadT / 900) : 1);
+      if (R <= 1) return;
+      var wob = Math.sin(t / 260) * 14 * scale;
+      g.save(); g.translate(sx, cy + wob); g.scale(scale, scale);
+      if (boss.flash > 0) { g.globalAlpha = .9; }
+      // 촉수
+      for (var a = 0; a < 9; a++) {
+        var ang = -1.3 + a * .33, len = R * (1.05 + Math.sin(t / 200 + a) * .12);
+        g.beginPath(); g.moveTo(0, 0);
+        g.quadraticCurveTo(Math.cos(ang) * len * .7 + 40, Math.sin(ang) * len * .7,
+                           Math.cos(ang) * len + Math.sin(t / 170 + a) * 30, Math.sin(ang) * len);
+        g.strokeStyle = boss.flash > 0 ? "#ff9db5" : "#5c2f7a";
+        g.lineWidth = 18; g.lineCap = "round"; g.stroke();
+      }
+      // 몸통
+      var bgr = g.createRadialGradient(-R * .3, -R * .35, R * .15, 0, 0, R);
+      bgr.addColorStop(0, boss.flash > 0 ? "#ffd0dc" : "#a86bd8");
+      bgr.addColorStop(1, boss.flash > 0 ? "#e0607f" : "#4a2170");
+      g.beginPath(); g.ellipse(0, 0, R * .82, R, 0, 0, 6.284);
+      g.fillStyle = bgr; g.fill();
+      g.strokeStyle = "rgba(255,255,255,.22)"; g.lineWidth = 5; g.stroke();
+      // 눈 세 개
+      [[-R * .32, -R * .22, R * .17], [R * .3, -R * .3, R * .13], [0, R * .18, R * .2]].forEach(function (e) {
+        g.beginPath(); g.arc(e[0], e[1], e[2], 0, 6.284);
+        g.fillStyle = "#f6f1e4"; g.fill();
+        g.beginPath(); g.arc(e[0] + Math.sin(t / 300) * e[2] * .2, e[1], e[2] * .5, 0, 6.284);
+        g.fillStyle = "#170f22"; g.fill();
+      });
+      // 이빨 난 입
+      g.beginPath(); g.ellipse(0, R * .58, R * .38, R * .16, 0, 0, 6.284);
+      g.fillStyle = "#210a1c"; g.fill();
+      for (var k = -3; k <= 3; k++) {
+        g.beginPath(); g.moveTo(k * R * .1, R * .45);
+        g.lineTo(k * R * .1 + R * .045, R * .62); g.lineTo(k * R * .1 - R * .045, R * .62);
+        g.closePath(); g.fillStyle = "#fff6e8"; g.fill();
+      }
+      g.restore(); g.globalAlpha = 1;
+      if (boss.flash > 0) boss.flash--;
+
+      // 체력바
+      if (!boss.dead) {
+        var bw = Math.min(VW * .5, 420), bx = (VW - bw) / 2, by = 26;
+        g.fillStyle = "rgba(6,12,26,.7)"; g.fillRect(bx - 3, by - 3, bw + 6, 24);
+        g.fillStyle = "#3a1f52"; g.fillRect(bx, by, bw, 18);
+        g.fillStyle = boss.hp <= 3 ? "#ff5b6e" : "#c07bff";
+        g.fillRect(bx, by, bw * (boss.hp / BOSS_HP), 18);
+        g.fillStyle = "#ffe6b8"; g.font = "600 17px 'Jua', sans-serif";
+        g.textAlign = "center"; g.textBaseline = "middle";
+        g.fillText("👾 우주 괴수  " + boss.hp + " / " + BOSS_HP, VW / 2, by + 9);
+      }
+    }
+
+    function drawVortex(camX, scale, t) {
+      if (!vortex) return;
+      var sx = (vortex.x - camX) * scale + VW / 2;
+      var cy = VH * .5, R = VH * .40 * Math.min(1, vortex.t / 500);
+      g.save(); g.translate(sx, cy);
+      var hg = g.createRadialGradient(0, 0, R * .2, 0, 0, R * 1.7);
+      hg.addColorStop(0, "rgba(170,110,255,.8)"); hg.addColorStop(.6, "rgba(90,50,180,.4)");
+      hg.addColorStop(1, "rgba(60,30,140,0)");
+      g.fillStyle = hg; g.beginPath(); g.arc(0, 0, R * 1.7, 0, 6.284); g.fill();
+      // 고브럽 입 모양 — 안쪽으로 감기는 나선
+      g.rotate(t / 320);
+      g.beginPath();
+      for (var s = 0; s <= 150; s++) {
+        var th = s / 150 * 15, rr = R * (1 - s / 150);
+        g[s ? "lineTo" : "moveTo"](Math.cos(th) * rr, Math.sin(th) * rr);
+      }
+      g.strokeStyle = "#cdb0ff"; g.lineWidth = 7; g.lineCap = "round"; g.stroke();
+      g.beginPath(); g.arc(0, 0, R * .22, 0, 6.284);
+      g.fillStyle = "#0a0418"; g.fill();
+      g.restore();
+    }
+
+    function drawShip(camX, scale, n, t) {
+      if (!ship) return;
+      var sx = (ship.x - camX) * scale + VW / 2;
+      var H = ship.h, W = ship.w, cy = VH * .5;
+      g.save(); g.translate(sx, cy); g.scale(scale, scale);
+      // 선체
+      g.beginPath();
+      g.moveTo(W * .5, 0);
+      g.quadraticCurveTo(W * .34, -H * .5, -W * .2, -H * .5);
+      g.lineTo(-W * .46, -H * .34);
+      g.quadraticCurveTo(-W * .58, 0, -W * .46, H * .34);
+      g.lineTo(-W * .2, H * .5);
+      g.quadraticCurveTo(W * .34, H * .5, W * .5, 0);
+      g.closePath();
+      var sg = g.createLinearGradient(0, -H * .5, 0, H * .5);
+      sg.addColorStop(0, "#e8eefc"); sg.addColorStop(.5, "#b9c6e4"); sg.addColorStop(1, "#7d8bb0");
+      g.fillStyle = sg; g.fill();
+      g.strokeStyle = "#5d6888"; g.lineWidth = 4; g.stroke();
+      // 엔진 불꽃
+      var fl = (0.7 + Math.random() * .5) * W * .35;
+      var fg2 = g.createLinearGradient(-W * .48, 0, -W * .48 - fl, 0);
+      fg2.addColorStop(0, "rgba(255,214,120,.95)"); fg2.addColorStop(1, "rgba(255,80,40,0)");
+      g.fillStyle = fg2;
+      g.beginPath(); g.moveTo(-W * .46, -H * .12);
+      g.lineTo(-W * .46 - fl, 0); g.lineTo(-W * .46, H * .12); g.closePath(); g.fill();
+      // 창문 — 참가자 수만큼 세로로
+      ship.seats.forEach(function (seat, k) {
+        var wy = -H * .5 + H * (k + 1) / (n + 1);
+        var wr = Math.min(H / (n + 2) * .42, W * .12);
+        g.beginPath(); g.arc(0, wy, wr, 0, 6.284);
+        g.fillStyle = "#12203c"; g.fill();
+        g.strokeStyle = "#eef3ff"; g.lineWidth = 4; g.stroke();
+        if (seat.idx >= 0 && !seat.blown) {          // 탑승한 고브럽 — 신난 얼굴
+          g.save(); g.beginPath(); g.arc(0, wy, wr - 3, 0, 6.284); g.clip();
+          g.beginPath(); g.arc(0, wy + wr * .28, wr * .78, 0, 6.284);
+          g.fillStyle = SKIN[seat.idx % SKIN.length]; g.fill();
+          var bounce = Math.sin(t / 150 + k) * wr * .07;
+          g.fillStyle = "#1b2440";                    // 웃는 눈 ^ ^
+          g.lineWidth = wr * .13; g.strokeStyle = "#1b2440"; g.lineCap = "round";
+          g.beginPath();
+          g.moveTo(-wr * .3, wy + bounce); g.lineTo(-wr * .16, wy - wr * .12 + bounce);
+          g.lineTo(-wr * .02, wy + bounce);
+          g.moveTo(wr * .06, wy + bounce); g.lineTo(wr * .2, wy - wr * .12 + bounce);
+          g.lineTo(wr * .34, wy + bounce);
+          g.stroke();
+          g.restore();
+        }
+        if (seat.blown) {                             // 터진 창 — 그을음
+          g.beginPath(); g.arc(0, wy, wr - 2, 0, 6.284);
+          g.fillStyle = "#1a0d12"; g.fill();
+          g.strokeStyle = "#ff8a5c"; g.lineWidth = 3; g.stroke();
+        }
+        g.globalAlpha = .35;
+        g.beginPath(); g.arc(-wr * .3, wy - wr * .34, wr * .3, 0, 6.284);
+        g.fillStyle = "#ffffff"; g.fill(); g.globalAlpha = 1;
+      });
+      g.restore();
+    }
 
     /* 배경 — 레이어마다 다른 속도로 흘러야 속도감이 난다 */
     function drawBg(camX, speed) {
@@ -275,8 +433,14 @@
       g.save();
       g.translate(sx, sy + bob);
       if (rn.spin) g.rotate(rn.spin);
-      if (rn.done && rn.rank === n && mode === "last") g.globalAlpha = .5;
+      if (rn.sad) g.globalAlpha = .85;
 
+      // 소용돌이에 삼켜진 동안 — 중심으로 빨려들며 사라진다
+      if (rn.sucked) {
+        var kk = Math.min(1, rn.suckT / 420);
+        g.rotate(kk * 7); g.scale(1 - kk * .92, 1 - kk * .92);
+        g.globalAlpha = 1 - kk * .9;
+      }
       // 블랙홀에 갇힌 동안 — 쪼그라들며 빙글빙글, 빠져나올 때 되돌아온다
       if (rn.holeT > 0) {
         var hp = rn.holeT / 2000;                        // 1 → 0
@@ -323,6 +487,26 @@
         g.beginPath(); g.arc(0, 0, size * .34, 0, 6.284);
         g.fillStyle = SKIN[i % SKIN.length]; g.fill();
       }
+      // 아파하는 >< 눈 — 외눈 위치(원본 SVG 기준 120,44)를 덮어 그린다
+      if (rn.hurtT > 0 || rn.sad) {
+        var ex = 0, ey = -size * .397, er = size * .104;
+        g.beginPath(); g.arc(ex, ey, er, 0, 6.284);
+        g.fillStyle = "#f4f0e6"; g.fill();
+        g.strokeStyle = "#17141f"; g.lineWidth = Math.max(2, er * .26); g.lineCap = "round";
+        if (rn.sad) {                            // 슬픈 눈 — 아래로 처진 반원 + 눈물
+          g.beginPath(); g.arc(ex, ey + er * .3, er * .58, 3.34, 6.08); g.stroke();
+          g.beginPath(); g.moveTo(ex + er * .5, ey + er * .5);
+          g.quadraticCurveTo(ex + er * .8, ey + er * 1.3, ex + er * .45, ey + er * 1.6);
+          g.fillStyle = "#7fd4ff"; g.fill();
+        } else {                                 // >< 찡긋
+          g.beginPath();
+          g.moveTo(ex - er * .72, ey - er * .5); g.lineTo(ex - er * .12, ey);
+          g.lineTo(ex - er * .72, ey + er * .5);
+          g.moveTo(ex + er * .72, ey - er * .5); g.lineTo(ex + er * .12, ey);
+          g.lineTo(ex + er * .72, ey + er * .5);
+          g.stroke();
+        }
+      }
       g.restore();
       g.globalAlpha = 1;
 
@@ -352,6 +536,9 @@
       // 결승선
       var fx = (TRACK - camX) * scale + VW / 2;
       if (fx > -60 && fx < VW + 60) drawFinish(fx, scale);
+      drawShip(camX, scale, n, t);
+      drawBoss(camX, scale, t);
+      drawVortex(camX, scale, t);
 
       // 운석
       rocks.forEach(function (r) {
@@ -439,6 +626,7 @@
       runners.map(function (rn, i) { return { rn: rn, i: i }; })
         .sort(function (a, b) { return a.rn.p - b.rn.p; })
         .forEach(function (o) {
+          if (o.rn.boarded) return;              // 우주선 창문에 있으니 트랙엔 안 그린다
           var wx = o.rn.p * TRACK;
           var sx = (wx - camX) * scale + VW / 2;
           if (sx < -140 || sx > VW + 140) return;
@@ -476,11 +664,11 @@
     }
 
     /* ── 경주 ─────────────────────────────────────
-       최종 순위를 먼저 균등 무작위로 뽑아 등수별 도착 시각을 못 박고,
-       도중의 흔들림·주춤은 결승선 앞에서 (1-f²)로 잦아든다.
-       → 선두는 계속 바뀌지만 도착 순서는 반드시 뽑은 대로.            */
+       공정성: 물리는 순위를 모른 채 정직하게 굴리고 이름만 레인에 무작위로
+       꽂는다. 어떤 레인이 유리하든 각 이름이 그 레인에 갈 확률이 1/n 이라
+       몇 등이 걸리든 확률은 균등하다.                                  */
     var busy = false, raf = 0;
-    var BASE_V = 1 / 17500;              // 방해가 없을 때의 기준 속도
+    var BASE_V = 1 / 12500;              // 방해가 없을 때의 기준 속도
     var CATCHUP = 4.0;                   // 뒤처질수록 빨라지는 정도(마리오카트식 추격)
 
     function start() {
@@ -509,13 +697,20 @@
       runners = lane.map(function (nm) {
         return { name: nm, p: 0, prevX: 0, rank: 0, done: false, spin: 0,
                  slowT: 0, dashT: 0, holeT: 0,        // 운석 감속 / 별 질주 / 블랙홀 정지
+                 hurtT: 0, sucked: false, suckT: 0, sad: false, boarded: false,
                  innate: .99 + Math.random() * .02,   // 타고난 속도차(아주 작게)
                  phase: Math.random() * 6.28, freq: .0009 + Math.random() * .0020 };
       });
       rocks = []; bits = [];
-      // ⭐ 부스트 별 · 🕳 블랙홀 — 트랙 곳곳 랜덤 레인에. 먼저 닿는 사람이 걸린다
+      // 👾 보스는 70% 지점. 몸통 박치기 10번이면 죽고 자리에 소용돌이를 남긴다
+      boss = { x: BOSS_P * TRACK, hp: BOSS_HP, flash: 0, dead: false, deadT: 0 };
+      vortex = null;
+      // 🚀 결승선 우주선 — 창문이 참가자 수만큼. 인원이 늘면 위아래로 길어진다
+      ship = { x: TRACK + 520, w: 470, h: 190 + n * 78, seats: [] };
+      for (var sI = 0; sI < n; sI++) ship.seats.push({ idx: -1, blown: false });
+      // ⭐ 부스트 별 · 🕳 블랙홀 — 보스 앞 구간에만 (뒤 구간은 짧아서 못 씀)
       orbs = [];
-      for (var op = .12; op < .86; op += .05 + Math.random() * .04) {
+      for (var op = .10; op < BOSS_P - .05; op += .045 + Math.random() * .035) {
         orbs.push({ x: op * TRACK, lane: Math.floor(Math.random() * n),
                     t: Math.random() * 6.28, got: false,
                     hole: Math.random() < .30 });     // 열에 셋은 블랙홀
@@ -564,6 +759,7 @@
 
         runners.forEach(function (rn, i) {
           if (rn.done) return;
+          if (rn.sucked) return;               // 소용돌이 안 — 아래 소용돌이 로직이 맡는다
           if (rn.spin) rn.spin = Math.abs(rn.spin) < .05 ? 0 : rn.spin * .9;
           var wx = rn.p * TRACK, wy = laneY(i, n);
           rocks.forEach(function (r) {
@@ -607,13 +803,84 @@
           else if (rn.dashT > 0) mul = 3;                       // 별 = 3배속
           else if (rn.slowT > 0) mul = .4;                      // 운석 = 잠깐 둔해짐
           else mul = 1;
+          if (rn.hurtT > 0) rn.hurtT -= dt;
           // 물결은 속도에만 얹는다(항상 양수) → 위치는 절대 뒤로 가지 않는다
           var wob = 1 + Math.sin(el * rn.freq + rn.phase) * .60;
           var rubber = 1 + CATCHUP * Math.max(0, leadP - rn.p);   // 뒤처질수록 빨라짐
           rn.p = Math.min(1, rn.p + BASE_V * rn.innate * wob * mul * rubber * dt);
+
+          // 👾 보스 몸통 박치기 — 보스가 살아 있으면 그 앞을 못 지나간다.
+          // 부딪히면 진짜로 뒤로 밀려나고(공격하려면 물러났다 다시 와야 한다) 체력이 1 깎인다.
+          if (boss && !boss.dead && rn.p >= BOSS_P) {
+            rn.p = BOSS_P - .028 - Math.random() * .012;
+            rn.hurtT = 620; rn.spin = (Math.random() < .5 ? -1 : 1) * 1.1;
+            boss.hp--; boss.flash = 7;
+            flash = "💥 " + rn.name + " 박치기! 남은 체력 " + Math.max(0, boss.hp); flashT = 900;
+            for (var d2 = 0; d2 < 14; d2++) bits.push({ x: BOSS_P * TRACK, y: wy,
+              vx: -(1 + Math.random() * 8), vy: (Math.random() - .5) * 9, life: 1,
+              c: d2 % 2 ? "#ff9db5" : "#c07bff" });
+            wrap.classList.add("shake");
+            setTimeout(function () { wrap.classList.remove("shake"); }, 280);
+            if (boss.hp <= 0) {
+              boss.dead = true; boss.deadT = 0;
+              flash = "👾 우주 괴수 격파!"; flashT = 1600;
+              for (var d3 = 0; d3 < 60; d3++) bits.push({ x: BOSS_P * TRACK, y: VH * .5,
+                vx: (Math.random() - .5) * 26, vy: (Math.random() - .5) * 22, life: 1,
+                c: d3 % 3 === 0 ? "#ffd479" : d3 % 3 === 1 ? "#c07bff" : "#ff9db5" });
+            }
+          }
           rn.prevX = wx;                       // 다음 프레임의 통과 판정 기준
-          if (rn.p >= 1) { rn.p = 1; rn.done = true; done++; rn.rank = done; arrived.push(i); }
+          if (rn.p >= 1) {
+            rn.p = 1; rn.done = true; done++; rn.rank = done; arrived.push(i);
+            ship.seats[rn.rank - 1].idx = i;   // 도착 순서대로 창문에 앉는다
+            rn.boarded = true;
+            flash = "🚀 " + rn.name + " 탑승 (" + rn.rank + "등)"; flashT = 1000;
+          }
         });
+
+        // 보스가 죽으면 그 자리에 소용돌이가 열려 전원을 삼켰다가 하나씩 뱉는다
+        if (boss && boss.dead) {
+          boss.deadT += dt;
+          if (!vortex && boss.deadT > 620) {
+            vortex = { x: BOSS_P * TRACK, t: 0, swallowed: false, releaseAt: 0, queue: [] };
+            flash = "🌀 소용돌이가 열렸다!"; flashT = 1500;
+          }
+        }
+        if (vortex) {
+          vortex.t += dt;
+          if (!vortex.swallowed) {
+            var allIn = true;
+            runners.forEach(function (rn) {
+              if (rn.done) return;
+              if (!rn.sucked) { rn.sucked = true; rn.suckT = 0; }
+              rn.suckT += dt;
+              rn.p = BOSS_P;                      // 소용돌이 입구에 모인다
+              if (rn.suckT < 420) allIn = false;
+            });
+            if (allIn) {
+              vortex.swallowed = true;
+              // 탈출 순서는 무작위 — 여기서 판이 한 번 완전히 섞인다
+              vortex.queue = runners.map(function (_, i2) { return i2; })
+                .filter(function (i2) { return !runners[i2].done; });
+              for (var qq = vortex.queue.length - 1; qq > 0; qq--) {
+                var rk = Math.floor(Math.random() * (qq + 1));
+                var rt = vortex.queue[qq]; vortex.queue[qq] = vortex.queue[rk]; vortex.queue[rk] = rt;
+              }
+              vortex.releaseAt = vortex.t + 500;
+            }
+          } else if (vortex.queue.length) {
+            if (vortex.t >= vortex.releaseAt) {
+              var out = vortex.queue.shift();
+              var ro = runners[out];
+              ro.sucked = false; ro.suckT = 0; ro.p = BOSS_P + .004;
+              flash = "🌀 " + ro.name + " 탈출!"; flashT = 900;
+              for (var e2 = 0; e2 < 18; e2++) bits.push({ x: BOSS_P * TRACK, y: laneY(out, n),
+                vx: 2 + Math.random() * 10, vy: (Math.random() - .5) * 10, life: 1,
+                c: e2 % 2 ? "#cdb0ff" : "#ffffff" });
+              vortex.releaseAt = vortex.t + 280 + Math.random() * 260;
+            }
+          }
+        }
 
         // 카메라 — 1위를 기준으로 잡고, 꼴찌까지 담기도록 벌어질수록 축소한다
         var xs = runners.map(function (r) { return r.p * TRACK; });
@@ -656,28 +923,94 @@
       wrap.classList.add("shake");
       setTimeout(function () { wrap.classList.remove("shake"); }, 320);
 
-      var pick = mode === "last" ? arrived[n - 1] : arrived[0];
-      $("winner-tag").textContent = mode === "last" ? "🔥 꼴찌 — 걸렸습니다" : "👑 1등";
-      $("winner-who").textContent = runners[pick].name;
-      $("winner").style.display = "block";
-      void $("winner").offsetWidth; $("winner").classList.add("pop");
+      var loseRank = Math.min(+$("pick-rank").value || n, n);
+      var pickIdx = arrived[loseRank - 1];
+      var loser = runners[pickIdx];
 
+      // 순위표는 바로 띄우고, 우주선 연출이 끝난 뒤 패자를 공개한다
       $("rank").innerHTML = arrived.map(function (idx, place) {
-        var r = place + 1, isLast = r === n;
+        var r = place + 1, isPick = r === loseRank;
         var medal = r === 1 ? "🥇" : r === 2 ? "🥈" : r === 3 ? "🥉" : r + "위";
-        return '<div class="r' + (isLast && mode === "last" ? " loser" : "") + '">' +
+        return '<div class="r' + (isPick ? " loser" : "") + '">' +
           '<span class="no">' + medal + "</span>" +
           '<span class="nm">' + runners[idx].name.replace(/[<>&]/g, "") + "</span>" +
-          '<span class="tag">' + (isLast ? "꼴찌" : "") + "</span></div>";
+          '<span class="tag">' + (isPick ? "걸림" : "") + "</span></div>";
       }).join("");
       $("rank").style.display = "block";
+      $("hud-left").textContent = "🚀 전원 탑승 — 출발 준비";
 
-      $("hud-left").textContent = "🏁 경주 종료";
+      // 카메라를 우주선으로 옮기며 잠깐 다 같이 신나 하다가, 걸린 창문이 펑 터진다
+      var bt0 = performance.now(), blown = false;
+      (function boarding(now) {
+        var k = Math.min(1, (now - bt0) / 1600);
+        // 우주선 전체가 화면에 담기게 배율을 맞춘다
+        var wantZ = Math.min(1.1, VW * .62 / ship.w);
+        cam.z += (wantZ - cam.z) * .06;
+        cam.x += (ship.x - cam.x) * .06;
+        bits.forEach(function (b) { b.x += b.vx; b.y += b.vy; b.vy += .35; b.life -= .022; });
+        bits = bits.filter(function (b) { return b.life > 0; });
+        draw(now, n, cam.x, cam.z, 0);
+        if (k >= 1 && !blown) {
+          blown = true; bt0 = now;             // 폭발 시점부터 다시 잰다
+          var seat = ship.seats[loseRank - 1];
+          seat.blown = true; loser.sad = true; loser.boarded = false;
+          var wrap2 = $("track-wrap");
+          wrap2.classList.add("shake");
+          setTimeout(function () { wrap2.classList.remove("shake"); }, 320);
+          for (var b2 = 0; b2 < 46; b2++) bits.push({ x: ship.x, y: VH * .5,
+            vx: -(2 + Math.random() * 14), vy: (Math.random() - .5) * 16, life: 1,
+            c: b2 % 3 === 0 ? "#ffd479" : b2 % 3 === 1 ? "#ff8a5c" : "#e8eefc" });
+          $("hud-left").textContent = "💥 " + loser.name + " 좌석 폭발!";
+        }
+        // 폭발 뒤 0.9초 동안 파편이 날리는 걸 보여주고 클로즈업으로 넘어간다
+        if (blown && now - bt0 > 900) return showLoser(loser, loseRank, n);
+        requestAnimationFrame(boarding);
+      })(bt0);
+
       $("btn-go").style.display = "none";
-      $("btn-again").style.display = ""; $("btn-edit").style.display = "";
-      busy = false;
       if (window.GoblubFeed) GoblubFeed.grant("race");
-      if (window.gbTrack) window.gbTrack("minigame_play", { game: "race", players: n, mode: mode, result: runners[pick].name });
+      if (window.gbTrack) window.gbTrack("minigame_play", { game: "race", players: n, rank: loseRank, result: loser.name });
+    }
+
+    // 패자 클로즈업 — 우주선은 떠나고 혼자 남는다
+    function showLoser(loser, loseRank, n) {
+      var t0 = performance.now();
+      (function zoom(now) {
+        var k = Math.min(1, (now - t0) / 900);
+        draw(now, n, cam.x + (ship ? 260 : 0) * k, cam.z, cam.v * (1 - k));
+        g.fillStyle = "rgba(4,6,15," + (k * .72) + ")";
+        g.fillRect(0, 0, VW, VH);
+        // 크게 띄운 슬픈 고브럽
+        var S = 150 + k * 210;
+        g.save(); g.translate(VW / 2, VH * .46 + Math.sin(now / 260) * 8);
+        var img = sprites[SKIN[runners.indexOf(loser) % SKIN.length]];
+        if (img && img.complete && img.naturalWidth)
+          g.drawImage(img, -S / 2, -S * .58, S, S * (196 / 240));
+        var ex = 0, ey = -S * .397, er = S * .104;
+        g.beginPath(); g.arc(ex, ey, er, 0, 6.284); g.fillStyle = "#f4f0e6"; g.fill();
+        g.strokeStyle = "#17141f"; g.lineWidth = er * .26; g.lineCap = "round";
+        g.beginPath(); g.arc(ex, ey + er * .34, er * .6, 3.34, 6.08); g.stroke();
+        g.beginPath(); g.moveTo(ex + er * .55, ey + er * .5);          // 눈물
+        g.quadraticCurveTo(ex + er * .95, ey + er * 1.5, ex + er * .5, ey + er * 1.9);
+        g.quadraticCurveTo(ex + er * .18, ey + er * 1.4, ex + er * .55, ey + er * .5);
+        g.fillStyle = "#7fd4ff"; g.fill();
+        g.restore();
+        g.globalAlpha = k;
+        g.fillStyle = "#ffd479"; g.font = "700 46px 'Jua', sans-serif";
+        g.textAlign = "center"; g.textBaseline = "middle";
+        g.fillText(loseRank + "등 — " + loser.name, VW / 2, VH * .84);
+        g.fillStyle = "#e8eeff"; g.font = "600 26px 'Jua', sans-serif";
+        g.fillText("우주선은 떠났습니다…", VW / 2, VH * .91);
+        g.globalAlpha = 1;
+        if (k < 1) return requestAnimationFrame(zoom);
+        $("winner-tag").textContent = "🔥 " + loseRank + "등 — 걸렸습니다";
+        $("winner-who").textContent = loser.name;
+        $("winner").style.display = "block";
+        void $("winner").offsetWidth; $("winner").classList.add("pop");
+        $("hud-left").textContent = "🏁 경주 종료";
+        $("btn-again").style.display = ""; $("btn-edit").style.display = "";
+        busy = false;
+      })(t0);
     }
 
     $("btn-go").onclick = function () { if (!busy) start(); };
@@ -690,13 +1023,14 @@
       $("btn-go").style.display = ""; $("btn-go").disabled = false;
       $("btn-again").style.display = "none"; $("btn-edit").style.display = "none";
       busy = false; runners = []; rocks = []; bits = []; orbs = [];
+      boss = null; vortex = null; ship = null;
       draw(0, Math.max(2, readItems().length || 4), 0, 1, 0);
     };
 
     // 첫 화면 — 출발선에 세워둔 미리보기
     (function preview() {
       var names = ["", "", "", ""];
-      runners = names.map(function (_, i) { return { name: "", p: .02 + i * .004, rank: 0, done: false, pen: 0, spin: 0 }; });
+      runners = names.map(function (_, i) { return { name: "", p: .02 + i * .004, rank: 0, done: false, spin: 0, hurtT: 0 }; });
       draw(0, 4, 0, 1, 0);
       setTimeout(preview2, 350);              // 스프라이트가 구워진 뒤 한 번 더
     })();
