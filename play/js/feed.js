@@ -30,6 +30,8 @@
     pastlife: { label: "🔮 전생 파티", url: "pastlife.html" },
     balance: { label: "⚖️ 밸런스 게임", url: "balance.html" },
     roulette: { label: "🎡 복불복 룰렛", url: "roulette.html" },
+    plinko: { label: "🎢 운명의 낙하", url: "plinko.html" },
+    race: { label: "🏁 고브럽 생존 레이스", url: "race.html" },
     questions: { label: "🎴 질문 카드", url: "questions.html" },
     naming: { label: "📛 네이밍 생성기", url: "naming.html" },
     whack: { label: "🕳️ 감정 몬스터 팡팡", url: "whack.html" },
