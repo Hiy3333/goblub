@@ -31,6 +31,18 @@
       border-radius:18px; overflow:hidden; background:#04060f;
       box-shadow:0 22px 54px rgba(0,6,20,.62), inset 0 0 0 1px rgba(255,255,255,.07); }
     .track-wrap canvas { display:block; width:100%; height:auto; }
+    /* 극장 모드 — 레이스 동안 화면 전체를 쓴다 */
+    body.theater { overflow:hidden; }
+    body.theater .track-wrap { position:fixed; inset:0; max-width:none; margin:0;
+      border-radius:0; z-index:998; box-shadow:none; }
+    body.theater .track-wrap canvas { width:100%; height:100%; object-fit:contain; }
+    body.theater .hud { position:fixed; top:10px; left:50%; transform:translateX(-50%);
+      z-index:999; max-width:none; width:auto; gap:18px; padding:8px 18px;
+      background:rgba(6,12,26,.62); border:1px solid rgba(255,255,255,.14);
+      border-radius:999px; backdrop-filter:blur(6px); }
+    body.theater .hud span { color:#e8eeff; }
+    body.theater .live { left:14px; top:14px; }
+    body.theater .live .lr { font-size:.94rem; }
     .track-wrap.shake { animation:tshake .28s ease; }
     @keyframes tshake { 0%,100%{transform:translate(0,0)} 25%{transform:translate(-7px,4px)}
       55%{transform:translate(6px,-4px)} 80%{transform:translate(-3px,1px)} }
@@ -796,7 +808,7 @@
       $("setup").style.display = "none"; $("hud").style.display = "flex";
       var wrap = $("track-wrap");
       wrap.classList.remove("final");
-      if (wrap.scrollIntoView) wrap.scrollIntoView({ behavior: "smooth", block: "center" });
+      document.body.classList.add("theater");   // 레이스 동안 전체 화면
 
       var n = names.length;
       // 공정성: 물리는 순위를 모른 채 정직하게 굴리고, 이름만 레인에 무작위로 꽂는다.
@@ -1148,6 +1160,12 @@
         $("hud-left").textContent = "🏁 경주 종료";
         $("btn-again").style.display = ""; $("btn-edit").style.display = "";
         busy = false;
+        // 클로즈업을 2초 보여준 뒤 전체 화면을 접고 결과로
+        setTimeout(function () {
+          document.body.classList.remove("theater");
+          var w2 = $("winner");
+          if (w2.scrollIntoView) w2.scrollIntoView({ behavior: "smooth", block: "center" });
+        }, 2000);
       })(t0);
     }
 
@@ -1155,6 +1173,7 @@
     $("btn-again").onclick = function () { $("btn-go").style.display = ""; $("btn-go").disabled = false; start(); };
     $("btn-edit").onclick = function () {
       if (raf) cancelAnimationFrame(raf);
+      document.body.classList.remove("theater");
       $("setup").style.display = ""; $("hud").style.display = "none";
       $("winner").style.display = "none"; $("rank").style.display = "none";
       $("live").innerHTML = ""; $("count").classList.remove("on");
