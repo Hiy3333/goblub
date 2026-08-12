@@ -271,7 +271,8 @@
     var VW = cv.width, VH = cv.height;
     var TRACK = 12000;                     // 월드 트랙 길이 — 길수록 배경이 빨리 흐른다
     var GROUND = VH - 150;
-    var cam = { x: 0, z: 1, v: 0 };        // z = 배율, v = 실제 이동 속도(월드 px/s)
+    // fx = 완충된 초점 x (카메라는 '상자 맞춤' 한 규칙으로만 움직인다)
+    var cam = { x: 0, z: 1, v: 0, fx: null };
     var runners = [], rocks = [], bits = [], orbs = [], farStars = [], midStars = [], fgDust = [];
     var SPAN = TRACK * 1.3;
     for (var i = 0; i < 190; i++) farStars.push({ x: Math.random() * SPAN, y: Math.random() * VH, r: Math.random() * 1.8 + .5 });
@@ -926,6 +927,16 @@
       g.globalAlpha = 1;
 
       // 주자 — 뒤에 있는 사람부터 그려 앞선 사람이 위로
+      // 지금 벌칙 등수 자리에 있는 주자 — 카메라로 쫓으면 화면이 흔들리니
+      // 표식으로 알린다(달리는 동안엔 자리 주인이 수시로 바뀐다)
+      var doomIdx = -1;
+      if (loseRankNow >= 1) {
+        var ordD = runners.map(function (r, i2) {
+          return { i: i2, key: r.done ? r.rank : n + (1 - r.p) };
+        }).sort(function (a, b) { return a.key - b.key; });
+        var dPick = ordD[Math.min(loseRankNow, ordD.length) - 1];
+        if (dPick) doomIdx = dPick.i;
+      }
       runners.map(function (rn, i) { return { rn: rn, i: i }; })
         .sort(function (a, b) { return a.rn.p - b.rn.p; })
         .forEach(function (o) {
@@ -934,6 +945,19 @@
           var sx = (wx - camX) * scale + VW / 2;
           if (sx < -140 || sx > VW + 140) return;
           drawRunner(o.rn, o.i, n, sx, scale, t);
+          if (o.i === doomIdx && !o.rn.done) {
+            var my = (laneY(o.i, n) - VH / 2) * scale + VH / 2;
+            var ms = Math.max(74, 142 * scale);
+            var pu = 1 + Math.sin(t / 170) * .12;
+            g.save(); g.translate(sx, my);
+            g.strokeStyle = "rgba(255,90,90,.9)"; g.lineWidth = 4 * Math.max(.6, scale);
+            g.beginPath(); g.ellipse(0, ms * .1, ms * .46 * pu, ms * .30 * pu, 0, 0, 6.284); g.stroke();
+            g.fillStyle = "rgba(255,90,90,.95)";                 // 머리 위 ▼
+            var ay = -ms * .92 - Math.sin(t / 170) * 5;
+            g.beginPath(); g.moveTo(-13, ay); g.lineTo(13, ay); g.lineTo(0, ay + 17);
+            g.closePath(); g.fill();
+            g.restore();
+          }
         });
     }
 
@@ -1034,7 +1058,7 @@
       // 배지는 반드시 레인 순서(runners 와 같은 인덱스)로 만들어야 한다.
       // 입력 순서(names)로 만들면 이름·색·등수가 서로 어긋난다.
       buildLive(lane); updateLive();
-      cam.x = 0; cam.z = 1;
+      cam.x = 0; cam.z = 1; cam.fx = null;
 
       // 3 · 2 · 1 · GO
       var cbox = $("count"), steps = ["3", "2", "1", "GO!"], ci = 0;
@@ -1254,33 +1278,38 @@
         if (slow && !slowNote) { slowNote = true; flash = "📸 포토피니시 각!"; flashT = 1400; }
         if (!slow) slowNote = false;
 
-        // 카메라 — 1위를 기준으로 잡고, 꼴찌까지 담기도록 벌어질수록 축소한다
+        /* ── 카메라 ───────────────────────────────────────────────
+           규칙 하나로 통일한다: "지금 봐야 할 것들"을 상자에 담고 그 상자를
+           화면에 맞춘다. 구간마다 초점을 갈아끼우면 전환 때마다 화면이 튄다.
+             · 상자 = 주자 전원 + (살아 있으면) 보스 + (가까우면) 결승선
+             · 줌아웃은 즉시, 줌인만 천천히 — 잘리는 것보다 느린 게 낫다
+             · 마지막에 상자를 화면 안으로 하드 클램프 — 부드러움보다 안 잘림 우선
+           포토피니시만 예외로 두 명을 크게 잡는다. */
         var xs = runners.map(function (r) { return r.p * TRACK; });
-        var leadX = Math.max.apply(null, xs), tailX = Math.min.apply(null, xs);
-        var spread = Math.max(260, leadX - tailX);
-        // 1위와 꼴찌 사이가 화면 가로의 64% 안에 들어오게 배율을 정한다
-        var wantZ = Math.max(.32, Math.min(1.45, VW * .64 / spread));
-        // 보스전엔 간격 기반 배율을 쓰지 않는다 — 튕길 때마다 간격이 널뛰어 줌이 출렁인다
-        if (!bossFight) cam.z += (wantZ - cam.z) * Math.min(1, rawDt / 300);
-        // 1위를 가로 72% 지점에 둔다 — 앞은 결승선, 뒤는 추격자들이 보이게
-        var wantX = leadX - VW * .22 / cam.z;
-        // 블랙홀이 열린 동안엔 카메라를 블랙홀에 고정 — 전원이 여기로 빨려든다
-        if (vortex && !vortex.fade) {
-          wantZ = .86; cam.z += (wantZ - cam.z) * Math.min(1, dt / 300);
-          wantX = doomedX(n);
+        var lo = Math.min.apply(null, xs), hi = Math.max.apply(null, xs);
+        if (boss && !boss.dead) hi = Math.max(hi, BOSS_P * TRACK + 220);   // 보스 몸통까지
+        if (hi > TRACK - 2200) hi = Math.max(hi, TRACK + 120);             // 결승선까지
+        var focus = (lo + hi) / 2;
+        var span = Math.max(420, hi - lo + 520);
+        var wantZ = Math.max(.32, Math.min(1.45, VW * .78 / span));
+
+        if (slow && fA && fB) {                     // 포토피니시 — 두 명 정면
+          focus = ((fA.p + fB.p) / 2) * TRACK;
+          wantZ = 1.35;
         }
-        // 보스전엔 벌칙 등수 자리에 있는 주자를 비춘다 — 정작 중요한 자리싸움이
-        // 화면 밖으로 나가면 안 된다(1위를 쫓으면 화면도 출렁인다)
-        if (bossFight) {
-          wantZ = .82; cam.z += (wantZ - cam.z) * Math.min(1, rawDt / 300);
-          wantX = doomedX(n);
+
+        if (cam.fx === null) { cam.fx = focus; cam.z = wantZ; }
+        cam.fx += (focus - cam.fx) * Math.min(1, rawDt / 220);
+        cam.z += (wantZ - cam.z) * Math.min(1, rawDt / 300);
+        if (wantZ < cam.z) cam.z = wantZ;           // 줌아웃은 즉시
+        cam.x += (cam.fx - cam.x) * Math.min(1, rawDt / 150);
+        if (!(slow && fA && fB)) {                  // 상자를 화면 안으로
+          var MG = 70;
+          var maxX = lo - (MG - VW / 2) / cam.z;
+          var minX = hi - (VW - MG - VW / 2) / cam.z;
+          if (cam.x > maxX) cam.x = maxX;
+          if (cam.x < minX) cam.x = minX;
         }
-        // 슬로모션 중엔 경계 다툼 두 명을 정면으로 크게
-        if (slow && fA && fB) {
-          cam.z += (1.35 - cam.z) * Math.min(1, rawDt / 220);
-          wantX = ((fA.p + fB.p) / 2) * TRACK;
-        }
-        cam.x += (wantX - cam.x) * Math.min(1, rawDt / 170);
 
         // 체감 속도 = 카메라가 실제로 지나간 월드 거리 (급변하지 않게 평활화)
         var inst = dt > 0 ? Math.abs(cam.x - camPrev) / (dt / 1000) : 0;
@@ -1308,16 +1337,6 @@
         else finish(arrived, n);
       }
       raf = requestAnimationFrame(tick);
-    }
-
-    // 지금 '벌칙 등수' 자리에 있는 주자의 월드 x. 보스전·블랙홀 구간에서
-    // 카메라가 이 사람을 따라가면 정작 중요한 자리싸움이 화면 밖으로 안 나간다.
-    function doomedX(n) {
-      var ord = runners.map(function (r, i) {
-        return { i: i, key: r.done ? r.rank : n + (1 - r.p) };
-      }).sort(function (a, b) { return a.key - b.key; });
-      var pick2 = ord[Math.min(loseRankNow, ord.length) - 1];
-      return pick2 ? runners[pick2.i].p * TRACK : BOSS_P * TRACK;
     }
 
     // 순위는 실제 도착 순서 그대로. 이름이 레인에 무작위로 꽂혀 있으므로 확률은 균등하다.
