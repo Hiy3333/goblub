@@ -1021,12 +1021,12 @@
       // 🚀 결승선 로켓 — 한 줄에 창문 2개, 인원이 늘면 줄이 아래로 붙는다
       ship = { x: TRACK + 560, m: shipMetrics(n), seats: [], eject: null, launch: null };
       for (var sI = 0; sI < n; sI++) ship.seats.push({ idx: -1, blown: false });
-      // ⭐ 부스트 별 · 🕳 블랙홀 — 보스 앞 구간에만 (뒤 구간은 짧아서 못 씀)
+      // ⭐ 부스트 별만 배치한다. 블랙홀은 보스를 잡아야 열리는 단 하나뿐 —
+      // 트랙에도 작은 블랙홀을 뿌리면 보스 블랙홀의 무게가 사라진다.
       orbs = [];
       for (var op = .10; op < BOSS_P - .05; op += .045 + Math.random() * .035) {
         orbs.push({ x: op * TRACK, lane: Math.floor(Math.random() * n),
-                    t: Math.random() * 6.28, got: false,
-                    hole: Math.random() < .30 });     // 열에 셋은 블랙홀
+                    t: Math.random() * 6.28, got: false, hole: false });
       }
       // 배지는 반드시 레인 순서(runners 와 같은 인덱스)로 만들어야 한다.
       // 입력 순서(names)로 만들면 이름·색·등수가 서로 어긋난다.
@@ -1105,17 +1105,11 @@
             if (o.got || o.lane !== i) return;
             if (!(rn.prevX <= o.x && wx >= o.x)) return;
             o.got = true;
-            if (o.hole) {
-              rn.holeT = 2000;                     // 2초 갇혔다가 빠져나온다
-              flash = "🕳 " + rn.name + " 빨려들어감!"; flashT = 1400;
-              for (var h = 0; h < 14; h++) bits.push({ x: o.x, y: wy, vx: (Math.random() - .5) * 7,
-                vy: -Math.random() * 5, life: 1, c: h % 2 ? "#b78cff" : "#5b3fa8" });
-            } else {
-              rn.dashT = 1300;                     // 1.3초간 3배속 질주
-              flash = "⭐ " + rn.name + " 부스트!"; flashT = 1200;
-              for (var b = 0; b < 16; b++) bits.push({ x: o.x, y: wy, vx: (Math.random() - .5) * 11,
-                vy: -Math.random() * 7, life: 1, c: b % 2 ? "#fff3b0" : "#ffd479" });
-            }
+            // 트랙 아이템은 부스트 별뿐이다 (블랙홀은 보스 자리 하나)
+            rn.dashT = 1300;                       // 1.3초간 3배속 질주
+            flash = "⭐ " + rn.name + " 부스트!"; flashT = 1200;
+            for (var b = 0; b < 16; b++) bits.push({ x: o.x, y: wy, vx: (Math.random() - .5) * 11,
+              vy: -Math.random() * 7, life: 1, c: b % 2 ? "#fff3b0" : "#ffd479" });
           });
 
           // 속도만 오르내린다 — 위치는 절대 뒤로 가지 않는다
@@ -1159,7 +1153,12 @@
               flash = "💥 " + rn.name + " 박치기! 남은 체력 " + Math.max(0, boss.hp); flashT = 900;
               if (boss.hp <= 0) {
                 boss.dead = true; boss.deadT = 0;
-                flash = "👾 우주 괴수 격파!"; flashT = 1600;
+                // 죽는 즉시 블랙홀을 연다. 한 프레임이라도 늦으면 장벽이 풀린 사이
+                // 앞서 있던 주자가 그대로 지나쳐 버린다.
+                vortex = { x: BOSS_P * TRACK, t: 0, swallowed: false, releaseAt: 0, queue: [] };
+                orbs.forEach(function (o) { o.got = true; });
+                sfx.whoosh();
+                flash = "👾 격파! 🕳 블랙홀이 열렸다!"; flashT = 1600;
                 for (var d3 = 0; d3 < 60; d3++) bits.push({ x: BOSS_P * TRACK, y: VH * .5,
                   vx: (Math.random() - .5) * 26, vy: (Math.random() - .5) * 22, life: 1,
                   c: d3 % 3 === 0 ? "#ffd479" : d3 % 3 === 1 ? "#c07bff" : "#ff9db5" });
@@ -1176,18 +1175,7 @@
         });
 
         // 보스가 죽으면 그 자리에 소용돌이가 열려 전원을 삼켰다가 하나씩 뱉는다
-        if (boss && boss.dead) {
-          boss.deadT += dt;
-          if (!vortex && boss.deadT > 620) {
-            vortex = { x: BOSS_P * TRACK, t: 0, swallowed: false, releaseAt: 0, queue: [] };
-            // 남아 있던 아이템을 전부 소진 처리한다. 보스에게 밀려난 구간(62~65%)에
-            // 안 먹은 게 남아 있으면, 탈출하며 p 가 점프할 때 한 프레임에 '지나친'
-            // 것으로 판정돼 블랙홀이 또 걸린다.
-            orbs.forEach(function (o) { o.got = true; });
-            sfx.whoosh();
-            flash = "🌀 소용돌이가 열렸다!"; flashT = 1500;
-          }
-        }
+        if (boss && boss.dead) boss.deadT += dt;
         if (vortex) {
           vortex.t += dt;
           if (!vortex.swallowed) {
