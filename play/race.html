@@ -292,7 +292,7 @@
     // 블랙홀은 월드에 놓인 물체다. 반지름도 월드 단위여야 줌이 변해도
     // 주자와 비율이 유지된다.
     var VORTEX_R = 640;   // 월드 반지름 — 고정 배율 0.42 에서 화면 지름 약 538px
-    var PULL = .06;       // 중력권 — 홀에서 트랙의 6% 를 벗어나야 완전히 자유
+    var PULL = .075;      // 중력권 — 홀에서 트랙의 7.5% 를 벗어나야 완전히 자유
     var vortex = null, ship = null;
 
     function drawVortex(camX, scale, t) {
@@ -992,7 +992,7 @@
                  slowT: 0, dashT: 0, holeT: 0,        // 운석 감속 / 별 질주 / 블랙홀 정지
                  hurtT: 0, bumpCD: 0, sucked: false, suckT: 0, passedHole: false,
                  // 중력 레벨 — 고브럽마다 다르다. 셀수록 홀에서 못 벗어난다.
-                 grav: Math.random(), escU: 1, sad: false, boarded: false,
+                 grav: Math.random(), escU: 1, wellT: 0, sad: false, boarded: false,
                  innate: .99 + Math.random() * .02,   // 타고난 속도차(아주 작게)
                  phase: Math.random() * 6.28, freq: .0009 + Math.random() * .0020 };
       });
@@ -1049,7 +1049,8 @@
       var flash = "", flashT = 0;           // 부스트·블랙홀 알림이 잠깐 머물게
       var camPrev = 0;
       var simEl = 0, timeScale = 1, slowNote = "", nextBeat = 700, slowUsed = 0;
-      var deepUsed = 0, rushOn = false;   // 결정타 슬로모션 예산 / 마무리 질주 여부
+      var deepUsed = 0, deepTS0 = 0, deepP0 = 0, rushOn = false;  // 결정타 / 마무리 질주
+      var DEEP_MS = 6500;                 // 결정타 슬로모션의 목표 길이(실제 시간)
 
       function tick(now) {
         var rawDt = Math.min(48, now - last); last = now;
@@ -1125,11 +1126,14 @@
           if (rushOn) mul = 3.2;                                // 승부는 났다 — 남은 인원은 전속력
           else if (rn.escU < 1) {
             // 중력권 안 — 중력이 셀수록 바닥 속도가 낮고, 멀어질수록 풀려난다.
-            // grav 0 이면 .58 배로 스르륵, grav 1 이면 .13 배로 낑낑댄다.
-            // 하한을 .06 까지 내리면 최악의 판에서 8.7초를 기어간다(실측).
-            // 그쯤 되면 긴장이 아니라 멈춘 것처럼 보인다 — .13 에서 끊는다.
-            var floorV = .58 - .45 * rn.grav;
+            // grav 0 이면 .56 배로 스르륵, grav 1 이면 .07 배로 기어간다.
+            rn.wellT += dt;
+            var floorV = .56 - .49 * rn.grav;
             mul = floorV + (1 - floorV) * rn.escU * rn.escU;
+            // 예전엔 최악의 판이 너무 길어지는 걸 '중력을 깎아서' 막았는데,
+            // 그러면 쫄깃함까지 같이 깎인다. 중력은 세게 두고, 오래 붙잡힌
+            // 만큼 안간힘이 붙게 해서 길이의 상한만 따로 잡는다.
+            if (rn.wellT > 1800) mul *= Math.min(3.2, 1 + (rn.wellT - 1800) / 2000);
           }
           else if (rn.holeT > 0) mul = 0;                       // 블랙홀 = 완전 정지
           else if (rn.dashT > 0) mul = 3;                       // 별 = 3배속
@@ -1189,7 +1193,7 @@
             if (r.done) return;
             if (r.sucked) { r.sucked = false; r.p = BOSS_P + .004; r.prevX = r.p * TRACK; }
             r.passedHole = true;                      // 블랙홀은 더 붙잡지 않는다
-            r.escU = 1; r.slowT = 0; r.holeT = 0;     // 중력도 여기서 풀린다
+            r.escU = 1; r.wellT = 0; r.slowT = 0; r.holeT = 0;   // 중력도 여기서 풀린다
             r.dashT = 9e5;                            // 잔상·속도선 — 속도를 눈에 보이게
           });
           if (vortex) vortex.queue.length = 0;
@@ -1212,6 +1216,7 @@
               vortex.queue.shift();
               ro.sucked = false;
               ro.passedHole = true;                    // 한 번 통과하면 다시 안 빨린다
+              ro.wellT = 0;                            // 안간힘 타이머는 나온 순간부터
               ro.p = BOSS_P + .0015;
               ro.prevX = ro.p * TRACK;                 // 뒤에 남은 아이템을 소급 판정하지 않게
               var heavy = ro.grav > .62;
@@ -1236,9 +1241,10 @@
         }
 
         // ── 슬로모션 ─────────────────────────────────────────────
-        // (A) 결정타: 벌칙 등수 자리가 바로 다음 차례이고 골 라인이 코앞이면,
+        // (A) 결정타: 벌칙 등수 자리가 바로 다음 차례이고 골 라인이 사정권이면,
         //     그 통과 장면을 길고 깊게 늘인다. 라이벌이 없어도 발동한다 —
-        //     이 한 장면이 판의 결말이니까. 3.4초까지(≒마지막 4.5% 구간).
+        //     이 한 장면이 판의 결말이니까. 마지막 7% 구간, 최대 7초.
+        //     다가갈수록 화면도 함께 밀고 들어가고 심장박동도 빨라진다.
         // (B) 포토피니시: 그 전 단계의 경계 다툼이 박빙일 때 (기존, 2.2초)
         var slow = false, deep = false, fA = null, fB = null, deepTS = .20;
         var ord2 = runners.map(function (r, i2) { return { i: i2, done: r.done, rank: r.rank, p: r.p }; })
@@ -1248,13 +1254,21 @@
             return ka - kb;
           });
         var occ = ord2[loseRank - 1];
-        if (done === loseRank - 1 && occ && !occ.done && occ.p > .955 && deepUsed < 4200) {
+        if (done < loseRank && occ && !occ.done && occ.p > .93 && deepUsed < 9000) {
           slow = true; deep = true; fA = occ; deepUsed += rawDt;
-          // 배속을 고정하면 결말의 길이가 판마다 제각각이 된다. 앞 등수가 늦게
-          // 들어와 당첨자가 이미 골 라인 코앞일 때는 33ms 만에 끝나 버렸다(실측
-          // 28판 33~4659ms). 남은 거리를 시간으로 환산해, 언제 걸리든 약 2.8초
-          // 짜리 결말이 되도록 배속을 역산한다.
-          deepTS = Math.max(.06, Math.min(.22, (1 - occ.p) * 15000 / 2800));
+          // 배속 정하기 — 세 번 틀렸던 자리다.
+          //   · 고정값 → 결말 길이가 판마다 제각각 (33~4659ms)
+          //   · 매 프레임 '남은 시간 T' 로 재계산 → 로그적으로 누적돼 끝없이
+          //     늘어지고, 28판 중 8판이 예산 상한에서 툭 풀렸다
+          //   · 시작할 때 한 번만 계산 → 이번엔 막판 역전 별(3배속)을 문 채로
+          //     들어오면 5초짜리 연출을 1.6초에 통과해 버렸다
+          // 그래서 '진행도 대비 흘러간 시간'으로 되먹임을 건다. 속도가 어떻게
+          // 변하든 총 길이가 목표(5초)로 수렴한다.
+          if (!deepTS0) { deepP0 = occ.p; deepTS0 = (1 - occ.p) * 15000 / DEEP_MS; }
+          var uD = Math.max(0, Math.min(.999, (occ.p - deepP0) / Math.max(1e-6, 1 - deepP0)));
+          var wantMs = DEEP_MS * uD;            // 지금쯤 흘렀어야 할 실제 시간
+          deepTS = deepTS0 * Math.max(.35, Math.min(2.5, (deepUsed + 120) / (wantMs + 120)));
+          deepTS = Math.max(.030, Math.min(.30, deepTS));
         } else if (done < loseRank && leadPre > .955 && slowUsed < 2200) {
           var cand = [];
           if (loseRank - 2 >= 0) cand.push(ord2[loseRank - 2]);
@@ -1266,7 +1280,10 @@
           }
           if (slow) slowUsed += rawDt;
         }
-        timeScale += ((slow ? (deep ? deepTS : .35) : 1) - timeScale) * Math.min(1, rawDt / 140);
+        // 결정타는 빠르게 물린다. 전환이 느리면 그 사이 화면이 제 속도로
+        // 흘러 목표 길이에서 0.5초쯤 샌다.
+        timeScale += ((slow ? (deep ? deepTS : .35) : 1) - timeScale)
+          * Math.min(1, rawDt / (deep ? 90 : 140));
         var mode = slow ? (deep ? "deep" : "photo") : "";
         if (mode && mode !== slowNote) {
           flash = deep ? "🎬 운명의 골 라인…" : "📸 포토피니시 각!"; flashT = 1400;
@@ -1297,7 +1314,10 @@
         var wantZ = LOCK_Z;
         if (slow && fA) {                           // 슬로모션 구간만 예외로 확대
           focus = (fB ? (fA.p + fB.p) / 2 : fA.p) * TRACK;
-          wantZ = fB ? 1.35 : 1.30;
+          // 결정타에선 다가갈수록 화면이 밀고 들어간다. 배속만 늘리면
+          // '느린 화면'이지 '조여드는 화면'은 아니다.
+          var uz = Math.max(0, Math.min(1, (fA.p - .93) / .07));
+          wantZ = fB ? 1.35 : 1.24 + .42 * uz * uz;
         }
         if (cam.fx === null) { cam.fx = focus; cam.x = focus; cam.z = wantZ; }
         cam.fx += (focus - cam.fx) * Math.min(1, rawDt / 90);
@@ -1317,7 +1337,9 @@
         // 심장박동 — 결승이 가까울수록 빨라진다 (실제 시간 기준)
         if (realEl >= nextBeat && done < n && leadPre > .5) {
           sfx.thump();
-          nextBeat = realEl + (980 - 620 * Math.min(1, leadPre));
+          // 결정타 슬로모션 동안엔 두 배로 뛴다 — 화면이 느려지는 만큼
+          // 소리가 조여 준다.
+          nextBeat = realEl + (deep ? 190 : 980 - 620 * Math.min(1, leadPre));
         }
         if (flashT > 0) flashT -= dt;
         $("hud-left").textContent = flashT > 0 ? flash
