@@ -282,7 +282,7 @@
     function laneY(i, n) { var top = 210, bot = GROUND - 20; return n === 1 ? (top + bot) / 2 : top + (bot - top) * i / (n - 1); }
 
     /* ── 보스 · 소용돌이 · 우주선 ─────────────────── */
-    var BOSS_P = .70, BOSS_HP = 10;
+    var BOSS_P = .70;        // 보스 체력은 인원에 따라 정해진다(start 참조)
     var boss = null, vortex = null, ship = null;
 
     function drawBoss(camX, scale, t) {
@@ -334,10 +334,10 @@
         g.fillStyle = "rgba(6,12,26,.7)"; g.fillRect(bx - 3, by - 3, bw + 6, 24);
         g.fillStyle = "#3a1f52"; g.fillRect(bx, by, bw, 18);
         g.fillStyle = boss.hp <= 3 ? "#ff5b6e" : "#c07bff";
-        g.fillRect(bx, by, bw * (boss.hp / BOSS_HP), 18);
+        g.fillRect(bx, by, bw * Math.max(0, boss.hp / boss.max), 18);
         g.fillStyle = "#ffe6b8"; g.font = "600 17px 'Jua', sans-serif";
         g.textAlign = "center"; g.textBaseline = "middle";
-        g.fillText("👾 우주 괴수  " + boss.hp + " / " + BOSS_HP, VW / 2, by + 9);
+        g.fillText("👾 우주 괴수  " + Math.max(0, boss.hp) + " / " + boss.max, VW / 2, by + 9);
       }
     }
 
@@ -1010,13 +1010,16 @@
       runners = lane.map(function (nm) {
         return { name: nm, p: 0, prevX: 0, rank: 0, done: false, spin: 0,
                  slowT: 0, dashT: 0, holeT: 0,        // 운석 감속 / 별 질주 / 블랙홀 정지
-                 hurtT: 0, sucked: false, suckT: 0, escT: 0, escDur: 1, sad: false, boarded: false,
+                 hurtT: 0, bumpCD: 0, sucked: false, suckT: 0, escT: 0, escDur: 1, sad: false, boarded: false,
                  innate: .99 + Math.random() * .02,   // 타고난 속도차(아주 작게)
                  phase: Math.random() * 6.28, freq: .0009 + Math.random() * .0020 };
       });
       rocks = []; bits = [];
       // 👾 보스는 70% 지점. 몸통 박치기 10번이면 죽고 자리에 소용돌이를 남긴다
-      boss = { x: BOSS_P * TRACK, hp: BOSS_HP, flash: 0, cd: 0, dead: false, deadT: 0 };
+      // 이제 모든 박치기가 데미지로 들어간다. 체력을 10 으로 고정하면 8명일 때
+      // 0.8초 만에 끝나 버려서, 인원에 맞춰 늘린다(2명 13 … 8명 28).
+      var bossHP = Math.round(8 + n * 2.5);
+      boss = { x: BOSS_P * TRACK, hp: bossHP, max: bossHP, flash: 0, cd: 0, dead: false, deadT: 0 };
       vortex = null;
       // 🚀 결승선 로켓 — 한 줄에 창문 2개, 인원이 늘면 줄이 아래로 붙는다
       ship = { x: TRACK + 560, m: shipMetrics(n), seats: [], eject: null, launch: null };
@@ -1085,7 +1088,8 @@
           if (rn.done) return;
           if (rn.sucked) return;               // 소용돌이 안 — 아래 소용돌이 로직이 맡는다
           if (rn.spin) rn.spin = Math.abs(rn.spin) < .05 ? 0 : rn.spin * .9;
-          if (rn.escT > 0) rn.escT -= dt;        // 낑낑대며 빠져나오는 잔여 시간
+          if (rn.escT > 0) rn.escT -= dt;
+          if (rn.bumpCD > 0) rn.bumpCD -= dt;        // 낑낑대며 빠져나오는 잔여 시간
           var wx = rn.p * TRACK, wy = laneY(i, n);
           rocks.forEach(function (r) {
             if (r.hit) return;
@@ -1136,20 +1140,22 @@
           // 👾 보스 몸통 박치기 — 보스가 살아 있으면 그 앞을 못 지나간다.
           // 부딪히면 진짜로 뒤로 밀려나고(공격하려면 물러났다 다시 와야 한다) 체력이 1 깎인다.
           if (boss && !boss.dead && rn.p >= BOSS_P) {
-            // 크게 튕겨 보내야 되돌아오는 데 시간이 걸려 박치기에 리듬이 생긴다
-            rn.p = BOSS_P - .052 - Math.random() * .024;
+            rn.p = BOSS_P - .026 - Math.random() * .012;   // 튕김 거리 절반
             rn.hurtT = 700; rn.spin = (Math.random() < .5 ? -1 : 1) * 1.3;
             for (var d2 = 0; d2 < 7; d2++) bits.push({ x: BOSS_P * TRACK, y: wy,
               vx: -(1 + Math.random() * 8), vy: (Math.random() - .5) * 9, life: 1,
               c: d2 % 2 ? "#ff9db5" : "#c07bff" });
-            // 여러 명이 동시에 닿아도 타격은 일정 간격으로만 들어간다.
-            // 화면 흔들림도 타격이 들어갈 때만 — 부딪힘마다 흔들면 정신이 없다.
-            if (boss.cd <= 0) {
-              boss.cd = 340;
+            // 쿨다운은 주자별로 둔다. 전역으로 두면 340ms 안에 두 번째로 박은
+            // 사람의 타격이 통째로 사라져 '여러 명이 박아도 한 번'이 된다.
+            if (rn.bumpCD <= 0) {
+              rn.bumpCD = 560;
               boss.hp--; boss.flash = 7;
               sfx.hit();
-              wrap.classList.add("shake");
-              setTimeout(function () { wrap.classList.remove("shake"); }, 280);
+              if (boss.cd <= 0) {                          // 화면 흔들림만 간격을 둔다
+                boss.cd = 150;
+                wrap.classList.add("shake");
+                setTimeout(function () { wrap.classList.remove("shake"); }, 240);
+              }
               flash = "💥 " + rn.name + " 박치기! 남은 체력 " + Math.max(0, boss.hp); flashT = 900;
               if (boss.hp <= 0) {
                 boss.dead = true; boss.deadT = 0;
@@ -1261,12 +1267,13 @@
         // 블랙홀이 열린 동안엔 카메라를 블랙홀에 고정 — 전원이 여기로 빨려든다
         if (vortex && !vortex.fade) {
           wantZ = .86; cam.z += (wantZ - cam.z) * Math.min(1, dt / 300);
-          wantX = BOSS_P * TRACK;
+          wantX = doomedX(n);
         }
-        // 보스전엔 카메라를 보스 기준으로 고정 — 튕겨다니는 1위를 쫓으면 화면이 출렁인다
+        // 보스전엔 벌칙 등수 자리에 있는 주자를 비춘다 — 정작 중요한 자리싸움이
+        // 화면 밖으로 나가면 안 된다(1위를 쫓으면 화면도 출렁인다)
         if (bossFight) {
           wantZ = .82; cam.z += (wantZ - cam.z) * Math.min(1, rawDt / 300);
-          wantX = BOSS_P * TRACK - VW * .16;
+          wantX = doomedX(n);
         }
         // 슬로모션 중엔 경계 다툼 두 명을 정면으로 크게
         if (slow && fA && fB) {
@@ -1301,6 +1308,16 @@
         else finish(arrived, n);
       }
       raf = requestAnimationFrame(tick);
+    }
+
+    // 지금 '벌칙 등수' 자리에 있는 주자의 월드 x. 보스전·블랙홀 구간에서
+    // 카메라가 이 사람을 따라가면 정작 중요한 자리싸움이 화면 밖으로 안 나간다.
+    function doomedX(n) {
+      var ord = runners.map(function (r, i) {
+        return { i: i, key: r.done ? r.rank : n + (1 - r.p) };
+      }).sort(function (a, b) { return a.key - b.key; });
+      var pick2 = ord[Math.min(loseRankNow, ord.length) - 1];
+      return pick2 ? runners[pick2.i].p * TRACK : BOSS_P * TRACK;
     }
 
     // 순위는 실제 도착 순서 그대로. 이름이 레인에 무작위로 꽂혀 있으므로 확률은 균등하다.
@@ -1358,8 +1375,10 @@
             $("hud-left").textContent = "🚀 " + (cd2 > 0 ? cd2 + "…" : "발사!");
           } else {
             L.thrust = 1;
-            L.lifted += dt2;                             // 위로 떠오른다
-            if (L.lifted > 380) ready = true;            // 떠오르는 순간 한 명이 튕겨 나간다
+            // 불이 붙으면 먼저 한 명이 튕겨 나가고, 그다음에 우주선이 떠오른다
+            if (!blown) ready = true;
+            else { L.after = (L.after || 0) + dt2;
+                   if (L.after > 420) L.lifted += dt2; }
           }
         }
         if (ready && !blown) {
