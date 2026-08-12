@@ -205,6 +205,9 @@
       swish: function () { tone(700, "sine", .3, .24, 220); },
       fuse: function () { hiss(.06, .2, 3400); },
       boom: function () { hiss(.9, .95, 300); tone(60, "sine", .8, .6, 30); },
+      pop: function () { tone(300, "triangle", .12, .32, 540); },
+      hit: function () { hiss(.12, .5, 700); tone(95, "triangle", .16, .32, 55); },
+      chirp: function () { tone(1150, "square", .07, .13, 1500); setTimeout(function () { tone(900, "square", .06, .1, 700); }, 70); },
       cheer: function () { tone(520, "triangle", .18, .25, 780); setTimeout(function () { tone(660, "triangle", .2, .22, 920); }, 130); }
     };
     $("btn-mute").onclick = function () {
@@ -214,7 +217,7 @@
     /* ── 월드 ─────────────────────────────────────── */
     var cv = $("cv"), g = cv.getContext("2d");
     var VW = cv.width, VH = cv.height;
-    var players = [], bits = [], smoke = [];
+    var players = [], bits = [], smoke = [], birds = [];
     var wrap = $("track-wrap");
 
     // 원형 배치 — 2명이면 마주 보고, 늘수록 타원이 넓어진다
@@ -345,7 +348,8 @@
                  sticky: Math.random(),        // 🧲 찐득 레벨 — 사람마다 다르다
                  struggle: 0, sootT: 0, jumpT: 0 };
       });
-      bits = []; smoke = [];
+      bits = []; smoke = []; birds = [];
+      var birdN = 0, glueSnap = false;
 
       /* 공정성 — 레이스와 같은 역산.
          당첨자를 지금 균등하게 뽑아 두고, 폭탄은 무작위로 돌다가 무장 시간이
@@ -357,7 +361,8 @@
       var holder = Math.floor(Math.random() * n);
       if (n > 2 && holder === loser && Math.random() < .5) holder = (holder + 1) % n;
       var dir = Math.random() < .5 ? 1 : -1;
-      var bomb = { st: "held", x: 0, y: 0, fx: 0, fy: 0, tx: 0, ty: 0, t: 0, dur: 1, rot: 0, cross: false };
+      var bomb = { st: "held", x: 0, y: 0, fx: 0, fy: 0, tx: 0, ty: 0, t: 0, dur: 1, rot: 0,
+                   cross: false, block: null, ret: false, arcH: 150 };
       var passCount = 0, holdT = 0, holdDur = 900;
       var state = "count";                    // count → run → silence → boom → after
       var stT = 0, el = 0, timeScale = 1;
@@ -390,38 +395,80 @@
         return { to: (holder + dir + n) % n, cross: false };
       }
 
+      // 비행 중 폭탄의 현재 위치 — 접착제 사출은 끝에서 느려지고, 되감김은 홱 당겨진다
+      function bombPos() {
+        if (bomb.st !== "fly") return { x: players[holder].x, y: players[holder].y };
+        var u = bomb.t;
+        if (bomb.block && bomb.block.type === "glue")
+          u = bomb.ret ? u * u : 1 - Math.pow(1 - u, 1.8);
+        return { x: bomb.fx + (bomb.tx - bomb.fx) * u,
+                 y: bomb.fy + (bomb.ty - bomb.fy) * u - Math.sin(Math.min(1, u) * Math.PI) * bomb.arcH };
+      }
+
       function throwBomb() {
         var pick = pickTarget();
         var from = players[holder], to = players[pick.to];
         bomb.st = "fly"; bomb.t = 0; bomb.cross = pick.cross;
         bomb.fx = from.x; bomb.fy = from.y;
         bomb.tx = to.x; bomb.ty = to.y;
+        bomb.block = null; bomb.ret = false; bomb.arcH = 150;
         var d = Math.hypot(to.x - from.x, to.y - from.y);
         bomb.dur = (360 - 190 * tempo()) * (pick.cross ? 1.5 : 1) * Math.max(.7, d / 420);
         bomb.toI = pick.to;
         sfx.toss();
-        // 💥 이 패스가 마지막인가 — 무장됐고 당첨자에게 날아간다
-        if (el >= armT && pick.to === loser && !finalFly) {
+        if (glueSnap) {                     // 직전에 접착제에 붙잡혔던 사람 — 이번엔 뚝! 하고 끊긴다
+          glueSnap = false;
+          for (var gs = 0; gs < 12; gs++) bits.push({ x: from.x, y: from.y,
+            vx: (Math.random() - .5) * 8, vy: -Math.random() * 6, life: .8,
+            c: gs % 2 ? "#f4e2a0" : "#d9c47e" });
+          sfx.pop();
+        }
+        // 💥 이 패스가 마지막인가 — 무장됐고 당첨자에게 날아간다.
+        // 마지막 패스는 어떤 것에도 가로채이지 않는다 — 여기서 가로채이면
+        // 폭탄이 엉뚱한 사람 손에서 터져 공정성이 통째로 깨진다.
+        var isFinal = el >= armT && pick.to === loser;
+        if (isFinal && !finalFly) {
           finalFly = true;
           flash = "💥 설마…!!"; flashT = 1600;
+        }
+        if (!isFinal) {
+          // 🧲 찐득손 — 접착제가 폭탄을 붙든 채 늘어나다가 도로 끌고 온다
+          if (from.sticky > .55 && el - lastFlash > 2600 && Math.random() < .45) {
+            bomb.block = { type: "glue", at: .5 + Math.random() * .18, from: holder };
+            lastFlash = el;
+          }
+          // 🐦 지나가던 새 — 날아가던 폭탄에 정통으로 맞고 폭탄이 되돌아온다
+          else if (birdN < 2 && passCount >= 3 && el - lastFlash > 2000 && Math.random() < .11) {
+            birdN++; lastFlash = el;
+            bomb.block = { type: "bird", at: .5, from: holder };
+            var hitX = from.x + (to.x - from.x) * .5;
+            var hitY = from.y + (to.y - from.y) * .5 - Math.sin(.5 * Math.PI) * bomb.arcH;
+            var fromLeft = hitX > VW / 2 ? true : false;   // 먼 쪽에서 날아와야 눈에 띈다
+            var sx2 = fromLeft ? -70 : VW + 70;
+            birds.push({ x: sx2, y: hitY, vx: (hitX - sx2) / (bomb.dur * .5),
+                         dir: fromLeft ? 1 : -1, flap: 0, state: "fly", vy: 0, rot: 0, life: 1 });
+            sfx.chirp();
+          }
         }
       }
 
       function land() {
-        holder = bomb.toI; bomb.st = "held"; holdT = 0; passCount++;
+        var wasRet = bomb.ret, retType = bomb.block ? bomb.block.type : null;
+        holder = bomb.toI; bomb.st = "held"; holdT = 0;
+        bomb.block = null; bomb.ret = false; bomb.arcH = 150;
         sfx.catchS();
-        $("hud-right").textContent = "💣 " + passCount + "번째 패스";
         if (finalFly) { state = "silence"; stT = 0; timeScale = 1; return; }
-        var p = players[holder], tp = tempo();
-        holdDur = (620 - 420 * tp) * (.8 + Math.random() * .4);
-        // 🧲 찐득손 — 레벨이 높은 사람은 폭탄이 손에 붙는다 (연출 전용)
-        p.struggle = 0;
-        if (p.sticky > .58 && el - lastFlash > 2600 && Math.random() < .55) {
-          var extra = 500 + p.sticky * 1100;
-          holdDur += extra; p.struggle = extra; lastFlash = el;
-          flash = "🧲 " + p.name + " — 손에서 안 떨어진다!"; flashT = Math.min(1500, extra);
-          sfx.stick();
+        if (wasRet) {
+          // 되돌아온 폭탄 — 잠깐 추스르고 다시 던진다 (패스 수는 안 센다)
+          var pR = players[holder];
+          if (retType === "glue") { pR.struggle = 650; holdDur = 680; glueSnap = true; }
+          else holdDur = 450;
+          return;
         }
+        passCount++;
+        $("hud-right").textContent = "💣 " + passCount + "번째 패스";
+        var tp = tempo();
+        holdDur = (620 - 420 * tp) * (.8 + Math.random() * .4);
       }
 
       function tick(now) {
@@ -458,6 +505,30 @@
             // 마지막 패스는 슬로모션 — 공중에서 시간이 늘어진다
             timeScale = finalFly ? .30 : 1;
             bomb.t += dt / bomb.dur;
+            // 가로채기 — 정점에서 폭탄이 던진 사람에게 되돌아간다
+            if (bomb.block && !bomb.ret && bomb.t >= bomb.block.at) {
+              var cp = bombPos();
+              var thP = players[bomb.block.from];
+              bomb.fx = cp.x; bomb.fy = cp.y;
+              bomb.tx = thP.x; bomb.ty = thP.y;
+              bomb.toI = bomb.block.from; bomb.t = 0; bomb.ret = true; bomb.arcH = 55;
+              if (bomb.block.type === "bird") {
+                bomb.dur = 420;
+                birds.forEach(function (b) {
+                  if (b.state !== "fly") return;
+                  b.state = "tumble"; b.vx = b.dir * -2.4; b.vy = -3.4;
+                });
+                for (var bs = 0; bs < 10; bs++) bits.push({ x: cp.x, y: cp.y,
+                  vx: (Math.random() - .5) * 9, vy: -Math.random() * 5, life: .9,
+                  c: bs % 2 ? "#ffe680" : "#ffffff" });
+                flash = "🐦 퍽! 지나가던 새가 맞았다"; flashT = 1500;
+                sfx.hit();
+              } else {
+                bomb.dur = 300;
+                flash = "🧲 " + thP.name + " — 접착제가 안 놔준다!"; flashT = 1500;
+                sfx.stick();
+              }
+            }
             if (bomb.t >= 1) { bomb.t = 1; timeScale = 1; land(); }
           }
         }
@@ -496,14 +567,16 @@
           if (stT >= 2100) { state = "after"; finish(players[holder]); return; }
         }
 
+        birds.forEach(function (b) {
+          if (b.state === "fly") { b.x += b.vx * dt; b.flap += dt; }
+          else { b.x += b.vx; b.y += b.vy; b.vy += .32; b.rot += .18; b.life -= .014; }
+        });
+        birds = birds.filter(function (b) { return b.state === "fly" || b.life > 0; });
+
         /* ── 카메라 — 평소엔 원 전체, 종반엔 폭탄을 따라 조여든다 ── */
         var wz = 1, wx2 = VW / 2, wy2 = VH * .52;
-        var bx = bomb.st === "fly"
-          ? bomb.fx + (bomb.tx - bomb.fx) * bomb.t
-          : players[holder].x;
-        var by = bomb.st === "fly"
-          ? bomb.fy + (bomb.ty - bomb.fy) * bomb.t - Math.sin(Math.min(1, bomb.t) * Math.PI) * 150
-          : players[holder].y;
+        var bp = bombPos();
+        var bx = bp.x, by = bp.y;
         if (state === "run" && tp > .55) {
           var zk = (tp - .55) / .45;
           wz = 1 + .18 * zk; wx2 += (bx - wx2) * .25 * zk; wy2 += (by - wy2) * .25 * zk;
@@ -532,10 +605,51 @@
         var R = sprSize(n) * .30 * grow;
         var wob = state === "silence" ? 1 + Math.sin(stT / 40) * .18
           : 1 + Math.sin(t / 90) * .04 * (1 + tp);
+        // 🧲 접착제 줄 — 던진 사람 손에서 폭탄까지 축 늘어난다
+        if (bomb.st === "fly" && bomb.block && bomb.block.type === "glue") {
+          var gP = players[bomb.block.from];
+          var ghx = gP.x, ghy = gP.y + 10;
+          var gd = Math.hypot(bx - ghx, by - ghy);
+          var sag = Math.max(12, 95 - gd * .12);          // 팽팽해질수록 처짐이 사라진다
+          g.strokeStyle = "rgba(244,226,160,.85)";
+          g.lineWidth = Math.max(2.5, 11 - gd / 55);      // 늘어날수록 가늘어진다
+          g.lineCap = "round";
+          g.beginPath(); g.moveTo(ghx, ghy);
+          g.quadraticCurveTo((ghx + bx) / 2, Math.max(ghy, by) + sag, bx, by);
+          g.stroke();
+          g.globalAlpha = .45; g.lineWidth = Math.max(1.2, g.lineWidth * .45);
+          g.beginPath(); g.moveTo(ghx, ghy - 4);
+          g.quadraticCurveTo((ghx + bx) / 2 + 14, Math.max(ghy, by) + sag * .55, bx, by - 3);
+          g.stroke(); g.globalAlpha = 1;
+        }
         if (state !== "boom" && state !== "after") {
           var rot = bomb.st === "fly" ? bomb.t * (bomb.cross ? 9 : 6) : Math.sin(t / 130) * .2 * (1 + tp * 2);
           drawBomb(bx, by - (bomb.st === "held" ? sprSize(n) * .06 : 0), R * wob, rot, tp, t);
         }
+        // 🐦 새 — 화면을 가로지르다 폭탄에 맞으면 별을 그리며 나뒹군다
+        birds.forEach(function (b) {
+          g.save(); g.translate(b.x, b.y);
+          if (b.state === "tumble") { g.globalAlpha = Math.max(0, b.life); g.rotate(b.rot); }
+          g.scale(b.dir, 1);
+          var fl2 = Math.sin(b.flap / 42);
+          g.fillStyle = "#ffe680";
+          g.beginPath(); g.ellipse(0, 0, 17, 12, 0, 0, 6.284); g.fill();
+          g.fillStyle = "#ffd24d";
+          g.beginPath(); g.moveTo(-2, -2);
+          g.quadraticCurveTo(-15, -15 - fl2 * 9, -21, -4 + fl2 * 7);
+          g.quadraticCurveTo(-10, 3, -2, 3); g.closePath(); g.fill();
+          g.fillStyle = "#ff9a3c";
+          g.beginPath(); g.moveTo(14, -2); g.lineTo(23, 1); g.lineTo(14, 4); g.closePath(); g.fill();
+          g.fillStyle = "#17141f"; g.beginPath(); g.arc(8, -4, 2.6, 0, 6.284); g.fill();
+          if (b.state === "tumble") {
+            g.fillStyle = "#fff";
+            for (var st2 = 0; st2 < 3; st2++) {
+              var aa = b.rot * 2 + st2 * 2.1;
+              g.fillRect(Math.cos(aa) * 25 - 2, Math.sin(aa) * 25 - 2, 4, 4);
+            }
+          }
+          g.restore(); g.globalAlpha = 1;
+        });
 
         // 파편·연기
         bits.forEach(function (b) { b.x += b.vx; b.y += b.vy; b.vy += .3; b.life -= .02; });
