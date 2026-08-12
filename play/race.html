@@ -272,7 +272,7 @@
     var TRACK = 12000;                     // 월드 트랙 길이 — 길수록 배경이 빨리 흐른다
     var GROUND = VH - 150;
     // fx = 완충된 초점 x, tgt = 따라가는 주자, pend/pendT = 대상 전환 대기
-    var cam = { x: 0, z: 1, v: 0, fx: null, tgt: -1, pendT: 0 };
+    var cam = { x: 0, z: 1, v: 0, fx: null };
     var runners = [], rocks = [], bits = [], orbs = [], farStars = [], midStars = [], fgDust = [];
     var SPAN = TRACK * 1.3;
     for (var i = 0; i < 190; i++) farStars.push({ x: Math.random() * SPAN, y: Math.random() * VH, r: Math.random() * 1.8 + .5 });
@@ -852,10 +852,12 @@
         if (sx < -60 || sx > VW + 60) return;
         var y = laneY(o.lane, n), sy = (y - VH / 2) * scale + VH / 2;
         o.t += .07;
-        var pulse = 1 + Math.sin(o.t) * .16, R = 27 * scale * pulse;
+        var pulse = 1 + Math.sin(o.t) * (o.late ? .24 : .16);
+        var R = (o.late ? 36 : 27) * scale * pulse;     // 역전용은 크게 뛴다
         g.save(); g.translate(sx, sy + Math.sin(o.t * .7) * 6 * scale);
         var hg = g.createRadialGradient(0, 0, 2, 0, 0, R * 2.1);
-        hg.addColorStop(0, "rgba(255,236,150,.85)"); hg.addColorStop(1, "rgba(255,200,60,0)");
+        hg.addColorStop(0, o.late ? "rgba(255,190,120,.95)" : "rgba(255,236,150,.85)");
+        hg.addColorStop(1, o.late ? "rgba(255,120,40,0)" : "rgba(255,200,60,0)");
         g.fillStyle = hg; g.beginPath(); g.arc(0, 0, R * 2.1, 0, 6.284); g.fill();
         g.rotate(o.t * .5);
         g.beginPath();
@@ -864,7 +866,9 @@
           g[k ? "lineTo" : "moveTo"](Math.cos(ang) * rr, Math.sin(ang) * rr);
         }
         g.closePath();
-        g.fillStyle = "#ffe066"; g.shadowColor = "#ffd479"; g.shadowBlur = 26 * scale; g.fill();
+        g.fillStyle = o.late ? "#ffb648" : "#ffe066";
+        g.shadowColor = o.late ? "#ff8a3c" : "#ffd479";
+        g.shadowBlur = (o.late ? 34 : 26) * scale; g.fill();
         g.shadowBlur = 0; g.restore();
       });
 
@@ -1005,10 +1009,25 @@
         orbs.push({ x: op * TRACK, lane: Math.floor(Math.random() * n),
                     t: Math.random() * 6.28, got: false, hole: false });
       }
+      // ⭐ 막판 역전용 별 — 블랙홀(70%)을 지난 뒤 결승 앞쪽에 2~3개.
+      // 여기까지 오면 추격 보정 때문에 다들 붙어 있어서 한 번의 부스트로
+      // 순위가 통째로 뒤집힌다. 서로 다른 레인에 놓아 기회를 흩뿌린다.
+      var lateLane = [];
+      for (var ll = 0; ll < n; ll++) lateLane.push(ll);
+      for (var lz = lateLane.length - 1; lz > 0; lz--) {
+        var lk = Math.floor(Math.random() * (lz + 1));
+        var lt = lateLane[lz]; lateLane[lz] = lateLane[lk]; lateLane[lk] = lt;
+      }
+      var lateN = Math.min(2 + Math.floor(Math.random() * 2), n);
+      for (var lq = 0; lq < lateN; lq++) {
+        orbs.push({ x: (.82 + lq * .045 + Math.random() * .02) * TRACK,
+                    lane: lateLane[lq], t: Math.random() * 6.28,
+                    got: false, hole: false, late: true });
+      }
       // 배지는 반드시 레인 순서(runners 와 같은 인덱스)로 만들어야 한다.
       // 입력 순서(names)로 만들면 이름·색·등수가 서로 어긋난다.
       buildLive(lane); updateLive();
-      cam.x = 0; cam.z = .42; cam.fx = null; cam.tgt = -1; cam.pendT = 0;
+      cam.x = 0; cam.z = .42; cam.fx = null;
 
       // 3 · 2 · 1 · GO
       var cbox = $("count"), steps = ["3", "2", "1", "GO!"], ci = 0;
@@ -1083,8 +1102,10 @@
             if (!(rn.prevX <= o.x && wx >= o.x)) return;
             o.got = true;
             // 트랙 아이템은 부스트 별뿐이다 (블랙홀은 보스 자리 하나)
-            rn.dashT = 1300;                       // 1.3초간 3배속 질주
-            flash = "⭐ " + rn.name + " 부스트!"; flashT = 1200;
+            // 결승 앞 별은 짧게. 다들 붙어 있는 구간이라 0.9초 3배속이면
+            // 이미 여러 명을 제친다 — 1.3초를 주면 순간이동처럼 보인다.
+            rn.dashT = o.late ? 900 : 1300;
+            flash = (o.late ? "⭐ 막판 역전! " : "⭐ ") + rn.name + " 부스트!"; flashT = 1200;
             for (var b = 0; b < 16; b++) bits.push({ x: o.x, y: wy, vx: (Math.random() - .5) * 11,
               vy: -Math.random() * 7, life: 1, c: b % 2 ? "#fff3b0" : "#ffd479" });
           });
@@ -1133,7 +1154,9 @@
           if (rn.p >= BOSS_P && !rn.passedHole && !rn.sucked) {
             if (!vortex) {
               vortex = { x: BOSS_P * TRACK, t: 0, queue: [], nextOut: 0 };
-              orbs.forEach(function (o) { o.got = true; });   // 남은 별은 소진 — 소급 판정 방지
+              // 홀 뒤쪽에 남은 별만 소진한다(소급 판정 방지).
+              // 전부 소진하면 결승 앞 역전용 별까지 같이 사라진다.
+              orbs.forEach(function (o) { if (o.x <= BOSS_P * TRACK) o.got = true; });
               sfx.whoosh();
               flash = "🕳 블랙홀이 열렸다!"; flashT = 1500;
               for (var d3 = 0; d3 < 46; d3++) bits.push({ x: BOSS_P * TRACK, y: VH * .5,
@@ -1251,49 +1274,35 @@
         slowNote = mode;
 
         /* ── 카메라 ───────────────────────────────────────────────
-           벌칙 등수 자리에 있는 주자에게 완전히 고정한다.
-           배율도 끝까지 고정 — 구간마다 배율을 바꾸면 그 전환이 곧 '이상함'이었다.
-           (측정: 배율을 고정하니 프레임당 흔들림 p95 148px → 5px)
-           대상이 바뀔 땐 400ms 버틴 뒤에 옮긴다. 자리 주인은 초당 몇 번씩
-           바뀌는데 그때마다 따라가면 화면이 튄다(전환 43.5회 → 7.6회).
-           대가: 다른 주자 15%쯤은 화면 밖에 있다 — 위치는 좌측 순위표로 본다. */
+           「사람」이 아니라 「벌칙 등수 자리」를 따라간다.
+
+           자리 주인은 초당 몇 번씩 바뀐다. 사람을 쫓으면 주인이 바뀔 때마다
+           화면이 튀어서 400ms 이력을 뒀는데, 이력이 걸린 동안은 엉뚱한
+           사람을 비추다가 뒤늦게 확 옮겨 가 오히려 더 부정확했다
+           (측정: 중앙 이탈 중앙값 106px · p99 899px · 1.7% 는 아예 화면 밖).
+
+           자리 자체의 위치는 주인이 바뀌어도 거의 그대로다 — 순위가 뒤집히는
+           두 사람은 애초에 나란히 있으니까. 그래서 자리를 쫓으면 이력 없이도
+           안 튀고, 늘 화면 정중앙에 붙는다. 초점이 매끄러워졌으니 완충도
+           과하게 걸 이유가 없어 함께 조였다.
+
+           배율은 끝까지 고정 — 구간마다 바꾸면 그 전환이 곧 '이상함'이었다. */
         var LOCK_Z = .42;
         var ordC = runners.map(function (r, i2) {
           return { i: i2, key: r.done ? r.rank : n + (1 - r.p) };
         }).sort(function (a, b) { return a.key - b.key; });
-        var wantT = ordC[Math.min(loseRankNow, ordC.length) - 1].i;
-        // 그 사람이 이미 도착했으면(우주선 창문 안이면) 아직 달리는 꼴찌를 비춘다.
-        // 안 그러면 결승선에 카메라가 주차돼 화면이 멈춘 것처럼 보인다 —
-        // 나머지는 화면 밖에서 달리고 있는데.
-        if (runners[wantT].done) {
-          var stillRun = ordC.filter(function (o) { return !runners[o.i].done; });
-          if (stillRun.length) wantT = stillRun[stillRun.length - 1].i;
-        }
-        // 이력(hysteresis)은 '누적식'이어야 한다. 예전엔 후보가 바뀔 때마다
-        // pendT 를 0 으로 되돌려서, 후보가 프레임마다 흔들리면 400ms 에 영영
-        // 도달하지 못하고 카메라가 옛 대상에 영구히 묶였다 — 결승선 정지의 원인.
-        // 그리고 지금 보고 있는 사람이 이미 도착했으면 지체 없이 옮긴다.
-        if (cam.tgt < 0 || runners[cam.tgt].done) { cam.tgt = wantT; cam.pendT = 0; }
-        else if (wantT === cam.tgt) { cam.pendT = 0; }
-        else {
-          cam.pendT += rawDt;
-          if (cam.pendT >= 400) { cam.tgt = wantT; cam.pendT = 0; }
-        }
+        var slotI = ordC[Math.min(loseRankNow, ordC.length) - 1].i;
 
-        // 카메라는 오직 벌칙 등수 자리의 주자만 따라간다.
-        // 예전엔 블랙홀이 열려 있는 동안 (블랙홀+선두)/2 로 강제 이동시켰는데,
-        // 선두가 결승에 닿으면 초점이 85% 지점 — 아무도 없는 허공 — 에 박혀
-        // 화면이 멈춘 것처럼 보였다. 스크린샷의 빈 우주가 정확히 그 좌표였다.
-        var focus = runners[cam.tgt].p * TRACK;
+        var focus = runners[slotI].p * TRACK;
         var wantZ = LOCK_Z;
         if (slow && fA) {                           // 슬로모션 구간만 예외로 확대
           focus = (fB ? (fA.p + fB.p) / 2 : fA.p) * TRACK;
           wantZ = fB ? 1.35 : 1.30;
         }
-        if (cam.fx === null) { cam.fx = focus; cam.z = wantZ; }
-        cam.fx += (focus - cam.fx) * Math.min(1, rawDt / 220);
+        if (cam.fx === null) { cam.fx = focus; cam.x = focus; cam.z = wantZ; }
+        cam.fx += (focus - cam.fx) * Math.min(1, rawDt / 90);
         cam.z += (wantZ - cam.z) * Math.min(1, rawDt / 300);
-        cam.x += (cam.fx - cam.x) * Math.min(1, rawDt / 150);
+        cam.x += (cam.fx - cam.x) * Math.min(1, rawDt / 70);
 
         // 체감 속도 = 카메라가 실제로 지나간 월드 거리 (급변하지 않게 평활화)
         var inst = dt > 0 ? Math.abs(cam.x - camPrev) / (dt / 1000) : 0;
