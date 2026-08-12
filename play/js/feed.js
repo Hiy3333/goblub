@@ -30,6 +30,7 @@
     pastlife: { label: "🔮 전생 파티", url: "pastlife.html" },
     balance: { label: "⚖️ 밸런스 게임", url: "balance.html" },
     roulette: { label: "🎡 복불복 룰렛", url: "roulette.html" },
+    bomb: { label: "💣 폭탄 돌리기", url: "bomb.html" },
     race: { label: "🏁 고브럽 생존 레이스", url: "race.html" },
     questions: { label: "🎴 질문 카드", url: "questions.html" },
     naming: { label: "📛 네이밍 생성기", url: "naming.html" },
