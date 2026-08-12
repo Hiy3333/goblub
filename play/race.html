@@ -341,25 +341,88 @@
       }
     }
 
+    /* 창문 안에 보이는 고브럽 얼굴 — 캐릭터 그대로 외눈 하나 + 소용돌이 입.
+       스프라이트를 그대로 축소하면 창문에서 몸통·팔다리가 잘려 이상해 보여서,
+       얼굴만 따로 그린다. */
+    function drawGoblubFace(cx, cy, r, col, t) {
+      g.save(); g.translate(cx, cy);
+      // 머리
+      g.beginPath(); g.arc(0, r * .06, r * .92, 0, 6.284);
+      var hg2 = g.createRadialGradient(-r * .3, -r * .3, r * .12, 0, r * .06, r * .95);
+      hg2.addColorStop(0, "#ffffff"); hg2.addColorStop(.38, col); hg2.addColorStop(1, col);
+      g.fillStyle = hg2; g.fill();
+      g.strokeStyle = "rgba(20,28,52,.35)"; g.lineWidth = r * .06; g.stroke();
+      // 외눈 — 흰자 + 검은자 + 반짝
+      var ey = -r * .40;
+      g.beginPath(); g.arc(0, ey, r * .34, 0, 6.284);
+      g.fillStyle = "#f4f0e6"; g.fill();
+      var blink = (Math.sin(t / 620) > .965) ? .12 : 1;     // 가끔 깜빡
+      g.save(); g.translate(0, ey); g.scale(1, blink);
+      g.beginPath(); g.arc(r * .07, r * .05, r * .18, 0, 6.284);
+      g.fillStyle = "#17141f"; g.fill();
+      g.beginPath(); g.arc(-r * .09, -r * .09, r * .075, 0, 6.284);
+      g.fillStyle = "#ffffff"; g.fill();
+      g.restore();
+      // 소용돌이 입 — 신나서 살짝 커졌다 작아진다
+      var mr = r * .40 * (1 + Math.sin(t / 190) * .08);
+      g.beginPath(); g.ellipse(0, r * .46, mr, mr * .82, 0, 0, 6.284);
+      g.fillStyle = "#1a1622"; g.fill();
+      g.beginPath();
+      for (var q = 0; q <= 60; q++) {
+        var th = q / 60 * 7.4, rr = mr * .82 * (1 - q / 60);
+        g[q ? "lineTo" : "moveTo"](Math.cos(th) * rr, r * .46 + Math.sin(th) * rr * .82);
+      }
+      g.strokeStyle = "#4b4060"; g.lineWidth = Math.max(1.4, r * .055); g.lineCap = "round"; g.stroke();
+      g.restore();
+    }
+
     function drawVortex(camX, scale, t) {
       if (!vortex) return;
-      var sx = (vortex.x - camX) * scale + VW / 2;
-      var cy = VH * .5, R = VH * .40 * Math.min(1, vortex.t / 500);
+      // 블랙홀은 화면 정중앙에 고정 — 여기로 전원이 빨려든다
+      var sx = VW / 2, cy = VH * .5;
+      var R = VH * .42 * Math.min(1, vortex.t / 520);
       g.save(); g.translate(sx, cy);
-      var hg = g.createRadialGradient(0, 0, R * .2, 0, 0, R * 1.7);
-      hg.addColorStop(0, "rgba(170,110,255,.8)"); hg.addColorStop(.6, "rgba(90,50,180,.4)");
-      hg.addColorStop(1, "rgba(60,30,140,0)");
-      g.fillStyle = hg; g.beginPath(); g.arc(0, 0, R * 1.7, 0, 6.284); g.fill();
-      // 고브럽 입 모양 — 안쪽으로 감기는 나선
-      g.rotate(t / 320);
-      g.beginPath();
-      for (var s = 0; s <= 150; s++) {
-        var th = s / 150 * 15, rr = R * (1 - s / 150);
-        g[s ? "lineTo" : "moveTo"](Math.cos(th) * rr, Math.sin(th) * rr);
+      // 바깥 자기장 헤일로
+      var hg = g.createRadialGradient(0, 0, R * .2, 0, 0, R * 2.0);
+      hg.addColorStop(0, "rgba(180,120,255,.85)"); hg.addColorStop(.45, "rgba(110,60,210,.45)");
+      hg.addColorStop(1, "rgba(50,20,120,0)");
+      g.fillStyle = hg; g.beginPath(); g.arc(0, 0, R * 2.0, 0, 6.284); g.fill();
+      // 자기장 선 — 바깥에서 안으로 빨려드는 곡선
+      g.save(); g.rotate(t / 900);
+      for (var f2 = 0; f2 < 10; f2++) {
+        g.beginPath();
+        for (var q2 = 0; q2 <= 40; q2++) {
+          var u = q2 / 40;
+          var th2 = f2 * .628 + u * 2.2, rr2 = R * (1.95 - u * .95);
+          g[q2 ? "lineTo" : "moveTo"](Math.cos(th2) * rr2, Math.sin(th2) * rr2 * .55);
+        }
+        g.strokeStyle = "rgba(196,158,255," + (.30 - f2 * .015) + ")";
+        g.lineWidth = 3; g.stroke();
       }
-      g.strokeStyle = "#cdb0ff"; g.lineWidth = 7; g.lineCap = "round"; g.stroke();
-      g.beginPath(); g.arc(0, 0, R * .22, 0, 6.284);
-      g.fillStyle = "#0a0418"; g.fill();
+      g.restore();
+      // 강착원반 — 납작하게 회전
+      g.save(); g.rotate(t / 520); g.scale(1, .42);
+      for (var d4 = 0; d4 < 3; d4++) {
+        g.beginPath(); g.arc(0, 0, R * (1.5 - d4 * .22), 0, 6.284);
+        var dg = g.createLinearGradient(-R * 1.5, 0, R * 1.5, 0);
+        dg.addColorStop(0, "rgba(255,190,120,0)"); dg.addColorStop(.35, "rgba(255,205,140,.55)");
+        dg.addColorStop(.62, "rgba(210,140,255,.5)"); dg.addColorStop(1, "rgba(140,80,255,0)");
+        g.strokeStyle = dg; g.lineWidth = R * .13; g.stroke();
+      }
+      g.restore();
+      // 안쪽 소용돌이
+      g.save(); g.rotate(-t / 300);
+      g.beginPath();
+      for (var s3 = 0; s3 <= 150; s3++) {
+        var th3 = s3 / 150 * 15, rr3 = R * (1 - s3 / 150);
+        g[s3 ? "lineTo" : "moveTo"](Math.cos(th3) * rr3, Math.sin(th3) * rr3);
+      }
+      g.strokeStyle = "rgba(214,186,255,.9)"; g.lineWidth = 6; g.lineCap = "round"; g.stroke();
+      g.restore();
+      // 사건의 지평선
+      g.beginPath(); g.arc(0, 0, R * .30, 0, 6.284);
+      g.fillStyle = "#05010e"; g.fill();
+      g.strokeStyle = "rgba(255,214,150,.85)"; g.lineWidth = 4; g.stroke();
       g.restore();
     }
 
@@ -501,18 +564,10 @@
           g.fillStyle = glassG; g.fill();
           g.strokeStyle = "#55636b"; g.lineWidth = 2.5; g.stroke();
         }
-        if (seat.idx >= 0 && !seat.blown) {          // 탑승 — ^ ^ 신난 얼굴
+        if (seat.idx >= 0 && !seat.blown) {          // 탑승 — 고브럽 얼굴(외눈 + 소용돌이 입)
           g.save(); g.beginPath(); g.arc(sp2.x, sp2.y, sp2.r - 2, 0, 6.284); g.clip();
           var bo = Math.sin(t / 150 + k) * sp2.r * .09;
-          g.beginPath(); g.arc(sp2.x, sp2.y + sp2.r * .36 + bo, sp2.r * .84, 0, 6.284);
-          g.fillStyle = SKIN[seat.idx % SKIN.length]; g.fill();
-          g.strokeStyle = "#1b2440"; g.lineWidth = sp2.r * .13; g.lineCap = "round";
-          g.beginPath();
-          g.moveTo(sp2.x - sp2.r * .40, sp2.y + bo); g.lineTo(sp2.x - sp2.r * .24, sp2.y - sp2.r * .16 + bo);
-          g.lineTo(sp2.x - sp2.r * .08, sp2.y + bo);
-          g.moveTo(sp2.x + sp2.r * .08, sp2.y + bo); g.lineTo(sp2.x + sp2.r * .24, sp2.y - sp2.r * .16 + bo);
-          g.lineTo(sp2.x + sp2.r * .40, sp2.y + bo);
-          g.stroke();
+          drawGoblubFace(sp2.x, sp2.y + bo, sp2.r * 1.05, SKIN[seat.idx % SKIN.length], t + k * 400);
           g.restore();
         }
         g.globalAlpha = .32;                          // 유리 반사
@@ -622,16 +677,46 @@
       var size = Math.max(74, 142 * scale);
       var tscale = Math.max(.62, scale);
       var bob = Math.sin(t / 78 + i * 1.7) * 7 * scale;
+
+      // 블랙홀 구간 — 자기 레인이 아니라 화면 정중앙으로 끌려간다
+      var kk = 0, drawX = sx, drawY = sy + bob;
+      if (rn.sucked || rn.escT > 0) {
+        var cxm = VW / 2, cym = VH / 2;
+        if (rn.sucked) {
+          kk = Math.min(1, rn.suckT / 760);           // 0 제자리 → 1 완전히 중심
+          var ease = kk * kk * (3 - 2 * kk);          // 가속하며 빨려든다
+          drawX = sx + (cxm - sx) * ease;
+          drawY = (sy + bob) + (cym - (sy + bob)) * ease;
+          // 끌려가며 나선을 그린다
+          var swirl = (1 - ease) * 46 * scale;
+          drawX += Math.cos(rn.suckT / 90 + i) * swirl;
+          drawY += Math.sin(rn.suckT / 90 + i) * swirl * .6;
+        } else {
+          // 탈출 — 중심에서 자기 레인으로 낑낑대며 튀어나온다
+          var ke = 1 - Math.min(1, rn.escT / 900);    // 1 중심 → 0 제자리
+          var pop = ke * ke;
+          drawX = sx + (cxm - sx) * pop;
+          drawY = (sy + bob) + (cym - (sy + bob)) * pop;
+          kk = pop * .8;
+        }
+      }
       g.save();
-      g.translate(sx, sy + bob);
+      g.translate(drawX, drawY);
       if (rn.spin) g.rotate(rn.spin);
       if (rn.sad) g.globalAlpha = .85;
 
-      // 소용돌이에 삼켜진 동안 — 중심으로 빨려들며 사라진다
+      // 빨려드는 중 — 회전하며 쪼그라든다
       if (rn.sucked) {
-        var kk = Math.min(1, rn.suckT / 420);
-        g.rotate(kk * 7); g.scale(1 - kk * .92, 1 - kk * .92);
-        g.globalAlpha = 1 - kk * .9;
+        g.rotate(kk * 9); g.scale(1 - kk * .88, 1 - kk * .88);
+        g.globalAlpha = 1 - kk * .85;
+      } else if (rn.escT > 0) {
+        // 낑낑대며 빠져나오는 중 — 늘었다 줄었다 하며 커진다
+        var kg = 1 - Math.min(1, rn.escT / 900);
+        var st = 1 - kg * .72;
+        var wob2 = 1 + Math.sin(rn.escT / 55) * .22 * kg;   // 낑낑 몸부림
+        g.rotate(-kg * 6 + Math.sin(rn.escT / 70) * .5 * kg);
+        g.scale(st * wob2, st / wob2);
+        g.globalAlpha = 1 - kg * .25;
       }
       // 블랙홀에 갇힌 동안 — 쪼그라들며 빙글빙글, 빠져나올 때 되돌아온다
       if (rn.holeT > 0) {
@@ -899,7 +984,7 @@
       runners = lane.map(function (nm) {
         return { name: nm, p: 0, prevX: 0, rank: 0, done: false, spin: 0,
                  slowT: 0, dashT: 0, holeT: 0,        // 운석 감속 / 별 질주 / 블랙홀 정지
-                 hurtT: 0, sucked: false, suckT: 0, sad: false, boarded: false,
+                 hurtT: 0, sucked: false, suckT: 0, escT: 0, sad: false, boarded: false,
                  innate: .99 + Math.random() * .02,   // 타고난 속도차(아주 작게)
                  phase: Math.random() * 6.28, freq: .0009 + Math.random() * .0020 };
       });
@@ -953,9 +1038,12 @@
         runners.forEach(function (r) { if (r.p > leadPre) leadPre = r.p; });
         // 보스 앞에 도달하면 운석을 멈춘다 — 화면에 사건은 하나면 충분하다
         var bossFight = !!(boss && !boss.dead && leadPre >= BOSS_P - .12);
-        if (Math.random() < .07 && el < 30000 && !bossFight) {
-          rocks.push({ x: leadPre * TRACK + 300 + Math.random() * 900, y: -60,
-            r: 16 + Math.random() * 20, rot: 0, vy: 6 + Math.random() * 5 });
+        // 결승선 근처(우주선 자리)엔 운석을 만들지 않는다 — 로켓을 가린다
+        if (Math.random() < .07 && el < 30000 && !bossFight && leadPre < .88) {
+          var rx = leadPre * TRACK + 300 + Math.random() * 900;
+          if (rx < TRACK * .93) {
+            rocks.push({ x: rx, y: -60, r: 16 + Math.random() * 20, rot: 0, vy: 6 + Math.random() * 5 });
+          }
         }
         rocks.forEach(function (r) { r.y += r.vy * (dt / 16.67); r.rot += .06; });
         rocks = rocks.filter(function (r) { return r.y < VH + 60; });
@@ -971,6 +1059,7 @@
           if (rn.done) return;
           if (rn.sucked) return;               // 소용돌이 안 — 아래 소용돌이 로직이 맡는다
           if (rn.spin) rn.spin = Math.abs(rn.spin) < .05 ? 0 : rn.spin * .9;
+          if (rn.escT > 0) rn.escT -= dt;        // 낑낑대며 빠져나오는 잔여 시간
           var wx = rn.p * TRACK, wy = laneY(i, n);
           rocks.forEach(function (r) {
             if (r.hit) return;
@@ -1072,8 +1161,8 @@
               if (rn.done) return;
               if (!rn.sucked) { rn.sucked = true; rn.suckT = 0; }
               rn.suckT += dt;
-              rn.p = BOSS_P;                      // 소용돌이 입구에 모인다
-              if (rn.suckT < 420) allIn = false;
+              rn.p = BOSS_P;                      // 블랙홀 입구에 모인다
+              if (rn.suckT < 760) allIn = false;
             });
             if (allIn) {
               vortex.swallowed = true;
@@ -1090,13 +1179,13 @@
             if (vortex.t >= vortex.releaseAt) {
               var out = vortex.queue.shift();
               var ro = runners[out];
-              ro.sucked = false; ro.suckT = 0; ro.p = BOSS_P + .004;
+              ro.sucked = false; ro.suckT = 0; ro.escT = 900; ro.p = BOSS_P + .004;
               flash = "🌀 " + ro.name + " 탈출!"; flashT = 900;
               sfx.pop();
               for (var e2 = 0; e2 < 18; e2++) bits.push({ x: BOSS_P * TRACK, y: laneY(out, n),
                 vx: 2 + Math.random() * 10, vy: (Math.random() - .5) * 10, life: 1,
                 c: e2 % 2 ? "#cdb0ff" : "#ffffff" });
-              vortex.releaseAt = vortex.t + 280 + Math.random() * 260;
+              vortex.releaseAt = vortex.t + 420 + Math.random() * 520;   // 나오는 속도는 랜덤
             }
           }
         }
@@ -1135,6 +1224,11 @@
         if (!bossFight) cam.z += (wantZ - cam.z) * Math.min(1, rawDt / 300);
         // 1위를 가로 72% 지점에 둔다 — 앞은 결승선, 뒤는 추격자들이 보이게
         var wantX = leadX - VW * .22 / cam.z;
+        // 블랙홀이 열린 동안엔 카메라를 블랙홀에 고정 — 전원이 여기로 빨려든다
+        if (vortex && vortex.queue.length + (vortex.swallowed ? 0 : 1) > 0) {
+          wantZ = .86; cam.z += (wantZ - cam.z) * Math.min(1, dt / 300);
+          wantX = BOSS_P * TRACK;
+        }
         // 보스전엔 카메라를 보스 기준으로 고정 — 튕겨다니는 1위를 쫓으면 화면이 출렁인다
         if (bossFight) {
           wantZ = .82; cam.z += (wantZ - cam.z) * Math.min(1, rawDt / 300);
