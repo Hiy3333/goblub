@@ -1298,14 +1298,25 @@
         var xs = runners.map(function (r) { return r.p * TRACK; });
         var lo = Math.min.apply(null, xs), hi = Math.max.apply(null, xs);
         var pad = 520;
-        if (boss && !boss.dead) {
-          // 보스전은 '창 크기 고정'이다. 주자 위치에 따라 상자를 늘리면
-          // 붙었다 벌어졌다 할 때마다 배율이 0.7~1.1 로 널뛰어 화면이 출렁인다.
-          // 멀리 있는 낙오자는 잠깐 화면 밖에 둔다 — 어차피 보스로 오는 길이다.
+        // '보스가 살아 있으면' 이 아니라 '보스 앞에 닿았으면' 이어야 한다.
+        // 보스는 출발 순간부터 살아 있어서, 조건을 빼면 시작하자마자 카메라가
+        // 보스에 붙어 버린다.
+        var atBoss = !!(boss && !boss.dead && hi >= boss.x - 820);
+        // 블랙홀도 '안에 아직 누가 남아 있는 동안'만 잡는다. 마지막 한 명이
+        // 나온 뒤에도 잡고 있으면 다들 달려나가는데 화면만 뒤에 남는다.
+        var inVortex = !!(vortex && !vortex.fade &&
+                          (!vortex.swallowed || vortex.queue.length > 0));
+        if (atBoss) {
+          // 창 크기를 고정한다. 주자 위치로 상자를 늘리면 붙었다 벌어졌다 할 때마다
+          // 배율이 0.7~1.1 로 널뛰어 화면이 출렁인다.
           lo = boss.x - 900; hi = boss.x + BOSS_R * .62; pad = 200;
-        } else if (vortex && !vortex.fade) {
-          // 블랙홀도 같은 이유로 고정 창
-          lo = vortex.x - VORTEX_R * 1.15; hi = vortex.x + VORTEX_R * 1.15; pad = 260;
+        } else if (inVortex) {
+          // 먼저 빠져나온 사람은 앞으로 달려나간다 — 그쪽도 담아야 화면 밖으로 안 샌다
+          lo = vortex.x - VORTEX_R * 1.15;
+          hi = Math.max(vortex.x + VORTEX_R * 1.15, hi + 260);
+          pad = 260;
+        } else if (boss && !boss.dead && hi >= boss.x - 2400) {
+          hi = Math.max(hi, boss.x + BOSS_R * .62);   // 접근 중 — 보스가 서서히 들어오게
         }
         if (hi > TRACK - 2200) hi = Math.max(hi, TRACK + 120);             // 결승선까지
         var focus = (lo + hi) / 2;
