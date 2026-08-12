@@ -289,102 +289,10 @@
 
     /* ── 보스 · 소용돌이 · 우주선 ─────────────────── */
     var BOSS_P = .70;        // 보스 체력은 인원에 따라 정해진다(start 참조)
-    // 보스·블랙홀은 월드에 놓인 물체다. 반지름도 월드 단위로 둬야 줌이 변해도
-    // 주자와 비율이 유지된다(화면 고정으로 두면 줌아웃할 때 혼자 커 보인다).
-    var BOSS_R = 400, VORTEX_R = 430;
-    var boss = null, vortex = null, ship = null;
-
-    function drawBoss(camX, scale, t) {
-      if (!boss) return;
-      var sx = (boss.x - camX) * scale + VW / 2;
-      if (sx < -700 || sx > VW + 700) return;
-      var cy = VH * .5, R = BOSS_R * scale * (boss.dead ? Math.max(0, 1 - boss.deadT / 900) : 1);
-      if (R <= 1) return;
-      var wob = Math.sin(t / 260) * 14 * scale;
-      g.save(); g.translate(sx, cy + wob); g.scale(scale, scale);
-      if (boss.flash > 0) { g.globalAlpha = .9; }
-      // 촉수
-      for (var a = 0; a < 9; a++) {
-        var ang = -1.3 + a * .33, len = R * (1.05 + Math.sin(t / 200 + a) * .12);
-        g.beginPath(); g.moveTo(0, 0);
-        g.quadraticCurveTo(Math.cos(ang) * len * .7 + 40, Math.sin(ang) * len * .7,
-                           Math.cos(ang) * len + Math.sin(t / 170 + a) * 30, Math.sin(ang) * len);
-        g.strokeStyle = boss.flash > 0 ? "#ff9db5" : "#5c2f7a";
-        g.lineWidth = 18; g.lineCap = "round"; g.stroke();
-      }
-      // 몸통
-      var bgr = g.createRadialGradient(-R * .3, -R * .35, R * .15, 0, 0, R);
-      bgr.addColorStop(0, boss.flash > 0 ? "#ffd0dc" : "#a86bd8");
-      bgr.addColorStop(1, boss.flash > 0 ? "#e0607f" : "#4a2170");
-      g.beginPath(); g.ellipse(0, 0, R * .82, R, 0, 0, 6.284);
-      g.fillStyle = bgr; g.fill();
-      g.strokeStyle = "rgba(255,255,255,.22)"; g.lineWidth = 5; g.stroke();
-      // 눈 세 개
-      [[-R * .32, -R * .22, R * .17], [R * .3, -R * .3, R * .13], [0, R * .18, R * .2]].forEach(function (e) {
-        g.beginPath(); g.arc(e[0], e[1], e[2], 0, 6.284);
-        g.fillStyle = "#f6f1e4"; g.fill();
-        g.beginPath(); g.arc(e[0] + Math.sin(t / 300) * e[2] * .2, e[1], e[2] * .5, 0, 6.284);
-        g.fillStyle = "#170f22"; g.fill();
-      });
-      // 이빨 난 입
-      g.beginPath(); g.ellipse(0, R * .58, R * .38, R * .16, 0, 0, 6.284);
-      g.fillStyle = "#210a1c"; g.fill();
-      for (var k = -3; k <= 3; k++) {
-        g.beginPath(); g.moveTo(k * R * .1, R * .45);
-        g.lineTo(k * R * .1 + R * .045, R * .62); g.lineTo(k * R * .1 - R * .045, R * .62);
-        g.closePath(); g.fillStyle = "#fff6e8"; g.fill();
-      }
-      g.restore(); g.globalAlpha = 1;
-      if (boss.flash > 0) boss.flash--;
-
-      // 체력바
-      if (!boss.dead) {
-        // 전체화면에선 상단 중앙에 HUD 알약이 떠 있다. 26px 에 그리면 그 아래 깔린다.
-        var bw = Math.min(VW * .5, 420), bx = (VW - bw) / 2, by = 104;
-        g.fillStyle = "rgba(6,12,26,.7)"; g.fillRect(bx - 3, by - 3, bw + 6, 24);
-        g.fillStyle = "#3a1f52"; g.fillRect(bx, by, bw, 18);
-        g.fillStyle = boss.hp <= 3 ? "#ff5b6e" : "#c07bff";
-        g.fillRect(bx, by, bw * Math.max(0, boss.hp / boss.max), 18);
-        g.fillStyle = "#ffe6b8"; g.font = "600 17px 'Jua', sans-serif";
-        g.textAlign = "center"; g.textBaseline = "middle";
-        g.fillText("👾 우주 괴수  " + Math.max(0, boss.hp) + " / " + boss.max, VW / 2, by + 9);
-      }
-    }
-
-    /* 창문 안에 보이는 고브럽 얼굴 — 캐릭터 그대로 외눈 하나 + 소용돌이 입.
-       스프라이트를 그대로 축소하면 창문에서 몸통·팔다리가 잘려 이상해 보여서,
-       얼굴만 따로 그린다. */
-    function drawGoblubFace(cx, cy, r, col, t) {
-      g.save(); g.translate(cx, cy);
-      // 머리
-      g.beginPath(); g.arc(0, r * .06, r * .92, 0, 6.284);
-      var hg2 = g.createRadialGradient(-r * .3, -r * .3, r * .12, 0, r * .06, r * .95);
-      hg2.addColorStop(0, "#ffffff"); hg2.addColorStop(.38, col); hg2.addColorStop(1, col);
-      g.fillStyle = hg2; g.fill();
-      g.strokeStyle = "rgba(20,28,52,.35)"; g.lineWidth = r * .06; g.stroke();
-      // 외눈 — 흰자 + 검은자 + 반짝
-      var ey = -r * .40;
-      g.beginPath(); g.arc(0, ey, r * .34, 0, 6.284);
-      g.fillStyle = "#f4f0e6"; g.fill();
-      var blink = (Math.sin(t / 620) > .965) ? .12 : 1;     // 가끔 깜빡
-      g.save(); g.translate(0, ey); g.scale(1, blink);
-      g.beginPath(); g.arc(r * .07, r * .05, r * .18, 0, 6.284);
-      g.fillStyle = "#17141f"; g.fill();
-      g.beginPath(); g.arc(-r * .09, -r * .09, r * .075, 0, 6.284);
-      g.fillStyle = "#ffffff"; g.fill();
-      g.restore();
-      // 소용돌이 입 — 신나서 살짝 커졌다 작아진다
-      var mr = r * .40 * (1 + Math.sin(t / 190) * .08);
-      g.beginPath(); g.ellipse(0, r * .46, mr, mr * .82, 0, 0, 6.284);
-      g.fillStyle = "#1a1622"; g.fill();
-      g.beginPath();
-      for (var q = 0; q <= 60; q++) {
-        var th = q / 60 * 7.4, rr = mr * .82 * (1 - q / 60);
-        g[q ? "lineTo" : "moveTo"](Math.cos(th) * rr, r * .46 + Math.sin(th) * rr * .82);
-      }
-      g.strokeStyle = "#4b4060"; g.lineWidth = Math.max(1.4, r * .055); g.lineCap = "round"; g.stroke();
-      g.restore();
-    }
+    // 블랙홀은 월드에 놓인 물체다. 반지름도 월드 단위여야 줌이 변해도
+    // 주자와 비율이 유지된다.
+    var VORTEX_R = 640;   // 월드 반지름 — 고정 배율 0.42 에서 화면 지름 약 538px
+    var vortex = null, ship = null, holeDone = false;
 
     function drawVortex(camX, scale, t) {
       if (!vortex) return;
@@ -851,7 +759,6 @@
       var fx = (TRACK - camX) * scale + VW / 2;
       if (fx > -60 && fx < VW + 60) drawFinish(fx, scale);
       drawShip(camX, scale, n, t);
-      drawBoss(camX, scale, t);
       drawVortex(camX, scale, t);
 
       // 운석
@@ -1005,8 +912,8 @@
        꽂는다. 어떤 레인이 유리하든 각 이름이 그 레인에 갈 확률이 1/n 이라
        몇 등이 걸리든 확률은 균등하다.                                  */
     var busy = false, raf = 0, loseRankNow = 1, randomPick = false, pendingRank = "";
-    var BASE_V = 1 / 12500;              // 방해가 없을 때의 기준 속도
-    var CATCHUP = 4.0;                   // 뒤처질수록 빨라지는 정도(마리오카트식 추격)
+    var BASE_V = 1 / 15000;              // 방해가 없을 때의 기준 속도
+    var CATCHUP = 7.0;                   // 뒤처질수록 빨라지는 정도(마리오카트식 추격)
 
     function start() {
       var names = readItems();
@@ -1049,12 +956,8 @@
                  phase: Math.random() * 6.28, freq: .0009 + Math.random() * .0020 };
       });
       rocks = []; bits = [];
-      // 👾 보스는 70% 지점. 몸통 박치기 10번이면 죽고 자리에 소용돌이를 남긴다
-      // 이제 모든 박치기가 데미지로 들어간다. 체력을 10 으로 고정하면 8명일 때
-      // 0.8초 만에 끝나 버려서, 인원에 맞춰 늘린다(2명 13 … 8명 28).
-      var bossHP = Math.round(8 + n * 2.5);
-      boss = { x: BOSS_P * TRACK, hp: bossHP, max: bossHP, flash: 0, cd: 0, dead: false, deadT: 0 };
-      vortex = null;
+      // 🕳 블랙홀은 70% 지점. 첫 주자가 닿으면 열려서 전원을 삼킨다.
+      vortex = null; holeDone = false;
       // 🚀 결승선 로켓 — 한 줄에 창문 2개, 인원이 늘면 줄이 아래로 붙는다
       ship = { x: TRACK + 560, m: shipMetrics(n), seats: [], eject: null, launch: null };
       for (var sI = 0; sI < n; sI++) ship.seats.push({ idx: -1, blown: false });
@@ -1068,7 +971,7 @@
       // 배지는 반드시 레인 순서(runners 와 같은 인덱스)로 만들어야 한다.
       // 입력 순서(names)로 만들면 이름·색·등수가 서로 어긋난다.
       buildLive(lane); updateLive();
-      cam.x = 0; cam.z = .58; cam.fx = null; cam.tgt = -1; cam.pend = -1; cam.pendT = 0;
+      cam.x = 0; cam.z = .42; cam.fx = null; cam.tgt = -1; cam.pend = -1; cam.pendT = 0;
 
       // 3 · 2 · 1 · GO
       var cbox = $("count"), steps = ["3", "2", "1", "GO!"], ci = 0;
@@ -1099,10 +1002,10 @@
 
         var leadPre = 0;
         runners.forEach(function (r) { if (r.p > leadPre) leadPre = r.p; });
-        // 보스 앞에 도달하면 운석을 멈춘다 — 화면에 사건은 하나면 충분하다
-        var bossFight = !!(boss && !boss.dead && leadPre >= BOSS_P - .12);
+        // 블랙홀 근처와 블랙홀이 열린 동안엔 운석을 멈춘다 — 화면에 사건은 하나면 충분하다
+        var nearHole = vortex || leadPre >= BOSS_P - .10;
         // 결승선 근처(우주선 자리)엔 운석을 만들지 않는다 — 로켓을 가린다
-        if (Math.random() < .07 && el < 30000 && !bossFight && leadPre < .88) {
+        if (Math.random() < .07 && el < 30000 && !nearHole && leadPre < .88) {
           var rx = leadPre * TRACK + 300 + Math.random() * 900;
           if (rx < TRACK * .93) {
             rocks.push({ x: rx, y: -60, r: 16 + Math.random() * 20, rot: 0, vy: 6 + Math.random() * 5 });
@@ -1113,7 +1016,6 @@
         bits.forEach(function (b) { b.x += b.vx; b.y += b.vy; b.vy += .35; b.life -= .022; });
         bits = bits.filter(function (b) { return b.life > 0; });
 
-        if (boss && boss.cd > 0) boss.cd -= dt;
 
         var leadP = 0;
         runners.forEach(function (r) { if (r.p > leadP) leadP = r.p; });
@@ -1171,39 +1073,18 @@
           var rubber = 1 + CATCHUP * Math.max(0, leadP - rn.p);   // 뒤처질수록 빨라짐
           rn.p = Math.min(1, rn.p + BASE_V * rn.innate * wob * mul * rubber * dt);
 
-          // 👾 보스 몸통 박치기 — 보스가 살아 있으면 그 앞을 못 지나간다.
-          // 부딪히면 진짜로 뒤로 밀려나고(공격하려면 물러났다 다시 와야 한다) 체력이 1 깎인다.
-          if (boss && !boss.dead && rn.p >= BOSS_P) {
-            rn.p = BOSS_P - .026 - Math.random() * .012;   // 튕김 거리 절반
-            rn.hurtT = 700; rn.spin = (Math.random() < .5 ? -1 : 1) * 1.3;
-            for (var d2 = 0; d2 < 7; d2++) bits.push({ x: BOSS_P * TRACK, y: wy,
-              vx: -(1 + Math.random() * 8), vy: (Math.random() - .5) * 9, life: 1,
-              c: d2 % 2 ? "#ff9db5" : "#c07bff" });
-            // 쿨다운은 주자별로 둔다. 전역으로 두면 340ms 안에 두 번째로 박은
-            // 사람의 타격이 통째로 사라져 '여러 명이 박아도 한 번'이 된다.
-            if (rn.bumpCD <= 0) {
-              rn.bumpCD = 560;
-              boss.hp--; boss.flash = 7;
-              sfx.hit();
-              if (boss.cd <= 0) {                          // 화면 흔들림만 간격을 둔다
-                boss.cd = 150;
-                wrap.classList.add("shake");
-                setTimeout(function () { wrap.classList.remove("shake"); }, 240);
-              }
-              flash = "💥 " + rn.name + " 박치기! 남은 체력 " + Math.max(0, boss.hp); flashT = 900;
-              if (boss.hp <= 0) {
-                boss.dead = true; boss.deadT = 0;
-                // 죽는 즉시 블랙홀을 연다. 한 프레임이라도 늦으면 장벽이 풀린 사이
-                // 앞서 있던 주자가 그대로 지나쳐 버린다.
-                vortex = { x: BOSS_P * TRACK, t: 0, swallowed: false, releaseAt: 0, queue: [] };
-                orbs.forEach(function (o) { o.got = true; });
-                sfx.whoosh();
-                flash = "👾 격파! 🕳 블랙홀이 열렸다!"; flashT = 1600;
-                for (var d3 = 0; d3 < 60; d3++) bits.push({ x: BOSS_P * TRACK, y: VH * .5,
-                  vx: (Math.random() - .5) * 26, vy: (Math.random() - .5) * 22, life: 1,
-                  c: d3 % 3 === 0 ? "#ffd479" : d3 % 3 === 1 ? "#c07bff" : "#ff9db5" });
-              }
-            }
+          // 🕳 블랙홀 — 트랙 70% 지점. 첫 주자가 닿는 순간 열리고 전원을 삼킨다.
+          if (!vortex && !holeDone && rn.p >= BOSS_P) {
+            holeDone = true;
+            vortex = { x: BOSS_P * TRACK, t: 0, swallowed: false, releaseAt: 0, queue: [] };
+            orbs.forEach(function (o) { o.got = true; });   // 남은 별은 소진 — 소급 판정 방지
+            sfx.whoosh();
+            flash = "🕳 블랙홀이 열렸다!"; flashT = 1600;
+            for (var d3 = 0; d3 < 46; d3++) bits.push({ x: BOSS_P * TRACK, y: VH * .5,
+              vx: (Math.random() - .5) * 22, vy: (Math.random() - .5) * 20, life: 1,
+              c: d3 % 3 === 0 ? "#cdb0ff" : d3 % 3 === 1 ? "#8a5cff" : "#ffffff" });
+            wrap.classList.add("shake");
+            setTimeout(function () { wrap.classList.remove("shake"); }, 300);
           }
           rn.prevX = wx;                       // 다음 프레임의 통과 판정 기준
           if (rn.p >= 1) {
@@ -1214,8 +1095,6 @@
           }
         });
 
-        // 보스가 죽으면 그 자리에 소용돌이가 열려 전원을 삼켰다가 하나씩 뱉는다
-        if (boss && boss.dead) boss.deadT += dt;
         if (vortex) {
           vortex.t += dt;
           if (!vortex.swallowed) {
@@ -1295,7 +1174,7 @@
            대상이 바뀔 땐 400ms 버틴 뒤에 옮긴다. 자리 주인은 초당 몇 번씩
            바뀌는데 그때마다 따라가면 화면이 튄다(전환 43.5회 → 7.6회).
            대가: 다른 주자 15%쯤은 화면 밖에 있다 — 위치는 좌측 순위표로 본다. */
-        var LOCK_Z = .58;
+        var LOCK_Z = .42;
         var ordC = runners.map(function (r, i2) {
           return { i: i2, key: r.done ? r.rank : n + (1 - r.p) };
         }).sort(function (a, b) { return a.key - b.key; });
@@ -1500,7 +1379,7 @@
       $("btn-go").style.display = ""; $("btn-go").disabled = false;
       $("btn-again").style.display = "none"; $("btn-edit").style.display = "none";
       busy = false; runners = []; rocks = []; bits = []; orbs = [];
-      boss = null; vortex = null; ship = null;
+      vortex = null; ship = null; holeDone = false;
       draw(0, Math.max(2, readItems().length || 4), 0, 1, 0);
     };
 
