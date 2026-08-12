@@ -1061,7 +1061,7 @@
           if (rn.escT > 0) {
             // 블랙홀 자기장을 이겨내는 중 — 거의 못 나아가다 점점 풀려난다
             var ue = 1 - rn.escT / rn.escDur;
-            mul = .06 + .94 * ue * ue;
+            mul = .30 + .70 * ue * ue;
           }
           else if (rn.holeT > 0) mul = 0;                       // 블랙홀 = 완전 정지
           else if (rn.dashT > 0) mul = 3;                       // 별 = 3배속
@@ -1103,7 +1103,8 @@
               if (rn.done) return;
               if (!rn.sucked) { rn.sucked = true; rn.suckT = 0; }
               rn.suckT += dt;
-              rn.p = BOSS_P;                      // 블랙홀 입구에 모인다
+              // p 를 즉시 스냅하면 멀리 있던 주자가 순간이동해 카메라가 튄다
+              rn.p += (BOSS_P - rn.p) * Math.min(1, dt / 260);
               if (rn.suckT < 760) allIn = false;
             });
             if (allIn) {
@@ -1129,7 +1130,7 @@
               var out = vortex.queue.shift();
               var ro = runners[out];
               ro.sucked = false; ro.suckT = 0;
-              ro.escDur = 1200 + Math.random() * 1400;   // 빠져나오는 데 걸리는 시간은 제각각
+              ro.escDur = 850 + Math.random() * 750;     // 빠져나오는 데 걸리는 시간은 제각각
               ro.escT = ro.escDur;
               ro.p = BOSS_P + .004;
               ro.prevX = ro.p * TRACK;                   // 뒤에 남은 아이템을 소급 판정하지 않게
@@ -1138,7 +1139,7 @@
               for (var e2 = 0; e2 < 18; e2++) bits.push({ x: BOSS_P * TRACK, y: laneY(out, n),
                 vx: 2 + Math.random() * 10, vy: (Math.random() - .5) * 10, life: 1,
                 c: e2 % 2 ? "#cdb0ff" : "#ffffff" });
-              vortex.releaseAt = vortex.t + 420 + Math.random() * 520;   // 나오는 속도는 랜덤
+              vortex.releaseAt = vortex.t + 280 + Math.random() * 320;   // 나오는 속도는 랜덤
             }
           }
         }
@@ -1194,6 +1195,13 @@
         } else { cam.pend = -1; cam.pendT = 0; }
 
         var focus = runners[cam.tgt].p * TRACK;
+        if (vortex && !vortex.fade) {
+          // 블랙홀 안에서는 전원의 p 가 같다 → 벌칙 등수를 따라가면 카메라가
+          // 그 자리에 못박혀 화면이 멈춘 것처럼 보인다. 빠져나오는 쪽을 함께 담는다.
+          var outX = vortex.x;
+          runners.forEach(function (r) { if (!r.done && r.p * TRACK > outX) outX = r.p * TRACK; });
+          focus = (vortex.x + outX) / 2;
+        }
         var wantZ = LOCK_Z;
         if (slow && fA && fB) {                     // 포토피니시만 예외
           focus = ((fA.p + fB.p) / 2) * TRACK;
