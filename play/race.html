@@ -272,7 +272,7 @@
     var TRACK = 12000;                     // 월드 트랙 길이 — 길수록 배경이 빨리 흐른다
     var GROUND = VH - 150;
     // fx = 완충된 초점 x, tgt = 따라가는 주자, pend/pendT = 대상 전환 대기
-    var cam = { x: 0, z: 1, v: 0, fx: null, tgt: -1, pend: -1, pendT: 0 };
+    var cam = { x: 0, z: 1, v: 0, fx: null, tgt: -1, pendT: 0 };
     var runners = [], rocks = [], bits = [], orbs = [], farStars = [], midStars = [], fgDust = [];
     var SPAN = TRACK * 1.3;
     for (var i = 0; i < 190; i++) farStars.push({ x: Math.random() * SPAN, y: Math.random() * VH, r: Math.random() * 1.8 + .5 });
@@ -971,7 +971,7 @@
       // 배지는 반드시 레인 순서(runners 와 같은 인덱스)로 만들어야 한다.
       // 입력 순서(names)로 만들면 이름·색·등수가 서로 어긋난다.
       buildLive(lane); updateLive();
-      cam.x = 0; cam.z = .42; cam.fx = null; cam.tgt = -1; cam.pend = -1; cam.pendT = 0;
+      cam.x = 0; cam.z = .42; cam.fx = null; cam.tgt = -1; cam.pendT = 0;
 
       // 3 · 2 · 1 · GO
       var cbox = $("count"), steps = ["3", "2", "1", "GO!"], ci = 0;
@@ -1187,12 +1187,16 @@
           var stillRun = ordC.filter(function (o) { return !runners[o.i].done; });
           if (stillRun.length) wantT = stillRun[stillRun.length - 1].i;
         }
-        if (cam.tgt < 0) { cam.tgt = wantT; }
-        else if (wantT !== cam.tgt) {
-          if (wantT !== cam.pend) { cam.pend = wantT; cam.pendT = 0; }
+        // 이력(hysteresis)은 '누적식'이어야 한다. 예전엔 후보가 바뀔 때마다
+        // pendT 를 0 으로 되돌려서, 후보가 프레임마다 흔들리면 400ms 에 영영
+        // 도달하지 못하고 카메라가 옛 대상에 영구히 묶였다 — 결승선 정지의 원인.
+        // 그리고 지금 보고 있는 사람이 이미 도착했으면 지체 없이 옮긴다.
+        if (cam.tgt < 0 || runners[cam.tgt].done) { cam.tgt = wantT; cam.pendT = 0; }
+        else if (wantT === cam.tgt) { cam.pendT = 0; }
+        else {
           cam.pendT += rawDt;
-          if (cam.pendT >= 400) { cam.tgt = wantT; cam.pend = -1; cam.pendT = 0; }
-        } else { cam.pend = -1; cam.pendT = 0; }
+          if (cam.pendT >= 400) { cam.tgt = wantT; cam.pendT = 0; }
+        }
 
         var focus = runners[cam.tgt].p * TRACK;
         if (vortex && !vortex.fade) {
