@@ -280,7 +280,12 @@
     // 전경 먼지 — 카메라보다 빨리 흘러 화면 앞을 스쳐 지나간다. 속도감의 8할
     for (var i3 = 0; i3 < 34; i3++) fgDust.push({ x: Math.random() * SPAN, y: Math.random() * VH, r: Math.random() * 3.4 + 1.6 });
 
-    function laneY(i, n) { var top = 210, bot = GROUND - 20; return n === 1 ? (top + bot) / 2 : top + (bot - top) * i / (n - 1); }
+    // 레인은 화면 세로의 대부분을 쓴다. 예전엔 210~630(52%)만 써서 위아래가
+    // 휑하게 비었다.
+    function laneY(i, n) {
+      var top = 150, bot = VH - 120;
+      return n === 1 ? (top + bot) / 2 : top + (bot - top) * i / (n - 1);
+    }
 
     /* ── 보스 · 소용돌이 · 우주선 ─────────────────── */
     var BOSS_P = .70;        // 보스 체력은 인원에 따라 정해진다(start 참조)
@@ -334,7 +339,8 @@
 
       // 체력바
       if (!boss.dead) {
-        var bw = Math.min(VW * .5, 420), bx = (VW - bw) / 2, by = 26;
+        // 전체화면에선 상단 중앙에 HUD 알약이 떠 있다. 26px 에 그리면 그 아래 깔린다.
+        var bw = Math.min(VW * .5, 420), bx = (VW - bw) / 2, by = 104;
         g.fillStyle = "rgba(6,12,26,.7)"; g.fillRect(bx - 3, by - 3, bw + 6, 24);
         g.fillStyle = "#3a1f52"; g.fillRect(bx, by, bw, 18);
         g.fillStyle = boss.hp <= 3 ? "#ff5b6e" : "#c07bff";
@@ -685,10 +691,10 @@
     }
 
     function drawFinish(sx, scale) {
-      var w = 26 * scale;
+      var w = 26 * scale, ft = 100, fb = VH - 70, fh = (fb - ft) / 26;
       for (var b = 0; b < 26; b++) {
         g.fillStyle = b % 2 ? "#ffffff" : "#1a2140";
-        g.fillRect(sx, 150 + b * ((VH - 230) / 26), w, (VH - 230) / 26);
+        g.fillRect(sx, ft + b * fh, w, fh);
       }
       g.save();
       g.fillStyle = "#ffe6b8"; g.font = "700 " + Math.round(34 * scale) + "px 'Jua', sans-serif";
@@ -1291,14 +1297,19 @@
            포토피니시만 예외로 두 명을 크게 잡는다. */
         var xs = runners.map(function (r) { return r.p * TRACK; });
         var lo = Math.min.apply(null, xs), hi = Math.max.apply(null, xs);
-        if (boss && !boss.dead) hi = Math.max(hi, boss.x + BOSS_R * .55);  // 보스 몸통까지
-        if (vortex && !vortex.fade) {                                      // 블랙홀 전체가 담기게
-          lo = Math.min(lo, vortex.x - VORTEX_R * .9);
-          hi = Math.max(hi, vortex.x + VORTEX_R * .9);
+        var pad = 520;
+        if (boss && !boss.dead) {
+          // 보스전은 '창 크기 고정'이다. 주자 위치에 따라 상자를 늘리면
+          // 붙었다 벌어졌다 할 때마다 배율이 0.7~1.1 로 널뛰어 화면이 출렁인다.
+          // 멀리 있는 낙오자는 잠깐 화면 밖에 둔다 — 어차피 보스로 오는 길이다.
+          lo = boss.x - 900; hi = boss.x + BOSS_R * .62; pad = 200;
+        } else if (vortex && !vortex.fade) {
+          // 블랙홀도 같은 이유로 고정 창
+          lo = vortex.x - VORTEX_R * 1.15; hi = vortex.x + VORTEX_R * 1.15; pad = 260;
         }
         if (hi > TRACK - 2200) hi = Math.max(hi, TRACK + 120);             // 결승선까지
         var focus = (lo + hi) / 2;
-        var span = Math.max(420, hi - lo + 520);
+        var span = Math.max(420, hi - lo + pad);
         var wantZ = Math.max(.32, Math.min(1.45, VW * .78 / span));
 
         if (slow && fA && fB) {                     // 포토피니시 — 두 명 정면
