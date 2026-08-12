@@ -1025,7 +1025,8 @@
       var arrived = [];                     // 도착 순서대로 쌓인다 — 이게 곧 최종 순위
       var flash = "", flashT = 0;           // 부스트·블랙홀 알림이 잠깐 머물게
       var camPrev = 0;
-      var simEl = 0, timeScale = 1, slowNote = false, nextBeat = 700, slowUsed = 0;
+      var simEl = 0, timeScale = 1, slowNote = "", nextBeat = 700, slowUsed = 0;
+      var deepUsed = 0, rushOn = false;   // 결정타 슬로모션 예산 / 마무리 질주 여부
 
       function tick(now) {
         var rawDt = Math.min(48, now - last); last = now;
@@ -1091,7 +1092,8 @@
           if (rn.slowT > 0) rn.slowT -= dt;
 
           var mul;
-          if (rn.escT > 0) {
+          if (rushOn) mul = 3.2;                                // 승부는 났다 — 남은 인원은 전속력
+          else if (rn.escT > 0) {
             // 블랙홀 자기장을 이겨내는 중 — 거의 못 나아가다 점점 풀려난다
             var ue = 1 - rn.escT / rn.escDur;
             mul = .30 + .70 * ue * ue;
@@ -1103,7 +1105,9 @@
           if (rn.hurtT > 0) rn.hurtT -= dt;
           // 물결은 속도에만 얹는다(항상 양수) → 위치는 절대 뒤로 가지 않는다
           var wob = 1 + Math.sin(el * rn.freq + rn.phase) * .60;
-          var rubber = 1 + CATCHUP * Math.max(0, leadP - rn.p);   // 뒤처질수록 빨라짐
+          // 마무리 질주에선 추격보정을 끈다. 켜 두면 전원이 한 덩어리로
+          // 들이닥쳐 한 명씩 들어오는 그림이 사라진다.
+          var rubber = rushOn ? 1 : 1 + CATCHUP * Math.max(0, leadP - rn.p);
           rn.p = Math.min(1, rn.p + BASE_V * rn.innate * wob * mul * rubber * dt);
 
           // 🕳 블랙홀 — 트랙 70% 지점. '닿은 사람만' 빨려든다.
@@ -1137,6 +1141,22 @@
           }
         });
 
+        // 벌칙 등수가 골 라인을 넘는 순간, 이 판의 승부는 거기서 끝난다.
+        // 남은 고브럽은 결과와 무관하니 붙잡아 두지 않고 전속력으로 태워 보낸다.
+        if (!rushOn && done >= loseRank) {
+          rushOn = true;
+          slowUsed = 9e9; deepUsed = 9e9;             // 슬로모션 종료 — 여기서부턴 빠르게
+          runners.forEach(function (r) {
+            if (r.done) return;
+            if (r.sucked) { r.sucked = false; r.p = BOSS_P + .004; r.prevX = r.p * TRACK; }
+            r.passedHole = true;                      // 블랙홀은 더 붙잡지 않는다
+            r.escT = 0; r.slowT = 0; r.holeT = 0;
+            r.dashT = 9e5;                            // 잔상·속도선 — 속도를 눈에 보이게
+          });
+          flash = "🚀 나머지 전원 탑승 —!"; flashT = 1300;
+          sfx.whoosh();
+        }
+
         if (vortex) {
           vortex.t += dt;
           // 안에 있는 사람은 각자의 시계로 갇혀 있다가 각자 빠져나온다.
@@ -1169,16 +1189,27 @@
           }
         }
 
-        // ── 포토피니시 슬로모션: 걸릴 등수의 경계 다툼이 결승 직전 박빙이면 시간이 늘어진다
-        var slow = false, fA = null, fB = null;
-        if (done < loseRank && leadPre > .955 && slowUsed < 2200) {
-          var ord2 = runners.map(function (r, i2) { return { i: i2, done: r.done, rank: r.rank, p: r.p }; })
-            .sort(function (a, b) {
-              var ka = a.done ? a.rank : 1000 + (1 - a.p);
-              var kb = b.done ? b.rank : 1000 + (1 - b.p);
-              return ka - kb;
-            });
-          var occ = ord2[loseRank - 1];
+        // ── 슬로모션 ─────────────────────────────────────────────
+        // (A) 결정타: 벌칙 등수 자리가 바로 다음 차례이고 골 라인이 코앞이면,
+        //     그 통과 장면을 길고 깊게 늘인다. 라이벌이 없어도 발동한다 —
+        //     이 한 장면이 판의 결말이니까. 3.4초까지(≒마지막 4.5% 구간).
+        // (B) 포토피니시: 그 전 단계의 경계 다툼이 박빙일 때 (기존, 2.2초)
+        var slow = false, deep = false, fA = null, fB = null, deepTS = .20;
+        var ord2 = runners.map(function (r, i2) { return { i: i2, done: r.done, rank: r.rank, p: r.p }; })
+          .sort(function (a, b) {
+            var ka = a.done ? a.rank : 1000 + (1 - a.p);
+            var kb = b.done ? b.rank : 1000 + (1 - b.p);
+            return ka - kb;
+          });
+        var occ = ord2[loseRank - 1];
+        if (done === loseRank - 1 && occ && !occ.done && occ.p > .955 && deepUsed < 4200) {
+          slow = true; deep = true; fA = occ; deepUsed += rawDt;
+          // 배속을 고정하면 결말의 길이가 판마다 제각각이 된다. 앞 등수가 늦게
+          // 들어와 당첨자가 이미 골 라인 코앞일 때는 33ms 만에 끝나 버렸다(실측
+          // 28판 33~4659ms). 남은 거리를 시간으로 환산해, 언제 걸리든 약 2.8초
+          // 짜리 결말이 되도록 배속을 역산한다.
+          deepTS = Math.max(.06, Math.min(.22, (1 - occ.p) * 15000 / 2800));
+        } else if (done < loseRank && leadPre > .955 && slowUsed < 2200) {
           var cand = [];
           if (loseRank - 2 >= 0) cand.push(ord2[loseRank - 2]);
           if (loseRank < ord2.length) cand.push(ord2[loseRank]);
@@ -1187,11 +1218,14 @@
             cand.sort(function (a, b) { return Math.abs(a.p - occ.p) - Math.abs(b.p - occ.p); });
             if (Math.abs(occ.p - cand[0].p) < .022) { slow = true; fA = occ; fB = cand[0]; }
           }
+          if (slow) slowUsed += rawDt;
         }
-        if (slow) slowUsed += rawDt;                 // 총 2.2초까지만 — 매판 늘어지면 특별함이 사라진다
-        timeScale += ((slow ? .35 : 1) - timeScale) * Math.min(1, rawDt / 140);
-        if (slow && !slowNote) { slowNote = true; flash = "📸 포토피니시 각!"; flashT = 1400; }
-        if (!slow) slowNote = false;
+        timeScale += ((slow ? (deep ? deepTS : .35) : 1) - timeScale) * Math.min(1, rawDt / 140);
+        var mode = slow ? (deep ? "deep" : "photo") : "";
+        if (mode && mode !== slowNote) {
+          flash = deep ? "🎬 운명의 골 라인…" : "📸 포토피니시 각!"; flashT = 1400;
+        }
+        slowNote = mode;
 
         /* ── 카메라 ───────────────────────────────────────────────
            벌칙 등수 자리에 있는 주자에게 완전히 고정한다.
@@ -1229,9 +1263,9 @@
         // 화면이 멈춘 것처럼 보였다. 스크린샷의 빈 우주가 정확히 그 좌표였다.
         var focus = runners[cam.tgt].p * TRACK;
         var wantZ = LOCK_Z;
-        if (slow && fA && fB) {                     // 포토피니시만 예외
-          focus = ((fA.p + fB.p) / 2) * TRACK;
-          wantZ = 1.35;
+        if (slow && fA) {                           // 슬로모션 구간만 예외로 확대
+          focus = (fB ? (fA.p + fB.p) / 2 : fA.p) * TRACK;
+          wantZ = fB ? 1.35 : 1.30;
         }
         if (cam.fx === null) { cam.fx = focus; cam.z = wantZ; }
         cam.fx += (focus - cam.fx) * Math.min(1, rawDt / 220);
@@ -1254,7 +1288,8 @@
           nextBeat = realEl + (980 - 620 * Math.min(1, leadPre));
         }
         if (flashT > 0) flashT -= dt;
-        $("hud-left").textContent = flashT > 0 ? flash : "🥇 " + runners[liveOrd[0].i].name;
+        $("hud-left").textContent = flashT > 0 ? flash
+          : rushOn ? "🚀 탑승 중…" : "🥇 " + runners[liveOrd[0].i].name;
         $("hud-right").textContent = done + " / " + n + " 도착";
         updateLive();
 
