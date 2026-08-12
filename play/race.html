@@ -380,7 +380,10 @@
       if (!vortex) return;
       // 블랙홀은 화면 정중앙에 고정 — 여기로 전원이 빨려든다
       var sx = VW / 2, cy = VH * .5;
-      var R = VH * .42 * Math.min(1, vortex.t / 520);
+      var close = vortex.fade ? Math.max(0, 1 - vortex.fade / 700) : 1;
+      var R = VH * .42 * Math.min(1, vortex.t / 520) * close;
+      if (R < 2) return;
+      g.globalAlpha = close;
       g.save(); g.translate(sx, cy);
       // 바깥 자기장 헤일로
       var hg = g.createRadialGradient(0, 0, R * .2, 0, 0, R * 2.0);
@@ -424,6 +427,7 @@
       g.fillStyle = "#05010e"; g.fill();
       g.strokeStyle = "rgba(255,214,150,.85)"; g.lineWidth = 4; g.stroke();
       g.restore();
+      g.globalAlpha = 1;
     }
 
     // 세로형 로켓 — 한 줄에 창문 2개, 인원이 늘면 줄이 아래로 붙어 길어진다
@@ -448,7 +452,13 @@
       if (!ship) return;
       var sx = (ship.x - camX) * scale + VW / 2;
       var m = ship.m, W = m.W, H = m.H, hw = W / 2;
-      g.save(); g.translate(sx, VH * .5); g.scale(scale, scale);
+      // 발사 — 점화 중엔 부르르 떨고, 뜨면 위로 가속하며 올라간다
+      var L0 = ship.launch, lift = 0, shakeX = 0;
+      if (L0) {
+        if (L0.lifted > 0) { var lu = L0.lifted / 1000; lift = -(lu * lu) * 2600; }
+        if (L0.thrust) shakeX = (Math.random() - .5) * 7 * L0.thrust;
+      }
+      g.save(); g.translate(sx + shakeX, VH * .5 + lift); g.scale(scale, scale);
 
       var noseTop = -H / 2, seamY = noseTop + m.noseH, bodyBot = seamY + m.bodyH;
       function bodyW(y) {
@@ -534,6 +544,36 @@
       }
       fin(-1); fin(1);
 
+      // 엔진 화염 — 발사할 때 아래로 길게 뿜는다 (노즐보다 먼저 그려 뒤에 깔린다)
+      if (L0 && L0.thrust > 0) {
+        var th0 = L0.thrust, fLen = (150 + Math.random() * 120) * th0 * (L0.lifted > 0 ? 1.9 : 1);
+        var fW = hipW * (.62 + Math.random() * .12);
+        var fy0 = bodyBot + 20;
+        var flg = g.createLinearGradient(0, fy0, 0, fy0 + fLen);
+        flg.addColorStop(0, "rgba(255,255,235,.98)"); flg.addColorStop(.22, "rgba(255,222,130,.95)");
+        flg.addColorStop(.55, "rgba(255,150,50,.75)"); flg.addColorStop(1, "rgba(255,70,30,0)");
+        g.beginPath();
+        g.moveTo(-fW, fy0);
+        g.quadraticCurveTo(-fW * .5, fy0 + fLen * .55, 0, fy0 + fLen);
+        g.quadraticCurveTo(fW * .5, fy0 + fLen * .55, fW, fy0);
+        g.closePath(); g.fillStyle = flg; g.fill();
+        // 안쪽 흰 심지
+        g.beginPath();
+        g.moveTo(-fW * .42, fy0);
+        g.quadraticCurveTo(-fW * .2, fy0 + fLen * .4, 0, fy0 + fLen * .62);
+        g.quadraticCurveTo(fW * .2, fy0 + fLen * .4, fW * .42, fy0);
+        g.closePath(); g.fillStyle = "rgba(255,252,240,.85)"; g.fill();
+        // 연기 구름
+        for (var sm = 0; sm < 4; sm++) {
+          g.globalAlpha = .16 * th0;
+          g.beginPath();
+          g.arc((Math.random() - .5) * hw * 1.8, fy0 + 40 + Math.random() * fLen * .8,
+                26 + Math.random() * 34, 0, 6.284);
+          g.fillStyle = "#cfd6e6"; g.fill();
+        }
+        g.globalAlpha = 1;
+      }
+
       // 엔진 노즐
       g.beginPath(); g.ellipse(0, bodyBot + 18, hipW * .5, 16, 0, 0, 6.284);
       g.fillStyle = "#57433a"; g.fill();
@@ -575,29 +615,12 @@
         g.fillStyle = "#ffffff"; g.fill(); g.globalAlpha = 1;
       });
 
-      // 도화선 — 불꽃이 창문을 하나씩 훑고 지나가다 걸린 좌석에서 멈춘다
-      if (ship.fuse) {
-        var f = ship.fuse, fs = seatPos(f.k, m);
-        var prev = f.k > 0 ? seatPos(f.k - 1, m) : { x: -m.W * .19, y: -H / 2 + m.noseH * .5 };
-        var fx2 = prev.x + (fs.x - prev.x) * f.seg;
-        var fy2 = prev.y + (fs.y - prev.y) * f.seg;
-        // 지나온 자국
-        g.strokeStyle = "rgba(255,150,60,.5)"; g.lineWidth = 5; g.lineCap = "round";
-        g.beginPath(); g.moveTo(prev.x, prev.y); g.lineTo(fx2, fy2); g.stroke();
-        // 불꽃
-        var fr = 15 + Math.random() * 9;
-        var fgl = g.createRadialGradient(fx2, fy2, 2, fx2, fy2, fr * 2.2);
-        fgl.addColorStop(0, "rgba(255,246,200,.95)"); fgl.addColorStop(.45, "rgba(255,170,60,.7)");
-        fgl.addColorStop(1, "rgba(255,90,30,0)");
-        g.fillStyle = fgl; g.beginPath(); g.arc(fx2, fy2, fr * 2.2, 0, 6.284); g.fill();
-        g.fillStyle = "#fff8dc"; g.beginPath(); g.arc(fx2, fy2, fr * .5, 0, 6.284); g.fill();
-      }
-
       // 튕겨 나온 고브럽 — 창문에서 오른쪽으로 날아간다
       if (ship.eject) {
         var e = ship.eject, s2 = seatPos(e.k, m);
         g.save();
-        g.translate(s2.x + e.dx, s2.y + e.dy);
+        // 로켓은 위로 떠나지만 튕겨 나온 고브럽은 남는다 — 상승분(lift)을 되돌린다
+        g.translate(s2.x + e.dx, s2.y + e.dy - lift / scale);
         g.rotate(e.rot);
         var ES = 120;
         var eimg = sprites[SKIN[e.idx % SKIN.length]];
@@ -993,7 +1016,7 @@
       boss = { x: BOSS_P * TRACK, hp: BOSS_HP, flash: 0, cd: 0, dead: false, deadT: 0 };
       vortex = null;
       // 🚀 결승선 로켓 — 한 줄에 창문 2개, 인원이 늘면 줄이 아래로 붙는다
-      ship = { x: TRACK + 560, m: shipMetrics(n), seats: [], eject: null, fuse: null };
+      ship = { x: TRACK + 560, m: shipMetrics(n), seats: [], eject: null, launch: null };
       for (var sI = 0; sI < n; sI++) ship.seats.push({ idx: -1, blown: false });
       // ⭐ 부스트 별 · 🕳 블랙홀 — 보스 앞 구간에만 (뒤 구간은 짧아서 못 씀)
       orbs = [];
@@ -1175,7 +1198,11 @@
               }
               vortex.releaseAt = vortex.t + 500;
             }
-          } else if (vortex.queue.length) {
+          } else if (!vortex.queue.length) {
+            // 전원 탈출 — 블랙홀을 닫는다. 안 닫으면 결승·우주선까지 따라온다
+            vortex.fade = (vortex.fade || 0) + dt;
+            if (vortex.fade > 700) vortex = null;
+          } else {
             if (vortex.t >= vortex.releaseAt) {
               var out = vortex.queue.shift();
               var ro = runners[out];
@@ -1225,7 +1252,7 @@
         // 1위를 가로 72% 지점에 둔다 — 앞은 결승선, 뒤는 추격자들이 보이게
         var wantX = leadX - VW * .22 / cam.z;
         // 블랙홀이 열린 동안엔 카메라를 블랙홀에 고정 — 전원이 여기로 빨려든다
-        if (vortex && vortex.queue.length + (vortex.swallowed ? 0 : 1) > 0) {
+        if (vortex && !vortex.fade) {
           wantZ = .86; cam.z += (wantZ - cam.z) * Math.min(1, dt / 300);
           wantX = BOSS_P * TRACK;
         }
@@ -1293,8 +1320,9 @@
       $("hud-left").textContent = "🚀 전원 탑승 — 출발 준비";
 
       // 카메라를 우주선으로 옮기며 잠깐 다 같이 신나 하다가, 걸린 창문이 펑 터진다
-      var bt0 = performance.now(), blown = false;
+      var bt0 = performance.now(), blown = false, bPrev = bt0;
       (function boarding(now) {
+        var dt2 = Math.min(48, now - bPrev); bPrev = now;
         var k = Math.min(1, (now - bt0) / 2000);   // 다 같이 신나 하는 2초
         // 우주선 전체가 화면에 담기게 배율을 맞춘다
         var wantZ = Math.min(1.0, VH * .86 / ship.m.H);
@@ -1307,29 +1335,28 @@
           e.dx += e.vx; e.dy += e.vy; e.vy += .5; e.rot += .16;
         }
         draw(now, n, cam.x, cam.z, 0);
-        // 2초가 지나면 도화선에 불이 붙어 창문을 하나씩 훑는다
-        if (k >= 1 && !ship.fuse && !blown) {
-          ship.fuse = { k: 0, seg: 0, holdAt: 0 };
-          $("hud-left").textContent = "🔥 도화선에 불이 붙었다…";
+        // 2초가 지나면 카운트다운 후 로켓이 불을 뿜으며 발사된다
+        if (k >= 1 && !ship.launch && !blown) {
+          ship.launch = { t: 0, lifted: 0 };
+          $("hud-left").textContent = "🚀 3… 2… 1…";
         }
         var ready = false;
-        if (ship.fuse && !blown) {
-          var f2 = ship.fuse;
-          if (f2.k < loseRank - 1) {                     // 걸린 좌석까지 훑고 간다
-            // 좌석이 몇 개든 훑는 데 약 1.6초(96프레임)가 걸리게 정규화
-            f2.seg += (loseRank - 1) / 96;
-            if (Math.random() < .4) sfx.crackle();
-            if (f2.seg >= 1) { f2.seg = 0; f2.k++; }
-          } else if (f2.seg < 1) {
-            f2.seg = Math.min(1, f2.seg + .05);
-            if (Math.random() < .4) sfx.crackle();
-          } else {                                        // 걸린 좌석 앞에서 1초 정적
-            if (!f2.holdAt) { f2.holdAt = now; $("hud-left").textContent = "…"; }
-            if (now - f2.holdAt >= 1000) ready = true;
+        if (ship.launch && !blown) {
+          var L = ship.launch;
+          L.t += dt2;
+          if (L.t < 1800) {                              // 점화 — 불꽃이 부풀며 기체가 떤다
+            L.thrust = Math.min(1, L.t / 1800);
+            if (Math.random() < .5) sfx.crackle();
+            var cd2 = 3 - Math.floor(L.t / 600);
+            $("hud-left").textContent = "🚀 " + (cd2 > 0 ? cd2 + "…" : "발사!");
+          } else {
+            L.thrust = 1;
+            L.lifted += dt2;                             // 위로 떠오른다
+            if (L.lifted > 380) ready = true;            // 떠오르는 순간 한 명이 튕겨 나간다
           }
         }
         if (ready && !blown) {
-          blown = true; bt0 = now; ship.fuse = null; sfx.boom();
+          blown = true; bt0 = now; sfx.boom();
           var seat = ship.seats[loseRank - 1];
           seat.blown = true; loser.sad = true; loser.boarded = false;
           // 걸린 칸에서 오른쪽으로 튕겨 나온다
@@ -1342,7 +1369,7 @@
           for (var b2 = 0; b2 < 46; b2++) bits.push({ x: ship.x + sp2.x, y: VH * .5 + sp2.y,
             vx: 1 + Math.random() * 15, vy: (Math.random() - .5) * 16, life: 1,
             c: b2 % 3 === 0 ? "#ffd479" : b2 % 3 === 1 ? "#ff8a5c" : "#e8eefc" });
-          $("hud-left").textContent = "💥 " + loser.name + " 좌석 폭발!";
+          $("hud-left").textContent = "💥 " + loser.name + " 좌석 이탈!";
         }
         // 폭발 뒤 0.9초 동안 파편이 날리는 걸 보여주고 클로즈업으로 넘어간다
         if (blown && now - bt0 > 900) return showLoser(loser, loseRank, n);
@@ -1359,6 +1386,12 @@
       var t0 = performance.now();
       (function zoom(now) {
         var k = Math.min(1, (now - t0) / 900);
+        // 클로즈업 동안에도 로켓은 계속 위로 멀어진다
+        if (ship && ship.launch) ship.launch.lifted += 16;
+        if (ship && ship.eject) {
+          var e3 = ship.eject;
+          e3.dx += e3.vx; e3.dy += e3.vy; e3.vy += .5; e3.rot += .16;
+        }
         draw(now, n, cam.x + (ship ? 260 : 0) * k, cam.z, cam.v * (1 - k));
         g.fillStyle = "rgba(4,6,15," + (k * .72) + ")";
         g.fillRect(0, 0, VW, VH);
