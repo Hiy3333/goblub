@@ -292,6 +292,7 @@
     // 블랙홀은 월드에 놓인 물체다. 반지름도 월드 단위여야 줌이 변해도
     // 주자와 비율이 유지된다.
     var VORTEX_R = 640;   // 월드 반지름 — 고정 배율 0.42 에서 화면 지름 약 538px
+    var PULL = .06;       // 중력권 — 홀에서 트랙의 6% 를 벗어나야 완전히 자유
     var vortex = null, ship = null;
 
     function drawVortex(camX, scale, t) {
@@ -653,7 +654,7 @@
 
       // 블랙홀 구간 — 자기 레인이 아니라 화면 정중앙으로 끌려간다
       var kk = 0, drawX = sx, drawY = sy + bob;
-      if (rn.sucked || rn.escT > 0) {
+      if (rn.sucked || rn.escU < 1) {
         // 빨려드는 목적지는 블랙홀의 '월드' 위치다
         var cxm = vortex ? (vortex.x - camX) * scale + VW / 2 : VW / 2, cym = VH / 2;
         if (rn.sucked) {
@@ -667,7 +668,7 @@
           drawY += Math.sin(rn.suckT / 90 + i) * swirl * .6;
         } else {
           // 탈출 — 자기장에 되당겨지며 낑낑, 조금씩 자기 레인으로 밀려 나온다
-          var u = 1 - rn.escT / rn.escDur;                  // 0 중심 → 1 제자리
+          var u = rn.escU;                                  // 0 중심 → 1 제자리
           // 앞으로 나아가려다 도로 끌려가는 저항. 끝으로 갈수록 저항이 약해진다
           var resist = Math.sin(u * Math.PI * 3.5) * .13 * (1 - u);
           var uo = Math.max(0, Math.min(1, u - resist));
@@ -686,12 +687,14 @@
       if (rn.sucked) {
         g.rotate(kk * 9); g.scale(1 - kk * .88, 1 - kk * .88);
         g.globalAlpha = 1 - kk * .85;
-      } else if (rn.escT > 0) {
-        // 낑낑대며 빠져나오는 중 — 버둥거리며 조금씩 커진다
-        var uu = 1 - rn.escT / rn.escDur;                   // 0 중심 → 1 제자리
+      } else if (rn.escU < 1) {
+        // 낑낑대며 빠져나오는 중 — 버둥거리며 조금씩 커진다.
+        // 중력이 셀수록 더 격하게 몸부림친다.
+        var uu = rn.escU;                                   // 0 중심 → 1 제자리
+        var ag = .6 + rn.grav * .9;                         // 몸부림의 세기
         var st = .28 + .72 * uu;                            // 작았다가 원래 크기로
-        var wob2 = 1 + Math.sin(rn.escT / 42) * .26 * (1 - uu);   // 몸부림(끝날수록 잦아듦)
-        g.rotate(-(1 - uu) * 5 + Math.sin(rn.escT / 58) * .6 * (1 - uu));
+        var wob2 = 1 + Math.sin(t / 42 + i) * .26 * ag * (1 - uu);
+        g.rotate(-(1 - uu) * 5 + Math.sin(t / 58 + i) * .6 * ag * (1 - uu));
         g.scale(st * wob2, st / wob2);
         g.globalAlpha = .45 + .55 * uu;
       }
@@ -983,8 +986,9 @@
       runners = lane.map(function (nm) {
         return { name: nm, p: 0, prevX: 0, rank: 0, done: false, spin: 0,
                  slowT: 0, dashT: 0, holeT: 0,        // 운석 감속 / 별 질주 / 블랙홀 정지
-                 hurtT: 0, bumpCD: 0, sucked: false, suckT: 0, holdT: 0, passedHole: false,
-                 escT: 0, escDur: 1, sad: false, boarded: false,
+                 hurtT: 0, bumpCD: 0, sucked: false, suckT: 0, passedHole: false,
+                 // 중력 레벨 — 고브럽마다 다르다. 셀수록 홀에서 못 벗어난다.
+                 grav: Math.random(), escU: 1, sad: false, boarded: false,
                  innate: .99 + Math.random() * .02,   // 타고난 속도차(아주 작게)
                  phase: Math.random() * 6.28, freq: .0009 + Math.random() * .0020 };
       });
@@ -1058,7 +1062,6 @@
           if (rn.done) return;
           if (rn.sucked) return;               // 소용돌이 안 — 아래 소용돌이 로직이 맡는다
           if (rn.spin) rn.spin = Math.abs(rn.spin) < .05 ? 0 : rn.spin * .9;
-          if (rn.escT > 0) rn.escT -= dt;
           if (rn.bumpCD > 0) rn.bumpCD -= dt;        // 낑낑대며 빠져나오는 잔여 시간
           var wx = rn.p * TRACK, wy = laneY(i, n);
           rocks.forEach(function (r) {
@@ -1091,12 +1094,21 @@
           if (rn.dashT > 0) rn.dashT -= dt;
           if (rn.slowT > 0) rn.slowT -= dt;
 
+          // 🕳 탈출 진행도는 '시간'이 아니라 '거리'다. 시간 기준이면 중력이
+          // 아무리 세도 정해진 초가 지나면 똑같이 풀려나 버린다. 홀에서
+          // 얼마나 멀어졌는지로 재야 「멀어지면 원래 속도」가 성립한다.
+          rn.escU = rushOn ? 1 : rn.sucked ? 0
+            : rn.passedHole ? Math.max(0, Math.min(1, (rn.p - BOSS_P) / PULL)) : 1;
+
           var mul;
           if (rushOn) mul = 3.2;                                // 승부는 났다 — 남은 인원은 전속력
-          else if (rn.escT > 0) {
-            // 블랙홀 자기장을 이겨내는 중 — 거의 못 나아가다 점점 풀려난다
-            var ue = 1 - rn.escT / rn.escDur;
-            mul = .30 + .70 * ue * ue;
+          else if (rn.escU < 1) {
+            // 중력권 안 — 중력이 셀수록 바닥 속도가 낮고, 멀어질수록 풀려난다.
+            // grav 0 이면 .58 배로 스르륵, grav 1 이면 .13 배로 낑낑댄다.
+            // 하한을 .06 까지 내리면 최악의 판에서 8.7초를 기어간다(실측).
+            // 그쯤 되면 긴장이 아니라 멈춘 것처럼 보인다 — .13 에서 끊는다.
+            var floorV = .58 - .45 * rn.grav;
+            mul = floorV + (1 - floorV) * rn.escU * rn.escU;
           }
           else if (rn.holeT > 0) mul = 0;                       // 블랙홀 = 완전 정지
           else if (rn.dashT > 0) mul = 3;                       // 별 = 3배속
@@ -1107,7 +1119,11 @@
           var wob = 1 + Math.sin(el * rn.freq + rn.phase) * .60;
           // 마무리 질주에선 추격보정을 끈다. 켜 두면 전원이 한 덩어리로
           // 들이닥쳐 한 명씩 들어오는 그림이 사라진다.
-          var rubber = rushOn ? 1 : 1 + CATCHUP * Math.max(0, leadP - rn.p);
+          // 중력권 안에서도 죽인다 — 뒤에서 밀어 주면 중력이 상쇄돼
+          // 「누구는 엄청 천천히」가 성립하지 않는다. 벗어나면 다시 켜져
+          // 뒤처진 만큼 따라붙는다.
+          var damp = rn.escU < 1 ? rn.escU * rn.escU : 1;
+          var rubber = rushOn ? 1 : 1 + CATCHUP * Math.max(0, leadP - rn.p) * damp;
           rn.p = Math.min(1, rn.p + BASE_V * rn.innate * wob * mul * rubber * dt);
 
           // 🕳 블랙홀 — 트랙 70% 지점. '닿은 사람만' 빨려든다.
@@ -1116,7 +1132,7 @@
           // 몰렸다가 텅 비었다. 이제 각자 도착한 순서대로 삼켜지고 뱉어진다.
           if (rn.p >= BOSS_P && !rn.passedHole && !rn.sucked) {
             if (!vortex) {
-              vortex = { x: BOSS_P * TRACK, t: 0 };
+              vortex = { x: BOSS_P * TRACK, t: 0, queue: [], nextOut: 0 };
               orbs.forEach(function (o) { o.got = true; });   // 남은 별은 소진 — 소급 판정 방지
               sfx.whoosh();
               flash = "🕳 블랙홀이 열렸다!"; flashT = 1500;
@@ -1125,7 +1141,7 @@
                 c: d3 % 3 === 0 ? "#cdb0ff" : d3 % 3 === 1 ? "#8a5cff" : "#ffffff" });
             }
             rn.sucked = true; rn.suckT = 0;
-            rn.holdT = 900 + Math.random() * 1500;   // 안에 갇혀 있는 시간은 제각각
+            vortex.queue.push(i);                    // 들어간 순서 그대로 쌓인다
             rn.p = BOSS_P;
             flash = "🕳 " + rn.name + " 블랙홀에 빨려든다!"; flashT = 950;
             sfx.hit();
@@ -1150,9 +1166,10 @@
             if (r.done) return;
             if (r.sucked) { r.sucked = false; r.p = BOSS_P + .004; r.prevX = r.p * TRACK; }
             r.passedHole = true;                      // 블랙홀은 더 붙잡지 않는다
-            r.escT = 0; r.slowT = 0; r.holeT = 0;
+            r.escU = 1; r.slowT = 0; r.holeT = 0;     // 중력도 여기서 풀린다
             r.dashT = 9e5;                            // 잔상·속도선 — 속도를 눈에 보이게
           });
+          if (vortex) vortex.queue.length = 0;
           flash = "🚀 나머지 전원 탑승 —!"; flashT = 1300;
           sfx.whoosh();
         }
@@ -1162,26 +1179,32 @@
           // 안에 있는 사람은 각자의 시계로 갇혀 있다가 각자 빠져나온다.
           // (큐로 순서를 돌리던 예전 방식은 삼킨 인원과 뱉은 인원이 어긋나면
           //  블랙홀이 영영 안 닫혀서 카메라가 그 자리에 묶였다.)
-          runners.forEach(function (rn, i2) {
-            if (!rn.sucked) return;
-            rn.suckT += dt;
-            if (rn.suckT < rn.holdT) return;
-            rn.sucked = false;
-            rn.passedHole = true;                      // 한 번 통과하면 다시 안 빨린다
-            rn.escDur = 850 + Math.random() * 750;     // 빠져나오는 데 걸리는 시간은 제각각
-            rn.escT = rn.escDur;
-            rn.p = BOSS_P + .004;
-            rn.prevX = rn.p * TRACK;                   // 뒤에 남은 아이템을 소급 판정하지 않게
-            flash = "🌀 " + rn.name + " 빠져나오는 중…"; flashT = 900;
-            sfx.pop();
-            for (var e2 = 0; e2 < 18; e2++) bits.push({ x: BOSS_P * TRACK, y: laneY(i2, n),
-              vx: 2 + Math.random() * 10, vy: (Math.random() - .5) * 10, life: 1,
-              c: e2 % 2 ? "#cdb0ff" : "#ffffff" });
-          });
-          // 아직 통과 못 한 주자가 하나라도 있으면 계속 열어 둔다.
-          // 전원이 지나가고 몸부림까지 끝나야 닫는다 — 안 닫으면 우주선까지 따라온다.
+          runners.forEach(function (rn) { if (rn.sucked) rn.suckT += dt; });
+          // 들어간 순서 그대로 내보낸다. 안에서 버틴 시간이 아니라 큐 순서다 —
+          // 순서가 뒤집히면 블랙홀이 순위를 통째로 섞어 앞선 경주가 무의미해진다.
+          // 차이는 '나오는 순서'가 아니라 '나온 뒤의 속도'에서 난다.
+          if (vortex.queue.length && vortex.t >= vortex.nextOut) {
+            var qi = vortex.queue[0], ro = runners[qi];
+            if (ro.suckT >= 640) {                     // 빨려 들어가는 모션은 끝내고
+              vortex.queue.shift();
+              ro.sucked = false;
+              ro.passedHole = true;                    // 한 번 통과하면 다시 안 빨린다
+              ro.p = BOSS_P + .0015;
+              ro.prevX = ro.p * TRACK;                 // 뒤에 남은 아이템을 소급 판정하지 않게
+              var heavy = ro.grav > .62;
+              flash = "🌀 " + ro.name + (heavy ? " — 중력이 놔주질 않는다!" : " 빠져나오는 중…");
+              flashT = heavy ? 1300 : 900;
+              sfx.pop();
+              for (var e2 = 0; e2 < 18; e2++) bits.push({ x: BOSS_P * TRACK, y: laneY(qi, n),
+                vx: 2 + Math.random() * 10, vy: (Math.random() - .5) * 10, life: 1,
+                c: e2 % 2 ? "#cdb0ff" : "#ffffff" });
+              vortex.nextOut = vortex.t + 380 + Math.random() * 300;
+            }
+          }
+          // 전원이 통과하고 중력권까지 완전히 벗어나야 닫는다.
+          // 안 닫으면 결승·우주선까지 따라온다.
           var pending = runners.some(function (r) {
-            return !r.done && (r.sucked || !r.passedHole || r.escT > 0);
+            return !r.done && (r.sucked || !r.passedHole || r.escU < 1);
           });
           if (!pending) {
             vortex.fade = (vortex.fade || 0) + dt;
