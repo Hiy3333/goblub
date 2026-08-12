@@ -284,13 +284,16 @@
 
     /* ── 보스 · 소용돌이 · 우주선 ─────────────────── */
     var BOSS_P = .70;        // 보스 체력은 인원에 따라 정해진다(start 참조)
+    // 보스·블랙홀은 월드에 놓인 물체다. 반지름도 월드 단위로 둬야 줌이 변해도
+    // 주자와 비율이 유지된다(화면 고정으로 두면 줌아웃할 때 혼자 커 보인다).
+    var BOSS_R = 400, VORTEX_R = 430;
     var boss = null, vortex = null, ship = null;
 
     function drawBoss(camX, scale, t) {
       if (!boss) return;
       var sx = (boss.x - camX) * scale + VW / 2;
       if (sx < -700 || sx > VW + 700) return;
-      var cy = VH * .5, R = VH * .46 * (boss.dead ? Math.max(0, 1 - boss.deadT / 900) : 1);
+      var cy = VH * .5, R = BOSS_R * scale * (boss.dead ? Math.max(0, 1 - boss.deadT / 900) : 1);
       if (R <= 1) return;
       var wob = Math.sin(t / 260) * 14 * scale;
       g.save(); g.translate(sx, cy + wob); g.scale(scale, scale);
@@ -379,10 +382,10 @@
 
     function drawVortex(camX, scale, t) {
       if (!vortex) return;
-      // 블랙홀은 화면 정중앙에 고정 — 여기로 전원이 빨려든다
-      var sx = VW / 2, cy = VH * .5;
+      // 블랙홀도 월드에 박혀 있다 — 화면에 고정하면 카메라가 움직일 때 혼자 따라온다
+      var sx = (vortex.x - camX) * scale + VW / 2, cy = VH * .5;
       var close = vortex.fade ? Math.max(0, 1 - vortex.fade / 700) : 1;
-      var R = VH * .42 * Math.min(1, vortex.t / 520) * close;
+      var R = VORTEX_R * scale * Math.min(1, vortex.t / 520) * close;
       if (R < 2) return;
       g.globalAlpha = close;
       g.save(); g.translate(sx, cy);
@@ -694,7 +697,7 @@
       g.restore();
     }
 
-    function drawRunner(rn, i, n, sx, scale, t) {
+    function drawRunner(rn, i, n, sx, scale, t, camX) {
       var y = laneY(i, n);
       var sy = (y - VH / 2) * scale + VH / 2;
       // 크게 축소돼도 캐릭터·이름은 알아볼 수 있는 크기를 지킨다
@@ -705,7 +708,8 @@
       // 블랙홀 구간 — 자기 레인이 아니라 화면 정중앙으로 끌려간다
       var kk = 0, drawX = sx, drawY = sy + bob;
       if (rn.sucked || rn.escT > 0) {
-        var cxm = VW / 2, cym = VH / 2;
+        // 빨려드는 목적지는 블랙홀의 '월드' 위치다
+        var cxm = vortex ? (vortex.x - camX) * scale + VW / 2 : VW / 2, cym = VH / 2;
         if (rn.sucked) {
           kk = Math.min(1, rn.suckT / 760);           // 0 제자리 → 1 완전히 중심
           var ease = kk * kk * (3 - 2 * kk);          // 가속하며 빨려든다
@@ -944,7 +948,7 @@
           var wx = o.rn.p * TRACK;
           var sx = (wx - camX) * scale + VW / 2;
           if (sx < -140 || sx > VW + 140) return;
-          drawRunner(o.rn, o.i, n, sx, scale, t);
+          drawRunner(o.rn, o.i, n, sx, scale, t, camX);
           if (o.i === doomIdx && !o.rn.done) {
             var my = (laneY(o.i, n) - VH / 2) * scale + VH / 2;
             var ms = Math.max(74, 142 * scale);
@@ -1287,7 +1291,11 @@
            포토피니시만 예외로 두 명을 크게 잡는다. */
         var xs = runners.map(function (r) { return r.p * TRACK; });
         var lo = Math.min.apply(null, xs), hi = Math.max.apply(null, xs);
-        if (boss && !boss.dead) hi = Math.max(hi, BOSS_P * TRACK + 220);   // 보스 몸통까지
+        if (boss && !boss.dead) hi = Math.max(hi, boss.x + BOSS_R * .55);  // 보스 몸통까지
+        if (vortex && !vortex.fade) {                                      // 블랙홀 전체가 담기게
+          lo = Math.min(lo, vortex.x - VORTEX_R * .9);
+          hi = Math.max(hi, vortex.x + VORTEX_R * .9);
+        }
         if (hi > TRACK - 2200) hi = Math.max(hi, TRACK + 120);             // 결승선까지
         var focus = (lo + hi) / 2;
         var span = Math.max(420, hi - lo + 520);
