@@ -292,7 +292,7 @@
     // 블랙홀은 월드에 놓인 물체다. 반지름도 월드 단위여야 줌이 변해도
     // 주자와 비율이 유지된다.
     var VORTEX_R = 640;   // 월드 반지름 — 고정 배율 0.42 에서 화면 지름 약 538px
-    var vortex = null, ship = null, holeDone = false;
+    var vortex = null, ship = null;
 
     function drawVortex(camX, scale, t) {
       if (!vortex) return;
@@ -362,6 +362,38 @@
       return { x: (col ? 1 : -1) * m.W * .19,
                y: -m.H / 2 + m.noseH + m.padTop + row * m.rowH + m.rowH / 2,
                r: m.W * .135 };
+    }
+
+    /* 창문 안에서 밖을 내다보는 고브럽. 호출부가 창문 원으로 클립해 두므로
+       살짝 크게 그려서 유리에 얼굴이 꽉 차게 한다.
+       (이 함수가 없어서 1등이 탑승하는 순간 ReferenceError 로 애니메이션
+        루프가 통째로 죽었다 — 배경만 남고 멈추던 그 증상의 원인) */
+    function drawGoblubFace(x, y, r, skin, t) {
+      g.save();
+      g.translate(x, y);
+      var size = r * 2.1;
+      var img = sprites[skin];
+      if (img && img.complete && img.naturalWidth) {
+        g.drawImage(img, -size / 2, -size * .52, size, size * (196 / 240));
+        // 유리에 눌린 볼 — 창문에 얼굴을 붙인 느낌
+        g.globalAlpha = .16;
+        g.beginPath(); g.ellipse(0, r * .12, r * .78, r * .5, 0, 0, 6.284);
+        g.fillStyle = "#ffffff"; g.fill();
+        g.globalAlpha = 1;
+      } else {                                   // 스프라이트가 아직이면 직접 그린다
+        g.beginPath(); g.arc(0, 0, r * .82, 0, 6.284);
+        g.fillStyle = skin; g.fill();
+        g.strokeStyle = "rgba(23,20,31,.55)"; g.lineWidth = Math.max(1.5, r * .07); g.stroke();
+        var er = r * .25, ey = -r * .18;
+        var blink = Math.sin(t / 620) > .96 ? .18 : 1;   // 가끔 깜빡
+        g.beginPath(); g.ellipse(0, ey, er, er * blink, 0, 0, 6.284);
+        g.fillStyle = "#f4f0e6"; g.fill();
+        g.beginPath(); g.ellipse(0, ey, er * .46, er * .46 * blink, 0, 0, 6.284);
+        g.fillStyle = "#17141f"; g.fill();
+        g.strokeStyle = "#17141f"; g.lineWidth = Math.max(1.5, r * .08); g.lineCap = "round";
+        g.beginPath(); g.arc(0, r * .30, r * .26, .5, 2.64); g.stroke();   // 웃는 입
+      }
+      g.restore();
     }
 
     /* 레퍼런스 일러스트 느낌으로: 크림 노즈콘, 세이지그린 달걀형 동체,
@@ -951,13 +983,14 @@
       runners = lane.map(function (nm) {
         return { name: nm, p: 0, prevX: 0, rank: 0, done: false, spin: 0,
                  slowT: 0, dashT: 0, holeT: 0,        // 운석 감속 / 별 질주 / 블랙홀 정지
-                 hurtT: 0, bumpCD: 0, sucked: false, suckT: 0, escT: 0, escDur: 1, sad: false, boarded: false,
+                 hurtT: 0, bumpCD: 0, sucked: false, suckT: 0, holdT: 0, passedHole: false,
+                 escT: 0, escDur: 1, sad: false, boarded: false,
                  innate: .99 + Math.random() * .02,   // 타고난 속도차(아주 작게)
                  phase: Math.random() * 6.28, freq: .0009 + Math.random() * .0020 };
       });
       rocks = []; bits = [];
       // 🕳 블랙홀은 70% 지점. 첫 주자가 닿으면 열려서 전원을 삼킨다.
-      vortex = null; holeDone = false;
+      vortex = null;
       // 🚀 결승선 로켓 — 한 줄에 창문 2개, 인원이 늘면 줄이 아래로 붙는다
       ship = { x: TRACK + 560, m: shipMetrics(n), seats: [], eject: null, launch: null };
       for (var sI = 0; sI < n; sI++) ship.seats.push({ idx: -1, blown: false });
@@ -1073,18 +1106,27 @@
           var rubber = 1 + CATCHUP * Math.max(0, leadP - rn.p);   // 뒤처질수록 빨라짐
           rn.p = Math.min(1, rn.p + BASE_V * rn.innate * wob * mul * rubber * dt);
 
-          // 🕳 블랙홀 — 트랙 70% 지점. 첫 주자가 닿는 순간 열리고 전원을 삼킨다.
-          if (!vortex && !holeDone && rn.p >= BOSS_P) {
-            holeDone = true;
-            vortex = { x: BOSS_P * TRACK, t: 0, swallowed: false, releaseAt: 0, queue: [] };
-            orbs.forEach(function (o) { o.got = true; });   // 남은 별은 소진 — 소급 판정 방지
-            sfx.whoosh();
-            flash = "🕳 블랙홀이 열렸다!"; flashT = 1600;
-            for (var d3 = 0; d3 < 46; d3++) bits.push({ x: BOSS_P * TRACK, y: VH * .5,
-              vx: (Math.random() - .5) * 22, vy: (Math.random() - .5) * 20, life: 1,
-              c: d3 % 3 === 0 ? "#cdb0ff" : d3 % 3 === 1 ? "#8a5cff" : "#ffffff" });
+          // 🕳 블랙홀 — 트랙 70% 지점. '닿은 사람만' 빨려든다.
+          // 예전엔 열리는 순간 전원을 한꺼번에 삼켰다. 뒤에서 달리던 사람까지
+          // 순간이동으로 끌려와 순위가 통째로 리셋됐고, 화면엔 사건이 한 번에
+          // 몰렸다가 텅 비었다. 이제 각자 도착한 순서대로 삼켜지고 뱉어진다.
+          if (rn.p >= BOSS_P && !rn.passedHole && !rn.sucked) {
+            if (!vortex) {
+              vortex = { x: BOSS_P * TRACK, t: 0 };
+              orbs.forEach(function (o) { o.got = true; });   // 남은 별은 소진 — 소급 판정 방지
+              sfx.whoosh();
+              flash = "🕳 블랙홀이 열렸다!"; flashT = 1500;
+              for (var d3 = 0; d3 < 46; d3++) bits.push({ x: BOSS_P * TRACK, y: VH * .5,
+                vx: (Math.random() - .5) * 22, vy: (Math.random() - .5) * 20, life: 1,
+                c: d3 % 3 === 0 ? "#cdb0ff" : d3 % 3 === 1 ? "#8a5cff" : "#ffffff" });
+            }
+            rn.sucked = true; rn.suckT = 0;
+            rn.holdT = 900 + Math.random() * 1500;   // 안에 갇혀 있는 시간은 제각각
+            rn.p = BOSS_P;
+            flash = "🕳 " + rn.name + " 블랙홀에 빨려든다!"; flashT = 950;
+            sfx.hit();
             wrap.classList.add("shake");
-            setTimeout(function () { wrap.classList.remove("shake"); }, 300);
+            setTimeout(function () { wrap.classList.remove("shake"); }, 260);
           }
           rn.prevX = wx;                       // 다음 프레임의 통과 판정 기준
           if (rn.p >= 1) {
@@ -1097,50 +1139,33 @@
 
         if (vortex) {
           vortex.t += dt;
-          if (!vortex.swallowed) {
-            var allIn = true;
-            runners.forEach(function (rn) {
-              if (rn.done) return;
-              if (!rn.sucked) { rn.sucked = true; rn.suckT = 0; }
-              rn.suckT += dt;
-              // p 를 즉시 스냅하면 멀리 있던 주자가 순간이동해 카메라가 튄다
-              rn.p += (BOSS_P - rn.p) * Math.min(1, dt / 260);
-              if (rn.suckT < 760) allIn = false;
-            });
-            if (allIn) {
-              vortex.swallowed = true;
-              // 탈출 순서는 무작위 — 여기서 판이 한 번 완전히 섞인다
-              vortex.queue = runners.map(function (_, i2) { return i2; })
-                .filter(function (i2) { return !runners[i2].done; });
-              for (var qq = vortex.queue.length - 1; qq > 0; qq--) {
-                var rk = Math.floor(Math.random() * (qq + 1));
-                var rt = vortex.queue[qq]; vortex.queue[qq] = vortex.queue[rk]; vortex.queue[rk] = rt;
-              }
-              vortex.releaseAt = vortex.t + 500;
-            }
-          } else if (!vortex.queue.length) {
-            // 전원이 '완전히' 빠져나온 뒤에 닫는다. 안 닫으면 결승·우주선까지 따라온다
-            var stillOut = runners.some(function (r) { return !r.done && r.escT > 0; });
-            if (!stillOut) {
-              vortex.fade = (vortex.fade || 0) + dt;
-              if (vortex.fade > 700) vortex = null;
-            }
-          } else {
-            if (vortex.t >= vortex.releaseAt) {
-              var out = vortex.queue.shift();
-              var ro = runners[out];
-              ro.sucked = false; ro.suckT = 0;
-              ro.escDur = 850 + Math.random() * 750;     // 빠져나오는 데 걸리는 시간은 제각각
-              ro.escT = ro.escDur;
-              ro.p = BOSS_P + .004;
-              ro.prevX = ro.p * TRACK;                   // 뒤에 남은 아이템을 소급 판정하지 않게
-              flash = "🌀 " + ro.name + " 빠져나오는 중…"; flashT = 900;
-              sfx.pop();
-              for (var e2 = 0; e2 < 18; e2++) bits.push({ x: BOSS_P * TRACK, y: laneY(out, n),
-                vx: 2 + Math.random() * 10, vy: (Math.random() - .5) * 10, life: 1,
-                c: e2 % 2 ? "#cdb0ff" : "#ffffff" });
-              vortex.releaseAt = vortex.t + 280 + Math.random() * 320;   // 나오는 속도는 랜덤
-            }
+          // 안에 있는 사람은 각자의 시계로 갇혀 있다가 각자 빠져나온다.
+          // (큐로 순서를 돌리던 예전 방식은 삼킨 인원과 뱉은 인원이 어긋나면
+          //  블랙홀이 영영 안 닫혀서 카메라가 그 자리에 묶였다.)
+          runners.forEach(function (rn, i2) {
+            if (!rn.sucked) return;
+            rn.suckT += dt;
+            if (rn.suckT < rn.holdT) return;
+            rn.sucked = false;
+            rn.passedHole = true;                      // 한 번 통과하면 다시 안 빨린다
+            rn.escDur = 850 + Math.random() * 750;     // 빠져나오는 데 걸리는 시간은 제각각
+            rn.escT = rn.escDur;
+            rn.p = BOSS_P + .004;
+            rn.prevX = rn.p * TRACK;                   // 뒤에 남은 아이템을 소급 판정하지 않게
+            flash = "🌀 " + rn.name + " 빠져나오는 중…"; flashT = 900;
+            sfx.pop();
+            for (var e2 = 0; e2 < 18; e2++) bits.push({ x: BOSS_P * TRACK, y: laneY(i2, n),
+              vx: 2 + Math.random() * 10, vy: (Math.random() - .5) * 10, life: 1,
+              c: e2 % 2 ? "#cdb0ff" : "#ffffff" });
+          });
+          // 아직 통과 못 한 주자가 하나라도 있으면 계속 열어 둔다.
+          // 전원이 지나가고 몸부림까지 끝나야 닫는다 — 안 닫으면 우주선까지 따라온다.
+          var pending = runners.some(function (r) {
+            return !r.done && (r.sucked || !r.passedHole || r.escT > 0);
+          });
+          if (!pending) {
+            vortex.fade = (vortex.fade || 0) + dt;
+            if (vortex.fade > 700) vortex = null;
           }
         }
 
@@ -1198,14 +1223,11 @@
           if (cam.pendT >= 400) { cam.tgt = wantT; cam.pendT = 0; }
         }
 
+        // 카메라는 오직 벌칙 등수 자리의 주자만 따라간다.
+        // 예전엔 블랙홀이 열려 있는 동안 (블랙홀+선두)/2 로 강제 이동시켰는데,
+        // 선두가 결승에 닿으면 초점이 85% 지점 — 아무도 없는 허공 — 에 박혀
+        // 화면이 멈춘 것처럼 보였다. 스크린샷의 빈 우주가 정확히 그 좌표였다.
         var focus = runners[cam.tgt].p * TRACK;
-        if (vortex && !vortex.fade) {
-          // 블랙홀 안에서는 전원의 p 가 같다 → 벌칙 등수를 따라가면 카메라가
-          // 그 자리에 못박혀 화면이 멈춘 것처럼 보인다. 빠져나오는 쪽을 함께 담는다.
-          var outX = vortex.x;
-          runners.forEach(function (r) { if (!r.done && r.p * TRACK > outX) outX = r.p * TRACK; });
-          focus = (vortex.x + outX) / 2;
-        }
         var wantZ = LOCK_Z;
         if (slow && fA && fB) {                     // 포토피니시만 예외
           focus = ((fA.p + fB.p) / 2) * TRACK;
@@ -1398,7 +1420,7 @@
       $("btn-go").style.display = ""; $("btn-go").disabled = false;
       $("btn-again").style.display = "none"; $("btn-edit").style.display = "none";
       busy = false; runners = []; rocks = []; bits = []; orbs = [];
-      vortex = null; ship = null; holeDone = false;
+      vortex = null; ship = null;
       draw(0, Math.max(2, readItems().length || 4), 0, 1, 0);
     };
 
