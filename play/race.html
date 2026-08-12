@@ -1179,6 +1179,13 @@
           return { i: i2, key: r.done ? r.rank : n + (1 - r.p) };
         }).sort(function (a, b) { return a.key - b.key; });
         var wantT = ordC[Math.min(loseRankNow, ordC.length) - 1].i;
+        // 그 사람이 이미 도착했으면(우주선 창문 안이면) 아직 달리는 꼴찌를 비춘다.
+        // 안 그러면 결승선에 카메라가 주차돼 화면이 멈춘 것처럼 보인다 —
+        // 나머지는 화면 밖에서 달리고 있는데.
+        if (runners[wantT].done) {
+          var stillRun = ordC.filter(function (o) { return !runners[o.i].done; });
+          if (stillRun.length) wantT = stillRun[stillRun.length - 1].i;
+        }
         if (cam.tgt < 0) { cam.tgt = wantT; }
         else if (wantT !== cam.tgt) {
           if (wantT !== cam.pend) { cam.pend = wantT; cam.pendT = 0; }
