@@ -315,6 +315,12 @@
         var su = 1 - p.spikeT / 520;
         g.translate(0, -Math.sin(Math.min(1, su) * Math.PI) * 52);
       }
+      if (p.spikeHi > 0) {                       // 🏐 결승 스파이크 — 훨씬 높이 솟구친다
+        var sh = 1 - p.spikeHi / 620;
+        g.translate(0, -Math.sin(Math.min(1, sh) * Math.PI) * 150);
+        g.rotate(-.5 * Math.sin(Math.min(1, sh) * Math.PI));   // 팔을 뒤로 젖혔다 내리친다
+        g.scale(1 + .08 * Math.sin(sh * Math.PI), 1 - .06 * Math.sin(sh * Math.PI));
+      }
       if (p.fear > 0) {                          // 😱 부들부들 + 몸 젖히기 + 식은땀
         g.translate(Math.sin(t / 24 + i * 7) * 3.2 * p.fear, 0);
         g.rotate(p.fearDir * -.11 * p.fear + Math.sin(t / 27 + i * 5) * .05 * p.fear);
@@ -391,7 +397,7 @@
       players = order.map(function (nm, i) {
         var pos = seatPos(i, n);
         return { name: nm, x: pos.x, y: pos.y,
-                 struggle: 0, sootT: 0, jumpT: 0, spikeT: 0, fear: 0, fearDir: 0, juggleT: 0,
+                 struggle: 0, sootT: 0, jumpT: 0, spikeT: 0, spikeHi: 0, fear: 0, fearDir: 0, juggleT: 0,
                  homeX: pos.x, homeY: pos.y };
       });
       bits = []; smoke = [];
@@ -490,7 +496,7 @@
         if (finalStage === "relay") {
           pick = { to: loser, cross: true };
           finalLeg = true;
-          flash = "🙅 " + players[holder].name + " — 받자마자 넘겼다!!"; flashT = 1400;
+          flash = "🏐 " + players[holder].name + " 스파이크로 떠넘겼다!!"; flashT = 1400;
         }
         // 무장 후 당첨자행 패스가 잡히면 마지막 시퀀스 개시.
         // 50%는 데코이에게 먼저 — 「설마… 나?!」 하고 기겁한 사람이 받자마자
@@ -516,12 +522,18 @@
         var from = players[holder], to = players[pick.to];
         bomb.st = "fly"; bomb.t = 0; bomb.cross = pick.cross;
         bomb.fx = from.x; bomb.fy = from.y;
+        // 스파이크로 넘길 땐 뛰어오른 손 높이에서 출발해 아래로 내리꽂힌다
+        if (finalStage === "relay") bomb.fy -= 150;
         bomb.tx = to.x; bomb.ty = to.y;
         bomb.block = null; bomb.ret = false; bomb.arcH = 150; bomb.fumble = false;
         var d = Math.hypot(to.x - from.x, to.y - from.y);
         bomb.dur = (370 - 110 * tempo()) * (pick.cross ? 1.5 : 1) * Math.max(.7, d / 420);
+        if (finalStage === "relay") {
+          bomb.arcH = 10;      // 스파이크는 포물선이 아니라 내리꽂는 직선이다
+          bomb.dur = 340;      // 짧고 매섭게
+        }
         // 슬로모션 — 마지막 낙하는 더 길게(안돼안돼 할 시간), 릴레이는 다급하게
-        bomb.slowK = finalStage === "relay" ? .5
+        bomb.slowK = finalStage === "relay" ? .42
           : finalLeg ? .18
           : 1;
         if (finalLeg && finalStage !== "relay") bomb.dur *= 1.25;
@@ -556,9 +568,11 @@
         if (holder === loser && !wasRet) loserTouches++;
         if (finalFly) {
           if (holder === loser) { state = "silence"; stT = 0; timeScale = 1; return; }
-          // 💥 데코이가 받았다 — 0.25초 만에 기겁하며 되던진다
+          // 💥 데코이가 받았다 — 높이 뛰어올라 그대로 내리꽂는다.
+          // 점프 정점(spikeHi 의 최고점)에 맞춰 던지도록 holdDur 을 맞춘다.
           finalStage = "relay";
-          holdDur = 250; timeScale = 1;
+          players[holder].spikeHi = 620;
+          holdDur = 300; timeScale = 1;
           sfx.hit();
           return;
         }
@@ -615,6 +629,7 @@
           players.forEach(function (p) {
             if (p.struggle > 0) p.struggle -= dt;
             if (p.spikeT > 0) p.spikeT -= dt;
+            if (p.spikeHi > 0) p.spikeHi -= dt;
             if (p.juggleT > 0) {
               p.juggleT -= dt;
               if (Math.random() < .35) bits.push({ x: p.x + (Math.random() - .5) * 50,
