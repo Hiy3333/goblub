@@ -1051,7 +1051,7 @@
       var simEl = 0, timeScale = 1, slowNote = "", nextBeat = 700, slowUsed = 0;
       var deepUsed = 0, deepTS0 = 0, deepP0 = 0, deepBase = 0, rushOn = false;
       var revengeDone = false;            // ⭐ 막판 대역전은 판당 한 번만
-      var DEEP_MS = 6500;                 // 결정타 슬로모션의 목표 길이(실제 시간)
+      var DEEP_MS = 2000;                 // 결정타 슬로모션의 목표 길이(실제 시간)
 
       function tick(now) {
         var rawDt = Math.min(48, now - last); last = now;
@@ -1261,7 +1261,7 @@
             return ka - kb;
           });
         var occ = ord2[loseRank - 1];
-        if (done < loseRank && occ && !occ.done && occ.p > .93 && deepUsed < 12000) {
+        if (done < loseRank && occ && !occ.done && occ.p > .93 && deepUsed < 3600) {
           slow = true; deep = true; fA = occ; deepUsed += rawDt;
 
           /* ⭐ 막판 대역전 — 벌칙 등수 자리가 결승선에 닿기 직전, 50% 확률로
@@ -1275,7 +1275,7 @@
              가지 방식을 재 봤고 이 구성이 가장 높았다).
              발동은 0.32초 미룬다 — deep 첫 프레임에 띄우면 바로 아래
              mode 전환이 「🎬 운명의 골 라인…」으로 문구를 덮어쓴다. */
-          if (!revengeDone && deepUsed > 320) {
+          if (!revengeDone && deepUsed > 150) {
             revengeDone = true;
             var chaser = ord2[loseRank];               // 바로 뒤에서 달리던 주자
             if (chaser && !chaser.done && Math.random() < .5) {
@@ -1349,12 +1349,21 @@
 
         var focus = runners[slotI].p * TRACK;
         var wantZ = LOCK_Z;
-        if (slow && fA) {                           // 슬로모션 구간만 예외로 확대
-          focus = (fB ? (fA.p + fB.p) / 2 : fA.p) * TRACK;
-          // 결정타에선 다가갈수록 화면이 밀고 들어간다. 배속만 늘리면
-          // '느린 화면'이지 '조여드는 화면'은 아니다.
+        if (slow && fA) {
+          /* 결정타 화면 — 벌칙 자리 주자와 '뒤에서 별 먹고 오는 추격자'를
+             한 화면에 같이 담는다. 예전엔 벌칙 주자만 1.66배까지 밀고
+             들어가서, 정작 대역전의 주인공이 화면 밖에 있었다. */
+          var loP = fA.p, hiP = fA.p;
+          if (fB) { loP = Math.min(loP, fB.p); hiP = Math.max(hiP, fB.p); }
+          runners.forEach(function (r) {          // 대역전 스퍼트 중인 주자
+            if (r.revTgt >= 0) { loP = Math.min(loP, r.p); hiP = Math.max(hiP, r.p); }
+          });
+          focus = ((loP + hiP) / 2) * TRACK;
+          // 둘 사이가 벌어질수록 물러난다. 화면 폭의 70% 안에 둘 다 들어오게.
+          var spanW = Math.max(340, (hiP - loP) * TRACK + 620);
+          var fit = VW * .70 / spanW;
           var uz = Math.max(0, Math.min(1, (fA.p - .93) / .07));
-          wantZ = fB ? 1.35 : 1.24 + .42 * uz * uz;
+          wantZ = Math.max(LOCK_Z, Math.min(fB ? 1.35 : 1.10 + .30 * uz * uz, fit));
         }
         if (cam.fx === null) { cam.fx = focus; cam.x = focus; cam.z = wantZ; }
         cam.fx += (focus - cam.fx) * Math.min(1, rawDt / 90);
