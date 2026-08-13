@@ -297,7 +297,8 @@ window.addEventListener("resize", function(){
 
 // 위치 idx → 그날의 카드/방향(시드 셔플)
 function planFor(pickIdx){
-  var r=rng(seedFromStr(todayStr()+"|"+pickIdx));
+  // 시드에 고민을 넣는다. 날짜만으로 뽑으면 새 질문을 해도 같은 카드가 나온다.
+  var r=rng(seedFromStr(todayStr()+"|"+pickIdx+"|"+myWorry));
   var cardIdx=Math.floor(r()*MAJOR.length);
   var orient=(r()<0.62)?"정방향":"역방향";     // 정방향 조금 더 잦게
   return {cardIdx:cardIdx, orient:orient};
@@ -306,11 +307,12 @@ function planFor(pickIdx){
 function pick(pickIdx){
   if(phase!=="pick") return;
   phase="result";
-  // 오늘 이미 뽑았다면(다시 보기 재체험) 어떤 카드를 눌러도 오늘의 카드로 — 잠금을 덮어쓰지 않음
+  // 같은 고민을 다시 물으면 오늘의 카드 그대로(잠금 유지).
+  // 고민을 바꿨으면 새로 뽑는다 — 예전엔 날짜만 봐서 새 질문에도 같은 답이 나왔다.
   var saved=null;
   try{ saved=JSON.parse(localStorage.getItem(LOCK_KEY)); }catch(e){}
-  if(saved && saved.date===todayStr() && typeof saved.cardIdx==="number"){
-    myWorry=saved.worry||myWorry;
+  if(saved && saved.date===todayStr() && typeof saved.cardIdx==="number"
+     && (saved.worry||"")===myWorry){
     revealResult(saved.cardIdx, saved.orient, true);
     return;
   }
@@ -326,7 +328,7 @@ function replay(){
   still.style.backgroundImage="url('"+CAT_IDLE+"')"; still.classList.add("on");
   var w=$("worry"); if(w) w.value=myWorry||"";
   show(scIntro);
-  hintbar.textContent="오늘의 카드는 그대로다옹 — 과정을 다시 보여주는 거라냥.";
+  hintbar.textContent="다른 게 궁금하면 새로 물어보라냥 — 고민이 바뀌면 카드도 바뀐다옹.";
 }
 
 function revealResult(cardIdx, orient, fromLock){
@@ -345,10 +347,11 @@ function revealResult(cardIdx, orient, fromLock){
   readingEl.style.display="none"; readingEl.innerHTML=""; onceBar.style.display="none";
   statusEl.style.display="block"; statusEl.innerHTML='<span class="spin"></span>고양이가 카드를 읽는 중…';
 
-  // 오늘 해석이 이미 저장돼 있으면 API 없이 즉시 표시 — 언제든 다시 보기 가능
+  // 같은 고민의 해석이 저장돼 있으면 API 없이 즉시 표시 — 다시 보기는 공짜.
+  // 고민이 바뀌었으면 캐시를 쓰지 않는다.
   var saved=null;
   try{ saved=JSON.parse(localStorage.getItem(LOCK_KEY)); }catch(e){}
-  if(saved && saved.date===todayStr() && saved.reading){
+  if(saved && saved.date===todayStr() && saved.reading && (saved.worry||"")===myWorry){
     readingEl.style.display="block"; statusEl.style.display="none";
     readingEl.innerHTML=fmt(saved.reading); lastReading=saved.reading;
     onceBar.style.display="block";

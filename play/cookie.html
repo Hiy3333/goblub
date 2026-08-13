@@ -184,8 +184,16 @@ function hash(s){var h=5381;for(var i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(
 var d=new Date();
 var dstr=""+d.getFullYear()+("0"+(d.getMonth()+1)).slice(-2)+("0"+d.getDate()).slice(-2);
 var dk="goblub_cookie_"+dstr;
-var seed=hash(dstr);
-var fortune=FORTUNES[seed%FORTUNES.length];
+// 예전엔 날짜 해시로 고정이라 다시 깨도 같은 운세가 나왔다.
+// 이제 깰 때마다 새로 뽑고, 뽑은 결과를 저장해 재방문 시에는 그대로 보여준다.
+var fortune=FORTUNES[hash(dstr)%FORTUNES.length];
+function drawFortune(){
+  var prev=fortune, f=prev;
+  for(var i=0;i<12 && f===prev;i++) f=FORTUNES[Math.floor(Math.random()*FORTUNES.length)];
+  fortune=f;
+  try{ localStorage.setItem(dk, fortune); }catch(e){}
+  return f;
+}
 
 var phase="intro";
 function show(sc){ [scIntro,scPlay,scResult].forEach(function(s){s.classList.remove("on");}); sc.classList.add("on");
@@ -212,7 +220,7 @@ function playSeq(src, capText, bridge, onEnd){
 function choose(i){
   if(phase!=="intro") return;
   phase="play";
-  try{ localStorage.setItem(dk,"1"); }catch(e){}
+  drawFortune();          // 깰 때마다 새 운세 — 다시 보기로 또 깨면 또 바뀐다
   if(window.GoblubFeed) GoblubFeed.grant("cookie");
   show(scPlay);
   playAll();
@@ -281,7 +289,7 @@ function replay(){
   $("resultBody").style.display="none";
   $("revealbar").style.display="none";
   show(scIntro);
-  hintbar.textContent="오늘의 운세는 그대로다달 — 깨는 것만 다시 보여줄게달.";
+  hintbar.textContent="한 번 더 깨면 새 운세가 나온달 — 마음에 들 때까지 깨 보달.";
 }
 
 /* ── 이미지로 저장: 해달 사진 + 아래 오늘의 한 줄 ── */
@@ -395,11 +403,14 @@ function saveCard(){
   }
 }
 
-// 오늘 이미 깼으면 결과로 직행 (영상 없이)
+// 오늘 이미 깼으면 마지막에 뽑은 운세로 직행 (영상 없이)
 (function init(){
-  var opened=false;
-  try{ opened=!!localStorage.getItem(dk); }catch(e){}
-  if(opened) finish(true);
+  var saved=null;
+  try{ saved=localStorage.getItem(dk); }catch(e){}
+  if(saved){
+    if(saved!=="1") fortune=saved;   // "1" 은 예전 버전이 남긴 값
+    finish(true);
+  }
 })();
 </script>
 </body>
