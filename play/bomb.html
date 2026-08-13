@@ -389,7 +389,7 @@
         var pos = seatPos(i, n);
         return { name: nm, x: pos.x, y: pos.y,
                  sticky: Math.random(),        // 🧲 찐득 레벨 — 사람마다 다르다
-                 struggle: 0, sootT: 0, jumpT: 0, spikeT: 0, fear: 0, fearDir: 0 };
+                 struggle: 0, sootT: 0, jumpT: 0, spikeT: 0, fear: 0, fearDir: 0, juggleT: 0 };
       });
       bits = []; smoke = [];
       var glueSnap = false;
@@ -405,7 +405,8 @@
       if (n > 2 && holder === loser && Math.random() < .5) holder = (holder + 1) % n;
       var dir = Math.random() < .5 ? 1 : -1;
       var bomb = { st: "held", x: 0, y: 0, fx: 0, fy: 0, tx: 0, ty: 0, t: 0, dur: 1, rot: 0,
-                   cross: false, block: null, ret: false, arcH: 150 };
+                   cross: false, block: null, ret: false, arcH: 150,
+                   fumble: false, dx: 0, dy: 0, dvx: 0, dvy: 0, bounces: 0, dropT: 0, spinDir: 1 };
       var passCount = 0, holdT = 0, holdDur = 900;
       var state = "count";                    // count → run → silence → boom → after
       var stT = 0, el = 0, timeScale = 1;
@@ -440,7 +441,15 @@
 
       // 비행 중 폭탄의 현재 위치 — 접착제 사출은 끝에서 느려지고, 되감김은 홱 당겨진다
       function bombPos() {
-        if (bomb.st !== "fly") return { x: players[holder].x, y: players[holder].y };
+        if (bomb.st === "drop") return { x: bomb.dx, y: bomb.dy };
+        if (bomb.st !== "fly") {
+          var hp2 = players[holder];
+          if (hp2.juggleT > 0) {                 // 🤹 양손 사이를 뜨겁게 오간다
+            var jw = Math.sin(el / 75);
+            return { x: hp2.x + jw * sprSize(n) * .30, y: hp2.y - Math.abs(jw) * 22 };
+          }
+          return { x: hp2.x, y: hp2.y };
+        }
         var u = bomb.t;
         if (bomb.block && bomb.block.type === "glue")
           u = bomb.ret ? u * u : 1 - Math.pow(1 - u, 1.8);
@@ -454,7 +463,7 @@
         bomb.st = "fly"; bomb.t = 0; bomb.cross = pick.cross;
         bomb.fx = from.x; bomb.fy = from.y;
         bomb.tx = to.x; bomb.ty = to.y;
-        bomb.block = null; bomb.ret = false; bomb.arcH = 150;
+        bomb.block = null; bomb.ret = false; bomb.arcH = 150; bomb.fumble = false;
         var d = Math.hypot(to.x - from.x, to.y - from.y);
         bomb.dur = (370 - 110 * tempo()) * (pick.cross ? 1.5 : 1) * Math.max(.7, d / 420);
         bomb.toI = pick.to;
@@ -485,6 +494,10 @@
             bomb.block = { type: "spike", at: .80 + Math.random() * .1, from: holder };
             lastFlash = el;
           }
+          // 👐 캐치 실패 — 받다가 놓쳐서 바닥에 통통 튄다
+          else if (passCount >= 1 && el - lastFlash > 2400 && Math.random() < .12) {
+            bomb.fumble = true; lastFlash = el;
+          }
         }
       }
 
@@ -505,6 +518,17 @@
         var tp = tempo();
         // 종반 하한을 200ms→360ms 로. 그보다 빠르면 패스가 눈에 안 들어온다
         holdDur = (640 - 280 * tp) * (.8 + Math.random() * .4);
+        // 🤹 뜨거뜨거 — 달아오른 종반의 폭탄은 맨손으로 못 쥔다
+        var pJ = players[holder];
+        if (tp > .55 && el - lastFlash > 2400 && Math.random() < .45) {
+          var exJ = 650 + Math.random() * 350;
+          holdDur += exJ; pJ.juggleT = exJ; lastFlash = el;
+          flash = "🤹 " + pJ.name + " — 앗뜨뜨!!"; flashT = Math.min(1400, exJ);
+          sfx.fuse();
+          for (var js = 0; js < 8; js++) bits.push({ x: pJ.x, y: pJ.y - 20,
+            vx: (Math.random() - .5) * 6, vy: -Math.random() * 4, life: .6,
+            c: js % 2 ? "#ffd479" : "#ff8a3c" });
+        }
       }
 
       function tick(now) {
@@ -535,11 +559,28 @@
           players.forEach(function (p) {
             if (p.struggle > 0) p.struggle -= dt;
             if (p.spikeT > 0) p.spikeT -= dt;
+            if (p.juggleT > 0) p.juggleT -= dt;
           });
 
           if (bomb.st === "held") {
             holdT += dt;
             if (holdT >= holdDur) throwBomb();
+          } else if (bomb.st === "drop") {
+            // 바닥에 통통 — 세 번 튀거나 1.5초가 지나면 허둥지둥 주워 든다
+            var fdt = dt / 16.7;
+            bomb.dropT += dt;
+            bomb.dvy += .5 * fdt;
+            bomb.dx += bomb.dvx * fdt; bomb.dy += bomb.dvy * fdt;
+            var flr = players[bomb.toI].y + sprSize(n) * .48;
+            if (bomb.dy >= flr && bomb.dvy > 0) {
+              bomb.dy = flr; bomb.dvy = -bomb.dvy * .55; bomb.dvx *= .82; bomb.bounces++;
+              sfx.pop();
+              for (var fb = 0; fb < 6; fb++) bits.push({ x: bomb.dx, y: flr + 6,
+                vx: (Math.random() - .5) * 6, vy: -Math.random() * 3.5, life: .6,
+                c: fb % 2 ? "#ffd479" : "#8a7f96" });
+              if (bomb.bounces >= 3) { bomb.fumble = false; land(); }
+            }
+            if (bomb.st === "drop" && bomb.dropT > 1500) { bomb.fumble = false; land(); }
           } else {
             // 마지막 패스는 슬로모션 — 공중에서 시간이 늘어진다
             timeScale = finalFly ? .30 : 1;
@@ -567,7 +608,20 @@
                 sfx.stick();
               }
             }
-            if (bomb.t >= 1) { bomb.t = 1; timeScale = 1; land(); }
+            if (bomb.t >= 1) {
+              bomb.t = 1; timeScale = 1;
+              if (bomb.fumble && !bomb.ret) {
+                // 👐 놓쳤다!! — 손에서 튕겨 바닥으로. 이 1초가 제일 아찔하다
+                var rcvF = players[bomb.toI];
+                bomb.st = "drop"; bomb.dropT = 0; bomb.bounces = 0;
+                bomb.dx = rcvF.x + (Math.random() - .5) * 30;
+                bomb.dy = rcvF.y - sprSize(n) * .2;
+                bomb.dvx = (Math.random() < .5 ? -1 : 1) * (2 + Math.random() * 2.5);
+                bomb.dvy = -3.5; bomb.spinDir = Math.random() < .5 ? -1 : 1;
+                flash = "👐 " + rcvF.name + " 놓쳤다!!"; flashT = 1400;
+                sfx.hit();
+              } else land();
+            }
           }
         }
 
@@ -665,6 +719,10 @@
           var rcv2 = players[bomb.toI];
           rcv2.fear = .35 + .65 * tp;
           rcv2.fearDir = (rcv2.x - bx) > 0 ? 1 : -1;   // 폭탄 반대쪽으로 몸을 젖힌다
+        } else if (state === "run" && bomb.st === "drop") {
+          var rcv3 = players[bomb.toI];
+          rcv3.fear = 1;
+          rcv3.fearDir = (rcv3.x - bx) > 0 ? 1 : -1;
         } else if (state === "run" && bomb.st === "held" && tp > .5) {
           players[holder].fear = (tp - .5) * .9;
           players[holder].fearDir = 0;
@@ -716,7 +774,9 @@
           g.stroke(); g.globalAlpha = 1;
         }
         if (state !== "boom" && state !== "after") {
-          var rot = bomb.st === "fly" ? bomb.t * (bomb.cross ? 9 : 6) : Math.sin(t / 130) * .2 * (1 + tp * 2);
+          var rot = bomb.st === "fly" ? bomb.t * (bomb.cross ? 9 : 6)
+            : bomb.st === "drop" ? bomb.spinDir * bomb.dropT / 130
+            : Math.sin(t / 130) * .2 * (1 + tp * 2);
           drawBomb(bx, by - (bomb.st === "held" ? sprSize(n) * .06 : 0), R * wob, rot, tp, t);
         }
 
