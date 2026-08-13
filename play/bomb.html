@@ -320,6 +320,10 @@
         g.translate(Math.sin(t / 24 + i * 7) * 3.2 * p.fear, 0);
         g.rotate(p.fearDir * -.11 * p.fear + Math.sin(t / 27 + i * 5) * .05 * p.fear);
       }
+      if (p.juggleT > 0) {                       // 🤹 앗뜨뜨 — 발을 동동 구른다
+        g.translate(0, -Math.abs(Math.sin(t / 110)) * 10);
+        g.rotate(Math.sin(t / 110) * .09);
+      }
       if (p.struggle > 0) g.rotate(Math.sin(t / 36) * .16);          // 찐득손 몸부림
       if (p.sootT > 0) { g.filter = "brightness(.5)"; }              // 폭발 검댕
       var img = sprites[SKIN[i % SKIN.length]];
@@ -389,7 +393,8 @@
         var pos = seatPos(i, n);
         return { name: nm, x: pos.x, y: pos.y,
                  sticky: Math.random(),        // 🧲 찐득 레벨 — 사람마다 다르다
-                 struggle: 0, sootT: 0, jumpT: 0, spikeT: 0, fear: 0, fearDir: 0, juggleT: 0 };
+                 struggle: 0, sootT: 0, jumpT: 0, spikeT: 0, fear: 0, fearDir: 0, juggleT: 0,
+                 homeX: pos.x, homeY: pos.y };
       });
       bits = []; smoke = [];
       var glueSnap = false;
@@ -411,6 +416,7 @@
       var state = "count";                    // count → run → silence → boom → after
       var stT = 0, el = 0, timeScale = 1;
       var beatT = 0, lastFlash = -9e9, finalFly = false, silDone = false;
+      var finalStage = "", finalDecoy = -1, loserTouches = 0;   // 마지막 비트 / 밑밥 카운트
       var flash = "", flashT = 0;
       var cam = { x: VW / 2, y: VH * .52, z: 1, fx: VW / 2, fy: VH * .52, fz: 1 };
       var t0 = performance.now(), last = t0;
@@ -425,18 +431,31 @@
         if (n === 2) return { to: 1 - holder, cross: false };
         // 무장 후 유예가 지나면 당첨자에게 강제 크로스 — 판이 늘어지는 걸 막는다
         if (el >= armT + 6000 && holder !== loser) return { to: loser, cross: true };
+        // 🎯 당첨자 밑밥 — 중반까지 한 번도 못 받았으면 자연스럽게 한 번 거쳐 간다.
+        // 페르소나 테스트: 8인 판에서 당첨자가 25초 내내 투명인간이면 함성 대신
+        // 「쟤가 누구야?」가 나온다.
+        if (el < armT && el > armT * .45 && loserTouches === 0 && holder !== loser)
+          return { to: loser, cross: Math.abs(loser - holder) > 1 && Math.abs(loser - holder) < n - 1 };
         var tp = tempo();
         if (n >= 3 && Math.random() < .10 + .16 * tp) {
           dir = -dir;
           flash = "🔄 급반전!"; flashT = 900; sfx.swish();
         }
+        var to, cross = false;
         if (n >= 4 && Math.random() < .09 + .14 * tp) {
-          var to = (holder + (n >> 1) + (Math.random() < .5 ? 0 : 1)) % n;
+          to = (holder + (n >> 1) + (Math.random() < .5 ? 0 : 1)) % n;
           if (to === holder) to = (to + 1) % n;
-          flash = "💨 크로스 패스!"; flashT = 900;
-          return { to: to, cross: true };
+          cross = true;
+        } else to = (holder + dir + n) % n;
+        // 반대 극단 방지 — 종반에 당첨자에게 과하게 몰리면 「조작 아니야?」가
+        // 나온다(4인 판 실측: 19초에 5번). 무장 전엔 2번까지만.
+        if (el < armT && to === loser && loserTouches >= 2) {
+          to = (to + dir + n) % n;
+          if (to === holder) to = (to + dir + n) % n;
+          cross = false;
         }
-        return { to: (holder + dir + n) % n, cross: false };
+        if (cross) { flash = "💨 크로스 패스!"; flashT = 900; }
+        return { to: to, cross: cross };
       }
 
       // 비행 중 폭탄의 현재 위치 — 접착제 사출은 끝에서 느려지고, 되감김은 홱 당겨진다
@@ -444,9 +463,12 @@
         if (bomb.st === "drop") return { x: bomb.dx, y: bomb.dy };
         if (bomb.st !== "fly") {
           var hp2 = players[holder];
-          if (hp2.juggleT > 0) {                 // 🤹 양손 사이를 뜨겁게 오간다
-            var jw = Math.sin(el / 75);
-            return { x: hp2.x + jw * sprSize(n) * .30, y: hp2.y - Math.abs(jw) * 22 };
+          if (hp2.juggleT > 0) {
+            // 🤹 그냥 패스처럼 보이면 안 된다 — 폭탄이 '위로' 크게 떠서
+            // 포물선을 그리며 양손을 오가야 저글링으로 읽힌다
+            var th2 = el / 110, sn2 = Math.sin(th2), cs2 = Math.cos(th2);
+            return { x: hp2.x + sn2 * sprSize(n) * .34,
+                     y: hp2.y - 10 - cs2 * cs2 * 64 };
           }
           return { x: hp2.x, y: hp2.y };
         }
@@ -459,6 +481,35 @@
 
       function throwBomb() {
         var pick = pickTarget();
+        var finalLeg = false;
+        // ── 마지막 시퀀스 ──
+        // 릴레이 중이면 무조건 당첨자에게 (데코이가 기겁하며 되던지는 그 패스)
+        if (finalStage === "relay") {
+          pick = { to: loser, cross: true };
+          finalLeg = true;
+          flash = "🙅 " + players[holder].name + " — 받자마자 넘겼다!!"; flashT = 1400;
+        }
+        // 무장 후 당첨자행 패스가 잡히면 마지막 시퀀스 개시.
+        // 50%는 데코이에게 먼저 — 「설마… 나?!」 하고 기겁한 사람이 받자마자
+        // 진짜 당첨자에게 넘긴다. 낚임은 연출이고 당첨자는 애초에 뽑힌 그대로.
+        else if (el >= armT && !finalFly && pick.to === loser) {
+          finalFly = true; finalLeg = true;
+          var dk = -1;
+          if (n >= 3 && Math.random() < .5) {
+            for (var dq = 0; dq < 20; dq++) {
+              var c2 = Math.floor(Math.random() * n);
+              if (c2 !== loser && c2 !== holder) { dk = c2; break; }
+            }
+          }
+          if (dk >= 0) {
+            finalDecoy = dk; finalStage = "decoy";
+            pick = { to: dk, cross: true };
+            flash = "💥 설마… " + players[dk].name + "?!"; flashT = 2000;
+          } else {
+            finalStage = "direct";
+            flash = "💥 설마… " + players[loser].name + "?!"; flashT = 2000;
+          }
+        }
         var from = players[holder], to = players[pick.to];
         bomb.st = "fly"; bomb.t = 0; bomb.cross = pick.cross;
         bomb.fx = from.x; bomb.fy = from.y;
@@ -466,6 +517,11 @@
         bomb.block = null; bomb.ret = false; bomb.arcH = 150; bomb.fumble = false;
         var d = Math.hypot(to.x - from.x, to.y - from.y);
         bomb.dur = (370 - 110 * tempo()) * (pick.cross ? 1.5 : 1) * Math.max(.7, d / 420);
+        // 슬로모션 — 마지막 낙하는 더 길게(안돼안돼 할 시간), 릴레이는 다급하게
+        bomb.slowK = finalStage === "relay" ? .5
+          : finalLeg ? .18
+          : 1;
+        if (finalLeg && finalStage !== "relay") bomb.dur *= 1.25;
         bomb.toI = pick.to;
         sfx.toss();
         if (glueSnap) {                     // 직전에 접착제에 붙잡혔던 사람 — 이번엔 뚝! 하고 끊긴다
@@ -475,15 +531,9 @@
             c: gs % 2 ? "#f4e2a0" : "#d9c47e" });
           sfx.pop();
         }
-        // 💥 이 패스가 마지막인가 — 무장됐고 당첨자에게 날아간다.
-        // 마지막 패스는 어떤 것에도 가로채이지 않는다 — 여기서 가로채이면
-        // 폭탄이 엉뚱한 사람 손에서 터져 공정성이 통째로 깨진다.
-        var isFinal = el >= armT && pick.to === loser;
-        if (isFinal && !finalFly) {
-          finalFly = true;
-          flash = "💥 설마…!!"; flashT = 1600;
-        }
-        if (!isFinal) {
+        // 마지막 시퀀스의 패스들은 어떤 것에도 가로채이지 않는다 —
+        // 여기서 가로채이면 폭탄이 엉뚱한 사람 손에서 터져 공정성이 깨진다.
+        if (!finalFly) {
           // 🧲 찐득손 — 접착제가 폭탄을 붙든 채 늘어나다가 도로 끌고 온다
           if (from.sticky > .55 && el - lastFlash > 2600 && Math.random() < .45) {
             bomb.block = { type: "glue", at: .5 + Math.random() * .18, from: holder };
@@ -506,7 +556,15 @@
         holder = bomb.toI; bomb.st = "held"; holdT = 0;
         bomb.block = null; bomb.ret = false; bomb.arcH = 150;
         sfx.catchS();
-        if (finalFly) { state = "silence"; stT = 0; timeScale = 1; return; }
+        if (holder === loser && !wasRet) loserTouches++;
+        if (finalFly) {
+          if (holder === loser) { state = "silence"; stT = 0; timeScale = 1; return; }
+          // 💥 데코이가 받았다 — 0.25초 만에 기겁하며 되던진다
+          finalStage = "relay";
+          holdDur = 250; timeScale = 1;
+          sfx.hit();
+          return;
+        }
         if (wasRet) {
           // 되돌아온 폭탄 — 잠깐 추스르고 다시 던진다 (패스 수는 안 센다)
           var pR = players[holder];
@@ -559,7 +617,16 @@
           players.forEach(function (p) {
             if (p.struggle > 0) p.struggle -= dt;
             if (p.spikeT > 0) p.spikeT -= dt;
-            if (p.juggleT > 0) p.juggleT -= dt;
+            if (p.juggleT > 0) {
+              p.juggleT -= dt;
+              if (Math.random() < .35) bits.push({ x: p.x + (Math.random() - .5) * 50,
+                y: p.y - 55 - Math.random() * 40, vx: (Math.random() - .5) * 2,
+                vy: -1.5 - Math.random() * 2, life: .5,
+                c: Math.random() < .5 ? "#ffd479" : "#ff8a3c" });
+            }
+            // 👐 제자리 복귀 — 폭탄을 주우러 갔던 고브럽이 자기 자리로 걸어온다
+            if (Math.abs(p.x - p.homeX) > 1.5 && !(bomb.st === "drop" && players[bomb.toI] === p))
+              p.x += (p.homeX - p.x) * Math.min(1, dt / 280);
           });
 
           if (bomb.st === "held") {
@@ -571,6 +638,10 @@
             bomb.dropT += dt;
             bomb.dvy += .5 * fdt;
             bomb.dx += bomb.dvx * fdt; bomb.dy += bomb.dvy * fdt;
+            bomb.dx = Math.max(90, Math.min(VW - 90, bomb.dx));   // 화면 밖으로 구르지 않게
+            // 놓친 사람이 폭탄을 쫓아간다 — 주우면 자기 자리로 걸어 돌아온다
+            var chsr = players[bomb.toI];
+            chsr.x += (bomb.dx - chsr.x) * Math.min(1, dt / 200);
             var flr = players[bomb.toI].y + sprSize(n) * .48;
             if (bomb.dy >= flr && bomb.dvy > 0) {
               bomb.dy = flr; bomb.dvy = -bomb.dvy * .55; bomb.dvx *= .82; bomb.bounces++;
@@ -583,7 +654,7 @@
             if (bomb.st === "drop" && bomb.dropT > 1500) { bomb.fumble = false; land(); }
           } else {
             // 마지막 패스는 슬로모션 — 공중에서 시간이 늘어진다
-            timeScale = finalFly ? .30 : 1;
+            timeScale = bomb.slowK || 1;
             bomb.t += dt / bomb.dur;
             // 가로채기 — 폭탄이 던진 사람에게 되돌아간다
             if (bomb.block && !bomb.ret && bomb.t >= bomb.block.at) {
@@ -776,6 +847,7 @@
         if (state !== "boom" && state !== "after") {
           var rot = bomb.st === "fly" ? bomb.t * (bomb.cross ? 9 : 6)
             : bomb.st === "drop" ? bomb.spinDir * bomb.dropT / 130
+            : players[holder].juggleT > 0 ? t / 95
             : Math.sin(t / 130) * .2 * (1 + tp * 2);
           drawBomb(bx, by - (bomb.st === "held" ? sprSize(n) * .06 : 0), R * wob, rot, tp, t);
         }
