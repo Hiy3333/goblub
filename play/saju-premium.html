@@ -100,6 +100,22 @@
     .arch-item:hover { border-color:#ff8a5a; background:rgba(45,28,40,.85); }
     .arch-item b { display:block; color:#e8dcc8; font-family:'Nanum Myeongjo',serif; font-size:1.02rem; }
     .arch-item span { color:#9a8ba8; font-size:.84rem; }
+    .arch-row { display:flex; gap:8px; width:100%; max-width:460px; margin:0 auto 9px; align-items:stretch; }
+    .arch-row .arch-item { flex:1; min-width:0; margin:0; }
+    .arch-del { flex:none; width:46px; cursor:pointer; border-radius:12px;
+      border:1px solid rgba(255,138,90,.35); background:rgba(30,18,30,.7);
+      color:#c9a; font-size:1.05rem; }
+    .arch-del:hover { border-color:#ff8a5a; color:#ffb185; }
+    /* 삭제 확인 — 행이 통째로 질문으로 바뀐다 */
+    .arch-confirm { display:flex; gap:8px; align-items:center; width:100%; max-width:460px;
+      margin:0 auto 9px; padding:12px 14px; border-radius:12px;
+      border:1px solid rgba(255,90,90,.55); background:rgba(50,18,22,.85); }
+    .arch-confirm b { flex:1; min-width:0; color:#ffd9c8; font-size:.92rem; font-weight:400;
+      font-family:'Nanum Myeongjo',serif; }
+    .arch-confirm button { flex:none; cursor:pointer; border-radius:10px; padding:8px 12px;
+      font-family:inherit; font-size:.88rem; }
+    .arch-confirm .yes { border:0; background:#a83232; color:#ffe8dc; }
+    .arch-confirm .no { border:1px solid rgba(255,255,255,.25); background:transparent; color:#cbb; }
 
     /* ===== 명부 페이지 넘김 뷰어 ===== */
     #pager { max-width: 620px; margin: 0 auto; }
@@ -345,17 +361,48 @@
           localStorage.setItem("goblub_mb_idx", JSON.stringify(idx.slice(0, 12)));
         } catch (e) {}
       }
+      function deleteSnapshot(key) {
+        try { localStorage.removeItem("goblub_mb_" + key); } catch (e) {}
+        try {
+          var left = archIdx().filter(function (e3) { return e3.key !== key; });
+          localStorage.setItem("goblub_mb_idx", JSON.stringify(left));
+        } catch (e) {}
+        if (archIdx().length) renderArchive();
+        else { $("archive").style.display = "none"; startTale(birth()); }  // 다 태웠으면 새 명부부터
+      }
       function renderArchive() {
         var idx = archIdx();
         var list = $("arch-list"); list.innerHTML = "";
         idx.forEach(function (e2) {
           var d2 = new Date(e2.ts);
+          var wrap = document.createElement("div");
+          wrap.className = "arch-row";
           var row = document.createElement("button");
           row.className = "arch-item";
           row.innerHTML = "<b>📖 " + esc(e2.name) + "의 명부</b><span>" + e2.y + "." + e2.m + "." + e2.d +
             " 생 · " + (d2.getMonth() + 1) + "/" + d2.getDate() + " 새김</span>";
           row.onclick = function () { viewSnapshot(e2.key); };
-          list.appendChild(row);
+          // 삭제 — 누르면 행이 통째로 확인 질문으로 바뀐다 (즉시 지우지 않는다)
+          var del = document.createElement("button");
+          del.className = "arch-del"; del.textContent = "🔥";
+          del.setAttribute("aria-label", "이 명부 태우기");
+          del.onclick = function (ev) {
+            ev.stopPropagation();
+            var ask = document.createElement("div");
+            ask.className = "arch-confirm";
+            var msg = document.createElement("b");
+            msg.textContent = (e2.name || "") + "의 명부를 태울까? 되살릴 수 없다.";
+            var yes = document.createElement("button");
+            yes.className = "yes"; yes.textContent = "🔥 태운다";
+            yes.onclick = function (ev2) { ev2.stopPropagation(); deleteSnapshot(e2.key); };
+            var no = document.createElement("button");
+            no.className = "no"; no.textContent = "남겨둔다";
+            no.onclick = function (ev2) { ev2.stopPropagation(); list.replaceChild(wrap, ask); };
+            ask.appendChild(msg); ask.appendChild(yes); ask.appendChild(no);
+            list.replaceChild(ask, wrap);
+          };
+          wrap.appendChild(row); wrap.appendChild(del);
+          list.appendChild(wrap);
         });
         $("archive").style.display = "block";
       }
