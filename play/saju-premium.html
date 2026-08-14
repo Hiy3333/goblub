@@ -296,7 +296,7 @@
   <script src="js/report-ui.js?v=6"></script>
   <script src="js/gwigok-audio.js?v=1"></script>
   <script src="js/lunar.js?v=1"></script>
-  <script src="js/tale.js?v=29"></script>
+  <script src="js/tale.js?v=30"></script>
   <script>
     (function () {
       var $ = function (id) { return document.getElementById(id); };
@@ -313,7 +313,7 @@
       ];
       var TOTAL = PARTS.length;
       var data = null, base = null, deep = null, baseKey = null, paid = false;
-      var userName = "", userFocus = "";
+      var userName = "", userFocus = "", userJob = "", userLove = "";
       $("cost").textContent = COST;
 
       function djb2(s) { var h = 5381; for (var i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0; return (h >>> 0).toString(36); }
@@ -336,7 +336,8 @@
       function saveSnapshot() {
         if (!curBirth || !baseKey) return;
         try {
-          var snap = { name: userName || "", focus: userFocus || "", birth: curBirth, ts: Date.now(), parts: {} };
+          var snap = { name: userName || "", focus: userFocus || "", job: userJob || "", love: userLove || "",
+                       birth: curBirth, ts: Date.now(), parts: {} };
           PARTS.forEach(function (p) { snap.parts[p.id] = p.text || ""; });
           localStorage.setItem("goblub_mb_" + baseKey, JSON.stringify(snap));
           var idx = archIdx().filter(function (e) { return e.key !== baseKey; });
@@ -364,6 +365,7 @@
         if (!snap || !snap.parts || !snap.birth) { return; }
         computeFrom(snap.birth);
         userName = snap.name || ""; userFocus = snap.focus || "";
+        userJob = snap.job || ""; userLove = snap.love || "";
         document.body.classList.add("story-mode");   // 명부 열람도 이계 — 배경 어둡게 + 고브럽 버디 숨김
         $("archive").style.display = "none"; $("gate").style.display = "none";
         $("report-panel").style.display = "block";
@@ -413,6 +415,7 @@
             try { localStorage.setItem("goblub_tale_seen", "1"); } catch (e) {}
             if (payload && payload.base) { base = payload.base; deep = payload.deep; baseKey = djb2(JSON.stringify(base)); }
             userName = (payload && payload.name) || ""; userFocus = (payload && payload.focus) || "";
+            userJob = (payload && payload.job) || ""; userLove = (payload && payload.love) || "";
             enterReport();
           },
           onExit: function (payload) {
@@ -685,7 +688,8 @@
           setTimeout(function () { genPart(i, 1); }, 3000);
           return true;
         }
-        Dosa.fetchAI("/api/saju-report", { saju: base, deep: deep, part: p.id, name: userName || undefined, focus: userFocus || undefined, edition: "myeongbu2" }, "goblub_rep3_", {
+        Dosa.fetchAI("/api/saju-report", { saju: base, deep: deep, part: p.id, name: userName || undefined, focus: userFocus || undefined,
+          job: userJob || undefined, love: userLove || undefined, edition: "myeongbu2" }, "goblub_rep3_", {
           accept: function (full) { return signed(full); },
           cooldownMs: 4000, cooldownKey: "goblub_rep_cd",
           onChunk: function (t) { buffer += t; },

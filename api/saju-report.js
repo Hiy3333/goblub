@@ -214,11 +214,15 @@ export default async function handler(req, res) {
   // 손님 정보(이름·특히 궁금한 것) — 있으면 집중 답변 유도
   const name = typeof req.body.name === "string" ? req.body.name.slice(0, 20).replace(/[<>]/g, "") : "";
   const focus = typeof req.body.focus === "string" ? req.body.focus.slice(0, 80).replace(/[<>]/g, "") : "";
+  const job = typeof req.body.job === "string" ? req.body.job.slice(0, 20).replace(/[<>]/g, "") : "";
+  const love = typeof req.body.love === "string" ? req.body.love.slice(0, 12).replace(/[<>]/g, "") : "";
   let guestBlock = "";
-  if (name || focus) {
+  if (name || focus || job || love) {
     guestBlock = "\n\n[손님 정보]\n";
     if (name) guestBlock += `이름: ${name} — 글 속에서 가끔 이름을 자연스럽게 불러 친밀하게. 남발 금지(파트당 1~2회).\n`;
     if (focus) guestBlock += `특히 궁금해하는 것: ${focus} — 이 파트가 이 관심사와 닿는 대목에서는 한 발 더 깊이 파고들어 직접적으로 답해라. 단, 이 파트 본래 주제를 벗어나지 말고 데이터 근거는 그대로 유지.\n`;
+    if (job) guestBlock += `생업: ${job} — 재물·일·직업 이야기는 반드시 이 형편에 맞춰라. 학생·취준생에게 승진 운운하거나, 주부·무직에게 직장 상사 이야기를 꺼내는 헛발질 금지. 이 생업의 실제 고민(수입 흐름, 시험·합격, 매출, 커리어 전환 등)에 닿는 말로 풀어라.\n`;
+    if (love) guestBlock += `연애·혼인 상태: ${love} — 인연·애정 이야기는 반드시 이 상태에서 출발하라. 기혼자에게 새로운 만남을 권하지 말고(부부 관계·가정의 결로 읽어라), 연애 중인 자에게는 지금 연인과의 흐름으로, 미혼·솔로에게는 만남의 시기와 방향으로 읽어라.\n`;
   }
 
   try {

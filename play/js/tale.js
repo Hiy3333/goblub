@@ -150,7 +150,7 @@ box-shadow:0 0 0 100vmax #040308,0 0 70px rgba(0,0,0,.8)}}";
   }
 
   function start(opts) {
-    var collected = { name: "", focus: "", focusLabel: "", birth: null };
+    var collected = { name: "", focus: "", focusLabel: "", birth: null, job: "", love: "" };
     var base = opts.base || null, deep = opts.deep || null;
 
     function coldRead() {
@@ -223,7 +223,19 @@ box-shadow:0 0 0 100vmax #040308,0 0 70px rgba(0,0,0,.8)}}";
       // 콜드리딩 (생년월일 확정 후 재계산된 base/deep 사용)
       { id: 24, name: "귀곡", cls: "n-gwi", text: function () { var c = coldRead(); return c.ilju ? ("[" + hj(c.ilju) + "(" + c.ilju + ")] 일주.\n" + c.strengthLine) : c.strengthLine; } },
       { id: 25, name: "귀곡", cls: "n-gwi", text: function () { return coldRead().missLine; } },
-      { id: 26, name: "귀곡", cls: "n-gwi", text: "내 이름은 [귀곡(鬼哭)].\n산 자의 팔자를 읽는 저승의 사자다." },
+      { id: 26, name: "귀곡", cls: "n-gwi", text: "내 이름은 [귀곡(鬼哭)].\n산 자의 팔자를 읽는 저승의 사자다.", goto: 261 },
+      // 생업·연분 — 팔자를 산 자의 형편에 맞춰 읽기 위한 문답
+      { id: 261, name: "귀곡", cls: "n-gwi",
+        text: "이승에서는 무슨 일로\n밥을 벌고 있느냐.\n\n생업을 알아야 재물길을 바로 짚는다.",
+        input: { kind: "select", key: "job", submit: "🧾 생업을 아뢴다", placeholder: "…생업을 고르라",
+          options: ["학생", "취업·시험 준비", "직장인", "공무원·공기업", "자영업·사업",
+                    "프리랜서·창작", "전문직", "주부", "무직·쉬는 중", "기타"] },
+        goto: 262 },
+      { id: 262, name: "귀곡", cls: "n-gwi",
+        text: "…네 곁은 어떠하냐.\n\n연(緣)의 매듭을 알아야\n인연길을 헛짚지 않는다.",
+        input: { kind: "select", key: "love", submit: "🪢 연을 아뢴다", placeholder: "…지금의 연을 고르라",
+          options: ["기혼자", "미혼자", "연애 중", "솔로"] },
+        goto: 27 },
       // 궁금한 것(초점) 선택
       { id: 27, name: "귀곡", cls: "n-gwi", text: "무엇이 그리 궁금하여\n저승 문턱까지 넘어왔느냐?", choices: [
         { label: FOCI[0].label, setFocus: 0, goto: 29 },
@@ -382,7 +394,25 @@ box-shadow:0 0 0 100vmax #040308,0 0 70px rgba(0,0,0,.8)}}";
     function renderInput(inp) {
       inpEl.style.display = "flex"; inpEl.innerHTML = "";
       nextEl.style.visibility = "hidden";
-      if (inp.kind === "text") {
+      if (inp.kind === "select") {
+        // 드롭다운 하나 + 확인. 고르지 않으면 흔들며 재촉한다.
+        var sl = document.createElement("select");
+        var ph = document.createElement("option");
+        ph.value = ""; ph.textContent = inp.placeholder || "…고르라"; ph.disabled = true; ph.selected = true;
+        sl.appendChild(ph);
+        (inp.options || []).forEach(function (o) {
+          var op = document.createElement("option"); op.value = o; op.textContent = o; sl.appendChild(op);
+        });
+        if (collected[inp.key]) sl.value = collected[inp.key];
+        var okS = document.createElement("button"); okS.className = "ok"; okS.textContent = inp.submit || "확인";
+        okS.onclick = function (e) {
+          e.stopPropagation(); kickBGM();
+          if (!sl.value) { sl.classList.remove("err"); void sl.offsetWidth; sl.classList.add("err"); return; }
+          collected[inp.key] = sl.value;
+          advance();
+        };
+        inpEl.appendChild(sl); inpEl.appendChild(okS);
+      } else if (inp.kind === "text") {
         var i = document.createElement("input");
         i.type = "text"; i.maxLength = inp.maxlen || 20; i.placeholder = inp.placeholder || "";
         if (inp.key === "name" && collected.name) i.value = collected.name;
@@ -486,7 +516,7 @@ box-shadow:0 0 0 100vmax #040308,0 0 70px rgba(0,0,0,.8)}}";
     function end(kind) {
       if (ended) return; ended = true;
       if (bgm) bgm.stop();
-      var payload = { name: collected.name, focus: collected.focus, focusLabel: collected.focusLabel, birth: collected.birth, base: base, deep: deep };
+      var payload = { name: collected.name, focus: collected.focus, focusLabel: collected.focusLabel, birth: collected.birth, job: collected.job, love: collected.love, base: base, deep: deep };
       // 입장: 분석 화면(z-index 낮음)을 먼저 밑에 깔고 → 스토리를 페이드아웃
       // (사라진 뒤에 띄우면 그 틈에 뒤 페이지가 번쩍 보인다)
       if (kind === "enter" && opts.onEnter) { try { opts.onEnter(payload); } catch (e) {} }
