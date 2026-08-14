@@ -464,7 +464,8 @@ box-shadow:0 0 0 100vmax #040308,0 0 70px rgba(0,0,0,.8)}}";
           }
           var hv = wrapH.el.value; b.hour = hv === "" ? null : +hv;
           b.min = b.hour == null ? 0 : (+wrapMi.el.value || 0);
-          b.gender = wrapG.el.value || null;
+          if (!wrapG.el.value) { shake(wrapG.el); return; }   // 성별은 반드시 아뢰어야 한다
+          b.gender = wrapG.el.value;
           collected.birth = b;
           if (opts.compute) { var r = opts.compute(b); if (r) { base = r.base; deep = r.deep; } }
           advance();
@@ -483,7 +484,11 @@ box-shadow:0 0 0 100vmax #040308,0 0 70px rgba(0,0,0,.8)}}";
           if (kind === "d") { for (var d = 1; d <= 31; d++) s.add(new Option(d + "일", d)); s.value = (pre.cal === "lunar" ? pre.ld : pre.d) || 1; }
           if (kind === "h") { s.add(new Option("태어난 시 모름", "")); for (var h = 0; h < 24; h++) s.add(new Option(h + "시", h)); s.value = (pre.hour == null ? "" : pre.hour); }
           if (kind === "mi") { for (var mi2 = 0; mi2 < 60; mi2++) s.add(new Option(mi2 + "분", mi2)); s.value = (pre.min == null ? 0 : pre.min); }
-          if (kind === "g") { s.add(new Option("성별 안 밝힘", "")); s.add(new Option("남", "M")); s.add(new Option("여", "F")); s.value = pre.gender || ""; }
+          if (kind === "g") {
+            var gp = new Option("성별", ""); gp.disabled = true;
+            s.add(gp); s.add(new Option("남", "M")); s.add(new Option("여", "F"));
+            s.value = pre.gender || "";
+          }
           return { el: s };
         }
       }
