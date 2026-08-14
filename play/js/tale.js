@@ -215,7 +215,7 @@ box-shadow:0 0 0 100vmax #040308,0 0 70px rgba(0,0,0,.8)}}";
       { id: 21, vbg: "gwigok_idle", name: "귀곡", cls: "n-gwi",
         text: "…돌아봤구나.\n그럼 그것도 네 얼굴을 봤겠지.\n\n(문 쪽을 힐끗 본다)\n……앉거라. 문은 닫아두마." },
       // 이름 입력
-      { id: 22, name: "귀곡", cls: "n-gwi", text: "산 자여. 네 이름을 이 천막에\n똑똑히 남겨라.",
+      { id: 22, name: "귀곡", cls: "n-gwi", text: "산 자여. 네 이름을 이 명부에\n똑똑히 남겨라.",
         input: { kind: "text", key: "name", placeholder: "이름 (또는 불리고 싶은 이름)", maxlen: 12, submit: "🖊 이름을 새긴다" } },
       // 생년월일 입력
       { id: 23, name: "귀곡", cls: "n-gwi", text: function () { return (collected.name ? collected.name + "… " : "") + "언제 이 세상에 왔느냐.\n한 치도 틀리지 말고 아뢰라."; },
@@ -226,7 +226,7 @@ box-shadow:0 0 0 100vmax #040308,0 0 70px rgba(0,0,0,.8)}}";
       { id: 26, name: "귀곡", cls: "n-gwi", text: "내 이름은 [귀곡(鬼哭)].\n산 자의 팔자를 읽는 저승의 사자다.", goto: 261 },
       // 생업·연분 — 팔자를 산 자의 형편에 맞춰 읽기 위한 문답
       { id: 261, name: "귀곡", cls: "n-gwi",
-        text: "이승에서는 무슨 일로\n밥을 벌고 있느냐.\n\n생업을 알아야 재물길을 바로 짚는다.",
+        text: "…묻겠다.\n이승에서 네 하루는\n무엇으로 채워져 있느냐.\n\n생업을 알아야 재물길을 바로 짚는다.",
         input: { kind: "select", key: "job", submit: "🧾 생업을 아뢴다", placeholder: "…생업을 고르라",
           options: ["학생", "취업·시험 준비", "직장인", "공무원·공기업", "자영업·사업",
                     "프리랜서·창작", "전문직", "주부", "무직·쉬는 중", "기타"] },
