@@ -1,4 +1,4 @@
-// goblub 「우리 별자리」 엔진 — window.Stars = { pick(s, rA, rB) }
+// goblub 「부엉이 별자리 궁합」 엔진 — window.Stars = { pick(s, rA, rB) }
 // 기존 궁합 계산(Gunghap.score)은 그대로 쓰고, 점수 대신 별자리 하나를 고른다.
 // 좌표는 0~1 정규 공간. pts = [x, y, side(0=A,1=B), big?] / links = [i, j]
 (function () {

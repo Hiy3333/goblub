@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>우리 별자리 — goblub</title>
+<title>부엉이 별자리 궁합 — goblub</title>
 <meta name="description" content="두 사람의 사주에서 별을 꺼내 하나로 이어, 세상에 없던 별자리를 만들어 드려요 — 점수 대신 별자리 하나" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -180,14 +180,14 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
 <div class="app">
   <div class="topbar">
     <a href="fortune-hub.html">← 운세</a>
-    <span class="t">✧ 우리 별자리</span>
+    <span class="t">✧ 부엉이 별자리 궁합</span>
     <span class="sp"></span>
   </div>
 
   <!-- ① 들머리 + 입력 -->
   <div class="screen on" id="scIntro">
     <div class="lead">
-      <h1>우리 별자리</h1>
+      <h1>부엉이 별자리 궁합</h1>
       <p>두 사람의 사주에서 별을 꺼내 하나로 잇습니다.<br />점수 대신, 세상에 없던 별자리 하나가 남습니다.</p>
     </div>
 
@@ -295,7 +295,7 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
 <script src="js/gunghap.js?v=2"></script>
 <script src="js/stars.js?v=2"></script>
 <script src="js/dosa.js?v=2"></script>
-<script src="js/feed.js?v=9"></script>
+<script src="js/feed.js?v=10"></script>
 <script>
 var $=function(id){return document.getElementById(id);};
 var scIntro=$("scIntro"), scOwl=$("scOwl"), scSky=$("scSky"), cv=$("cv"), ctx=cv.getContext("2d");
@@ -726,7 +726,7 @@ $("btn-save").onclick=function(){
   p.fillText(star.mag+"등성 · "+star.obsText, plate.width/2, cv.height+27*S);
   p.fillStyle="#5d738d";
   p.font=(15*S)+"px Jua, 'Malgun Gothic', sans-serif";
-  p.fillText("goblub · 우리 별자리", plate.width/2, cv.height+55*S);
+  p.fillText("goblub · 부엉이 별자리 궁합", plate.width/2, cv.height+55*S);
   var a=document.createElement("a");
   a.download="goblub-우리별자리.png";
   a.href=plate.toDataURL("image/png"); a.click();
