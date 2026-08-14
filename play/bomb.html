@@ -206,6 +206,41 @@
     var cv = $("cv"), g = cv.getContext("2d");
     var VW = cv.width, VH = cv.height;
     var players = [], bits = [], smoke = [];
+
+    /* ── 대사 ────────────────────────────────────────────────
+       같은 판에서 같은 말이 연달아 나오면 금세 질린다. 직전에 쓴 것과
+       다른 걸 고른다. {n} 은 이름 자리. */
+    var LINES = {
+      juggle: ["🤹 {n} — 앗 뜨거!! 앗뜨뜨뜨!",
+               "🤹 {n} 손바닥 익는다!!",
+               "🤹 {n} — 뜨거 뜨거 뜨거!!",
+               "🤹 {n} 저글링 시작… 이거 못 놔!",
+               "🤹 {n} — 아 뜨거!! 누가 좀 받아줘!!"],
+      fumble: ["👐 {n} 놓쳤다!!",
+               "👐 {n} — 어어어 미끄러진다!!",
+               "👐 {n} 손에서 튀었다!!",
+               "👐 {n} — 아 놓쳤어 어떡해!!",
+               "👐 {n} 데굴데굴… 빨리 주워!!"],
+      spike:  ["🏐 {n} 스파이크!! 안 받아!",
+               "🏐 {n} — 어딜! 도로 가져가!",
+               "🏐 {n} 강스파이크!! 내 손엔 못 온다",
+               "🏐 {n} — 반사!! 얍!",
+               "🏐 {n} 점프 리시브!! 받은 적 없음"],
+      relay:  ["🏐 {n} — 나 아니야!! 넘겨!!",
+               "🏐 {n} 스파이크로 떠넘겼다!!",
+               "🏐 {n} — 받자마자 얍!! 미안!",
+               "🏐 {n} — 어딜 나한테!! 도로 받아!"]
+    };
+    var lastLine = {};
+    function say(kind, name) {
+      var arr = LINES[kind], t = arr[0];
+      for (var i = 0; i < 12; i++) {
+        t = arr[Math.floor(Math.random() * arr.length)];
+        if (t !== lastLine[kind]) break;
+      }
+      lastLine[kind] = t;
+      return t.replace("{n}", name);
+    }
     var wrap = $("track-wrap");
 
     // 원형 배치 — 2명이면 마주 보고, 늘수록 타원이 넓어진다
@@ -486,7 +521,7 @@
         if (finalStage === "relay") {
           pick = { to: loser, cross: true };
           finalLeg = true;
-          flash = "🏐 " + players[holder].name + " 스파이크로 떠넘겼다!!"; flashT = 1400;
+          flash = say("relay", players[holder].name); flashT = 1500;
         }
         // 무장 후 당첨자행 패스가 잡히면 마지막 시퀀스 개시.
         // 50%는 데코이에게 먼저 — 「설마… 나?!」 하고 기겁한 사람이 받자마자
@@ -583,7 +618,7 @@
           did.juggle++;
           var exJ = 650 + Math.random() * 350;
           holdDur += exJ; pJ.juggleT = exJ; lastFlash = el;
-          flash = "🤹 " + pJ.name + " — 앗뜨뜨!!"; flashT = Math.min(1400, exJ);
+          flash = say("juggle", pJ.name); flashT = Math.min(1600, exJ);
           sfx.fuse();
           for (var js = 0; js < 8; js++) bits.push({ x: pJ.x, y: pJ.y - 20,
             vx: (Math.random() - .5) * 6, vy: -Math.random() * 4, life: .6,
@@ -674,7 +709,7 @@
                 for (var bs = 0; bs < 12; bs++) bits.push({ x: cp.x, y: cp.y,
                   vx: (Math.random() - .5) * 10, vy: -Math.random() * 6, life: .9,
                   c: bs % 2 ? "#ffe680" : "#ffffff" });
-                flash = "🏐 " + rcvP.name + " 스파이크!"; flashT = 1300;
+                flash = say("spike", rcvP.name); flashT = 1400;
                 sfx.hit();
               }
             }
@@ -688,7 +723,7 @@
                 bomb.dy = rcvF.y - sprSize(n) * .2;
                 bomb.dvx = (Math.random() < .5 ? -1 : 1) * (2 + Math.random() * 2.5);
                 bomb.dvy = -3.5; bomb.spinDir = Math.random() < .5 ? -1 : 1;
-                flash = "👐 " + rcvF.name + " 놓쳤다!!"; flashT = 1400;
+                flash = say("fumble", rcvF.name); flashT = 1500;
                 sfx.hit();
               } else land();
             }
