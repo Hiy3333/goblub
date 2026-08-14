@@ -111,9 +111,14 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
   background:rgba(8,16,30,.55);backdrop-filter:blur(6px);
   transition:background .15s,border-color .15s}
 .skipbtn:hover{background:rgba(20,34,58,.8);border-color:rgba(255,255,255,.5)}
-/* 깨우기 버튼 — 부엉이가 꾸벅 멈춘 순간에 뜬다 */
-.owlwake{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);z-index:3;
+/* 깨우기 버튼 — 부엉이가 꾸벅 멈춘 순간에 뜬다.
+   버튼이 뜨는 동안에도 아래 안내 문구('쉿… 졸고 있어요')는 그대로 떠 있다.
+   bottom:16px 이면 문구 글자와 11px 겹쳐 가려 버린다 — 문구 위로 띄운다. */
+.owlwake{position:absolute;left:50%;bottom:52px;transform:translateX(-50%);z-index:3;
   display:none;padding:12px 24px;border:0;border-radius:999px;cursor:pointer;
+  /* left:50% 절대배치라 가용 폭이 컨테이너의 절반뿐 — 좁은 화면에서 글자가
+     두 줄로 깨진다. 한 줄로 붙잡아 둔다. */
+  white-space:nowrap;
   font-family:inherit;font-size:1.02rem;color:#16243a;
   background:linear-gradient(180deg,#ffeec2,#ffd98a);
   box-shadow:0 10px 24px rgba(255,215,140,.35);
