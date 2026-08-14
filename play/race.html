@@ -81,11 +81,6 @@
     .rank .r .nm { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     .rank .r .tag { flex:none; font-size:.85rem; color:var(--ink-soft); }
 
-    .winner { text-align:center; margin-top:14px; display:none; }
-    .winner .tag { display:inline-block; font-size:.86rem; color:var(--ink-soft); margin-bottom:2px; }
-    .winner .who { font-size:1.9rem; line-height:1.35; word-break:keep-all; }
-    .winner.pop { animation:wpop .5s cubic-bezier(.2,1.5,.4,1); }
-    @keyframes wpop { from{transform:scale(.5); opacity:0} to{transform:scale(1); opacity:1} }
   </style>
 </head>
 <body class="clay">
@@ -120,10 +115,6 @@
         <div class="count" id="count"></div>
       </div>
 
-      <div class="winner" id="winner">
-        <span class="tag" id="winner-tag">🔥 걸렸습니다</span>
-        <p class="who" id="winner-who"></p>
-      </div>
       <div class="rank" id="rank"></div>
 
       <div class="result-actions">
@@ -961,7 +952,6 @@
       busy = true;
       $("btn-go").disabled = true;
       $("btn-again").style.display = "none"; $("btn-edit").style.display = "none";
-      $("winner").style.display = "none"; $("winner").classList.remove("pop");
       $("rank").style.display = "none"; $("rank").innerHTML = "";
       $("setup").style.display = "none"; $("hud").style.display = "flex";
       var wrap = $("track-wrap");
@@ -1525,19 +1515,17 @@
         g.fillText("우주선은 떠났습니다…", VW / 2, VH * .91);
         g.globalAlpha = 1;
         if (k < 1) return requestAnimationFrame(zoom);
+        // 걸린 사람은 캔버스 클로즈업이 '몇 등 — 누구'로 이미 보여 준다.
+        // 아래에 같은 문구를 또 띄우지 않고, 전체 순위표만 남긴다.
         $("rank").innerHTML = pendingRank;
         $("rank").style.display = "block";
-        $("winner-tag").textContent = (randomPick ? "🎲 랜덤 → " : "🔥 ") + loseRank + "등 — 걸렸습니다";
-        $("winner-who").textContent = loser.name;
-        $("winner").style.display = "block";
-        void $("winner").offsetWidth; $("winner").classList.add("pop");
         $("hud-left").textContent = "🏁 경주 종료";
         $("btn-again").style.display = ""; $("btn-edit").style.display = "";
         busy = false;
         // 클로즈업을 2초 보여준 뒤 전체 화면을 접고 결과로
         setTimeout(function () {
           document.body.classList.remove("theater");
-          var w2 = $("winner");
+          var w2 = $("rank");
           if (w2.scrollIntoView) w2.scrollIntoView({ behavior: "smooth", block: "center" });
         }, 2000);
       })(t0);
@@ -1549,7 +1537,7 @@
       if (raf) cancelAnimationFrame(raf);
       document.body.classList.remove("theater");
       $("setup").style.display = ""; $("hud").style.display = "none";
-      $("winner").style.display = "none"; $("rank").style.display = "none";
+      $("rank").style.display = "none";
       $("rank").innerHTML = ""; pendingRank = "";
       $("live").innerHTML = ""; $("count").classList.remove("on");
       $("btn-go").style.display = ""; $("btn-go").disabled = false;
