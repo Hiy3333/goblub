@@ -407,7 +407,19 @@
     var rname = document.getElementById("gm-rname");
     var rocketFx = null; // 발사 시퀀스: up(불 뿜으며 상승)→sputter(연료 부족 픽픽)→fall(추락)→land(쿵)
     obj.addEventListener("click", function () {
-      if (rocketFx || ship) return;
+      // 고브럽이 안에 타고 있으면 발사 대신 '불러내기' — 튀어나와 가운데로 걸어와
+      // 카테고리를 촤라락 펼친다. (예전엔 탑승 중 클릭이 그냥 무시됐다)
+      if (ship) {
+        peek.style.opacity = "0";
+        el.style.opacity = "1"; el.style.pointerEvents = "";
+        ship = null; lastShipAt = Date.now();
+        if (mode !== "idle") return;              // 이미 카드가 펼쳐지는 중이면 그대로 둔다
+        if (hint) hint.style.display = "none";
+        el.classList.add("orbon");
+        mode = "run";                             // 가운데 도착하면 run 로직이 beginSpit 호출
+        return;
+      }
+      if (rocketFx) return;
       rocketFx = { phase: "up", t0: Date.now(), max: Math.min(window.innerHeight * 0.38, 330) };
       flame.className = "gm-flame";
       flame.style.display = "block";
