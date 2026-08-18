@@ -336,7 +336,7 @@ function replay(){
   phase="intro";
   try{ vid.pause(); vid.removeAttribute("src"); vid.load(); }catch(e){}
   still.style.backgroundImage="url('"+CAT_IDLE+"')"; still.classList.add("on");
-  var w=$("worry"); if(w) w.value=myWorry||"";
+  var w=$("worry"); if(w) w.value="";   // 새 질문을 받도록 비워 둔다
   show(scIntro);
   hintbar.textContent="다른 게 궁금하면 새로 물어보라냥 — 고민이 바뀌면 카드도 바뀐다옹.";
 }
