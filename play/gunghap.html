@@ -1031,9 +1031,10 @@ $("btn-report").onclick=function(){
       aspects:last.asp.map(function(a){ return "A의 "+a.paKo+"-B의 "+a.pbKo+" "+a.type+"(오브 "+a.orb+"도)"; })
     }
   },{
+    noCache:true,   // 볼 때마다 새 리포트 — 지난 글이 되살아나지 않는다
     onChunk:function(t){ acc+=t; txt.innerHTML=fmt(acc); },
-    onDone:function(cached){ txt.innerHTML=fmt(acc);
-      st.textContent=cached?"🔮 (전에 뽑아 둔 리포트예요)":"🔮 리포트 끝! 캡처해서 공유해 보세요."; },
+    onDone:function(){ txt.innerHTML=fmt(acc);
+      st.textContent="🔮 리포트 끝! 캡처해서 공유해 보세요."; },
     onError:function(code,sec){
       txt.style.display="none";
       st.textContent = code==="not_configured" ? "관측소가 아직 문을 열지 않았어요. 곧 엽니다!" :

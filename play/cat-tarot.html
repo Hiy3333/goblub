@@ -237,15 +237,8 @@ function rng(seed){ return function(){ seed|=0; seed=seed+0x6D2B79F5|0; var t=Ma
 function show(sc){ [scIntro,scSpread,scPick,scResult].forEach(function(s){s.classList.remove("on");}); sc.classList.add("on");
   document.body.classList.toggle("top", sc===scResult); if(sc===scResult) window.scrollTo(0,0); }
 
-// 이미 오늘 뽑았으면 결과로 직행
-(function initLock(){
-  try{
-    var rec=JSON.parse(localStorage.getItem(LOCK_KEY));
-    if(rec && rec.date===todayStr() && typeof rec.cardIdx==="number"){
-      myWorry=rec.worry||""; revealResult(rec.cardIdx, rec.orient, true);
-    }
-  }catch(e){}
-})();
+// 재방문해도 결과로 직행하지 않는다 — 언제나 처음부터(질문 입력) 새로 진입.
+// 같은 고민을 다시 물으면 pick()에서 오늘의 카드·풀이를 그대로 재사용한다.
 
 $("goBtn").onclick=function(){
   myWorry=($("worry").value||"").trim();

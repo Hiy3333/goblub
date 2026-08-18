@@ -207,8 +207,7 @@ button.fire:hover{background:rgba(190,55,25,.36)}
   }
   function enter(){
     showPill();
-    var saved=null; try{ saved=JSON.parse(localStorage.getItem(todayKey())); }catch(e){}
-    if(saved&&saved.q&&saved.a){ showAnswer(saved.q,saved.a,true); return; }
+    // 재방문해도 풀이로 직행하지 않는다 — 언제나 꿈 입력부터 새로 진입
     if(birth&&birth.y){ $("gate").style.display="none"; $("askbox").style.display="block"; }
     else { $("askbox").style.display="none"; $("gate").style.display="block"; }
   }

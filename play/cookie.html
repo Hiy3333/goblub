@@ -414,15 +414,7 @@ function saveCard(){
   }
 }
 
-// 오늘 이미 깼으면 마지막에 뽑은 운세로 직행 (영상 없이)
-(function init(){
-  var saved=null;
-  try{ saved=localStorage.getItem(dk); }catch(e){}
-  if(saved){
-    if(saved!=="1") fortune=saved;   // "1" 은 예전 버전이 남긴 값
-    finish(true);
-  }
-})();
+// 재방문해도 결과로 직행하지 않는다 — 언제나 해달 인사부터 새로 진입, 깰 때마다 새 운세.
 </script>
 </body>
 </html>

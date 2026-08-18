@@ -203,10 +203,8 @@ button.fire:disabled{opacity:.5;cursor:default}
     try{ localStorage.setItem("goblub_birth",JSON.stringify(birth)); }catch(e){}
     $("gate").style.display="none";
     showPill();
-    // 오늘 답이 이미 있으면 그 답으로, 아니면 물음 입력으로
-    var saved=null; try{ saved=JSON.parse(localStorage.getItem(todayKey())); }catch(e){}
-    if(saved&&saved.q&&saved.a) showAnswer(saved.q,saved.a,true);
-    else $("askbox").style.display="block";
+    // 언제나 물음 입력부터 — 지난 답은 「지난 답 보기」로만 되돌아간다
+    $("askbox").style.display="block";
   };
 
   $("edit").onclick=function(ev){ ev.preventDefault();
@@ -243,9 +241,7 @@ button.fire:disabled{opacity:.5;cursor:default}
       data=d;
       try{ birth=JSON.parse(localStorage.getItem("goblub_birth")); }catch(e){}
       showPill();
-      // 오늘 이미 물었으면 저장된 문답을 바로 보여준다
-      var saved=null; try{ saved=JSON.parse(localStorage.getItem(todayKey())); }catch(e){}
-      if(saved&&saved.q&&saved.a){ showAnswer(saved.q,saved.a,true); return; }
+      // 재방문해도 답으로 직행하지 않는다 — 언제나 물음 입력부터 새로 진입
       if(birth&&birth.y){ $("askbox").style.display="block"; }
       else $("gate").style.display="block";
     })
