@@ -60,6 +60,13 @@ video::-webkit-media-controls,video::-webkit-media-controls-start-playback-butto
 video::-webkit-media-controls-overlay-play-button{display:none!important;-webkit-appearance:none!important}
 #scPlay .cap{position:absolute;left:0;right:0;bottom:14px;text-align:center;z-index:3;
   font-family:'Nanum Myeongjo',serif;color:#fef3df;font-size:.96rem;text-shadow:0 2px 14px rgba(0,0,0,.9)}
+/* 연출 넘어가기 — 영상 오른쪽 위 */
+.skipbtn{position:absolute;right:10px;top:10px;z-index:5;
+  padding:7px 14px;border:1px solid rgba(255,255,255,.28);border-radius:999px;cursor:pointer;
+  font-family:'Gowun Batang',serif;font-size:.84rem;color:#eaf2ff;
+  background:rgba(8,16,30,.55);backdrop-filter:blur(6px);
+  transition:background .15s,border-color .15s}
+.skipbtn:hover{background:rgba(20,34,58,.8);border-color:rgba(255,255,255,.5)}
 
 /* ── 결과 ── */
 #scResult{background:#0b1220}
@@ -126,6 +133,7 @@ video::-webkit-media-controls-overlay-play-button{display:none!important;-webkit
   <div class="screen" id="scPlay">
     <video id="vid" muted playsinline webkit-playsinline preload="auto"></video>
     <div class="still" id="still"></div>
+    <button class="skipbtn" id="skip-play" type="button">건너뛰기 ›</button>
     <p class="cap" id="cap"></p>
   </div>
 
@@ -261,6 +269,9 @@ function chainFallback(){
     });
   });
 }
+
+// 건너뛰기 — 집기→깨기→건네기 연출을 통째로 넘기고 바로 쪽지로
+$("skip-play").onclick=function(){ if(phase==="play") finish(false); };
 
 function finish(fromLock){
   if(phase==="result") return;          // 종료 이벤트와 감시 타이머가 겹쳐도 한 번만

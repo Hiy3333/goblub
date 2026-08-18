@@ -120,6 +120,13 @@ video::-webkit-media-controls-overlay-play-button{display:none!important;-webkit
 .hintbar{margin-top:16px;color:var(--ink-soft);font-size:.83rem;text-align:center;line-height:1.7;max-width:340px}
 .spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(233,200,119,.3);
   border-top-color:var(--gold);border-radius:50%;animation:sp .8s linear infinite;vertical-align:-2px;margin-right:6px}
+/* 연출 넘어가기 — 영상 오른쪽 위 */
+.skipbtn{position:absolute;right:10px;top:10px;z-index:5;
+  padding:7px 14px;border:1px solid rgba(255,255,255,.28);border-radius:999px;cursor:pointer;
+  font-family:inherit;font-size:.84rem;color:#eaf2ff;
+  background:rgba(8,16,30,.55);backdrop-filter:blur(6px);
+  transition:background .15s,border-color .15s}
+.skipbtn:hover{background:rgba(20,34,58,.8);border-color:rgba(255,255,255,.5)}
 @keyframes sp{to{transform:rotate(360deg)}}
 </style>
 </head>
@@ -146,6 +153,7 @@ video::-webkit-media-controls-overlay-play-button{display:none!important;-webkit
   <div class="screen" id="scSpread">
     <video id="vid" muted playsinline webkit-playsinline preload="auto"></video>
     <div class="still on" id="still"></div>
+    <button class="skipbtn" id="skip-spread" type="button">건너뛰기 ›</button>
     <p class="cap" id="cap">고양이가 카드를 펼치는 중…</p>
   </div>
 
@@ -252,6 +260,8 @@ function startSpread(){
   var p=vid.play(); if(p&&p.catch) p.catch(function(){ toPick(); });
   setTimeout(function(){ if(phase==="spread") toPick(); }, 6500);
 }
+// 건너뛰기 — 펼침 영상을 통째로 넘기고 바로 카드 선택으로
+$("skip-spread").onclick=function(){ if(phase==="spread") toPick(); };
 
 function toPick(){
   phase="pick";
