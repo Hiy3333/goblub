@@ -65,6 +65,21 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
   color:var(--ink-soft);font-size:.84rem;opacity:0;transition:opacity .5s}
 .skycap.on{opacity:1}
 
+/* ── 그날의 하늘 (실측 천문) ── */
+.astro{margin-top:14px;background:rgba(14,26,44,.72);border:1px solid var(--line);border-radius:16px;padding:14px 16px}
+.astro h4{margin:0 0 10px;color:var(--gold);font-size:.95rem}
+.astro .cols{display:flex;gap:10px}
+.astro .col{flex:1;min-width:0;background:rgba(10,18,32,.6);border-radius:12px;padding:10px 12px}
+.astro .col b{display:block;color:#cfe0f5;font-size:.82rem;margin-bottom:6px}
+.astro .col p{margin:3px 0;font-size:.84rem;color:#aabde0}
+.astro .col p i{font-style:normal;color:#ffe6b8}
+.astro .col p.sm{font-size:.76rem;color:#8ba0c4}
+.astro .asp{margin-top:10px;border-top:1px dashed rgba(255,255,255,.14);padding-top:10px}
+.astro .asp p{margin:4px 0;font-size:.84rem;color:#aabde0}
+.astro .asp p i{font-style:normal;color:#ffd9a0}
+.astro .foot{margin-top:8px;font-size:.72rem;color:#7b8bab}
+@media (max-width:520px){ .astro .cols{flex-direction:column} }
+
 /* ── 결과 ── */
 .panel{opacity:0;transform:translateY(10px);transition:opacity .6s ease,transform .6s ease}
 .panel.on{opacity:1;transform:none}
@@ -262,6 +277,9 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
       <div class="card"><h4>이 배열이 말하는 것</h4><p id="r-desc"></p></div>
       <div class="card"><h4>흐려지기 쉬운 곳</h4><p id="r-care"></p></div>
 
+      <!-- 그날의 하늘 — 실제 천문 계산 -->
+      <div class="astro" id="r-astro" style="display:none"></div>
+
       <!-- 부엉이의 관측 수첩 -->
       <div class="owlnote">
         <img src="img/stars/owl-write.webp" alt="수첩에 받아 적는 부엉이" />
@@ -293,6 +311,7 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
 <script src="../js/common.js?v=11" data-root=".."></script>
 <script src="js/saju.js"></script>
 <script src="js/gunghap.js?v=2"></script>
+<script src="js/astro.js?v=1"></script>
 <script src="js/stars.js?v=2"></script>
 <script src="js/dosa.js?v=2"></script>
 <script src="js/feed.js?v=10"></script>
@@ -380,6 +399,11 @@ $("btn-go").onclick=function(){
   var rA=Saju.compute(data,ba,{trueSolar:true}), rB=Saju.compute(data,bb,{trueSolar:true});
   var s=Gunghap.score(rA,rB);
   last={rA:rA,rB:rB,ba:ba,bb:bb,s:s};
+  // 실제 천문 — 두 생일의 하늘과 행성 사이 각
+  try{
+    last.astA=Astro.chart(ba); last.astB=Astro.chart(bb);
+    last.asp=Astro.aspects(last.astA,last.astB,4);
+  }catch(e){ last.astA=null; }
   star=Stars.pick(s,rA,rB);
   if(window.GoblubFeed) GoblubFeed.grant("gunghap");
   playOwl();   // 고개 까딱까지 재생 → "별 보러 가볼까~?" 확인 팝업에서 멈춘다
@@ -670,6 +694,36 @@ function reveal(){
   })();
 }
 
+/* ── 그날의 하늘 렌더 ── */
+function rx(c,k){ return c.retro[k] ? " ℞" : ""; }   // 역행 표시
+function astroCol(who, c){
+  var h=[ "<b>"+who+"</b>" ];
+  h.push("<p>"+c.phase.emo+" <i>"+c.phase.name+"</i> · 달빛 "+c.phase.illum+"%</p>");
+  h.push("<p>☉ 태양 <i>"+c.signs.sun.sym+" "+c.signs.sun.ko+" "+c.signs.sun.degText+"</i></p>");
+  h.push("<p>☽ 달 <i>"+c.signs.moon.sym+" "+c.signs.moon.ko+" "+c.signs.moon.degText+"</i></p>");
+  h.push("<p>♀ 금성 <i>"+c.signs.venus.ko+rx(c,"venus")+"</i> · ♂ 화성 <i>"+c.signs.mars.ko+rx(c,"mars")+"</i></p>");
+  h.push('<p class="sm">☿ '+c.signs.mercury.ko+rx(c,"mercury")+" · ♃ "+c.signs.jupiter.ko+rx(c,"jupiter")+" · ♄ "+c.signs.saturn.ko+rx(c,"saturn")+"</p>");
+  if(c.asc) h.push("<p>⬆ 상승궁 <i>"+c.asc.sym+" "+c.asc.ko+"</i></p>");
+  return '<div class="col">'+h.join("")+"</div>";
+}
+function renderAstro(){
+  var box=$("r-astro");
+  if(!last.astA){ box.style.display="none"; return; }
+  var h='<h4>🔭 그날의 하늘 — 관측 기록</h4><div class="cols">'+
+    astroCol("나의 밤", last.astA)+astroCol("그 사람의 밤", last.astB)+'</div>';
+  if(last.asp && last.asp.length){
+    h+='<div class="asp">';
+    last.asp.forEach(function(a){
+      h+='<p>'+a.paSym+' 나의 '+a.paKo+' × '+a.pbSym+' 그 사람의 '+a.pbKo+
+         ' — <i>'+a.type+'</i> · '+a.feel+'</p>';
+    });
+    h+='</div>';
+  }
+  h+='<div class="foot">궤도 계산으로 얻은 그날의 실제 행성 배치입니다 (℞=역행'+
+     (last.astA.asc&&last.astB.asc?'':' · 시각을 모르면 정오 기준, 시각을 적으면 상승궁까지 나와요')+')</div>';
+  box.innerHTML=h; box.style.display="block";
+}
+
 /* ── 결과 채우기 ── */
 var OHN={목:"나무",화:"불",토:"흙",금:"쇠",수:"물"};
 function fillPanel(){
@@ -691,6 +745,7 @@ function fillPanel(){
     '<div class="pill"><b>그 사람의 별</b><span style="color:'+star.colorB+'"><i></i>'+
       tB.hanja+'</span><b style="margin-top:3px">'+OHN[star.ohB]+' 빛 · '+last.rB.zodiac+'띠</b></div>';
 
+  renderAstro();
   $("r-detail").innerHTML=
     dl("두 빛", T.ilgan[s.ilgan.type])+
     dl("이어짐", T.ilji[s.ilji.type])+
@@ -755,7 +810,18 @@ $("btn-report").onclick=function(){
     b: Dosa.buildPayload(last.rB,last.bb,null,false),
     score:{ total:last.s.total, grade:last.s.grade, ilgan:last.s.ilgan.type,
             ilji:last.s.ilji.type, oheng:last.s.oheng.type, tti:last.s.tti.type,
-            constellation:star.name, sub:star.sub, mag:star.mag }
+            constellation:star.name, sub:star.sub, mag:star.mag },
+    astro: !last.astA ? undefined : {
+      a:{ sun:last.astA.signs.sun.ko, moon:last.astA.signs.moon.ko,
+          venus:last.astA.signs.venus.ko, mars:last.astA.signs.mars.ko,
+          phase:last.astA.phase.name, illum:last.astA.phase.illum,
+          asc:last.astA.asc?last.astA.asc.ko:undefined },
+      b:{ sun:last.astB.signs.sun.ko, moon:last.astB.signs.moon.ko,
+          venus:last.astB.signs.venus.ko, mars:last.astB.signs.mars.ko,
+          phase:last.astB.phase.name, illum:last.astB.phase.illum,
+          asc:last.astB.asc?last.astB.asc.ko:undefined },
+      aspects:last.asp.map(function(a){ return "A의 "+a.paKo+"-B의 "+a.pbKo+" "+a.type+"(오브 "+a.orb+"도)"; })
+    }
   },{
     onChunk:function(t){ acc+=t; txt.innerHTML=fmt(acc); },
     onDone:function(cached){ txt.innerHTML=fmt(acc);
