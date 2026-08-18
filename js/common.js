@@ -87,7 +87,11 @@
   var isHome = !!(document.body && document.body.classList.contains("home-moon"));
   var logoHTML = isHome
     ? '<img class="logo-img" src="' + root + '/img/logo.png?v=1" alt="goblub" />'
-    : '<span class="l1">H</span><span class="l2">o</span><span class="l3">m</span><span class="l4">e</span>';
+    : // 서브 페이지의 Home — goblub 로고와 같은 결(흰 글자 + 네이비 두꺼운 테두리)
+      '<svg class="logo-home" viewBox="0 0 132 44" aria-label="Home">' +
+      '<text x="66" y="33" text-anchor="middle" font-family="Jua, \'Black Han Sans\', sans-serif" ' +
+      'font-size="32" letter-spacing="2" fill="#ffffff" stroke="#002C43" stroke-width="7" ' +
+      'stroke-linejoin="round" paint-order="stroke">HOME</text></svg>';
   var headerHTML =
     '<header class="site-header">' +
     '<a class="logo" href="' + root + '/index.html">' + logoHTML + "</a>" +

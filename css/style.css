@@ -79,6 +79,8 @@ a {
 
 /* 이미지 로고 (홈) — 헤더 높이에 맞춰 축소 */
 .logo .logo-img { height: 42px; width: auto; display: block; }
+/* 서브 페이지 Home — 로고와 같은 결의 SVG 워드마크 */
+.logo .logo-home { height: 34px; width: auto; display: block; }
 
 .logo span { text-shadow: 0 1px 2px rgba(90, 100, 170, 0.25); }
 .logo .l1 { color: #ff4d6e; }
