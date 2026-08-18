@@ -77,6 +77,9 @@ a {
   font-family: "Black Han Sans", "Jua", sans-serif;
 }
 
+/* 이미지 로고 (홈) — 헤더 높이에 맞춰 축소 */
+.logo .logo-img { height: 42px; width: auto; display: block; }
+
 .logo span { text-shadow: 0 1px 2px rgba(90, 100, 170, 0.25); }
 .logo .l1 { color: #ff4d6e; }
 .logo .l2 { color: #f5a623; }
