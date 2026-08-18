@@ -84,8 +84,7 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
 .astro .aspcard b{display:block;color:#ffe6b8;font-size:.9rem}
 .astro .aspcard b em{font-style:normal;font-size:.74rem;color:#ffd9a0;
   border:1px solid rgba(255,214,150,.4);border-radius:999px;padding:1px 8px;margin-left:6px}
-.astro .aspcard .who{display:block;margin:3px 0 4px;font-size:.74rem;color:#8ba0c4}
-.astro .aspcard p{margin:0;font-size:.86rem;color:#cdd9ef;line-height:1.6}
+.astro .aspcard p{margin:5px 0 0;font-size:.86rem;color:#cdd9ef;line-height:1.6}
 .astro .foot{margin-top:8px;font-size:.72rem;color:#7b8bab}
 @media (max-width:520px){ .astro .cols{flex-direction:column} }
 
@@ -709,10 +708,6 @@ function reveal(){
 }
 
 /* ── 그날의 하늘 렌더 — 처음 보는 사람도 읽히게, 전문용어 없이 ── */
-// 행성이 궁합에서 맡는 역할을 일상 언어로
-var PMEAN={ sun:"겉으로 보이는 모습", moon:"남몰래 품은 속마음", venus:"사랑할 때의 모습",
-  mars:"열정이 움직이는 방식", mercury:"말하고 통하는 방식", jupiter:"꿈꾸는 방향",
-  saturn:"약속을 지키는 방식" };
 // 달 위상을 문장으로
 function phaseLine(c){
   var p=c.phase;
@@ -791,7 +786,6 @@ function renderAstro(){
     if(seen[dk]) return; seen[dk]=1;
     var dom=aspDomain(a.pa,a.pb), tag=ASP_TAG[a.type]||["✨",a.type];
     h+='<div class="aspcard"><b>'+tag[0]+' '+dom.nm+' <em>'+tag[1]+'</em></b>'+
-       '<span class="who">나의 '+PMEAN[a.pa]+' × 그 사람의 '+PMEAN[a.pb]+'</span>'+
        '<p>'+(dom.t[a.type]||a.feel)+'</p></div>';
   });
   h+='<div class="foot">실제 천문 계산으로 찾은 그날의 별 배치예요'+
