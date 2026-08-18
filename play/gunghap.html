@@ -73,7 +73,9 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
 .astro .col b{display:block;color:#cfe0f5;font-size:.82rem;margin-bottom:6px}
 .astro .col p{margin:3px 0;font-size:.84rem;color:#aabde0}
 .astro .col p i{font-style:normal;color:#ffe6b8}
-.astro .col p.sm{font-size:.76rem;color:#8ba0c4}
+.astro .col p s{text-decoration:none;color:#8ba0c4;font-size:.78rem}
+.astro .lead{margin:0 0 10px;font-size:.82rem;color:#9db2d4}
+.astro .asphd{display:block;color:#cfe0f5;font-size:.84rem;margin-bottom:6px}
 .astro .asp{margin-top:10px;border-top:1px dashed rgba(255,255,255,.14);padding-top:10px}
 .astro .asp p{margin:4px 0;font-size:.84rem;color:#aabde0}
 .astro .asp p i{font-style:normal;color:#ffd9a0}
@@ -694,33 +696,55 @@ function reveal(){
   })();
 }
 
-/* ── 그날의 하늘 렌더 ── */
-function rx(c,k){ return c.retro[k] ? " ℞" : ""; }   // 역행 표시
+/* ── 그날의 하늘 렌더 — 처음 보는 사람도 읽히게, 전문용어 없이 ── */
+// 행성이 궁합에서 맡는 역할을 일상 언어로
+var PMEAN={ sun:"겉으로 보이는 모습", moon:"남몰래 품은 속마음", venus:"사랑할 때의 모습",
+  mars:"열정이 움직이는 방식", mercury:"말하고 통하는 방식", jupiter:"꿈꾸는 방향",
+  saturn:"약속을 지키는 방식" };
+// 달 위상을 문장으로
+function phaseLine(c){
+  var p=c.phase;
+  if(p.illum>=97) return p.emo+" 달이 꽉 찬 보름밤에 태어났어요";
+  // 위상명이 "삭"이면 달이 안 보이는 밤 — "~이 뜬 밤"이라고 쓰면 모순이 된다
+  if(p.illum<=6 || p.name.indexOf("삭")===0)
+    return p.emo+" 달이 숨은 캄캄한 밤에 태어났어요";
+  return p.emo+" "+p.name+"이 뜬 밤 · 달빛 "+p.illum+"%";
+}
 function astroCol(who, c){
   var h=[ "<b>"+who+"</b>" ];
-  h.push("<p>"+c.phase.emo+" <i>"+c.phase.name+"</i> · 달빛 "+c.phase.illum+"%</p>");
-  h.push("<p>☉ 태양 <i>"+c.signs.sun.sym+" "+c.signs.sun.ko+" "+c.signs.sun.degText+"</i></p>");
-  h.push("<p>☽ 달 <i>"+c.signs.moon.sym+" "+c.signs.moon.ko+" "+c.signs.moon.degText+"</i></p>");
-  h.push("<p>♀ 금성 <i>"+c.signs.venus.ko+rx(c,"venus")+"</i> · ♂ 화성 <i>"+c.signs.mars.ko+rx(c,"mars")+"</i></p>");
-  h.push('<p class="sm">☿ '+c.signs.mercury.ko+rx(c,"mercury")+" · ♃ "+c.signs.jupiter.ko+rx(c,"jupiter")+" · ♄ "+c.signs.saturn.ko+rx(c,"saturn")+"</p>");
-  if(c.asc) h.push("<p>⬆ 상승궁 <i>"+c.asc.sym+" "+c.asc.ko+"</i></p>");
+  h.push("<p>"+phaseLine(c)+"</p>");
+  h.push("<p>☀️ <i>"+c.signs.sun.ko+"</i> <s>— 겉으로 보이는 나</s></p>");
+  h.push("<p>🌙 <i>"+c.signs.moon.ko+"</i> <s>— 숨겨둔 속마음</s></p>");
+  h.push("<p>💗 <i>"+c.signs.venus.ko+"</i> <s>— 사랑할 때의 나</s></p>");
+  h.push("<p>🔥 <i>"+c.signs.mars.ko+"</i> <s>— 열정의 방향</s></p>");
+  if(c.asc) h.push("<p>👋 <i>"+c.asc.ko+"</i> <s>— 첫인상</s></p>");
   return '<div class="col">'+h.join("")+"</div>";
 }
+// 각(어스펙트)을 쉬운 문장으로
+var ASP_EASY={
+  "합(合)":"같은 자리에서 만나요 — 설명하지 않아도 통하는 느낌",
+  "육각(60°)":"서로 순풍을 보내요 — 함께 있으면 일이 술술 풀려요",
+  "사각(90°)":"부딪히는 각이에요 — 티격태격이 오히려 스파크가 돼요",
+  "삼각(120°)":"가장 편한 각도로 이어져요 — 애쓰지 않아도 잘 맞아요",
+  "대극(180°)":"정반대에서 마주 봐요 — 나에게 없는 걸 가진 사람이라 끌려요"
+};
 function renderAstro(){
   var box=$("r-astro");
   if(!last.astA){ box.style.display="none"; return; }
-  var h='<h4>🔭 그날의 하늘 — 관측 기록</h4><div class="cols">'+
+  var h='<h4>🔭 그날의 하늘 — 관측 기록</h4>'+
+    '<p class="lead">두 분이 태어난 날, 하늘에 실제로 떠 있던 별들의 기록이에요.</p>'+
+    '<div class="cols">'+
     astroCol("나의 밤", last.astA)+astroCol("그 사람의 밤", last.astB)+'</div>';
   if(last.asp && last.asp.length){
-    h+='<div class="asp">';
+    h+='<div class="asp"><b class="asphd">✨ 두 하늘이 만나는 자리</b>';
     last.asp.forEach(function(a){
-      h+='<p>'+a.paSym+' 나의 '+a.paKo+' × '+a.pbSym+' 그 사람의 '+a.pbKo+
-         ' — <i>'+a.type+'</i> · '+a.feel+'</p>';
+      h+='<p><i>나의 '+PMEAN[a.pa]+'</i>과 <i>그 사람의 '+PMEAN[a.pb]+'</i>이 '+
+         (ASP_EASY[a.type]||a.feel)+'</p>';
     });
     h+='</div>';
   }
-  h+='<div class="foot">궤도 계산으로 얻은 그날의 실제 행성 배치입니다 (℞=역행'+
-     (last.astA.asc&&last.astB.asc?'':' · 시각을 모르면 정오 기준, 시각을 적으면 상승궁까지 나와요')+')</div>';
+  h+='<div class="foot">실제 천문 계산으로 구한 그날의 별 배치예요'+
+     (last.astA.asc&&last.astB.asc?'':' · 태어난 시각을 적으면 첫인상 별자리까지 나와요')+'</div>';
   box.innerHTML=h; box.style.display="block";
 }
 
