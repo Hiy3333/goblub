@@ -43,11 +43,12 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
 .order .sub{margin:0 0 14px;color:var(--ink-soft);font-size:.83rem}
 .who{margin-bottom:12px}
 .who h3{margin:0 0 7px;font-size:.94rem;color:var(--gold);font-weight:400}
-.row{display:flex;flex-wrap:wrap;gap:6px}
-.row select,.row input{flex:1 1 auto;min-width:74px;padding:9px 8px;border-radius:10px;
+.row{display:flex;gap:6px}
+.row+.row{margin-top:6px}
+.row select,.row input{flex:1 1 auto;min-width:0;padding:9px 8px;border-radius:10px;
   background:#0e1c2c;color:var(--ink);border:1px solid var(--line);
   font-family:inherit;font-size:.9rem}
-.row input{max-width:74px}
+.row input{flex:0 0 74px}
 .gobtn{width:100%;margin-top:6px;padding:14px;border:0;border-radius:14px;cursor:pointer;
   font-family:inherit;font-size:1.05rem;color:#16243a;
   background:linear-gradient(180deg,#ffeec2,#ffd98a);
@@ -257,8 +258,10 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
       <div class="who">
         <h3>나</h3>
         <div class="row">
-          <select id="a-cal" aria-label="양력/음력"></select>
           <select id="a-year"></select><select id="a-month"></select><select id="a-day"></select>
+          <select id="a-cal" aria-label="양력/음력"></select>
+        </div>
+        <div class="row">
           <select id="a-hour"><option value="">시 몰라요</option></select>
           <input type="number" id="a-min" min="0" max="59" value="0" aria-label="분" />
         </div>
@@ -266,8 +269,10 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
       <div class="who">
         <h3>그 사람</h3>
         <div class="row">
-          <select id="b-cal" aria-label="양력/음력"></select>
           <select id="b-year"></select><select id="b-month"></select><select id="b-day"></select>
+          <select id="b-cal" aria-label="양력/음력"></select>
+        </div>
+        <div class="row">
           <select id="b-hour"><option value="">시 몰라요</option></select>
           <input type="number" id="b-min" min="0" max="59" value="0" aria-label="분" />
         </div>
