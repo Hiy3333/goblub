@@ -49,6 +49,14 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
   background:#0e1c2c;color:var(--ink);border:1px solid var(--line);
   font-family:inherit;font-size:.9rem}
 .row input{flex:0 0 74px}
+/* 시간 줄 — 왼쪽 정렬, 내용 크기만큼만 + 시간 모름 체크박스 */
+.trow{justify-content:flex-start}
+.trow select{flex:0 0 auto}
+.trow input[type=number]{flex:0 0 64px}
+.trow select:disabled,.trow input:disabled{opacity:.4}
+.nohr{display:flex;align-items:center;gap:6px;font-size:.88rem;color:#b9c6dc;
+  cursor:pointer;user-select:none;padding:0 4px}
+.nohr input{accent-color:#ff8ac2;width:17px;height:17px;cursor:pointer}
 .gobtn{width:100%;margin-top:6px;padding:14px;border:0;border-radius:14px;cursor:pointer;
   font-family:inherit;font-size:1.05rem;color:#16243a;
   background:linear-gradient(180deg,#ffeec2,#ffd98a);
@@ -261,9 +269,10 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
           <select id="a-year"></select><select id="a-month"></select><select id="a-day"></select>
           <select id="a-cal" aria-label="양력/음력"></select>
         </div>
-        <div class="row">
-          <select id="a-hour"><option value="">시 몰라요</option></select>
+        <div class="row trow">
+          <select id="a-hour" aria-label="시"><option value="" disabled selected>시</option></select>
           <input type="number" id="a-min" min="0" max="59" value="0" aria-label="분" />
+          <label class="nohr"><input type="checkbox" id="a-nohr" checked /> 시간 모름</label>
         </div>
       </div>
       <div class="who">
@@ -272,9 +281,10 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
           <select id="b-year"></select><select id="b-month"></select><select id="b-day"></select>
           <select id="b-cal" aria-label="양력/음력"></select>
         </div>
-        <div class="row">
-          <select id="b-hour"><option value="">시 몰라요</option></select>
+        <div class="row trow">
+          <select id="b-hour" aria-label="시"><option value="" disabled selected>시</option></select>
           <input type="number" id="b-min" min="0" max="59" value="0" aria-label="분" />
+          <label class="nohr"><input type="checkbox" id="b-nohr" checked /> 시간 모름</label>
         </div>
       </div>
       <button class="gobtn" id="btn-go">✦ 오늘 밤 하늘 펴 보기</button>
@@ -371,6 +381,14 @@ function fillSelects(p){
 }
 fillSelects("a"); fillSelects("b");
 
+/* 시간 모름 체크 — 켜면 시·분을 잠근다 */
+function wireNohr(p){
+  var cb=$(p+"-nohr"), h=$(p+"-hour"), mi=$(p+"-min");
+  function sync(){ h.disabled=cb.checked; mi.disabled=cb.checked; }
+  cb.addEventListener("change", sync); sync();
+}
+wireNohr("a"); wireNohr("b");
+
 /* 관계 선택 — 짝사랑/썸/커플에 따라 결과 문체가 달라진다 */
 var relSel="";
 $("rel-row").addEventListener("click", function(e){
@@ -435,7 +453,7 @@ function readBirth(p){
     if(dt.getFullYear()!==y||dt.getMonth()!==m-1||dt.getDate()!==d) return null;
     b={y:y,m:m,d:d};
   }
-  if(hv!==""){ b.hour=+hv; b.min=Math.max(0,Math.min(59,mi)); }
+  if(!$(p+"-nohr").checked && hv!==""){ b.hour=+hv; b.min=Math.max(0,Math.min(59,mi)); }
   return b;
 }
 function showErr(msg){ var e=$("err"); e.textContent=msg; e.style.display="block"; }
