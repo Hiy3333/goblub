@@ -54,6 +54,13 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
   box-shadow:0 10px 24px rgba(255,215,140,.22)}
 .gobtn:active{transform:translateY(1px)}
 .errmsg{display:none;margin:10px 0 0;color:#ff9d8a;font-size:.86rem;text-align:center}
+.relrow{display:flex;gap:7px}
+.relbtn{flex:1;padding:11px 4px;border-radius:12px;cursor:pointer;font-family:inherit;
+  font-size:.95rem;color:#cfd9f2;background:#0e1c2c;border:1px solid var(--line);transition:all .15s}
+.relbtn.on{color:#2a1030;background:linear-gradient(135deg,#ffb3d9,#c9a8ff);border-color:transparent;
+  box-shadow:0 6px 18px rgba(210,140,255,.35)}
+.relrow.shake{animation:relShake .3s}
+@keyframes relShake{0%,100%{transform:none}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
 .fine{margin:12px 0 0;color:#6f8299;font-size:.76rem;text-align:center;line-height:1.7}
 
 /* ── 하늘 ── */
@@ -240,8 +247,17 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
       <h2>✦ 관측 신청서</h2>
       <p class="sub">두 분의 생일을 적어 주시면 그 밤하늘을 그려 드려요</p>
       <div class="who">
+        <h3>우리는 지금</h3>
+        <div class="relrow" id="rel-row">
+          <button type="button" class="relbtn" data-rel="crush">💘 짝사랑</button>
+          <button type="button" class="relbtn" data-rel="some">👀 썸</button>
+          <button type="button" class="relbtn" data-rel="couple">💑 커플</button>
+        </div>
+      </div>
+      <div class="who">
         <h3>나</h3>
         <div class="row">
+          <select id="a-cal" aria-label="양력/음력"></select>
           <select id="a-year"></select><select id="a-month"></select><select id="a-day"></select>
           <select id="a-hour"><option value="">시 몰라요</option></select>
           <input type="number" id="a-min" min="0" max="59" value="0" aria-label="분" />
@@ -250,6 +266,7 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
       <div class="who">
         <h3>그 사람</h3>
         <div class="row">
+          <select id="b-cal" aria-label="양력/음력"></select>
           <select id="b-year"></select><select id="b-month"></select><select id="b-day"></select>
           <select id="b-hour"><option value="">시 몰라요</option></select>
           <input type="number" id="b-min" min="0" max="59" value="0" aria-label="분" />
@@ -296,7 +313,7 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
       <div class="profs" id="r-profs"></div>
 
       <div class="card2 c-sum"><h4>💫 이 케미의 핵심</h4><p id="r-desc"></p></div>
-      <div class="card2 c-warn"><h4>🚨 싸움 나는 포인트 미리보기</h4><p id="r-care"></p></div>
+      <div class="card2 c-warn"><h4 id="r-warnhd">🚨 싸움 나는 포인트 미리보기</h4><p id="r-care"></p></div>
 
       <!-- 실제 천문 계산으로 찾은 케미 포인트 -->
       <div class="astro" id="r-astro" style="display:none"></div>
@@ -325,6 +342,7 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
 <script src="js/saju.js"></script>
 <script src="js/gunghap.js?v=2"></script>
 <script src="js/astro.js?v=1"></script>
+<script src="js/lunar.js?v=1"></script>
 <script src="js/stars.js?v=2"></script>
 <script src="js/dosa.js?v=2"></script>
 <script src="js/feed.js?v=10"></script>
@@ -338,7 +356,8 @@ try{ fetch(OWL_FLY).catch(function(){}); fetch(OWL_LOOK).catch(function(){}); }c
 
 /* ── 입력 ── */
 function fillSelects(p){
-  var y=$(p+"-year"), m=$(p+"-month"), d=$(p+"-day"), h=$(p+"-hour"), now=new Date().getFullYear();
+  var y=$(p+"-year"), m=$(p+"-month"), d=$(p+"-day"), h=$(p+"-hour"), c=$(p+"-cal"), now=new Date().getFullYear();
+  c.add(new Option("양력","")); c.add(new Option("음력","L")); c.add(new Option("음력 윤달","LL"));
   for(var i=now;i>=1930;i--) y.add(new Option(i+"년", i));
   for(var j=1;j<=12;j++) m.add(new Option(j+"월", j));
   for(var k=1;k<=31;k++) d.add(new Option(k+"일", k));
@@ -346,6 +365,14 @@ function fillSelects(p){
   y.value=1995; m.value=1; d.value=1;
 }
 fillSelects("a"); fillSelects("b");
+
+/* 관계 선택 — 짝사랑/썸/커플에 따라 결과 문체가 달라진다 */
+var relSel="";
+$("rel-row").addEventListener("click", function(e){
+  var b=e.target.closest(".relbtn"); if(!b) return;
+  relSel=b.dataset.rel;
+  this.querySelectorAll(".relbtn").forEach(function(x){ x.classList.toggle("on", x===b); });
+});
 
 /* ── 부엉이 재우기 → 깨우기 연출 ──
    대기 영상은 고개가 가장 푹 숙여지는 2.35초에서 멈추고 「깨운다」 버튼이 뜬다.
@@ -392,9 +419,17 @@ fillSelects("a"); fillSelects("b");
 function readBirth(p){
   var y=+$(p+"-year").value, m=+$(p+"-month").value, d=+$(p+"-day").value;
   var hv=$(p+"-hour").value, mi=+($(p+"-min").value||0);
-  var dt=new Date(y,m-1,d);
-  if(dt.getFullYear()!==y||dt.getMonth()!==m-1||dt.getDate()!==d) return null;
-  var b={y:y,m:m,d:d};
+  var cal=$(p+"-cal").value, b;
+  if(cal){                                     // 음력 → 양력 변환(무효 날짜면 null)
+    if(!window.GoblubLunar) return null;
+    var sol=GoblubLunar.lunarToSolar(y,m,d,cal==="LL");
+    if(!sol) return null;
+    b={y:sol.y,m:sol.m,d:sol.d};
+  }else{
+    var dt=new Date(y,m-1,d);
+    if(dt.getFullYear()!==y||dt.getMonth()!==m-1||dt.getDate()!==d) return null;
+    b={y:y,m:m,d:d};
+  }
   if(hv!==""){ b.hour=+hv; b.min=Math.max(0,Math.min(59,mi)); }
   return b;
 }
@@ -407,11 +442,17 @@ fetch("data/saju-terms.json").then(function(r){ if(!r.ok) throw 0; return r.json
 $("btn-go").onclick=function(){
   $("err").style.display="none";
   if(!data){ showErr("성도를 못 펼쳤어요. 새로고침 해주세요."); return; }
+  if(!relSel){
+    showErr("지금 어떤 사이인지 먼저 골라 주세요!");
+    var rr=$("rel-row"); rr.classList.remove("shake"); void rr.offsetWidth; rr.classList.add("shake");
+    if(rr.scrollIntoView) rr.scrollIntoView({behavior:"smooth", block:"center"});
+    return;
+  }
   var ba=readBirth("a"), bb=readBirth("b");
   if(!ba||!bb){ showErr("없는 날짜가 있어요. 다시 확인해 주세요!"); return; }
   var rA=Saju.compute(data,ba,{trueSolar:true}), rB=Saju.compute(data,bb,{trueSolar:true});
   var s=Gunghap.score(rA,rB);
-  last={rA:rA,rB:rB,ba:ba,bb:bb,s:s};
+  last={rA:rA,rB:rB,ba:ba,bb:bb,s:s,rel:relSel};
   // 실제 천문 — 두 생일의 하늘과 행성 사이 각
   try{
     last.astA=Astro.chart(ba); last.astB=Astro.chart(bb);
@@ -815,12 +856,15 @@ function chemStats(){
   var seed=(last.ba.y*373+last.ba.m*47+last.ba.d*13+last.bb.y*211+last.bb.m*29+last.bb.d*7)>>>0;
   function jig(k){ return ((seed*(k*2+3))%1000)/1000*14-7; }
   function pct(v){ return Math.max(41, Math.min(99, Math.round(v))); }
+  var R={ couple:[["⚡","티격태격 지수"],["🏠","오래갈 확률"]],
+          some:  [["⚡","밀당 스파크"],["🚀","연애 발전 확률"]],
+          crush: [["🚧","다가가기 난이도"],["💌","이루어질 확률"]] }[last.rel||"couple"];
   return [
     { e:"💘", k:"첫눈에 스파크", v:pct(52+(vm?20:6)+harm*4+jig(1)) },
     { e:"🗣", k:"티키타카", v:pct(40+t*.45+(mm?8:0)+jig(2)) },
     { e:"🫀", k:"설렘 지속력", v:pct(38+t*.4+(vv?14:0)+jig(3)) },
-    { e:"⚡", k:"티격태격 지수", v:pct(30+clash*16+jig(4)) },
-    { e:"🏠", k:"오래갈 확률", v:pct(36+t*.52-clash*3+jig(5)) }
+    { e:R[0][0], k:R[0][1], v:pct(30+clash*16+jig(4)) },
+    { e:R[1][0], k:R[1][1], v:pct(36+t*.52-clash*3+jig(5)) }
   ];
 }
 /* 해시태그 — 등급·행성 케미·달 대비에서 뽑는다 */
@@ -830,7 +874,8 @@ function chemTags(){
   add({"천생연분":"#운명각","찰떡궁합":"#찰떡케미","노력하면 꿀떡":"#가꾸는재미",
        "서로 배우는 사이":"#서로의세계","파란만장 드라마":"#서사맛집"}[last.s.grade]);
   var DOMTAG={"심장 담당":"#심장이바빠","속마음 채널":"#눈빛만봐도","연애 온도":"#취향환상의합",
-    "겉과 속":"#겉바속촉","기세 대결":"#리모컨쟁탈전","속도계":"#텐션메이커","수다 케미":"#티키타카",
+    "겉과 속":"#겉바속촉","기세 대결":(last.rel==="couple"?"#리모컨쟁탈전":"#기싸움도케미"),
+    "속도계":"#텐션메이커","수다 케미":"#티키타카",
     "매력 안테나":"#자꾸눈이가","포근함 지분":"#힐링캠프","꿈의 방향":"#같은곳을본다","의리 지분":"#의리의리"};
   var TYPETAG={"사각(90°)":"#투닥투닥","대극(180°)":"#자석커플","합(合)":"#운명적겹침",
     "삼각(120°)":"#억지로안맞춰도","육각(60°)":"#순풍순풍"};
@@ -876,9 +921,13 @@ function fillPanel(){
     document.querySelectorAll("#r-stats .bar i").forEach(function(b){ b.style.width=b.dataset.w+"%"; });
   }, 60);
 
+  $("r-warnhd").textContent={ couple:"🚨 싸움 나는 포인트 미리보기",
+    some:"🚨 애매해질 수 있는 포인트", crush:"🚨 삐끗하기 쉬운 포인트" }[last.rel||"couple"];
+
   if(last.astA&&last.astB){
+    var bEmo={couple:"😍",some:"👀",crush:"🫣"}[last.rel||"couple"];
     $("r-profs").style.display="";
-    $("r-profs").innerHTML=profCard("😎 나",last.astA)+profCard("😍 그 사람",last.astB);
+    $("r-profs").innerHTML=profCard("😎 나",last.astA)+profCard(bEmo+" 그 사람",last.astB);
   } else $("r-profs").style.display="none";
 
   renderAstro();
@@ -936,6 +985,7 @@ $("btn-report").onclick=function(){
   txt.style.display="block"; txt.innerHTML="";
   var acc="";
   Dosa.fetchGunghap({
+    relation: last.rel||"couple",
     a: Dosa.buildPayload(last.rA,last.ba,null,false),
     b: Dosa.buildPayload(last.rB,last.bb,null,false),
     score:{ total:last.s.total, grade:last.s.grade, ilgan:last.s.ilgan.type,
@@ -967,8 +1017,10 @@ $("btn-report").onclick=function(){
 };
 function fmt(s){
   var out=s.replace(/</g,"&lt;");
-  ["✦ 처음 끌린 이유","✦ 심장이 가장 빨리 뛰는 순간","✦ 구름이 끼는 날 — 이렇게 다툰다",
-   "✦ 다시 반짝이는 법","✦ 오늘 밤의 처방"].forEach(function(h){
+  ["✦ 처음 끌린 이유","✦ 심장이 가장 빨리 뛰는 순간","✦ 구름이 끼는 날 — 이렇게 다툰다","✦ 다시 반짝이는 법",
+   "✦ 지금 이 기류의 정체","✦ 상대도 흔들리고 있다는 신호","✦ 조심해야 할 순간","✦ 썸에서 연애로 넘어가는 법",
+   "✦ 내가 끌린 진짜 이유","✦ 그 사람은 이런 사람","✦ 통하는 다가가기","✦ 마음을 전한다면",
+   "✦ 오늘 밤의 처방"].forEach(function(h){
     out=out.replace(h,'<span class="hd">'+h+'</span>');
   });
   return out;
