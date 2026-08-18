@@ -86,9 +86,9 @@
   // 홈에서는 goblub 로고, 그 외 페이지에서는 Home(누르면 홈으로)
   var isHome = !!(document.body && document.body.classList.contains("home-moon"));
   var logoHTML = isHome
-    ? '<img class="logo-img" src="' + root + '/img/logo.png?v=2" alt="goblub" />'
+    ? '<img class="logo-img" src="' + root + '/img/logo.png?v=3" alt="goblub" />'
     : // 서브 페이지 HOME — GOBLUB 로고와 같은 서체·크기, O는 로고의 고브럽 머리 그대로
-      '<img class="logo-img" src="' + root + '/img/home.png?v=9" alt="Home" />';
+      '<img class="logo-img" src="' + root + '/img/home.png?v=10" alt="Home" />';
   var headerHTML =
     '<header class="site-header">' +
     '<a class="logo" href="' + root + '/index.html">' + logoHTML + "</a>" +
