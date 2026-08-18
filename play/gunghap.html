@@ -79,6 +79,13 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
 .astro .asp{margin-top:10px;border-top:1px dashed rgba(255,255,255,.14);padding-top:10px}
 .astro .asp p{margin:4px 0;font-size:.84rem;color:#aabde0}
 .astro .asp p i{font-style:normal;color:#ffd9a0}
+.astro .aspcard{margin:8px 0;padding:10px 12px;background:rgba(10,18,32,.6);
+  border-radius:12px;border:1px solid rgba(255,214,150,.14)}
+.astro .aspcard b{display:block;color:#ffe6b8;font-size:.9rem}
+.astro .aspcard b em{font-style:normal;font-size:.74rem;color:#ffd9a0;
+  border:1px solid rgba(255,214,150,.4);border-radius:999px;padding:1px 8px;margin-left:6px}
+.astro .aspcard .who{display:block;margin:3px 0 4px;font-size:.74rem;color:#8ba0c4}
+.astro .aspcard p{margin:0;font-size:.86rem;color:#cdd9ef;line-height:1.6}
 .astro .foot{margin-top:8px;font-size:.72rem;color:#7b8bab}
 @media (max-width:520px){ .astro .cols{flex-direction:column} }
 
@@ -720,14 +727,64 @@ function astroCol(who, c){
   if(c.asc) h.push("<p>👋 <i>"+c.asc.ko+"</i> <s>— 첫인상</s></p>");
   return '<div class="col">'+h.join("")+"</div>";
 }
-// 각(어스펙트)을 쉬운 문장으로
-var ASP_EASY={
-  "합(合)":"같은 자리에서 만나요 — 설명하지 않아도 통하는 느낌",
-  "육각(60°)":"서로 순풍을 보내요 — 함께 있으면 일이 술술 풀려요",
-  "사각(90°)":"부딪히는 각이에요 — 티격태격이 오히려 스파크가 돼요",
-  "삼각(120°)":"가장 편한 각도로 이어져요 — 애쓰지 않아도 잘 맞아요",
-  "대극(180°)":"정반대에서 마주 봐요 — 나에게 없는 걸 가진 사람이라 끌려요"
+// ── 어스펙트 결과지 — 행성 조합마다 고유한 장면, 각도마다 다른 맛 ──
+// 태그: 합=겹침🌟 육각=순풍🍃 사각=스파크⚡ 삼각=찰떡🧩 대극=자석🧲
+var ASP_TAG={ "합(合)":["🌟","운명적 겹침"], "육각(60°)":["🍃","순풍"],
+  "사각(90°)":["⚡","스파크"], "삼각(120°)":["🧩","찰떡"], "대극(180°)":["🧲","자석"] };
+// 조합(정렬 키) → 이름 + 각도별 한 줄 장면
+var ASP_STORY={
+  "sun-sun":{ nm:"기세 대결", t:{
+    "합(合)":"둘 다 무대 체질이 같아요. 같은 편이면 최강, 리모컨 쟁탈전은 각오하세요.",
+    "육각(60°)":"서로의 스타일을 응원하는 사이예요. 잘난 척해도 밉지가 않아요.",
+    "사각(90°)":"둘 다 지기 싫어해요. 근데 그 기 싸움이 은근 재미있는 거, 인정?",
+    "삼각(120°)":"억지로 맞추지 않아도 결이 같아요. 남들이 보면 남매냐고 물어봐요.",
+    "대극(180°)":"완전 다른 스타일인데 이상하게 눈이 가요. 서로의 세계가 궁금한 사이." } },
+  "moon-sun":{ nm:"겉과 속", t:{
+    "합(合)":"한쪽이 보여주는 모습이 다른 쪽 속마음과 똑같아요. \"어떻게 알았어?\"가 일상이 돼요.",
+    "육각(60°)":"말 꺼내기 전에 눈치로 알아채는 조합. 편안함이 기본값이에요.",
+    "사각(90°)":"겉모습만 보고 오해했다가, 알고 보니 반전 매력에 빠지는 코스예요.",
+    "삼각(120°)":"보여주는 쪽과 받아주는 쪽이 자연스럽게 맞물려요. 오래 볼수록 편한 사이.",
+    "대극(180°)":"서로의 숨긴 면을 정면에서 마주 봐요. 들킨 것 같은데 싫지 않은 게 문제죠." } },
+  "moon-moon":{ nm:"속마음 채널", t:{
+    "합(合)":"속마음 주파수가 같은 채널이에요. 침묵이 어색하지 않은 사이.",
+    "육각(60°)":"기분 나쁜 날 굳이 설명 안 해도 돼요. 알아서 간식을 내미는 조합.",
+    "사각(90°)":"서운해지는 포인트가 서로 달라 가끔 삐끗해요. 대신 화해하면 두 배로 애틋해요.",
+    "삼각(120°)":"감정 온도가 비슷해요. 같이 있으면 마음이 잔잔해지는 사이.",
+    "대극(180°)":"한쪽이 가라앉을 때 한쪽이 끌어올려요. 감정의 시소가 균형을 잡는 조합." } },
+  "venus-venus":{ nm:"연애 온도", t:{
+    "합(合)":"사랑받고 싶은 방식이 똑같아요. 서로가 서로의 이상형 답안지예요.",
+    "육각(60°)":"데이트 취향이 잘 통해요. \"뭐 먹을래?\"가 3초 만에 끝나는 사이.",
+    "사각(90°)":"로맨스 문법이 서로 달라요. 서프라이즈가 자꾸 엇갈리는데, 그래서 안 질려요.",
+    "삼각(120°)":"애정 표현이 자연스럽게 오가요. 낯간지러운 말도 이 사람 앞에선 술술 나와요.",
+    "대극(180°)":"사랑하는 방식이 정반대라 처음엔 당황해요. 나중엔 그게 제일 설레고요." } },
+  "mars-venus":{ nm:"심장 담당", t:{
+    "합(合)":"설렘 스위치가 같은 위치에 있어요. 첫 만남부터 심장이 바쁜 조합.",
+    "육각(60°)":"티 안 내려고 해도 자꾸 웃음이 새요. 썸 단계가 유난히 달콤한 사이.",
+    "사각(90°)":"밀당이 자동으로 걸리는 각이에요. 애타는 만큼 불꽃도 확실해요.",
+    "삼각(120°)":"한쪽이 다가가면 한쪽이 정확히 받아줘요. 박자가 맞는 심장이에요.",
+    "대극(180°)":"자석의 N극과 S극. 멀어지려 해도 결국 서로를 돌아보게 되는 사이." } },
+  "mars-mars":{ nm:"속도계", t:{
+    "합(合)":"추진력 만렙 듀오예요. 계획 세우다 보면 이미 출발해 있어요.",
+    "육각(60°)":"노는 텐션이 잘 맞아요. 같이 있으면 시간이 순삭이에요.",
+    "사각(90°)":"액셀 밟는 타이밍이 서로 달라요. 답답함 반, 짜릿함 반.",
+    "삼각(120°)":"체력도 취미도 합이 좋아요. 여행 메이트로는 최상급.",
+    "대극(180°)":"한쪽이 불이면 한쪽이 물이에요. 서로의 브레이크와 액셀이 되어주는 사이." } }
 };
+// 표에 없는 조합의 이름(행성 성격으로) + 각도별 공용 장면
+function aspDomain(pa,pb){
+  var k=[pa,pb].sort().join("-");
+  if(ASP_STORY[k]) return ASP_STORY[k];
+  function has(x){ return pa===x||pb===x; }
+  var nm = has("mercury")?"수다 케미" : has("jupiter")?"꿈의 방향" : has("saturn")?"의리 지분"
+    : (has("sun")&&has("venus"))?"매력 안테나" : (has("moon")&&has("venus"))?"포근함 지분"
+    : has("mars")?"불씨 담당" : "숨은 케미";
+  return { nm:nm, t:{
+    "합(合)":"같은 자리에서 딱 겹쳐요. 우연이라기엔 타이밍이 너무 좋죠.",
+    "육각(60°)":"서로 순풍을 보내는 각도예요. 곁에 있으면 일이 술술 풀려요.",
+    "사각(90°)":"부딪히는 각인데, 이 티키타카가 은근 중독성 있어요.",
+    "삼각(120°)":"애쓰지 않아도 맞물리는 각도예요. 오래 갈 조합의 기본기죠.",
+    "대극(180°)":"정반대에서 마주 보는 각. 나에게 없는 반쪽을 가진 사람이에요." } };
+}
 function renderAstro(){
   var box=$("r-astro");
   if(!last.astA){ box.style.display="none"; return; }
@@ -737,9 +794,14 @@ function renderAstro(){
     astroCol("나의 밤", last.astA)+astroCol("그 사람의 밤", last.astB)+'</div>';
   if(last.asp && last.asp.length){
     h+='<div class="asp"><b class="asphd">✨ 두 하늘이 만나는 자리</b>';
+    var seen={};
     last.asp.forEach(function(a){
-      h+='<p><i>나의 '+PMEAN[a.pa]+'</i>과 <i>그 사람의 '+PMEAN[a.pb]+'</i>이 '+
-         (ASP_EASY[a.type]||a.feel)+'</p>';
+      var dk=[a.pa,a.pb].sort().join("-")+"|"+a.type;   // 거울 조합(금성×화성 ↔ 화성×금성) 중복 카드 방지
+      if(seen[dk]) return; seen[dk]=1;
+      var dom=aspDomain(a.pa,a.pb), tag=ASP_TAG[a.type]||["✨",a.type];
+      h+='<div class="aspcard"><b>'+tag[0]+' '+dom.nm+' <em>'+tag[1]+'</em></b>'+
+         '<span class="who">나의 '+PMEAN[a.pa]+' × 그 사람의 '+PMEAN[a.pb]+'</span>'+
+         '<p>'+(dom.t[a.type]||a.feel)+'</p></div>';
     });
     h+='</div>';
   }
