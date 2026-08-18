@@ -87,15 +87,17 @@
       }
       body.fanmode .card .icon { font-size: 2.2rem; }
       body.fanmode .card h2 { font-size: 1.45rem; line-height: 1.18; margin: 0; max-width: 100%;
-        word-break: keep-all; overflow-wrap: anywhere; }
+        word-break: keep-all; overflow-wrap: break-word; text-wrap: balance; }
       body.fanmode .card p { font-size: .9rem; line-height: 1.4; padding: 0 6px; margin: 0; max-width: 100%;
-        word-break: keep-all; overflow-wrap: anywhere;
+        word-break: keep-all; overflow-wrap: break-word; text-wrap: balance;
         display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
       /* 카드가 많은 페이지(미니 9장)는 글자를 조금 줄여 넘침 방지 */
-      body.fanmode.dense .card .icon { font-size: 1.85rem; }
+      body.fanmode .card .icon, body.fanmode .card h2 { flex-shrink: 0; margin: 0; } /* 제목·아이콘은 절대 안 눌린다(간격은 gap 담당) */
+      body.fanmode.dense .card { gap: 6px; padding: 10px; }
+      body.fanmode.dense .card .icon { font-size: 1.6rem; padding: 4px; }
       body.fanmode.dense .card h2 { font-size: 1.24rem; }
-      body.fanmode.dense .card p { font-size: .82rem; }
-      body.fanmode .card .btn-download { font-size: .82rem; padding: 6px 14px; }
+      body.fanmode.dense .card p { font-size: .82rem; -webkit-line-clamp: 4; }
+      body.fanmode .card .btn-download { font-size: .82rem; padding: 6px 14px; margin-top: 0; flex-shrink: 0; } /* 간격은 gap이 담당 — 설명 글이 눌리지 않게 */
     }
     /* 카테고리 카드 뽕뽕 등장 */
     .card-grid .card { opacity: 0; }
@@ -135,7 +137,7 @@
       <article class="card tint-sky">
         <span class="icon">🌡️</span>
         <h2>마음온도</h2>
-        <p>오늘 내 마음의 온도를 재보는 자가성찰 웹앱</p>
+        <p>마음 온도를 재는 자가성찰 웹앱</p>
         <button class="btn-download" disabled>준비 중</button>
       </article>
 
@@ -163,7 +165,7 @@
       <article class="card tint-mint">
         <span class="icon">⛑️</span>
         <h2>Golden time</h2>
-        <p>신체적, 정신적으로 힘들 때 즉시 도움 받는 앱</p>
+        <p>힘들 때 즉시 도움 받는 앱</p>
         <button class="btn-download" disabled>준비 중</button>
       </article>
     </section>
