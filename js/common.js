@@ -88,7 +88,7 @@
   var logoHTML = isHome
     ? '<img class="logo-img" src="' + root + '/img/logo.png?v=1" alt="goblub" />'
     : // 서브 페이지 HOME — GOBLUB 로고와 같은 서체·크기, O는 로고의 고브럽 머리 그대로
-      '<img class="logo-img" src="' + root + '/img/home.png?v=6" alt="Home" />';
+      '<img class="logo-img" src="' + root + '/img/home.png?v=7" alt="Home" />';
   var headerHTML =
     '<header class="site-header">' +
     '<a class="logo" href="' + root + '/index.html">' + logoHTML + "</a>" +
