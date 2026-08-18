@@ -1021,6 +1021,52 @@
   </script>
 
   <script>
+  /* ===== 살아있는 홈 — 시간대에 따라 고브럽이 다른 말을 건다 ===== */
+  (function () {
+    var el = document.getElementById("gm-goblub");
+    if (!el) return;
+    var st = document.createElement("style");
+    st.textContent = ".gm-say{position:absolute;left:50%;bottom:calc(100% + 12px);transform:translateX(-50%) scale(.9);" +
+      "background:#fff8e6;color:#3a3020;border-radius:14px;padding:9px 14px;font-family:'Jua','Malgun Gothic',sans-serif;" +
+      "font-size:.92rem;white-space:nowrap;box-shadow:0 8px 20px rgba(0,10,24,.4);opacity:0;pointer-events:none;" +
+      "transition:opacity .3s,transform .3s;z-index:12}" +
+      ".gm-say.on{opacity:1;transform:translateX(-50%) scale(1)}" +
+      ".gm-say::after{content:'';position:absolute;left:50%;bottom:-8px;transform:translateX(-50%);" +
+      "border:8px solid transparent;border-top-color:#fff8e6;border-bottom:0}";
+    document.head.appendChild(st);
+    var SLOTS = [
+      { h: [5, 8],   lines: ["…하암. 너 진짜 일찍 일어났다 🌅", "아침 공기 냠… 오늘 기운 좋은데?"] },
+      { h: [8, 11],  lines: ["좋은 아침! 오늘 운세 보고 가 ☀️", "아침밥 먹었어? 난 나쁜 감정 먹었어"] },
+      { h: [11, 14], lines: ["점심 뭐 먹지… 넌 정했어? 🍜", "밥 먹고 포춘쿠키 하나 어때"] },
+      { h: [14, 18], lines: ["나른한 시간… 미니게임 한 판? 🎲", "오후엔 집중력 도둑이 다닌대. 조심해"] },
+      { h: [18, 21], lines: ["오늘 하루 어땠어? 🌆", "저녁엔 별자리 궁합이 잘 맞는대"] },
+      { h: [21, 24], lines: ["라면… 끓일까 말까… 🍜", "자기 전에 타로 한 장 어때 🌙"] },
+      { h: [0, 3],   lines: ["…너 왜 안 자냐 👀", "이 시간엔 별이 제일 잘 보여 ✨"] },
+      { h: [3, 5],   lines: ["새벽 3시… 무슨 고민 있어?", "쉿. 지금은 귀곡 선생 순찰 시간이야 🕯"] }
+    ];
+    var bub = document.createElement("div");
+    bub.className = "gm-say";
+    el.appendChild(bub);
+    var idx = 0;
+    function slotLines() {
+      var h = new Date().getHours();
+      for (var i = 0; i < SLOTS.length; i++)
+        if (h >= SLOTS[i].h[0] && h < SLOTS[i].h[1]) return SLOTS[i].lines;
+      return SLOTS[1].lines;
+    }
+    function say() {
+      if (el.style.visibility === "hidden" || el.style.display === "none") return;
+      var ls = slotLines();
+      bub.textContent = ls[idx % ls.length]; idx++;
+      bub.classList.add("on");
+      setTimeout(function () { bub.classList.remove("on"); }, 6500);
+    }
+    setTimeout(say, 1800);
+    setInterval(say, 48000);
+  })();
+  </script>
+
+  <script>
   /* ===== 공지 팝업 — admin에서 등록한 공지를 홈에서 띄운다 =====
      mode "once"  : 닫으면 그 공지는 다시 안 뜸 (localStorage 기록)
      mode "always": 노출 기간 동안 방문할 때마다 뜸 */
