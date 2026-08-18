@@ -78,7 +78,12 @@
 .rx span{color:#9a8ba8;font-size:.83rem;line-height:1.55;display:block;white-space:normal}\
 @media (max-width:420px){.rx-grid{grid-template-columns:1fr}}\
 .rd-p .hj,.hanja{font-family:'Nanum Myeongjo',serif}\
-.hl-y{cursor:pointer;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px}";
+.hl-y{cursor:pointer;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px}\
+.sum{margin:14px 0 6px;background:linear-gradient(180deg,rgba(46,26,30,.55),rgba(30,18,24,.72));border:1px solid rgba(220,120,90,.4);border-left:4px solid #ff7a4d;border-radius:12px;padding:12px 14px}\
+.sum .sum-t{display:block;color:#ffb08a;font-family:'Nanum Myeongjo',serif;font-weight:800;font-size:.84rem;letter-spacing:.08em;margin-bottom:8px}\
+.sum ul{margin:0;padding:0;list-style:none}\
+.sum li{position:relative;padding-left:19px;margin:6px 0;color:#e8dfcd;font-size:.9rem;line-height:1.65}\
+.sum li::before{content:\"✓\";position:absolute;left:0;color:#ff7a4d}";
   var st = document.createElement("style");
   st.textContent = css;
   document.head.appendChild(st);
@@ -228,20 +233,34 @@
     return { html: t };
   }
 
-  // 한 ◆ 블록의 본문을 HTML로 (▸카드 그룹 처리, 스포일러·도사말풍선 없음)
+  // 한 ◆ 블록의 본문을 HTML로 (▸카드 그룹·▣ 요점 박스 처리, 스포일러·도사말풍선 없음)
   function blockHtml(lines) {
-    var html = "", rxGroup = [];
+    var html = "", rxGroup = [], sumLines = null;
     function flushRx() {
       if (rxGroup.length >= 2) html += '<div class="rx-grid">' + rxGroup.join("") + "</div>";
       else rxGroup.forEach(function (r2) { html += r2 + "\n"; });
       rxGroup = [];
     }
+    function flushSum() {
+      if (!sumLines) return;
+      if (sumLines.length) html += '<div class="sum"><span class="sum-t">▣ 이 장의 요점</span><ul>' +
+        sumLines.map(function (s) { return "<li>" + s + "</li>"; }).join("") + "</ul></div>";
+      sumLines = null;
+    }
     lines.forEach(function (raw) {
-      var lh = lineHtml(raw.trim() ? raw.trim() : "");
+      var t = raw.trim();
+      // ▣ 요점 — 다음의 ▸ 줄들을 체크리스트 박스로 묶는다
+      if (/^▣/.test(t)) { flushRx(); flushSum(); sumLines = []; return; }
+      if (sumLines) {
+        if (/^▸/.test(t)) { sumLines.push(t.replace(/^▸\s*/, "")); return; }
+        if (!t) return;
+        flushSum();   // 요점 아닌 내용이 오면 박스를 닫고 평소대로
+      }
+      var lh = lineHtml(t ? t : "");
       if (lh.rx) rxGroup.push(lh.html);
       else { flushRx(); html += (lh.kv ? lh.html : raw) + "\n"; }
     });
-    flushRx();
+    flushRx(); flushSum();
     return html;
   }
   // 『강조』 → 피 흘리는 붉은 글씨
