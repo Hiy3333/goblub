@@ -89,37 +89,51 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
 .astro .foot{margin-top:8px;font-size:.72rem;color:#7b8bab}
 @media (max-width:520px){ .astro .cols{flex-direction:column} }
 
-/* ── 결과 ── */
+/* ── 결과 — 케미 리포트 ── */
 .panel{opacity:0;transform:translateY(10px);transition:opacity .6s ease,transform .6s ease}
 .panel.on{opacity:1;transform:none}
-.title{text-align:center;margin:20px 0 4px}
-.title .nm{font-size:1.62rem;letter-spacing:1px;
-  text-shadow:0 0 22px rgba(160,200,255,.4)}
-.title .sb{margin-top:6px;color:var(--gold);font-size:.95rem}
-.magbar{display:flex;align-items:center;justify-content:center;gap:9px;margin:14px 0 2px}
-.magbar b{font-size:1.12rem;color:var(--gold);font-weight:400}
-.magbar span{color:var(--ink-soft);font-size:.86rem}
-.obs{text-align:center;color:#8fa8c4;font-size:.85rem;margin:8px 0 0;line-height:1.7}
-
-.card{margin-top:16px;background:rgba(18,34,52,.66);border:1px solid var(--line);
-  border-radius:16px;padding:14px 15px}
-.card h4{margin:0 0 6px;font-size:.9rem;color:var(--gold);font-weight:400}
-.card p{margin:0;font-size:.93rem;line-height:1.85;color:#dbe6f5}
-.card+.card{margin-top:10px}
-
-.pairbox{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:16px}
-.pill{background:rgba(18,34,52,.66);border:1px solid var(--line);border-radius:13px;
-  padding:9px 13px;text-align:center;min-width:112px}
-.pill b{display:block;font-size:.78rem;color:var(--ink-soft);font-weight:400}
-.pill span{display:block;margin-top:3px;font-size:.95rem}
-.pill i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;
-  vertical-align:middle;box-shadow:0 0 8px currentColor;background:currentColor}
-
-.detail{margin-top:10px}
-.dl{display:flex;gap:10px;padding:11px 13px;background:rgba(18,34,52,.5);
-  border:1px solid var(--line);border-radius:13px;margin-top:8px}
-.dl .k{flex:0 0 62px;color:var(--gold);font-size:.85rem}
-.dl .v{flex:1;font-size:.87rem;line-height:1.75;color:#cfdcec}
+.hero2{text-align:center;margin:22px 0 6px}
+.hero2 .nm{font-size:1.9rem;letter-spacing:1px;line-height:1.25;display:inline-block;
+  background:linear-gradient(100deg,#ffd98a,#ff9ecb 45%,#b39dff 85%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 0 16px rgba(255,170,220,.35))}
+.hero2 .sb{margin-top:6px;color:#c9b8ff;font-size:.95rem}
+.scorebig{display:flex;align-items:baseline;justify-content:center;gap:7px;margin:14px 0 2px}
+.scorebig b{font-size:2.7rem;font-weight:400;color:#fff;line-height:1;
+  text-shadow:0 0 26px rgba(255,150,210,.55)}
+.scorebig span{color:#9fb2c9;font-size:.95rem}
+.chembadge{display:inline-block;margin-top:10px;padding:7px 18px;border-radius:999px;
+  font-size:.96rem;color:#2a1030;background:linear-gradient(135deg,#ffb3d9,#c9a8ff);
+  box-shadow:0 8px 22px rgba(210,140,255,.35)}
+.tags{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin-top:14px}
+.tags .tag{padding:6px 13px;border-radius:999px;font-size:.85rem;color:#e3d5ff;
+  background:rgba(150,110,255,.14);border:1px solid rgba(190,150,255,.35)}
+.statbox{margin-top:18px;background:rgba(20,26,52,.72);border:1px solid rgba(150,130,255,.22);
+  border-radius:20px;padding:16px 16px 8px}
+.statbox h4{margin:0 0 13px;font-size:.95rem;color:#ffd9ef;font-weight:400}
+.strow{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.strow .k{flex:0 0 118px;font-size:.88rem;color:#dfe6f8}
+.strow .bar{flex:1;height:12px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}
+.strow .bar i{display:block;height:100%;width:0;border-radius:999px;
+  background:linear-gradient(90deg,#ff8ac2,#b39dff);
+  box-shadow:0 0 12px rgba(255,150,210,.5);transition:width 1.1s cubic-bezier(.25,1,.4,1)}
+.strow .v{flex:0 0 42px;text-align:right;font-size:.9rem;color:#ffb8dd}
+.profs{display:flex;gap:10px;margin-top:14px}
+.prof{flex:1;min-width:0;background:rgba(20,26,52,.72);border:1px solid rgba(150,130,255,.22);
+  border-radius:18px;padding:13px 14px}
+.prof b{display:block;font-size:.88rem;color:#ffd9ef;margin-bottom:8px;font-weight:400}
+.prof p{margin:5px 0;font-size:.85rem;color:#cfd9f2}
+.prof p i{font-style:normal;color:#fff}
+.prof p s{text-decoration:none;color:#9aa8cc;font-size:.76rem}
+.prof .ph{margin-top:9px;font-size:.78rem;color:#9aa8cc}
+.card2{margin-top:12px;border-radius:18px;padding:14px 16px;border:1px solid}
+.card2 h4{margin:0 0 6px;font-size:.92rem;font-weight:400}
+.card2 p{margin:0;font-size:.93rem;line-height:1.8;color:#e6ecf9}
+.c-sum{background:rgba(30,26,60,.7);border-color:rgba(190,150,255,.3)}
+.c-sum h4{color:#d9c6ff}
+.c-warn{background:rgba(52,22,40,.65);border-color:rgba(255,130,170,.3)}
+.c-warn h4{color:#ffa8c4}
+@media (max-width:520px){ .profs{flex-direction:column} }
 
 /* ── 관측소 조수 부엉이 ── */
 .owlbox{margin-top:16px;border-radius:18px;overflow:hidden;position:relative;
@@ -174,12 +188,6 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
   animation:owlPulse2 1.6s ease-in-out infinite}
 @keyframes owlPulse2{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
 
-.owlnote{display:flex;gap:12px;align-items:center;margin-top:10px;
-  background:rgba(18,34,52,.66);border:1px solid var(--line);border-radius:16px;padding:12px 14px}
-.owlnote img{width:86px;height:86px;border-radius:12px;flex:0 0 auto;object-fit:cover}
-.owlnote p{margin:0;font-size:.88rem;line-height:1.75;color:#dbe6f5}
-.owlnote b{color:var(--gold);font-weight:400}
-
 .namebox{margin-top:14px;background:rgba(40,32,60,.6);border:1px solid rgba(190,170,255,.28);
   border-radius:16px;padding:14px 15px;text-align:center}
 .namebox p{margin:0 0 10px;font-size:.9rem;color:#d9cffb;line-height:1.75}
@@ -190,8 +198,9 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
 .btnrow button,.btnrow a{flex:1 1 46%;padding:12px;border:1px solid var(--line);
   border-radius:13px;background:rgba(18,34,52,.7);color:var(--ink);cursor:pointer;
   font-family:inherit;font-size:.93rem;text-align:center;text-decoration:none}
-.btnrow .main{flex:1 1 100%;border:0;color:#16243a;
-  background:linear-gradient(180deg,#ffeec2,#ffd98a)}
+.btnrow .main{flex:1 1 100%;border:0;color:#fff;font-size:1.02rem;
+  background:linear-gradient(135deg,#ff7fbd,#8f6bff);
+  box-shadow:0 10px 26px rgba(190,110,255,.38)}
 #st-status{margin:12px 0 0;text-align:center;color:var(--ink-soft);font-size:.86rem}
 #st-text{display:none;margin-top:12px;background:rgba(18,34,52,.66);border:1px solid var(--line);
   border-radius:16px;padding:14px 15px;font-size:.92rem;line-height:1.9;
@@ -274,38 +283,34 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
     </div>
 
     <div class="panel" id="panel">
-      <div class="title">
+      <div class="hero2">
         <div class="nm" id="r-name"></div>
         <div class="sb" id="r-sub"></div>
+        <div class="scorebig"><b id="r-score">0</b><span>점 · 케미 지수</span></div>
+        <div><span class="chembadge" id="r-chem"></span></div>
       </div>
-      <div class="magbar"><b id="r-mag"></b><span id="r-magt"></span></div>
-      <p class="obs" id="r-obs"></p>
 
-      <div class="pairbox" id="r-pair"></div>
+      <div class="tags" id="r-tags"></div>
 
-      <div class="card"><h4>이 배열이 말하는 것</h4><p id="r-desc"></p></div>
-      <div class="card"><h4>흐려지기 쉬운 곳</h4><p id="r-care"></p></div>
+      <div class="statbox"><h4>📊 우리 케미 스탯</h4><div id="r-stats"></div></div>
 
-      <!-- 그날의 하늘 — 실제 천문 계산 -->
+      <div class="profs" id="r-profs"></div>
+
+      <div class="card2 c-sum"><h4>💫 이 케미의 핵심</h4><p id="r-desc"></p></div>
+      <div class="card2 c-warn"><h4>🚨 싸움 나는 포인트 미리보기</h4><p id="r-care"></p></div>
+
+      <!-- 실제 천문 계산으로 찾은 케미 포인트 -->
       <div class="astro" id="r-astro" style="display:none"></div>
 
-      <!-- 부엉이의 관측 수첩 -->
-      <div class="owlnote">
-        <img src="img/stars/owl-write.webp" alt="수첩에 받아 적는 부엉이" />
-        <p id="owl-note"></p>
-      </div>
-
       <div class="namebox" id="r-namebox" style="display:none">
-        <p>이 배열은 어떤 성도(星圖)에도 없습니다.<br />이름은 두 분이 지어 주세요.</p>
+        <p>이 별자리, 오늘 밤 처음 생겼어요.<br />둘만 아는 이름 하나 지어 줄래요? ✏️</p>
         <input type="text" id="r-nameinput" maxlength="14" placeholder="○○○자리" />
       </div>
 
-      <div class="detail" id="r-detail"></div>
-
       <div class="btnrow">
-        <button class="main" id="btn-report">✦ 이 하늘을 더 오래 보기</button>
-        <button id="btn-save">⬇ 별자리 저장</button>
-        <button id="btn-retry">↺ 다른 사람과</button>
+        <button class="main" id="btn-report">🔮 AI 심층 케미 리포트 받기</button>
+        <button id="btn-save">📸 결과 저장</button>
+        <button id="btn-retry">↺ 다른 사람이랑</button>
       </div>
       <p id="st-status" style="display:none"></p>
       <div id="st-text"></div>
@@ -717,16 +722,6 @@ function phaseLine(c){
     return p.emo+" 달이 숨은 캄캄한 밤에 태어났어요";
   return p.emo+" "+p.name+"이 뜬 밤 · 달빛 "+p.illum+"%";
 }
-function astroCol(who, c){
-  var h=[ "<b>"+who+"</b>" ];
-  h.push("<p>"+phaseLine(c)+"</p>");
-  h.push("<p>☀️ <i>"+c.signs.sun.ko+"</i> <s>— 겉으로 보이는 나</s></p>");
-  h.push("<p>🌙 <i>"+c.signs.moon.ko+"</i> <s>— 숨겨둔 속마음</s></p>");
-  h.push("<p>💗 <i>"+c.signs.venus.ko+"</i> <s>— 사랑할 때의 나</s></p>");
-  h.push("<p>🔥 <i>"+c.signs.mars.ko+"</i> <s>— 열정의 방향</s></p>");
-  if(c.asc) h.push("<p>👋 <i>"+c.asc.ko+"</i> <s>— 첫인상</s></p>");
-  return '<div class="col">'+h.join("")+"</div>";
-}
 // ── 어스펙트 결과지 — 행성 조합마다 고유한 장면, 각도마다 다른 맛 ──
 // 태그: 합=겹침🌟 육각=순풍🍃 사각=스파크⚡ 삼각=찰떡🧩 대극=자석🧲
 var ASP_TAG={ "합(合)":["🌟","운명적 겹침"], "육각(60°)":["🍃","순풍"],
@@ -787,56 +782,112 @@ function aspDomain(pa,pb){
 }
 function renderAstro(){
   var box=$("r-astro");
-  if(!last.astA){ box.style.display="none"; return; }
-  var h='<h4>🔭 그날의 하늘 — 관측 기록</h4>'+
-    '<p class="lead">두 분이 태어난 날, 하늘에 실제로 떠 있던 별들의 기록이에요.</p>'+
-    '<div class="cols">'+
-    astroCol("나의 밤", last.astA)+astroCol("그 사람의 밤", last.astB)+'</div>';
-  if(last.asp && last.asp.length){
-    h+='<div class="asp"><b class="asphd">✨ 두 하늘이 만나는 자리</b>';
-    var seen={};
-    last.asp.forEach(function(a){
-      var dk=[a.pa,a.pb].sort().join("-")+"|"+a.type;   // 거울 조합(금성×화성 ↔ 화성×금성) 중복 카드 방지
-      if(seen[dk]) return; seen[dk]=1;
-      var dom=aspDomain(a.pa,a.pb), tag=ASP_TAG[a.type]||["✨",a.type];
-      h+='<div class="aspcard"><b>'+tag[0]+' '+dom.nm+' <em>'+tag[1]+'</em></b>'+
-         '<span class="who">나의 '+PMEAN[a.pa]+' × 그 사람의 '+PMEAN[a.pb]+'</span>'+
-         '<p>'+(dom.t[a.type]||a.feel)+'</p></div>';
-    });
-    h+='</div>';
-  }
-  h+='<div class="foot">실제 천문 계산으로 구한 그날의 별 배치예요'+
-     (last.astA.asc&&last.astB.asc?'':' · 태어난 시각을 적으면 첫인상 별자리까지 나와요')+'</div>';
+  if(!last.astA || !last.asp || !last.asp.length){ box.style.display="none"; return; }
+  var h='<h4>💥 우리 케미 포인트</h4>'+
+    '<p class="lead">두 사람이 태어난 날, 실제 하늘에서 찾아낸 케미예요.</p>';
+  var seen={};
+  last.asp.forEach(function(a){
+    var dk=[a.pa,a.pb].sort().join("-")+"|"+a.type;   // 거울 조합(금성×화성 ↔ 화성×금성) 중복 카드 방지
+    if(seen[dk]) return; seen[dk]=1;
+    var dom=aspDomain(a.pa,a.pb), tag=ASP_TAG[a.type]||["✨",a.type];
+    h+='<div class="aspcard"><b>'+tag[0]+' '+dom.nm+' <em>'+tag[1]+'</em></b>'+
+       '<span class="who">나의 '+PMEAN[a.pa]+' × 그 사람의 '+PMEAN[a.pb]+'</span>'+
+       '<p>'+(dom.t[a.type]||a.feel)+'</p></div>';
+  });
+  h+='<div class="foot">실제 천문 계산으로 찾은 그날의 별 배치예요'+
+     (last.astA.asc&&last.astB.asc?'':' · 태어난 시각까지 적으면 더 정확해져요')+'</div>';
   box.innerHTML=h; box.style.display="block";
 }
 
-/* ── 결과 채우기 ── */
-var OHN={목:"나무",화:"불",토:"흙",금:"쇠",수:"물"};
+/* ── 결과 채우기 — 케미 리포트 ── */
+var SIGN_SHORT={ "양자리":"직진형","황소자리":"뚝심러","쌍둥이자리":"수다케미","게자리":"다정러",
+  "사자자리":"주인공","처녀자리":"디테일러","천칭자리":"밸런스장인","전갈자리":"올인러",
+  "사수자리":"자유영혼","염소자리":"츤데레","물병자리":"4차원","물고기자리":"감성러" };
+var GRADE_BADGE={ "천생연분":"💍 운명급 케미","찰떡궁합":"🍡 찰떡급 케미","노력하면 꿀떡":"🍯 꿀떡 가능형",
+  "서로 배우는 사이":"📚 케미 성장형","파란만장 드라마":"🎢 드라마 찍는 케미" };
+
+/* 케미 스탯 — 궁합 점수·행성 각 데이터에서 결정적으로 계산(같은 커플이면 늘 같은 값) */
+function chemStats(){
+  var s=last.s, asp=last.asp||[], t=s.total;
+  var harm=0, clash=0, vm=false, vv=false, mm=false;
+  asp.forEach(function(a){
+    if(/합|삼각|육각/.test(a.type)) harm++;
+    if(/사각|대극/.test(a.type)) clash++;
+    var k=[a.pa,a.pb].sort().join("-");
+    if(k==="mars-venus") vm=true;
+    if(k==="venus-venus") vv=true;
+    if(k==="moon-moon"||k==="moon-sun") mm=true;
+  });
+  var seed=(last.ba.y*373+last.ba.m*47+last.ba.d*13+last.bb.y*211+last.bb.m*29+last.bb.d*7)>>>0;
+  function jig(k){ return ((seed*(k*2+3))%1000)/1000*14-7; }
+  function pct(v){ return Math.max(41, Math.min(99, Math.round(v))); }
+  return [
+    { e:"💘", k:"첫눈에 스파크", v:pct(52+(vm?20:6)+harm*4+jig(1)) },
+    { e:"🗣", k:"티키타카", v:pct(40+t*.45+(mm?8:0)+jig(2)) },
+    { e:"🫀", k:"설렘 지속력", v:pct(38+t*.4+(vv?14:0)+jig(3)) },
+    { e:"⚡", k:"티격태격 지수", v:pct(30+clash*16+jig(4)) },
+    { e:"🏠", k:"오래갈 확률", v:pct(36+t*.52-clash*3+jig(5)) }
+  ];
+}
+/* 해시태그 — 등급·행성 케미·달 대비에서 뽑는다 */
+function chemTags(){
+  var tags=[], seen={};
+  function add(t){ if(t&&!seen[t]){ seen[t]=1; tags.push(t); } }
+  add({"천생연분":"#운명각","찰떡궁합":"#찰떡케미","노력하면 꿀떡":"#가꾸는재미",
+       "서로 배우는 사이":"#서로의세계","파란만장 드라마":"#서사맛집"}[last.s.grade]);
+  var DOMTAG={"심장 담당":"#심장이바빠","속마음 채널":"#눈빛만봐도","연애 온도":"#취향환상의합",
+    "겉과 속":"#겉바속촉","기세 대결":"#리모컨쟁탈전","속도계":"#텐션메이커","수다 케미":"#티키타카",
+    "매력 안테나":"#자꾸눈이가","포근함 지분":"#힐링캠프","꿈의 방향":"#같은곳을본다","의리 지분":"#의리의리"};
+  var TYPETAG={"사각(90°)":"#투닥투닥","대극(180°)":"#자석커플","합(合)":"#운명적겹침",
+    "삼각(120°)":"#억지로안맞춰도","육각(60°)":"#순풍순풍"};
+  (last.asp||[]).forEach(function(a){
+    var dom=aspDomain(a.pa,a.pb);
+    add(DOMTAG[dom.nm]); add(TYPETAG[a.type]);
+  });
+  if(last.astA&&last.astB && Math.abs(last.astA.phase.illum-last.astB.phase.illum)>=70)
+    add("#보름과그믐");
+  return tags.slice(0,6);
+}
+function profCard(who,c){
+  return '<div class="prof"><b>'+who+'</b>'+
+    '<p>☀️ <i>'+c.signs.sun.ko+'</i> · '+(SIGN_SHORT[c.signs.sun.ko]||"")+' <s>— 겉모습</s></p>'+
+    '<p>🌙 <i>'+c.signs.moon.ko+'</i> · '+(SIGN_SHORT[c.signs.moon.ko]||"")+' <s>— 찐 속마음</s></p>'+
+    '<p>💗 <i>'+c.signs.venus.ko+'</i> · '+(SIGN_SHORT[c.signs.venus.ko]||"")+' <s>— 연애 스타일</s></p>'+
+    '<p class="ph">'+phaseLine(c)+'</p></div>';
+}
 function fillPanel(){
-  var s=last.s, T=Gunghap.TEXTS;
+  var s=last.s;
   $("r-name").textContent=star.name;
   $("r-sub").textContent=star.sub;
-  $("r-mag").textContent=star.mag+"등성";
-  $("r-magt").textContent="· "+star.magText;
-  $("r-obs").textContent=star.obsText;
+  $("r-chem").textContent=GRADE_BADGE[s.grade]||s.grade;
   $("r-desc").textContent=star.desc;
   $("r-care").textContent=star.care;
-  $("owl-note").innerHTML='<b>부엉의 관측 수첩</b> — 오늘 밤 「'+star.name+'」 '+
-    star.mag+'등성을 새로 받아 적었습니다. 다음 관측도 부엉이 맡을게요!';
 
-  var tA=Saju.pillarText(last.rA.pillars.day), tB=Saju.pillarText(last.rB.pillars.day);
-  $("r-pair").innerHTML=
-    '<div class="pill"><b>나의 별</b><span style="color:'+star.colorA+'"><i></i>'+
-      tA.hanja+'</span><b style="margin-top:3px">'+OHN[star.ohA]+' 빛 · '+last.rA.zodiac+'띠</b></div>'+
-    '<div class="pill"><b>그 사람의 별</b><span style="color:'+star.colorB+'"><i></i>'+
-      tB.hanja+'</span><b style="margin-top:3px">'+OHN[star.ohB]+' 빛 · '+last.rB.zodiac+'띠</b></div>';
+  // 케미 지수 카운트업
+  (function(){
+    var el=$("r-score"), t0=Date.now(), to=s.total;
+    (function up(){ var p=Math.min(1,(Date.now()-t0)/900);
+      el.textContent=Math.round(to*(1-Math.pow(1-p,3)));
+      if(p<1) requestAnimationFrame(up); })();
+  })();
+
+  $("r-tags").innerHTML=chemTags().map(function(t){ return '<span class="tag">'+t+'</span>'; }).join("");
+
+  var stats=chemStats();
+  $("r-stats").innerHTML=stats.map(function(st){
+    return '<div class="strow"><span class="k">'+st.e+' '+st.k+'</span>'+
+      '<span class="bar"><i data-w="'+st.v+'"></i></span><span class="v">'+st.v+'%</span></div>';
+  }).join("");
+  setTimeout(function(){
+    document.querySelectorAll("#r-stats .bar i").forEach(function(b){ b.style.width=b.dataset.w+"%"; });
+  }, 60);
+
+  if(last.astA&&last.astB){
+    $("r-profs").style.display="";
+    $("r-profs").innerHTML=profCard("😎 나",last.astA)+profCard("😍 그 사람",last.astB);
+  } else $("r-profs").style.display="none";
 
   renderAstro();
-  $("r-detail").innerHTML=
-    dl("두 빛", T.ilgan[s.ilgan.type])+
-    dl("이어짐", T.ilji[s.ilji.type])+
-    dl("채움", T.oheng[s.oheng.type])+
-    dl("띠", T.tti[s.tti.type]);
 
   var nb=$("r-namebox");
   nb.style.display = star.naming ? "block" : "none";
@@ -852,7 +903,6 @@ function fillPanel(){
   $("skycap").classList.remove("on");   // 캔버스 안에 이름이 뜨므로 안내문은 걷는다
   $("panel").classList.add("on");
 }
-function dl(k,v){ return '<div class="dl"><span class="k">'+k+'</span><span class="v">'+v+'</span></div>'; }
 
 /* ── 저장 ── */
 $("btn-save").onclick=function(){
@@ -888,7 +938,7 @@ $("btn-retry").onclick=function(){
 $("btn-report").onclick=function(){
   if(!last) return;
   var btn=this, txt=$("st-text"), st=$("st-status");
-  btn.disabled=true; st.style.display="block"; st.textContent="✦ 별지기가 접안렌즈를 들여다보는 중…";
+  btn.disabled=true; st.style.display="block"; st.textContent="🔮 별지기가 둘의 하늘을 읽는 중…";
   txt.style.display="block"; txt.innerHTML="";
   var acc="";
   Dosa.fetchGunghap({
@@ -911,7 +961,7 @@ $("btn-report").onclick=function(){
   },{
     onChunk:function(t){ acc+=t; txt.innerHTML=fmt(acc); },
     onDone:function(cached){ txt.innerHTML=fmt(acc);
-      st.textContent=cached?"✦ (지난밤에 적어 둔 기록이에요)":"✦ 오늘 밤 관측, 여기까지입니다."; },
+      st.textContent=cached?"🔮 (전에 뽑아 둔 리포트예요)":"🔮 리포트 끝! 캡처해서 공유해 보세요."; },
     onError:function(code,sec){
       txt.style.display="none";
       st.textContent = code==="not_configured" ? "관측소가 아직 문을 열지 않았어요. 곧 엽니다!" :
@@ -923,7 +973,8 @@ $("btn-report").onclick=function(){
 };
 function fmt(s){
   var out=s.replace(/</g,"&lt;");
-  ["✦ 첫 관측","✦ 가장 밝은 지점","✦ 흐려지는 지점","✦ 다시 밝히는 법"].forEach(function(h){
+  ["✦ 처음 끌린 이유","✦ 심장이 가장 빨리 뛰는 순간","✦ 구름이 끼는 날 — 이렇게 다툰다",
+   "✦ 다시 반짝이는 법","✦ 오늘 밤의 처방"].forEach(function(h){
     out=out.replace(h,'<span class="hd">'+h+'</span>');
   });
   return out;
