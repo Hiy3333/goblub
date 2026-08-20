@@ -506,11 +506,23 @@ function render(){
     : C.nowAge < C.rise.age
       ? "떡상 구간까지 <b>"+(C.rise.age-C.nowAge)+"년</b> — 지금은 매집(존버) 타이밍입니다."
       : "가장 큰 상승장은 지났지만, 차트를 보세요 — <b>고점은 갱신하라고 있는 겁니다.</b>";
+  // 말년 판정 — 곡선(환경)과 궁위(그릇)를 함께 보고 모순 없는 문장을 고른다
+  var lateDecs=C.decs.filter(function(d){ return d.age>=51; });
+  var lateAvg=lateDecs.length ? lateDecs.reduce(function(a,d){return a+d.score;},0)/lateDecs.length : 50;
+  var lateLine="";
+  if(C.lateGood && lateAvg>=55)
+    lateLine=" 말년 대운도 순풍인데 말년궁(시주)에 용신까지 앉아 있어 <b>명실상부 대기만성형</b>입니다.";
+  else if(C.lateGood)
+    lateLine=" 말년 대운의 파도 자체는 낮게 관측되지만, 말년궁(시주)에 용신이 앉아 있어 <b>낙폭 대비 실속은 지켜지는 구조</b> — 후반부는 판을 키우기보다 지키는 전략이 맞습니다.";
+  else if(lateAvg>=60)
+    lateLine=" 후반 대운이 길게 순풍이라 <b>뒤로 갈수록 편해지는 후반형</b> 차트입니다.";
   $("r-note").innerHTML="📊 <b>애널리스트 고브럽 코멘트</b> — "+
     "이 종목의 최대 상승 구간은 <b>"+C.rise.age+"~"+(C.rise.age+9)+"세</b>, 전성기 고점은 <b>"+C.peak.age+"세</b>로 관측됩니다. "+
-    noteNow+" 참고로 "+C.dip.age+"세 부근의 저점은 결함이 아니라 <b>도약 전 웅크림</b>으로 분석됩니다."+
+    noteNow+(C.dip.age<=C.endAge-10
+      ?" 참고로 "+C.dip.age+"세 부근의 저점은 결함이 아니라 <b>도약 전 웅크림</b>으로 분석됩니다."
+      :" 참고로 "+C.dip.age+"세 부근은 파도가 가장 낮은 시기 — <b>무리한 확장만 피하면 되는 관리 구간</b>입니다.")+
     (C.tongkwan?" 또한 이 사주는 <b>관인상생</b> 통로가 열려 있어 압박운(관성)이 명예로 변환되는 체질입니다.":"")+
-    (C.lateGood?" 말년궁(시주)에 용신이 앉아 있어 <b>말년의 그릇 자체가 따뜻한 대기만성형</b> — 후반 구간 점수보다 실속이 좋습니다.":"");
+    lateLine;
 }
 $("btn-retry").onclick=function(){ $("result").style.display="none"; $("intro").style.display="block"; window.scrollTo(0,0); };
 
