@@ -105,7 +105,7 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
   <div id="intro">
     <div class="lead">
       <h1>내 인생, 지금 몇 층이야?</h1>
-      <p>대운의 흐름을 주식 차트처럼 펼쳐 드립니다.<br>떡상 구간 · 전성기 · 조정장까지 콕.</p>
+      <p>대운 8구간 + 해마다의 세운까지 만세력으로 실계산해<br>주식 차트처럼 펼쳐 드립니다. 떡상 구간 · 전성기 · 조정장까지 콕.</p>
     </div>
     <div class="box">
       <h2>📋 상장 신청서</h2>
@@ -205,51 +205,86 @@ var FAVOR={
   "중화":{ "비견":0,"겁재":-6,"정인":4,"편인":0,"식신":6,"상관":-2,"편재":4,"정재":6,"편관":-4,"정관":6 }
 };
 var GAN_OH={0:"목",1:"목",2:"화",3:"화",4:"토",5:"토",6:"금",7:"금",8:"수",9:"수"};
-function rng(seed){ return function(){ seed|=0; seed=seed+0x6D2B79F5|0; var t=Math.imul(seed^seed>>>15,1|seed);
-  t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+/* 지지 관계 — 충(정면 6칸)·육합·삼합(반합) */
+function isChung(a,b){ return ((a-b)%12+12)%12===6; }
+var YUKHAP={0:1,1:0,2:11,11:2,3:10,10:3,4:9,9:4,5:8,8:5,6:7,7:6};
+var SAMHAP=[[8,0,4],[2,6,10],[5,9,1],[11,3,7]];
+function samhapHalf(a,b){
+  if(a===b) return false;
+  return SAMHAP.some(function(g){ return g.indexOf(a)>=0 && g.indexOf(b)>=0; });
+}
+/* 세운 간지 — 그 해의 연간지 (60갑자: 서기 Y년 = (Y-4)%60) */
+function yearGZ(y){ return { gan:((y-4)%10+10)%10, ji:((y-4)%12+12)%12 }; }
 
 function buildChart(r, birth){
   var lab=r.strength.label, F=FAVOR[lab];
   var ohArr=Object.keys(r.oheng).map(function(k){return [k,r.oheng[k]];}).sort(function(a,b){return a[1]-b[1];});
   var weak=[ohArr[0][0],ohArr[1][0]], strong=ohArr[4][0];
+  // 원국 지지들 — 세운·대운과의 충/합 판정 대상 (일지가 가장 무겁다)
+  var natal=[];
+  [["year",1.0],["month",1.2],["day",1.5],["hour",1.0]].forEach(function(kw){
+    var p=r.pillars[kw[0]]; if(p) natal.push({ ji:p[1], w:kw[1] });
+  });
+  function ohBonus(gan, ji, scale){
+    var s=0;
+    [GAN_OH[gan], GAN_OH[Saju.branchMainGan(ji)]].forEach(function(o){
+      if(weak.indexOf(o)>=0) s+=3*scale;
+      if(o===strong) s-=2*scale;
+    });
+    return s;
+  }
+  function sipScore(gan, ji, wGan, wJi){
+    var gs=Saju.SIPSEONG[Saju.sipseong(r.ilgan, gan)];
+    var js=Saju.SIPSEONG[Saju.sipseong(r.ilgan, Saju.branchMainGan(ji))];
+    return (F[gs]||0)*wGan + (F[js]||0)*wJi;
+  }
+  // 대운 점수 — 십성 억부 + 오행 보완 + 원국 지지와의 충/합
   function decadeScore(du){
-    var s=50;
-    var gs=Saju.SIPSEONG[Saju.sipseong(r.ilgan, du.gan)];
-    var js=Saju.SIPSEONG[Saju.sipseong(r.ilgan, Saju.branchMainGan(du.ji))];
-    s += (F[gs]||0)*1.0 + (F[js]||0)*1.25;
-    var go=GAN_OH[du.gan], jo=GAN_OH[Saju.branchMainGan(du.ji)];
-    [go,jo].forEach(function(o){
-      if(weak.indexOf(o)>=0) s+=6;
-      if(o===strong) s-=4;
+    var s=50 + sipScore(du.gan, du.ji, 1.0, 1.25) + ohBonus(du.gan, du.ji, 2);
+    natal.forEach(function(n){
+      if(isChung(du.ji, n.ji)) s-=4*n.w;
+      else if(YUKHAP[du.ji]===n.ji) s+=2.5*n.w;
+      else if(samhapHalf(du.ji, n.ji)) s+=1.5*n.w;
     });
     return Math.max(16, Math.min(94, s));
   }
   var decs=r.daeun.list.map(function(du){ return { age:du.age, gan:du.gan, ji:du.ji, score:decadeScore(du) }; });
-  // 연 단위 곡선: 1세 ~ 마지막 대운 끝(최대 90세)
-  var seed=(birth.y*10000+birth.m*100+birth.d)^(birth.hour!=null?birth.hour*7:0)^(sexSel==="M"?13:71);
-  var rr=rng(seed);
   var endAge=Math.min(90, decs[decs.length-1].age+10);
-  var pts=[];
   function decAt(a){
     for(var i=decs.length-1;i>=0;i--) if(a>=decs[i].age) return i;
     return -1;
   }
-  var noise=[];
-  for(var a=1;a<=endAge;a++) noise.push((rr()-0.5)*11);
-  for(var a2=1;a2<endAge-1;a2++) noise[a2]=(noise[a2-1]+noise[a2]*2+noise[a2+1])/4; // 부드럽게
+  // 세운 보정 — 그 해 간지의 십성 억부 + 오행 보완 + 원국·대운 지지와의 충/합 (전부 실계산, 무작위 없음)
+  function seunDelta(year, decJi){
+    var g=yearGZ(year);
+    var s = sipScore(g.gan, g.ji, 0.5, 0.6) + ohBonus(g.gan, g.ji, 1);
+    natal.forEach(function(n){
+      if(isChung(g.ji, n.ji)) s-=4.5*n.w;
+      else if(YUKHAP[g.ji]===n.ji) s+=2.5*n.w;
+      else if(samhapHalf(g.ji, n.ji)) s+=1.8*n.w;
+    });
+    if(decJi!=null){
+      if(isChung(g.ji, decJi)) s-=4;
+      else if(YUKHAP[g.ji]===decJi) s+=2.5;
+    }
+    return Math.max(-20, Math.min(20, s));
+  }
+  var pts=[];
   for(var age=1;age<=endAge;age++){
-    var i=decAt(age), base;
+    var i=decAt(age), base, decJi=null;
     if(i<0){ // 첫 대운 전 어린 시절 — 50에서 첫 대운 점수로 서서히
       var t0=age/decs[0].age;
       base=50+(decs[0].score-50)*t0*t0*(3-2*t0);
     }else{
       var cur=decs[i], nxt=decs[i+1];
+      decJi=cur.ji;
       var t=(age-cur.age)/10; if(t>1)t=1;
       var to=nxt?nxt.score:cur.score;
       var tt=t*t*(3-2*t);
       base=cur.score+(to-cur.score)*tt;
     }
-    pts.push({ age:age, v:Math.max(8, Math.min(97, base+noise[age-1])) });
+    var year=birth.y+age-1;                 // 세는나이 age의 해
+    pts.push({ age:age, year:year, v:Math.max(8, Math.min(97, base+seunDelta(year, decJi)*0.85)) });
   }
   // 분석 포인트
   var peak=pts[0], dip=pts[0];
@@ -331,7 +366,7 @@ function drawChart(g, C, X, Y, W, H){
   g.fillText("🚀", rx, py(scoreAt(C,C.rise.age))-20);
   // 타이틀 — 「지금」 라벨과 안 겹치게 차트 안 왼쪽 위 구석, 옅게
   g.textAlign="left"; g.fillStyle="rgba(142,163,196,.55)"; g.font="20px Jua, sans-serif";
-  g.fillText("운세지수(0~100) · 대운 8구간 기반 · GOBLUB 증권", x0+8, y0+26);
+  g.fillText("운세지수(0~100) · 대운 8구간+세운 실계산 · GOBLUB 증권", x0+8, y0+26);
 }
 function scoreAt(C,age){ var p=C.pts[Math.max(0,Math.min(C.pts.length-1,age-1))]; return p.v; }
 
@@ -369,7 +404,7 @@ function render(){
   $("t-chg").textContent=(C.slope>=0?"▲ +":"▼ ")+Math.abs(C.slope).toFixed(1)+
     (cls==="up"?" 상승장":cls==="down"?" 조정 중":" 횡보");
   $("t-meta").innerHTML="일간 <i>"+Saju.GAN[r.ilgan]+"</i> · "+r.strength.label+
-    " · 상장 "+C.pts.length+"년물 · "+r.zodiac+"띠";
+    " · "+r.zodiac+"띠 · 대운+세운(연간지) 실계산 "+C.pts.length+"년물";
   drawChart($("cv").getContext("2d"), C, 0, 0, 1080, 640);
   $("s-rise").textContent=C.rise.age+"~"+(C.rise.age+9)+"세";
   $("s-peak").textContent=C.peak.age+"세 · "+C.peak.v.toFixed(0)+"층";
