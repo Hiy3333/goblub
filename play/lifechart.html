@@ -153,6 +153,7 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
 
 <script src="../js/common.js?v=24" data-root=".."></script>
 <script src="js/saju.js"></script>
+<script src="js/saju-deep.js"></script>
 <script src="js/lunar.js?v=1"></script>
 <script>
 var $=function(id){return document.getElementById(id);};
@@ -216,10 +217,15 @@ function samhapHalf(a,b){
 /* 세운 간지 — 그 해의 연간지 (60갑자: 서기 Y년 = (Y-4)%60) */
 function yearGZ(y){ return { gan:((y-4)%10+10)%10, ji:((y-4)%12+12)%12 }; }
 
-function buildChart(r, birth){
+function buildChart(r, birth, deep){
   var lab=r.strength.label, F=FAVOR[lab];
-  var ohArr=Object.keys(r.oheng).map(function(k){return [k,r.oheng[k]];}).sort(function(a,b){return a[1]-b[1];});
-  var weak=[ohArr[0][0],ohArr[1][0]], strong=ohArr[4][0];
+  // 오행 축 = 용신(억부+조후) — 귀곡 명부(saju-deep)와 같은 판정을 쓴다
+  var use=[], avoid=[];
+  if(deep && deep.yongshin){ use=deep.yongshin.use||[]; avoid=deep.yongshin.avoid||[]; }
+  else{ // 폴백: 부족/과다 휴리스틱
+    var ohArr=Object.keys(r.oheng).map(function(k){return [k,r.oheng[k]];}).sort(function(a,b){return a[1]-b[1];});
+    use=[ohArr[0][0],ohArr[1][0]]; avoid=[ohArr[4][0]];
+  }
   // 원국 지지들 — 세운·대운과의 충/합 판정 대상 (일지가 가장 무겁다)
   var natal=[];
   [["year",1.0],["month",1.2],["day",1.5],["hour",1.0]].forEach(function(kw){
@@ -228,8 +234,8 @@ function buildChart(r, birth){
   function ohBonus(gan, ji, scale){
     var s=0;
     [GAN_OH[gan], GAN_OH[Saju.branchMainGan(ji)]].forEach(function(o){
-      if(weak.indexOf(o)>=0) s+=3*scale;
-      if(o===strong) s-=2*scale;
+      if(use.indexOf(o)>=0) s+=3*scale;      // 용신 오행이 들어오는 운 = 길
+      if(avoid.indexOf(o)>=0) s-=3*scale;    // 기신 오행 = 흉
     });
     return s;
   }
@@ -387,8 +393,10 @@ $("btn-go").onclick=function(){
   if(!r.daeun||!r.daeun.list||!r.daeun.list.length){
     $("err").textContent="대운 계산에 실패했어요. 다시 시도해 주세요!"; $("err").style.display="block"; return;
   }
-  var C=buildChart(r,b);
-  last={C:C, r:r, b:b};
+  var deep=null;
+  try{ deep=SajuDeep.facts(r, b, sexSel); }catch(e){}
+  var C=buildChart(r,b,deep);
+  last={C:C, r:r, b:b, deep:deep};
   render();
 };
 function render(){
@@ -403,8 +411,9 @@ function render(){
   $("t-now").textContent=C.nowV.toFixed(1);
   $("t-chg").textContent=(C.slope>=0?"▲ +":"▼ ")+Math.abs(C.slope).toFixed(1)+
     (cls==="up"?" 상승장":cls==="down"?" 조정 중":" 횡보");
-  $("t-meta").innerHTML="일간 <i>"+Saju.GAN[r.ilgan]+"</i> · "+r.strength.label+
-    " · "+r.zodiac+"띠 · 대운+세운(연간지) 실계산 "+C.pts.length+"년물";
+  var ys=last.deep&&last.deep.yongshin ? " · 용신 "+last.deep.yongshin.use.join("·") : "";
+  $("t-meta").innerHTML="일간 <i>"+Saju.GAN[r.ilgan]+"</i> · "+r.strength.label+ys+
+    " · 대운+세운 실계산 "+C.pts.length+"년물";
   drawChart($("cv").getContext("2d"), C, 0, 0, 1080, 640);
   $("s-rise").textContent=C.rise.age+"~"+(C.rise.age+9)+"세";
   $("s-peak").textContent=C.peak.age+"세 · "+C.peak.v.toFixed(0)+"층";
