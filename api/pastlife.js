@@ -1,5 +1,7 @@
-// 전생 대환장 파티 — 사주 시드 기반 다중 전생 연대기 + 대표 전생 SVG 생성 프록시.
-import { streamGemini, geminiConfigured } from "../lib/gemini.js";
+// 전생 대환장 파티 — 사주 시드 기반 전생 연대기(텍스트) + 전생 삽화(이미지 생성) 프록시.
+// mode 없음: 전생 2개 텍스트 + 장면 묘사(@@SCENE) 스트리밍 (flash — SVG를 안 그리니 pro 불필요)
+// mode "img": 장면 묘사 1개 → 귀여운 카툰 일러스트 1장 (gemini-2.5-flash-image, 장당 ≈$0.039)
+import { streamGemini, genImage, geminiConfigured } from "../lib/gemini.js";
 import { aiGuard } from "../lib/ratelimit.js";
 
 const ALLOWED_ORIGINS = [
@@ -27,27 +29,30 @@ const SYSTEM = `당신은 '전생 판독가 고브럽 도사'입니다. 사주�
 @@LIFE|선사시대|이모지 1~2개|칭호(15자 이내)
 (본문 2~3문장)
 (나쁜 전생이면 본문 다음 줄에 "@@FIX" 와 개선판 본문 2~3문장)
-@@SVG
-<svg ...>선사시대 장면</svg>
+@@SCENE
+(이 전생의 삽화 장면 묘사 1~2문장)
 @@LIFE|조선시대|이모지 1~2개|칭호(15자 이내)
 (본문 2~3문장)
-@@SVG
-<svg ...>조선시대 장면</svg>
+@@SCENE
+(이 전생의 삽화 장면 묘사 1~2문장)
 @@FINALE
 (현생 회수 문단)
 
-[@@SVG 삽화 — "귀여운 만화(웹툰 짤)" 스타일, 공유용이라 완성도 매우 중요]
-각 전생마다 그 장면을 담은 삽화 1장을 "@@SVG" 다음 줄부터 그린다. 아래 스타일을 반드시 지켜라(옛날 순정만화·웹툰 짤 같은 귀여운 톤).
-- 형식: <svg viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg"> … </svg> (정사각형, </svg>로 반드시 닫기).
-- ★스타일 핵심(꼭 지킬 것):
-  · 모든 주요 도형에 굵은 검정 외곽선을 넣는다 — stroke="#3a2b23", stroke-width 5~8, stroke-linejoin="round", stroke-linecap="round". 이 두꺼운 테두리가 만화 느낌의 핵심이다.
-  · 색은 부드러운 파스텔 flat 단색만(하늘색·연두·살구·미색·연분홍 등). 그라디언트·복잡한 음영·반투명 금지.
-  · 주인공은 둥글둥글 귀여운 SD(2~3등신) 캐릭터: 크고 동그란 머리, 점 눈 2개(작은 원), 아주 단순한 입/눈썹으로 표정. 볼터치(작은 분홍 원) 넣으면 더 귀엽다.
-- 구성: (1) 배경을 위=하늘, 아래=땅/바닥 두 면으로 크게 나눠 칠해 장면감을 준다, (2) 화면 가운데에 주인공을 큼직하게, (3) 시대·직업 소품 2~4개(전부 굵은 외곽선), (4) 본문의 웃긴 상황을 한눈에 보이게.
-- ★제목 배너: 이미지 맨 위 가로로 둥근 사각형 배너(rect rx로, 흰색/미색 채움 + 굵은 검정 외곽선)를 그리고 그 안에 이 전생의 칭호를 한글로 크게 적는다 — <text> font-size 34~44, fill="#3a2b23", text-anchor="middle", font-weight 굵게. (첨부 예시의 "노비의 삶" 같은 느낌)
-- 시대 고증(귀엽게 단순화): 선사시대=동굴·모닥불·매머드나 사슴·털가죽·돌도구; 조선시대=한복·갓·기와/초가·소·쟁기·붓·두루마리.
-- 도형 22~40개(circle·ellipse·rect·rounded rect·path·polygon·line). 선명하고 단순하게.
-- 반드시 문법적으로 유효하고 완결된 SVG. 열린 태그를 모두 닫아라. script·외부 이미지/폰트/링크 참조·이벤트 속성(on*) 절대 금지. 모든 좌표는 0~600 범위 안.`;
+[@@SCENE 장면 묘사 — 일러스트레이터에게 넘길 그림 지시문]
+각 전생마다 본문의 가장 웃긴 순간 하나를 그림 한 장으로 묘사한다.
+- 주인공 1명이 무엇을 하고 있는지(동작·표정), 곁의 소품 2~3개, 배경 한 줄 — 구체적인 명사로.
+- 시대 고증을 귀엽게: 선사시대=동굴·모닥불·매머드·털가죽·돌도구, 조선시대=한복·갓·기와/초가·소·붓·두루마리.
+- 글자·간판·문자가 필요한 장면은 만들지 마라(그림에 텍스트 금지).
+- 예: "털가죽을 입은 동그란 원시인이 모닥불 앞에서 탄 고기를 들고 울상을 짓고 있다. 옆에는 시큰둥한 매머드, 배경은 동굴 입구와 보름달."`;
+
+// 삽화 스타일 — 모든 전생 그림에 공통 적용(귀여운 카툰 스티커 톤)
+const IMG_STYLE =
+  "아주 귀여운 한국 카툰 스티커 스타일의 정사각형 일러스트를 그려줘. " +
+  "둥글둥글한 2등신 SD 캐릭터(크고 동그란 얼굴, 까만 점 눈, 발그레한 볼터치), " +
+  "두껍고 부드러운 다크브라운 외곽선, 밝은 파스텔 플랫 컬러, 단순하고 깔끔한 배경, " +
+  "스티커처럼 또렷한 구성, 유쾌하고 사랑스러운 분위기. " +
+  "사진처럼 사실적으로 그리지 말 것. 잔혹하거나 무서운 묘사 금지. " +
+  "이미지 안에 글자·문자·간판 텍스트를 절대 넣지 말 것.";
 
 function validPillar(p) {
   return !!p && typeof p.ganji === "string" && p.ganji.length === 2 &&
@@ -78,6 +83,22 @@ export default async function handler(req, res) {
   if (!geminiConfigured()) return res.status(501).json({ error: "not_configured" });
   if (!(await aiGuard(req, res, "pastlife"))) return;   // 서버측 레이트리밋(IP당 분당/일당)
 
+  // ── 삽화 모드: 장면 묘사 → 귀여운 카툰 이미지 1장 ──
+  if (req.body && req.body.mode === "img") {
+    const era = typeof req.body.era === "string" ? req.body.era : "";
+    const scene = typeof req.body.scene === "string"
+      ? req.body.scene.slice(0, 320).replace(/[<>{}]/g, "") : "";
+    if (!/^(선사시대|조선시대)$/.test(era) || scene.length < 8) {
+      return res.status(400).json({ error: "bad_scene" });
+    }
+    try {
+      const img = await genImage(IMG_STYLE + "\n\n장면(" + era + "): " + scene);
+      return res.status(200).json({ img: "data:" + img.mime + ";base64," + img.data });
+    } catch (err) {
+      return res.status(502).json({ error: "img_fail" });
+    }
+  }
+
   const saju = req.body && req.body.saju;
   if (!validate(saju)) return res.status(400).json({ error: "bad_payload" });
 
@@ -85,12 +106,11 @@ export default async function handler(req, res) {
     const wrote = await streamGemini(res, {
       system: SYSTEM,
       user:
-        "다음은 만세력 엔진이 계산한 이 사람의 사주입니다. 전생 2개(선사시대·조선시대)를 발굴하고, 각 전생마다 공유할 만한 SVG 삽화 한 장씩 그려 주세요.\n" +
+        "다음은 만세력 엔진이 계산한 이 사람의 사주입니다. 전생 2개(선사시대·조선시대)를 발굴하고, 각 전생마다 삽화 장면 묘사를 붙여 주세요.\n" +
         JSON.stringify(saju),
-      maxTokens: 16000,
+      maxTokens: 2400,
       temperature: 0.95,
-      model: "gemini-2.5-pro",
-      thinkingBudget: 4000, // pro thinking 상한 → 나머지(≈12000)를 두 전생 SVG 출력에 확보(삽화 누락 방지)
+      model: "gemini-2.5-flash",
     });
     if (!wrote) res.write("\n@@FINALE\n도사님이 이 전생 기록에는 말을 아끼시네요. 다시 시도해 주세요.");
     return res.end();

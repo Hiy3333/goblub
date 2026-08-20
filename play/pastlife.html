@@ -106,14 +106,12 @@
         .then(function (dd) { data = dd; })
         .catch(function () { showErr("데이터를 불러오지 못했어요. 새로고침 해주세요."); });
 
-      // ---- 응답 파서: @@LIFE / @@FIX / @@SVG(전생별) / @@FINALE ----
-      function extractSvg(s) {
-        var idx = s.indexOf("@@SVG");
-        if (idx < 0) return { text: s, svg: null };
-        var raw = s.slice(idx + 5);
-        var a = raw.indexOf("<svg"), b = raw.lastIndexOf("</svg>");
-        var svg = (a > -1 && b > -1) ? raw.slice(a, b + 6) : null;
-        return { text: s.slice(0, idx), svg: svg };
+      // ---- 응답 파서: @@LIFE / @@FIX / @@SCENE(삽화 장면 묘사) / @@FINALE ----
+      function extractScene(s) {
+        var idx = s.indexOf("@@SCENE");
+        if (idx < 0) return { text: s, scene: null };
+        var scene = s.slice(idx + 7).trim();
+        return { text: s.slice(0, idx), scene: scene || null };
       }
 
       function parseReading(text) {
@@ -127,30 +125,84 @@
           var nl = chunk.indexOf("\n");
           if (nl < 0) return;
           var head = chunk.slice(0, nl).replace(/^\|/, "").split("|");
-          var ex = extractSvg(chunk.slice(nl + 1));
+          var ex = extractScene(chunk.slice(nl + 1));
           var body = ex.text.trim();
           var fix = null;
           var fx = body.indexOf("@@FIX");
           if (fx > -1) { fix = body.slice(fx + 5).trim(); body = body.slice(0, fx).trim(); }
           lives.push({ era: (head[0] || "").trim(), emoji: (head[1] || "🌀").trim(),
-            title: (head[2] || "이름 모를 전생").trim(), body: body, fix: fix, svg: ex.svg });
+            title: (head[2] || "이름 모를 전생").trim(), body: body, fix: fix, scene: ex.scene });
         });
         return { lives: lives, finale: finale };
       }
 
-      function sanitizeSvg(svgText) {
+      // ---- 삽화: 장면 묘사 → 이미지 생성 API. 같은 장면은 로컬에 압축 저장해 재생성 비용 방지 ----
+      var API_BASE = /\.vercel\.app$/.test(location.hostname) ? location.origin : "https://goblub-2.vercel.app";
+      function sceneKey(s) { var h = 5381; for (var i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0; return "goblub_plimg_" + (h >>> 0).toString(36); }
+      function cacheArt(key, dataUrl) {
         try {
-          var doc = new DOMParser().parseFromString(svgText, "image/svg+xml");
-          if (doc.querySelector("parsererror")) return null;
-          var root = doc.documentElement;
-          Array.prototype.slice.call(doc.querySelectorAll("script, foreignObject, image, use")).forEach(function (n) { n.remove(); });
-          Array.prototype.slice.call(doc.querySelectorAll("*")).forEach(function (el) {
-            Array.prototype.slice.call(el.attributes).forEach(function (at) {
-              if (/^on/i.test(at.name) || /(javascript:|http)/i.test(at.value)) el.removeAttribute(at.name);
+          var keys = JSON.parse(localStorage.getItem("goblub_plimg_keys") || "[]");
+          keys.push(key);
+          while (keys.length > 6) localStorage.removeItem(keys.shift());   // 최근 6장만 보관
+          localStorage.setItem("goblub_plimg_keys", JSON.stringify(keys));
+          localStorage.setItem(key, dataUrl);
+        } catch (e) {}
+      }
+      // 원본 PNG(≈1~2MB)를 800px JPEG로 압축 — 표시·저장·캐시 전부 이걸 쓴다
+      function compressArt(dataUrl, cb) {
+        var im = new Image();
+        im.onload = function () {
+          try {
+            var c = document.createElement("canvas"); c.width = 800; c.height = 800;
+            var g = c.getContext("2d");
+            g.fillStyle = "#fff"; g.fillRect(0, 0, 800, 800);
+            g.drawImage(im, 0, 0, 800, 800);
+            cb(c.toDataURL("image/jpeg", 0.85));
+          } catch (e) { cb(dataUrl); }
+        };
+        im.onerror = function () { cb(null); };
+        im.src = dataUrl;
+      }
+      function loadArt(life, art, n) {
+        var key = sceneKey(life.era + "|" + life.scene);
+        var cached = null;
+        try { cached = localStorage.getItem(key); } catch (e) {}
+        if (cached) { showArt(cached, life, art, n); return; }
+        art.innerHTML = '<div class="svg-missing"><span class="big">🎨</span>도사님이 삽화를 그리는 중…<br>먹을 가는 데 십 초쯤 걸려요</div>';
+        fetch(API_BASE + "/api/pastlife", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ mode: "img", era: life.era, scene: life.scene })
+        }).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+          .then(function (j) {
+            if (!j.img) throw new Error("no img");
+            compressArt(j.img, function (small) {
+              if (!small) throw new Error("compress");
+              cacheArt(key, small);
+              showArt(small, life, art, n);
             });
+          })
+          .catch(function () {
+            art.innerHTML = '<div class="svg-missing"><span class="big">' + life.emoji +
+              '</span>삽화 붓이 미끄러졌어요!<br></div>';
+            var rb = document.createElement("button");
+            rb.className = "btn-ghost"; rb.textContent = "🖌 삽화 다시 그리기";
+            rb.onclick = function () { loadArt(life, art, n); };
+            art.firstChild.appendChild(rb);
           });
-          return root;
-        } catch (e) { return null; }
+      }
+      function showArt(dataUrl, life, art, n) {
+        art.innerHTML = "";
+        var im = document.createElement("img");
+        im.src = dataUrl; im.alt = life.title;
+        im.style.cssText = "max-width:340px;width:100%;display:block;margin:0 auto;border-radius:14px;background:#fff;";
+        art.appendChild(im);
+        var save = document.createElement("button");
+        save.className = "btn-ghost";
+        save.style.marginTop = "8px";
+        save.textContent = "🖼 이 장면 이미지 저장";
+        save.onclick = function () { saveLifeImage(dataUrl, life, n); };
+        art.appendChild(save);
       }
 
       // ---- 고브럽 씹어먹기 모션 ----
@@ -187,8 +239,8 @@
         }, 30);
       }
 
-      // 전생 장면 SVG를 공유용 카드(제목+삽화+브랜딩)로 저장 — 미드나잇 시티팝 네온 룩
-      function saveLifeImage(svgRoot, life, n) {
+      // 전생 삽화를 공유용 카드(제목+삽화+브랜딩)로 저장 — 미드나잇 시티팝 네온 룩
+      function saveLifeImage(artUrl, life, n) {
         var W = 720, H = 1280; // 9:16 — 인스타 스토리 비율
         var canvas = document.createElement("canvas");
         canvas.width = W; canvas.height = H;
@@ -209,10 +261,6 @@
           if (line) g.fillText(line, x, yy);
           return yy;
         }
-        var clone = svgRoot.cloneNode(true);
-        clone.setAttribute("width", "600"); clone.setAttribute("height", "600");
-        clone.removeAttribute("style");
-        var xml = new XMLSerializer().serializeToString(clone);
         var img = new Image();
         img.onload = function () {
           // 야경 그라데이션 배경
@@ -274,7 +322,7 @@
           else dl(canvas.toDataURL("image/png"));
         };
         img.onerror = function () { alert("이미지 저장에 실패했어요. 다시 시도해 주세요."); };
-        img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(xml);
+        img.src = artUrl;
       }
 
       function render(parsed) {
@@ -290,19 +338,9 @@
             '<div class="life-art"></div>' +
             '<p class="life-body"></p>';
           card.querySelector(".life-body").textContent = life.body;
-          var svgRoot = life.svg ? sanitizeSvg(life.svg) : null;
           var art = card.querySelector(".life-art");
-          if (svgRoot) {
-            svgRoot.setAttribute("width", "100%");
-            svgRoot.removeAttribute("height");
-            svgRoot.style.cssText = "max-width:340px; display:block; margin:0 auto; border-radius:14px; background:#fff;";
-            art.appendChild(svgRoot);
-            var save = document.createElement("button");
-            save.className = "btn-ghost";
-            save.style.marginTop = "8px";
-            save.textContent = "🖼 이 장면 이미지 저장";
-            (function (sv, lf, idx) { save.onclick = function () { saveLifeImage(sv, lf, idx); }; })(svgRoot, life, n);
-            art.appendChild(save);
+          if (life.scene) {
+            loadArt(life, art, n);   // 삽화는 비동기 생성 — 글 먼저 보여주고 그림이 뒤따라온다
           } else {
             missingArt++;
             art.innerHTML = '<div class="svg-missing"><span class="big">' + life.emoji +
@@ -346,11 +384,12 @@
         $("dig-panel").style.display = "block";
         $("result-area").style.display = "none";
         var buffer = "";
-        Dosa.fetchAI("/api/pastlife", { saju: payload }, "goblub_pl6_", {
-          // 두 전생 모두 삽화가 있는 완전한 응답만 캐시(삽화 누락 결과가 고착되는 것 방지)
+        Dosa.fetchAI("/api/pastlife", { saju: payload }, "goblub_pl7_", {
+          // 두 전생 모두 장면 묘사가 있는 완전한 응답만 캐시(삽화 누락 결과가 고착되는 것 방지)
           accept: function (full) {
             var p = parseReading(full);
-            return p.lives.length > 0 && p.lives.every(function (l) { return !!l.svg; });
+            return p.lives.length > 0 && !!p.finale &&
+              p.lives.every(function (l) { return !!l.scene; });
           },
           onChunk: function (t) {
             buffer += t;
