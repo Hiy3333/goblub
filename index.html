@@ -738,6 +738,9 @@
                : Math.sin(now / 1000 * 1.4) * 1.2;
       var lean = g === "run" ? 8 : g === "dash" ? 6 : 0; // 달릴 땐 앞으로 기울기
       var hop = (g === "run" || g === "dash") ? Math.abs(Math.sin(ph)) * 3 : 0;
+      // 시간대 멘트 중엔 제자리에서 통통 — 귀엽게 콩콩 뛰며 말한다
+      var talkB = (mode === "idle" && now < talkUntil && !ship) ? Math.abs(Math.sin(now / 1000 * 6)) : -1;
+      if (talkB >= 0) hop = talkB * 13;
       var step = moving ? Math.sin(ph * 2) * 0.012 : 0;
       var y = groundY() - el.offsetHeight - hop;
       var sx = 1, sy = 1;
@@ -746,6 +749,7 @@
         var k = Math.sin((1 - squashT / 0.3) * Math.PI) * 0.2;
         sx = 1 + k; sy = 1 - k;
       }
+      if (talkB >= 0) { var tk = (1 - talkB) * 0.08; sx += tk; sy -= tk; } // 착지 순간 몰랑 눌림
       el.style.transform = "translate(" + x + "px, " + y + "px)";
 
       // 토성 고리를 도는 반짝임 + 광원 기준 그림자
