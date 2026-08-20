@@ -126,12 +126,20 @@
           if (nl < 0) return;
           var head = chunk.slice(0, nl).replace(/^\|/, "").split("|");
           var ex = extractScene(chunk.slice(nl + 1));
-          var body = ex.text.trim();
+          var body = ex.text.trim(), scene = ex.scene;
           var fix = null;
           var fx = body.indexOf("@@FIX");
           if (fx > -1) { fix = body.slice(fx + 5).trim(); body = body.slice(0, fx).trim(); }
+          // 모델이 @@FIX를 @@SCENE 뒤에 쓰는 변칙도 수습
+          if (scene) {
+            var sfx = scene.indexOf("@@FIX");
+            if (sfx > -1) { fix = fix || scene.slice(sfx + 5).trim(); scene = scene.slice(0, sfx).trim(); }
+          }
+          var title = (head[2] || "이름 모를 전생").trim();
+          // @@SCENE이 빠져도 삽화는 무조건 그린다 — 본문 자체를 장면 묘사로 쓴다
+          if (!scene) scene = title + ". " + body.slice(0, 220);
           lives.push({ era: (head[0] || "").trim(), emoji: (head[1] || "🌀").trim(),
-            title: (head[2] || "이름 모를 전생").trim(), body: body, fix: fix, scene: ex.scene });
+            title: title, body: body, fix: fix, scene: scene });
         });
         return { lives: lives, finale: finale };
       }
@@ -328,7 +336,6 @@
       function render(parsed) {
         var box = $("lives");
         box.innerHTML = "";
-        var missingArt = 0;
         parsed.lives.forEach(function (life, n) {
           var card = document.createElement("section");
           card.className = "life-card" + (life.fix ? " bad" : "");
@@ -339,13 +346,7 @@
             '<p class="life-body"></p>';
           card.querySelector(".life-body").textContent = life.body;
           var art = card.querySelector(".life-art");
-          if (life.scene) {
-            loadArt(life, art, n);   // 삽화는 비동기 생성 — 글 먼저 보여주고 그림이 뒤따라온다
-          } else {
-            missingArt++;
-            art.innerHTML = '<div class="svg-missing"><span class="big">' + life.emoji +
-              '</span>이 전생의 삽화는 도사님이 못 그렸어요<br>아래 <b>다시 발굴</b>을 누르면 새 삽화가 나올 수 있어요!</div>';
-          }
+          loadArt(life, art, n);   // 삽화는 비동기 생성 — 파서가 장면을 반드시 채우므로 무조건 그린다
           if (life.fix) {
             var btn = document.createElement("button");
             btn.className = "summon";
@@ -355,12 +356,6 @@
           }
           box.appendChild(card);
         });
-        if (missingArt) {
-          var hint = document.createElement("p");
-          hint.className = "art-hint";
-          hint.innerHTML = "🎨 삽화 일부가 안 나왔어요. 아래 <b>다시 발굴</b>을 누르면 새로 그려드려요!";
-          box.appendChild(hint);
-        }
         if (parsed.finale) { $("finale-text").textContent = parsed.finale; $("finale-box").style.display = "block"; }
         $("svg-panel").style.display = "block";
         $("result-area").style.display = "block";
