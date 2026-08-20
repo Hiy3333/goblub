@@ -206,14 +206,23 @@ var FAVOR={
   "중화":{ "비견":0,"겁재":-6,"정인":4,"편인":0,"식신":6,"상관":-2,"편재":4,"정재":6,"편관":-4,"정관":6 }
 };
 var GAN_OH={0:"목",1:"목",2:"화",3:"화",4:"토",5:"토",6:"금",7:"금",8:"수",9:"수"};
-/* 지지 관계 — 충(정면 6칸)·육합·삼합(반합) */
+/* 지지 관계 — 충(정면 6칸)·육합·삼합(반합/완성)·형·원진·해·방합 */
 function isChung(a,b){ return ((a-b)%12+12)%12===6; }
 var YUKHAP={0:1,1:0,2:11,11:2,3:10,10:3,4:9,9:4,5:8,8:5,6:7,7:6};
-var SAMHAP=[[8,0,4],[2,6,10],[5,9,1],[11,3,7]];
+var SAMHAP=[[8,0,4],[2,6,10],[5,9,1],[11,3,7]];               // 수·화·금·목국
+var SAMHAP_OH=["수","화","금","목"];
+var BANGHAP=[[2,3,4],[5,6,7],[8,9,10],[11,0,1]];              // 목·화·금·수방
+var BANGHAP_OH=["목","화","금","수"];
 function samhapHalf(a,b){
   if(a===b) return false;
   return SAMHAP.some(function(g){ return g.indexOf(a)>=0 && g.indexOf(b)>=0; });
 }
+function pk(a,b){ return a<b ? a+"-"+b : b+"-"+a; }
+var HYUNG={"2-5":1,"5-8":1,"2-8":1,"1-10":1,"7-10":1,"1-7":1,"0-3":1};   // 인사신·축술미 삼형(쌍)·자묘형
+var WONJIN={"0-7":1,"1-6":1,"2-9":1,"3-8":1,"4-11":1,"5-10":1};
+var HAE={"0-7":1,"1-6":1,"2-5":1,"3-4":1,"8-11":1,"9-10":1};
+/* 천간합 — 갑기·을경·병신·정임·무계 */
+var GANHAP={0:5,5:0,1:6,6:1,2:7,7:2,3:8,8:3,4:9,9:4};
 /* 세운 간지 — 그 해의 연간지 (60갑자: 서기 Y년 = (Y-4)%60) */
 function yearGZ(y){ return { gan:((y-4)%10+10)%10, ji:((y-4)%12+12)%12 }; }
 
@@ -240,6 +249,52 @@ function buildChart(r, birth, deep){
   [["year",1.0],["month",1.2],["day",1.5],["hour",1.0]].forEach(function(kw){
     var p=r.pillars[kw[0]]; if(p) natal.push({ ji:p[1], w:kw[1] });
   });
+  var natalJis=natal.map(function(n){return n.ji;});
+  // 원국 천간들(일간 제외) — 용신/기신 합거 판정 대상
+  var natalGans=[];
+  ["year","month","hour"].forEach(function(k){ var p=r.pillars[k]; if(p) natalGans.push(p[0]); });
+  // 공망 — 내 일주가 속한 순(旬)에서 비는 두 지지 (통설대로 세운에만 적용)
+  var dg=r.pillars.day[0], dj=r.pillars.day[1], p60=0;
+  for(var i60=0;i60<60;i60++) if(i60%10===dg && i60%12===dj){ p60=i60; break; }
+  var gmDec=Math.floor(p60/10);
+  var gongmang=[((10-2*gmDec)%12+12)%12, ((11-2*gmDec)%12+12)%12];
+  // 운 지지가 원국 2자와 삼합/방합 「국」을 완성하는가 — 완성 국의 오행이 용신이면 대길, 기신이면 부담
+  function groupComplete(groups, ohNames, j){
+    for(var gi=0;gi<groups.length;gi++){
+      var g=groups[gi];
+      if(g.indexOf(j)<0) continue;
+      var others=g.filter(function(x){return x!==j;});
+      if(others.every(function(x){return natalJis.indexOf(x)>=0;})) return ohNames[gi];
+    }
+    return null;
+  }
+  function gukBonus(j, big){
+    var oh=groupComplete(SAMHAP, SAMHAP_OH, j);
+    var scale=big?1:0.7;
+    if(oh==null){ oh=groupComplete(BANGHAP, BANGHAP_OH, j); scale*=0.5; if(oh==null) return 0; }
+    if(use.indexOf(oh)>=0) return 10*scale;
+    if(avoid.indexOf(oh)>=0){
+      // 완성 국이 관성 오행이고 관인상생 통로가 있으면 부담이 명예로 상쇄된다
+      var gwanOh=OH_ORDER[(OH_ORDER.indexOf(myOhName)+3)%5];
+      return (oh===gwanOh && tongkwan) ? -2*scale : -8*scale;
+    }
+    return 3*scale;
+  }
+  // 운 천간의 합 — 용신 천간을 묶으면(합거) 흉, 기신 천간을 묶으면 길
+  function hapgeo(g){
+    var s=0;
+    natalGans.forEach(function(h){
+      if(GANHAP[g]!==h) return;
+      var oh=GAN_OH[h];
+      if(use.indexOf(oh)>=0) s-=5;        // 용신 합거
+      else if(avoid.indexOf(oh)>=0) s+=3; // 기신 합거
+    });
+    return s;
+  }
+  // 식상생재 통관 — 신강 사주가 재성운을 만날 때 원국에 식상이 있으면 흐름이 순해진다
+  var siksangOh=OH_ORDER[(OH_ORDER.indexOf(myOhName)+1)%5];
+  var jaeOh=OH_ORDER[(OH_ORDER.indexOf(myOhName)+2)%5];
+  var siksangSaeng=(lab==="신강") && (r.oheng[siksangOh]||0) >= 1.0;
   function ohBonus(gan, ji, scale){
     var s=0;
     [GAN_OH[gan], GAN_OH[Saju.branchMainGan(ji)]].forEach(function(o){
@@ -253,14 +308,20 @@ function buildChart(r, birth, deep){
     var js=Saju.SIPSEONG[Saju.sipseong(r.ilgan, Saju.branchMainGan(ji))];
     return (F[gs]||0)*wGan + (F[js]||0)*wJi;
   }
-  // 대운 점수 — 십성 억부 + 오행 보완 + 원국 지지와의 충/합
+  // 대운 점수 — 십성 억부 + 오행 보완 + 충/합/형/원진/해 + 국 완성 + 합거 + 식상생재
   function decadeScore(du){
     var s=50 + sipScore(du.gan, du.ji, 1.0, 1.25) + ohBonus(du.gan, du.ji, 2);
     natal.forEach(function(n){
+      var key=pk(du.ji, n.ji);
       if(isChung(du.ji, n.ji)) s-=4*n.w;
       else if(YUKHAP[du.ji]===n.ji) s+=2.5*n.w;
       else if(samhapHalf(du.ji, n.ji)) s+=1.5*n.w;
+      else if(HYUNG[key]) s-=2*n.w;
+      else if(WONJIN[key]) s-=1.2*n.w;
+      else if(HAE[key]) s-=1*n.w;
     });
+    s += gukBonus(du.ji, true) + hapgeo(du.gan);
+    if(siksangSaeng && (GAN_OH[du.gan]===jaeOh || GAN_OH[Saju.branchMainGan(du.ji)]===jaeOh)) s+=3;
     return Math.max(16, Math.min(94, s));
   }
   var decs=r.daeun.list.map(function(du){ return { age:du.age, gan:du.gan, ji:du.ji, score:decadeScore(du) }; });
@@ -269,19 +330,26 @@ function buildChart(r, birth, deep){
     for(var i=decs.length-1;i>=0;i--) if(a>=decs[i].age) return i;
     return -1;
   }
-  // 세운 보정 — 그 해 간지의 십성 억부 + 오행 보완 + 원국·대운 지지와의 충/합 (전부 실계산, 무작위 없음)
+  // 세운 보정 — 십성 억부 + 오행 + 충/합/형/원진/해 + 국 완성 + 합거 + 공망 반감 (전부 실계산, 무작위 없음)
   function seunDelta(year, decJi){
     var g=yearGZ(year);
     var s = sipScore(g.gan, g.ji, 0.5, 0.6) + ohBonus(g.gan, g.ji, 1);
     natal.forEach(function(n){
+      var key=pk(g.ji, n.ji);
       if(isChung(g.ji, n.ji)) s-=4.5*n.w;
       else if(YUKHAP[g.ji]===n.ji) s+=2.5*n.w;
       else if(samhapHalf(g.ji, n.ji)) s+=1.8*n.w;
+      else if(HYUNG[key]) s-=2*n.w;
+      else if(WONJIN[key]) s-=1.2*n.w;
+      else if(HAE[key]) s-=1*n.w;
     });
     if(decJi!=null){
       if(isChung(g.ji, decJi)) s-=4;
       else if(YUKHAP[g.ji]===decJi) s+=2.5;
     }
+    s += gukBonus(g.ji, false) + hapgeo(g.gan)*0.8;
+    if(siksangSaeng && GAN_OH[g.gan]===jaeOh) s+=2;
+    if(gongmang.indexOf(g.ji)>=0) s*=0.55;   // 공망년 — 좋은 것도 궂은 것도 반감(통설: 세운에만)
     return Math.max(-20, Math.min(20, s));
   }
   var pts=[];
