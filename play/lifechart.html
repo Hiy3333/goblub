@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>인생 주가 차트 — goblub</title>
+<meta name="description" content="내 대운을 주식 차트처럼 — 떡상 구간, 전성기, 조정장까지 콕 집어주는 인생 차트" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
+<style>
+:root{ --bg:#0a0f1c; --panel:#111a2e; --line:rgba(140,165,210,.16);
+  --ink:#e8effc; --soft:#8ea3c4; --up:#ff4d57; --down:#4d8dff; --gold:#ffd98a; }
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--ink);font-family:'Jua','Malgun Gothic',sans-serif}
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(110% 60% at 50% -8%, rgba(80,110,190,.16), transparent 60%),
+             radial-gradient(90% 55% at 50% 112%, rgba(255,90,110,.08), transparent 60%)}
+.app{position:relative;z-index:1;max-width:560px;margin:0 auto;padding:0 16px 44px}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 2px 6px}
+.topbar a{color:var(--soft);text-decoration:none;font-size:.92rem}
+.topbar .t{font-size:1.05rem}
+.topbar .sp{width:44px}
+
+/* ── 입력 ── */
+.lead{text-align:center;padding:16px 6px 4px}
+.lead h1{margin:0 0 8px;font-size:1.62rem;text-shadow:0 0 18px rgba(255,120,130,.3)}
+.lead p{margin:0;color:var(--soft);font-size:.93rem;line-height:1.75}
+.box{margin-top:16px;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px 15px 18px}
+.box h2{margin:0 0 10px;font-size:1rem;color:var(--gold);font-weight:400}
+.row{display:flex;gap:6px}
+.row+.row{margin-top:7px}
+.row select,.row input{flex:1 1 auto;min-width:0;padding:10px 8px;border-radius:10px;
+  background:#0c1424;color:var(--ink);border:1px solid var(--line);font-family:inherit;font-size:.9rem}
+.trow{justify-content:flex-start}
+.trow select{flex:0 0 auto}
+.trow input[type=number]{flex:0 0 64px}
+.trow .unit{align-self:center;font-size:.88rem;color:var(--soft)}
+.nohr{display:flex;align-items:center;gap:7px;font-size:.88rem;color:var(--soft);
+  cursor:pointer;user-select:none;padding:0 4px;margin-left:4px}
+.nohr input{flex:none;width:18px;height:18px;min-width:0;padding:0;margin:0;
+  background:none;border:none;accent-color:#5a728f;cursor:pointer}
+.sexrow{display:flex;gap:7px;margin-top:7px}
+.sexbtn{flex:1;padding:11px 4px;border-radius:12px;cursor:pointer;font-family:inherit;
+  font-size:.95rem;color:#cfd9f2;background:#0c1424;border:1px solid var(--line);transition:all .15s}
+.sexbtn.on{color:#fff;background:linear-gradient(135deg,#ff5b66,#ff8a5a);border-color:transparent;
+  box-shadow:0 6px 18px rgba(255,100,90,.3)}
+.sexrow.shake{animation:shk .3s}
+@keyframes shk{0%,100%{transform:none}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.gobtn{width:100%;margin-top:12px;padding:14px;border:0;border-radius:14px;cursor:pointer;
+  font-family:inherit;font-size:1.05rem;color:#fff;
+  background:linear-gradient(135deg,#ff4d57,#ff8a5a);
+  box-shadow:0 10px 26px rgba(255,90,90,.35)}
+.errmsg{display:none;margin:10px 0 0;color:#ff9d8a;font-size:.86rem;text-align:center}
+.fine{margin:12px 0 0;color:#5f7091;font-size:.76rem;text-align:center;line-height:1.7}
+
+/* ── 결과: 증권앱 톤 ── */
+#result{display:none}
+.tick{margin-top:14px;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:15px 17px}
+.tick .nm{display:flex;align-items:baseline;gap:8px}
+.tick .nm b{font-size:1.3rem;font-weight:400}
+.tick .nm span{color:var(--soft);font-size:.8rem}
+.tick .price{display:flex;align-items:baseline;gap:10px;margin-top:6px}
+.tick .price b{font-size:2.2rem;font-weight:400;line-height:1}
+.tick .price .chg{font-size:.98rem}
+.tick .price.up b,.tick .price.up .chg{color:var(--up)}
+.tick .price.down b,.tick .price.down .chg{color:var(--down)}
+.tick .price.flat b,.tick .price.flat .chg{color:#d6deee}
+.tick .meta{margin-top:7px;color:var(--soft);font-size:.8rem}
+.tick .meta i{font-style:normal;color:#ffd9a0}
+
+.chartwrap{margin-top:12px;background:var(--panel);border:1px solid var(--line);
+  border-radius:18px;padding:10px 8px 6px;overflow:hidden}
+.chartwrap canvas{display:block;width:100%;height:auto}
+
+.stats{display:flex;gap:8px;margin-top:12px}
+.stat{flex:1;min-width:0;background:var(--panel);border:1px solid var(--line);border-radius:15px;
+  padding:12px 10px;text-align:center}
+.stat .e{font-size:1.5rem;display:block}
+.stat b{display:block;margin-top:4px;font-size:.8rem;color:var(--soft);font-weight:400}
+.stat span{display:block;margin-top:2px;font-size:.98rem;color:#fff}
+.stat.hot span{color:var(--up)}
+.stat.cold span{color:var(--down)}
+
+.note{margin-top:12px;background:var(--panel);border:1px solid var(--line);border-radius:16px;
+  padding:13px 16px;font-size:.92rem;line-height:1.8;color:#dbe4f5}
+.note b{color:var(--gold);font-weight:400}
+.disc{margin:12px 4px 0;color:#5f7091;font-size:.74rem;text-align:center;line-height:1.7}
+
+.btnrow{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.btnrow button,.btnrow a{flex:1 1 46%;padding:12px;border:1px solid var(--line);border-radius:13px;
+  background:rgba(20,30,52,.7);color:var(--ink);cursor:pointer;font-family:inherit;font-size:.93rem;
+  text-align:center;text-decoration:none}
+.btnrow .main{flex:1 1 100%;border:0;color:#fff;background:linear-gradient(135deg,#ff4d57,#ff8a5a)}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <a href="fortune-hub.html">← 운세</a>
+    <span class="t">📈 인생 주가 차트</span>
+    <span class="sp"></span>
+  </div>
+
+  <div id="intro">
+    <div class="lead">
+      <h1>내 인생, 지금 몇 층이야?</h1>
+      <p>대운의 흐름을 주식 차트처럼 펼쳐 드립니다.<br>떡상 구간 · 전성기 · 조정장까지 콕.</p>
+    </div>
+    <div class="box">
+      <h2>📋 상장 신청서</h2>
+      <div class="row">
+        <select id="in-year"></select><select id="in-month"></select><select id="in-day"></select>
+        <select id="in-cal"><option value="">양력</option><option value="L">음력</option><option value="LL">윤달</option></select>
+      </div>
+      <div class="row trow">
+        <select id="in-hour"><option value="" disabled selected>시</option></select>
+        <input type="number" id="in-min" min="0" max="59" value="0" aria-label="분" />
+        <span class="unit">분</span>
+        <label class="nohr">시간 모름 <input type="checkbox" id="in-nohr" /></label>
+      </div>
+      <div class="sexrow" id="sex-row">
+        <button type="button" class="sexbtn" data-sex="M">남자</button>
+        <button type="button" class="sexbtn" data-sex="F">여자</button>
+      </div>
+      <button class="gobtn" id="btn-go">📈 나 상장하기</button>
+      <p class="errmsg" id="err"></p>
+      <p class="fine">생일 정보는 이 브라우저 안에서만 계산되고 저장되지 않아요.<br>성별은 대운(10년 주기) 방향 계산에만 쓰입니다.</p>
+    </div>
+  </div>
+
+  <div id="result">
+    <div class="tick">
+      <div class="nm"><b id="t-name">나 (ME)</b><span id="t-code"></span><span id="t-sector"></span></div>
+      <div class="price" id="t-price"><b id="t-now"></b><span class="chg" id="t-chg"></span></div>
+      <div class="meta" id="t-meta"></div>
+    </div>
+    <div class="chartwrap"><canvas id="cv" width="1080" height="640"></canvas></div>
+    <div class="stats">
+      <div class="stat hot"><span class="e">🚀</span><b>떡상 구간</b><span id="s-rise"></span></div>
+      <div class="stat"><span class="e">⭐</span><b>전성기</b><span id="s-peak"></span></div>
+      <div class="stat cold"><span class="e">🧊</span><b>바닥 매수 기회</b><span id="s-dip"></span></div>
+    </div>
+    <div class="note" id="r-note"></div>
+    <p class="disc">※ 본 차트는 투자 정보가 아니며, 이 종목은 환불·손절이 불가합니다. 존버만 가능. · goblub</p>
+    <div class="btnrow">
+      <button class="main" id="btn-save">📸 차트 이미지 저장</button>
+      <button id="btn-retry">↺ 다시 상장</button>
+      <a href="fortune-hub.html">✧ 다른 운세 보기</a>
+    </div>
+  </div>
+</div>
+
+<script src="../js/common.js?v=24" data-root=".."></script>
+<script src="js/saju.js"></script>
+<script src="js/lunar.js?v=1"></script>
+<script>
+var $=function(id){return document.getElementById(id);};
+var data=null;
+fetch("data/saju-terms.json").then(function(r){return r.json();}).then(function(d){data=d;});
+
+/* ── 입력 ── */
+(function(){
+  var y=$("in-year"), m=$("in-month"), d=$("in-day"), h=$("in-hour"), now=new Date().getFullYear();
+  for(var i=now;i>=1935;i--) y.add(new Option(i+"년",i));
+  for(var j=1;j<=12;j++) m.add(new Option(j+"월",j));
+  for(var k=1;k<=31;k++) d.add(new Option(k+"일",k));
+  for(var t=0;t<24;t++) h.add(new Option(("0"+t).slice(-2)+"시",t));
+  y.value=2000; m.value=1; d.value=1;
+})();
+(function(){
+  var cb=$("in-nohr"), h=$("in-hour"), mi=$("in-min");
+  function sync(){ h.disabled=cb.checked; mi.disabled=cb.checked; }
+  cb.addEventListener("change",sync); sync();
+})();
+var sexSel="";
+$("sex-row").addEventListener("click",function(e){
+  var b=e.target.closest(".sexbtn"); if(!b) return;
+  sexSel=b.dataset.sex;
+  this.querySelectorAll(".sexbtn").forEach(function(x){ x.classList.toggle("on",x===b); });
+});
+
+function readBirth(){
+  var y=+$("in-year").value, m=+$("in-month").value, d=+$("in-day").value;
+  var cal=$("in-cal").value, b;
+  if(cal){
+    if(!window.GoblubLunar) return null;
+    var sol=GoblubLunar.lunarToSolar(y,m,d,cal==="LL");
+    if(!sol) return null;
+    b={y:sol.y,m:sol.m,d:sol.d};
+  }else{
+    var dt=new Date(y,m-1,d);
+    if(dt.getFullYear()!==y||dt.getMonth()!==m-1||dt.getDate()!==d) return null;
+    b={y:y,m:m,d:d};
+  }
+  var hv=$("in-hour").value;
+  if(!$("in-nohr").checked && hv!==""){ b.hour=+hv; b.min=Math.max(0,Math.min(59,+($("in-min").value)||0)); }
+  return b;
+}
+
+/* ── 점수 모델 — 신강약에 따라 십성의 길흉이 뒤집힌다(정통 규칙) + 오행 보완 ── */
+var FAVOR={
+  "신약":{ "비견":8,"겁재":4,"정인":10,"편인":6,"식신":-2,"상관":-6,"편재":-6,"정재":-4,"편관":-10,"정관":-6 },
+  "신강":{ "비견":-6,"겁재":-10,"정인":-4,"편인":-6,"식신":8,"상관":4,"편재":8,"정재":10,"편관":4,"정관":8 },
+  "중화":{ "비견":0,"겁재":-6,"정인":4,"편인":0,"식신":6,"상관":-2,"편재":4,"정재":6,"편관":-4,"정관":6 }
+};
+var GAN_OH={0:"목",1:"목",2:"화",3:"화",4:"토",5:"토",6:"금",7:"금",8:"수",9:"수"};
+function rng(seed){ return function(){ seed|=0; seed=seed+0x6D2B79F5|0; var t=Math.imul(seed^seed>>>15,1|seed);
+  t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+
+function buildChart(r, birth){
+  var lab=r.strength.label, F=FAVOR[lab];
+  var ohArr=Object.keys(r.oheng).map(function(k){return [k,r.oheng[k]];}).sort(function(a,b){return a[1]-b[1];});
+  var weak=[ohArr[0][0],ohArr[1][0]], strong=ohArr[4][0];
+  function decadeScore(du){
+    var s=50;
+    var gs=Saju.SIPSEONG[Saju.sipseong(r.ilgan, du.gan)];
+    var js=Saju.SIPSEONG[Saju.sipseong(r.ilgan, Saju.branchMainGan(du.ji))];
+    s += (F[gs]||0)*1.0 + (F[js]||0)*1.25;
+    var go=GAN_OH[du.gan], jo=GAN_OH[Saju.branchMainGan(du.ji)];
+    [go,jo].forEach(function(o){
+      if(weak.indexOf(o)>=0) s+=6;
+      if(o===strong) s-=4;
+    });
+    return Math.max(16, Math.min(94, s));
+  }
+  var decs=r.daeun.list.map(function(du){ return { age:du.age, gan:du.gan, ji:du.ji, score:decadeScore(du) }; });
+  // 연 단위 곡선: 1세 ~ 마지막 대운 끝(최대 90세)
+  var seed=(birth.y*10000+birth.m*100+birth.d)^(birth.hour!=null?birth.hour*7:0)^(sexSel==="M"?13:71);
+  var rr=rng(seed);
+  var endAge=Math.min(90, decs[decs.length-1].age+10);
+  var pts=[];
+  function decAt(a){
+    for(var i=decs.length-1;i>=0;i--) if(a>=decs[i].age) return i;
+    return -1;
+  }
+  var noise=[];
+  for(var a=1;a<=endAge;a++) noise.push((rr()-0.5)*11);
+  for(var a2=1;a2<endAge-1;a2++) noise[a2]=(noise[a2-1]+noise[a2]*2+noise[a2+1])/4; // 부드럽게
+  for(var age=1;age<=endAge;age++){
+    var i=decAt(age), base;
+    if(i<0){ // 첫 대운 전 어린 시절 — 50에서 첫 대운 점수로 서서히
+      var t0=age/decs[0].age;
+      base=50+(decs[0].score-50)*t0*t0*(3-2*t0);
+    }else{
+      var cur=decs[i], nxt=decs[i+1];
+      var t=(age-cur.age)/10; if(t>1)t=1;
+      var to=nxt?nxt.score:cur.score;
+      var tt=t*t*(3-2*t);
+      base=cur.score+(to-cur.score)*tt;
+    }
+    pts.push({ age:age, v:Math.max(8, Math.min(97, base+noise[age-1])) });
+  }
+  // 분석 포인트
+  var peak=pts[0], dip=pts[0];
+  pts.forEach(function(p){ if(p.v>peak.v)peak=p; if(p.v<dip.v)dip=p; });
+  var bestRise=decs[0], bestGain=-99;
+  for(var k=0;k<decs.length;k++){
+    var g=(decs[k+1]?decs[k+1].score:decs[k].score)-decs[k].score;
+    var g2=decs[k].score-(k>0?decs[k-1].score:50);
+    var gain=Math.max(g,g2)+decs[k].score*0.15;
+    if(gain>bestGain){ bestGain=gain; bestRise=decs[k]; }
+  }
+  var nowAge=Math.max(1, Math.min(endAge, new Date().getFullYear()-birth.y+1));
+  var nowP=pts[nowAge-1];
+  var prevP=pts[Math.max(0,nowAge-2)];
+  var slope=nowP.v-prevP.v;
+  return { pts:pts, decs:decs, peak:peak, dip:dip, rise:bestRise, nowAge:nowAge, nowV:nowP.v, slope:slope, endAge:endAge };
+}
+
+/* ── 차트 그리기 (증권 톤: 상승 빨강 / 하락 파랑) ── */
+function drawChart(g, C, X, Y, W, H){
+  var padL=64, padR=26, padT=54, padB=48;
+  var x0=X+padL, y0=Y+padT, cw=W-padL-padR, ch=H-padT-padB;
+  function px(age){ return x0+cw*(age-1)/(C.endAge-1); }
+  function py(v){ return y0+ch*(1-v/100); }
+  // 배경
+  var bg=g.createLinearGradient(0,Y,0,Y+H);
+  bg.addColorStop(0,"#0d1526"); bg.addColorStop(1,"#0a101e");
+  g.fillStyle=bg; g.fillRect(X,Y,W,H);
+  // 그리드
+  g.strokeStyle="rgba(140,165,210,.12)"; g.lineWidth=1; g.setLineDash([]);
+  g.font="20px Jua, sans-serif"; g.textAlign="right"; g.fillStyle="#5f7091";
+  [0,25,50,75,100].forEach(function(v){
+    var yy=py(v);
+    g.beginPath(); g.moveTo(x0,yy); g.lineTo(x0+cw,yy); g.stroke();
+    g.fillText(String(v), x0-10, yy+7);
+  });
+  g.textAlign="center";
+  for(var a=10;a<=C.endAge;a+=10){
+    var xx=px(a);
+    g.strokeStyle="rgba(140,165,210,.07)";
+    g.beginPath(); g.moveTo(xx,y0); g.lineTo(xx,y0+ch); g.stroke();
+    g.fillStyle="#5f7091"; g.fillText(a+"세", xx, y0+ch+30);
+  }
+  // 영역 채움
+  var area=g.createLinearGradient(0,y0,0,y0+ch);
+  area.addColorStop(0,"rgba(255,90,110,.22)"); area.addColorStop(.6,"rgba(140,100,255,.10)");
+  area.addColorStop(1,"rgba(0,0,0,0)");
+  g.beginPath();
+  C.pts.forEach(function(p,i){ var xx=px(p.age), yy=py(p.v); if(i===0)g.moveTo(xx,yy); else g.lineTo(xx,yy); });
+  g.lineTo(px(C.endAge),y0+ch); g.lineTo(px(1),y0+ch); g.closePath();
+  g.fillStyle=area; g.fill();
+  // 라인 — 기울기별 색(상승 빨강/하락 파랑)
+  g.lineWidth=5; g.lineCap="round"; g.lineJoin="round";
+  for(var i2=1;i2<C.pts.length;i2++){
+    var p1=C.pts[i2-1], p2=C.pts[i2];
+    var up=p2.v>=p1.v;
+    g.strokeStyle= up ? "#ff4d57" : "#4d8dff";
+    g.shadowColor= up ? "rgba(255,77,87,.45)" : "rgba(77,141,255,.4)";
+    g.shadowBlur=10;
+    g.beginPath(); g.moveTo(px(p1.age),py(p1.v)); g.lineTo(px(p2.age),py(p2.v)); g.stroke();
+  }
+  g.shadowBlur=0;
+  // 현재 위치 세로선
+  var nx=px(C.nowAge);
+  g.strokeStyle="rgba(255,217,138,.75)"; g.lineWidth=2.5; g.setLineDash([8,7]);
+  g.beginPath(); g.moveTo(nx,y0-4); g.lineTo(nx,y0+ch); g.stroke();
+  g.setLineDash([]);
+  g.font="24px Jua, sans-serif"; g.textAlign="center";
+  g.fillStyle="#ffd98a"; g.fillText("📍 지금 "+C.nowAge+"세", nx, y0-16);
+  // 현재가 점
+  g.beginPath(); g.arc(nx,py(C.nowV),9,0,6.283);
+  g.fillStyle="#fff"; g.fill();
+  g.lineWidth=4; g.strokeStyle=C.slope>=0?"#ff4d57":"#4d8dff"; g.stroke();
+  // 마커: 전성기 ⭐ / 바닥 🧊 / 떡상 🚀
+  g.font="30px Jua, sans-serif";
+  g.fillText("⭐", px(C.peak.age), py(C.peak.v)-16);
+  g.fillText("🧊", px(C.dip.age), py(C.dip.v)+38);
+  var rx=px(Math.max(1,C.rise.age));
+  g.fillText("🚀", rx, py(scoreAt(C,C.rise.age))-20);
+  // 타이틀 — 「지금」 라벨과 안 겹치게 차트 안 왼쪽 위 구석, 옅게
+  g.textAlign="left"; g.fillStyle="rgba(142,163,196,.55)"; g.font="20px Jua, sans-serif";
+  g.fillText("운세지수(0~100) · 대운 8구간 기반 · GOBLUB 증권", x0+8, y0+26);
+}
+function scoreAt(C,age){ var p=C.pts[Math.max(0,Math.min(C.pts.length-1,age-1))]; return p.v; }
+
+/* ── 결과 채우기 ── */
+var last=null;
+var SECTOR={ "목":"🌱 성장주", "화":"🔥 테마주(불장 전문)", "토":"🪨 가치주(존버형)", "금":"⚔️ 방산주(단단함)", "수":"🌊 유동성주(흐름 타입)" };
+$("btn-go").onclick=function(){
+  $("err").style.display="none";
+  if(!data){ $("err").textContent="차트 서버 접속 중… 잠시 후 다시!"; $("err").style.display="block"; return; }
+  if(!sexSel){
+    $("err").textContent="성별을 골라 주세요 — 대운 방향 계산에 필요해요!"; $("err").style.display="block";
+    var sr=$("sex-row"); sr.classList.remove("shake"); void sr.offsetWidth; sr.classList.add("shake");
+    return;
+  }
+  var b=readBirth();
+  if(!b){ $("err").textContent="없는 날짜예요. 다시 확인해 주세요!"; $("err").style.display="block"; return; }
+  var r=Saju.compute(data,b,{trueSolar:true, gender:sexSel});
+  if(!r.daeun||!r.daeun.list||!r.daeun.list.length){
+    $("err").textContent="대운 계산에 실패했어요. 다시 시도해 주세요!"; $("err").style.display="block"; return;
+  }
+  var C=buildChart(r,b);
+  last={C:C, r:r, b:b};
+  render();
+};
+function render(){
+  var C=last.C, r=last.r, b=last.b;
+  $("intro").style.display="none"; $("result").style.display="block";
+  window.scrollTo(0,0);
+  $("t-code").textContent="KRX "+b.y+String(b.m).padStart(2,"0")+String(b.d).padStart(2,"0");
+  var ohArr=Object.keys(r.oheng).sort(function(a,bk){return r.oheng[bk]-r.oheng[a];});
+  $("t-sector").textContent="· "+SECTOR[ohArr[0]];
+  var cls=C.slope>0.8?"up":C.slope<-0.8?"down":"flat";
+  var pr=$("t-price"); pr.className="price "+cls;
+  $("t-now").textContent=C.nowV.toFixed(1);
+  $("t-chg").textContent=(C.slope>=0?"▲ +":"▼ ")+Math.abs(C.slope).toFixed(1)+
+    (cls==="up"?" 상승장":cls==="down"?" 조정 중":" 횡보");
+  $("t-meta").innerHTML="일간 <i>"+Saju.GAN[r.ilgan]+"</i> · "+r.strength.label+
+    " · 상장 "+C.pts.length+"년물 · "+r.zodiac+"띠";
+  drawChart($("cv").getContext("2d"), C, 0, 0, 1080, 640);
+  $("s-rise").textContent=C.rise.age+"~"+(C.rise.age+9)+"세";
+  $("s-peak").textContent=C.peak.age+"세 · "+C.peak.v.toFixed(0)+"층";
+  $("s-dip").textContent=C.dip.age+"세 부근";
+  var noteNow = C.nowAge>=C.rise.age && C.nowAge<C.rise.age+10
+    ? "지금이 바로 <b>떡상 구간 안</b>입니다. 자세 잡으세요."
+    : C.nowAge < C.rise.age
+      ? "떡상 구간까지 <b>"+(C.rise.age-C.nowAge)+"년</b> — 지금은 매집(존버) 타이밍입니다."
+      : "가장 큰 상승장은 지났지만, 차트를 보세요 — <b>고점은 갱신하라고 있는 겁니다.</b>";
+  $("r-note").innerHTML="📊 <b>애널리스트 고브럽 코멘트</b> — "+
+    "이 종목의 최대 상승 구간은 <b>"+C.rise.age+"~"+(C.rise.age+9)+"세</b>, 전성기 고점은 <b>"+C.peak.age+"세</b>로 관측됩니다. "+
+    noteNow+" 참고로 "+C.dip.age+"세 부근의 저점은 결함이 아니라 <b>도약 전 웅크림</b>으로 분석됩니다.";
+}
+$("btn-retry").onclick=function(){ $("result").style.display="none"; $("intro").style.display="block"; window.scrollTo(0,0); };
+
+/* ── 이미지 저장 (1080×1350 — 인스타 피드 비율) ── */
+$("btn-save").onclick=function(){
+  if(!last) return;
+  var C=last.C, b=last.b;
+  var W=1080, H=1350;
+  var c=document.createElement("canvas"); c.width=W; c.height=H;
+  var g=c.getContext("2d");
+  var bg=g.createLinearGradient(0,0,0,H);
+  bg.addColorStop(0,"#0b1120"); bg.addColorStop(1,"#0a0e1a");
+  g.fillStyle=bg; g.fillRect(0,0,W,H);
+  g.textAlign="left";
+  g.fillStyle="#8ea3c4"; g.font="30px Jua, sans-serif"; g.fillText("📈 GOBLUB 증권", 60, 78);
+  g.fillStyle="#fff"; g.font="52px Jua, sans-serif"; g.fillText("나 (ME) 인생 차트", 60, 142);
+  var cls=C.slope>=0;
+  g.fillStyle=cls?"#ff4d57":"#4d8dff"; g.font="64px Jua, sans-serif";
+  g.fillText(C.nowV.toFixed(1)+(cls?" ▲":" ▼"), 60, 224);
+  g.fillStyle="#8ea3c4"; g.font="26px Jua, sans-serif";
+  g.fillText("지금 "+C.nowAge+"세 · "+(cls?"상승장":"조정 중"), 340, 222);
+  drawChart(g, C, 30, 260, W-60, 620);
+  // 요약 3줄
+  var rows=[["🚀","떡상 구간", C.rise.age+"~"+(C.rise.age+9)+"세","#ff4d57"],
+            ["⭐","전성기 고점", C.peak.age+"세 · "+C.peak.v.toFixed(0)+"층","#ffd98a"],
+            ["🧊","바닥 매수 기회", C.dip.age+"세 부근","#4d8dff"]];
+  var y=950;
+  rows.forEach(function(rw){
+    g.fillStyle="rgba(20,30,52,.85)";
+    g.beginPath(); g.roundRect ? g.roundRect(60,y,W-120,86,18) : g.rect(60,y,W-120,86); g.fill();
+    g.font="40px Jua, sans-serif"; g.fillStyle="#fff"; g.fillText(rw[0], 88, y+56);
+    g.font="30px Jua, sans-serif"; g.fillStyle="#8ea3c4"; g.fillText(rw[1], 160, y+54);
+    g.font="34px Jua, sans-serif"; g.fillStyle=rw[3]; g.textAlign="right"; g.fillText(rw[2], W-92, y+56);
+    g.textAlign="left";
+    y+=102;
+  });
+  g.textAlign="center";
+  g.fillStyle="#5f7091"; g.font="22px Jua, sans-serif";
+  g.fillText("※ 투자 정보 아님 · 환불/손절 불가 종목 · 존버만 가능", W/2, H-84);
+  g.fillStyle="#ffce7a"; g.font="26px Jua, sans-serif";
+  g.fillText("나도 상장하기 ▶ goblub-2.vercel.app", W/2, H-44);
+  var a=document.createElement("a");
+  a.download="goblub-인생차트.png"; a.href=c.toDataURL("image/png"); a.click();
+};
+</script>
+</body>
+</html>
