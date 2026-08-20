@@ -218,7 +218,16 @@ function samhapHalf(a,b){
 function yearGZ(y){ return { gan:((y-4)%10+10)%10, ji:((y-4)%12+12)%12 }; }
 
 function buildChart(r, birth, deep){
-  var lab=r.strength.label, F=FAVOR[lab];
+  var lab=r.strength.label;
+  var F={}; for(var fk in FAVOR[lab]) F[fk]=FAVOR[lab][fk];
+  // 관인상생(통관) — 원국에 인성(生我 오행)이 뿌리내려 있으면,
+  // 관성운이 「나를 치는 칼」이 아니라 「인성을 거쳐 명예로 변환되는 압력」이 된다.
+  // 신약·중화 사주의 편관/정관 감점을 크게 완화 (정통 통관 규칙).
+  var OH_ORDER=["목","화","토","금","수"];
+  var myOhName=GAN_OH[r.ilgan];
+  var insungOh=OH_ORDER[(OH_ORDER.indexOf(myOhName)+4)%5];   // 나를 생하는 오행
+  var tongkwan=(lab!=="신강") && (r.oheng[insungOh]||0) >= 1.0;
+  if(tongkwan){ F["편관"]+=7; F["정관"]+=7; }
   // 오행 축 = 용신(억부+조후) — 귀곡 명부(saju-deep)와 같은 판정을 쓴다
   var use=[], avoid=[];
   if(deep && deep.yongshin){ use=deep.yongshin.use||[]; avoid=deep.yongshin.avoid||[]; }
@@ -306,7 +315,13 @@ function buildChart(r, birth, deep){
   var nowP=pts[nowAge-1];
   var prevP=pts[Math.max(0,nowAge-2)];
   var slope=nowP.v-prevP.v;
-  return { pts:pts, decs:decs, peak:peak, dip:dip, rise:bestRise, nowAge:nowAge, nowV:nowP.v, slope:slope, endAge:endAge };
+  // 말년궁(시주) 체질 — 시주 천간이 용신 오행이면 「말년 그릇이 따뜻한」 사주
+  var lateGood=false;
+  if(r.pillars.hour){
+    var hg=GAN_OH[r.pillars.hour[0]];
+    if(use.indexOf(hg)>=0) lateGood=true;
+  }
+  return { pts:pts, decs:decs, peak:peak, dip:dip, rise:bestRise, nowAge:nowAge, nowV:nowP.v, slope:slope, endAge:endAge, tongkwan:tongkwan, lateGood:lateGood };
 }
 
 /* ── 차트 그리기 (증권 톤: 상승 빨강 / 하락 파랑) ── */
@@ -425,7 +440,9 @@ function render(){
       : "가장 큰 상승장은 지났지만, 차트를 보세요 — <b>고점은 갱신하라고 있는 겁니다.</b>";
   $("r-note").innerHTML="📊 <b>애널리스트 고브럽 코멘트</b> — "+
     "이 종목의 최대 상승 구간은 <b>"+C.rise.age+"~"+(C.rise.age+9)+"세</b>, 전성기 고점은 <b>"+C.peak.age+"세</b>로 관측됩니다. "+
-    noteNow+" 참고로 "+C.dip.age+"세 부근의 저점은 결함이 아니라 <b>도약 전 웅크림</b>으로 분석됩니다.";
+    noteNow+" 참고로 "+C.dip.age+"세 부근의 저점은 결함이 아니라 <b>도약 전 웅크림</b>으로 분석됩니다."+
+    (C.tongkwan?" 또한 이 사주는 <b>관인상생</b> 통로가 열려 있어 압박운(관성)이 명예로 변환되는 체질입니다.":"")+
+    (C.lateGood?" 말년궁(시주)에 용신이 앉아 있어 <b>말년의 그릇 자체가 따뜻한 대기만성형</b> — 후반 구간 점수보다 실속이 좋습니다.":"");
 }
 $("btn-retry").onclick=function(){ $("result").style.display="none"; $("intro").style.display="block"; window.scrollTo(0,0); };
 
