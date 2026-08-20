@@ -701,12 +701,18 @@
           } else {
             // 때가 되면 걷다 말고 정면 보고 시간대 멘트 (힌트 말풍선 그대로 사용)
             if (now > nextTalkAt && !rocketFx && hint && hint.style.display !== "none") {
-              var tl = timeLines();
-              hint.textContent = tl[talkIdx % tl.length]; talkIdx++;
-              hint.style.transition = "none"; hint.style.opacity = "1";
-              talkUntil = now + 4200;
-              nextTalkAt = now + 40000 + Math.random() * 25000;
-              gait = "stand"; gaitUntil = talkUntil;
+              // 로켓 뒤/근처에서는 말풍선이 가려진다 — 지나갈 때까지 잠시 미룬다
+              var rkW = 190, rkX = Math.min(W * 0.78, W - rkW - 24);
+              if (x + el.offsetWidth > rkX - 34 && x < rkX + rkW + 34) {
+                nextTalkAt = now + 2500;
+              } else {
+                var tl = timeLines();
+                hint.textContent = tl[talkIdx % tl.length]; talkIdx++;
+                hint.style.transition = "none"; hint.style.opacity = "1";
+                talkUntil = now + 4200;
+                nextTalkAt = now + 40000 + Math.random() * 25000;
+                gait = "stand"; gaitUntil = talkUntil;
+              }
             }
             if (now > gaitUntil) pickGait(now);
             var sp = gait === "dash" ? 400 : gait === "walk" ? WALK_SPEED : 0;
