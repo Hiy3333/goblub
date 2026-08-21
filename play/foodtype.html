@@ -35,7 +35,7 @@
   <script src="../js/common.js?v=24" data-root=".."></script>
   <script src="js/feed.js?v=10"></script>
   <script src="js/quiz.js?v=4"></script>
-  <script src="js/sharecard.js"></script>
+  <script src="js/sharecard.js?v=2"></script>
   <script>
     var TYPES = {
       mala:       { emoji:"🌶️", name:"화끈 중독성 마라탕형", short:"마라탕", tag:"인생은 맵기 3단계부터", rate:91, side:"후식 탕후루 (마라탕후루 풀코스)",
@@ -134,7 +134,7 @@
         '<button class="btn-primary" id="qz-retry">다시하기</button>' +
         '<button class="btn-ghost" id="qz-share">링크 복사</button></div>';
       el.querySelector("#card-slot").appendChild(ShareCard.render({
-        palette: "purple", emoji: r.emoji, badge: "음식형 인간", title: r.name,
+        palette: "orange", emoji: r.emoji, badge: "음식형 인간", title: r.name,
         lines: ["“" + r.tag + "”", "재주문율 " + r.rate + "%", "소울 사이드: " + r.side]
       }));
       el.querySelector("#qz-retry").onclick = api.restart;

@@ -1,8 +1,9 @@
 // 공용 결과 짤 카드 — Canvas 720x1280(9:16, 인스타 스토리 비율) PNG. ShareCard.render(spec) → 미리보기+저장버튼 DOM.
 // spec = { palette, emoji, badge, title, lines:[...], footer }
-// 미드나잇 시티팝 네온 룩: 야경 그라데이션 + 레트로 선 + 네온 프레임/글로우 + 시티 스카이라인.
+// 리퀴드 글래스 룩: 라이트 파스텔 그라데이션 배경 + 유리 패널 + 사이트 공용 포인트 컬러.
 (function () {
-  var PALETTE = { coral: "#ff6ec7", yellow: "#ffd93d", mint: "#6bffa0", sky: "#4deeea", purple: "#9d6bff", cream: "#ff6ec7" };
+  var PALETTE = { coral: "#ff5a76", yellow: "#f5a623", mint: "#35c98a", sky: "#3a8bff", purple: "#8f5bff", orange: "#ff8a3d", cream: "#ff5a76" };
+  var INK = "#2b3057", INK_SOFT = "#7079a8", INK_BODY = "#4a5180";
 
   function wrapText(c, text, x, y, maxW, lh) {
     var line = "", yy = y;
@@ -21,87 +22,93 @@
     c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath();
   }
 
+  function blob(c, x, y, r, color, alpha) {
+    var g = c.createRadialGradient(x, y, 0, x, y, r);
+    g.addColorStop(0, color); g.addColorStop(1, "rgba(255,255,255,0)");
+    c.save(); c.globalAlpha = alpha; c.fillStyle = g;
+    c.fillRect(x - r, y - r, r * 2, r * 2); c.restore();
+  }
+
+  function hexToRgba(hex, a) {
+    var n = parseInt(hex.slice(1), 16);
+    return "rgba(" + (n >> 16 & 255) + "," + (n >> 8 & 255) + "," + (n & 255) + "," + a + ")";
+  }
+
   function draw(canvas, spec) {
     var c = canvas.getContext("2d"), W = canvas.width, H = canvas.height;
-    var neon = PALETTE[spec.palette] || PALETTE.purple;
+    var accent = PALETTE[spec.palette] || PALETTE.purple;
 
-    // 야경 그라데이션 배경
+    // 라이트 파스텔 배경 (사이트 body와 동일 톤)
     var grd = c.createLinearGradient(0, 0, 0, H);
-    grd.addColorStop(0, "#0d0a2b"); grd.addColorStop(0.45, "#1c1250"); grd.addColorStop(1, "#45227a");
+    grd.addColorStop(0, "#f7f8fc"); grd.addColorStop(0.55, "#f0f2f9"); grd.addColorStop(1, "#e9ecf7");
     c.fillStyle = grd; c.fillRect(0, 0, W, H);
+    blob(c, 90, 60, 420, "rgba(255,110,145,0.55)", 0.30);
+    blob(c, W - 60, 180, 460, "rgba(70,135,255,0.55)", 0.30);
+    blob(c, 180, H * 0.55, 380, "rgba(255,190,90,0.5)", 0.22);
+    blob(c, W - 110, H - 120, 480, "rgba(150,96,255,0.55)", 0.28);
+    blob(c, W / 2, 400, 300, hexToRgba(accent, 0.5), 0.22);
 
-    // 레트로 선(줄무늬 태양) — 이모지 뒤 장식
+    // 유리 패널 (부드러운 그림자 + 흰 림 라이트)
     c.save();
-    c.beginPath(); c.arc(W / 2, 400, 170, 0, Math.PI * 2); c.clip();
-    var sun = c.createLinearGradient(0, 230, 0, 570);
-    sun.addColorStop(0, "#ffd93d"); sun.addColorStop(0.4, "#ff9a5a"); sun.addColorStop(0.75, "#ff6ec7"); sun.addColorStop(1, "#c85cff");
-    c.globalAlpha = 0.55; c.fillStyle = sun; c.fillRect(W / 2 - 170, 230, 340, 340);
-    c.globalAlpha = 1; c.fillStyle = "#151040";
-    for (var s = 0; s < 5; s++) c.fillRect(W / 2 - 170, 380 + s * 34, 340, 10 + s * 2);
+    c.shadowColor = "rgba(96,106,155,0.30)"; c.shadowBlur = 44; c.shadowOffsetY = 18;
+    c.fillStyle = "rgba(255,255,255,0.46)";
+    roundRect(c, 48, 60, W - 96, H - 120, 40); c.fill();
     c.restore();
+    c.strokeStyle = "rgba(255,255,255,0.95)"; c.lineWidth = 2.5;
+    roundRect(c, 48, 60, W - 96, H - 120, 40); c.stroke();
+    c.strokeStyle = "rgba(122,134,195,0.22)"; c.lineWidth = 1;
+    roundRect(c, 52, 64, W - 104, H - 128, 37); c.stroke();
+    // 상단 유리 글린트
+    var glint = c.createLinearGradient(0, 60, 0, 220);
+    glint.addColorStop(0, "rgba(255,255,255,0.55)"); glint.addColorStop(1, "rgba(255,255,255,0)");
+    c.save(); roundRect(c, 48, 60, W - 96, 160, 40); c.clip();
+    c.fillStyle = glint; c.fillRect(48, 60, W - 96, 160); c.restore();
 
-    // 시티 스카이라인
-    c.fillStyle = "#0a0620";
-    [[0, 1150, 90, 130], [110, 1120, 70, 160], [200, 1160, 80, 120], [300, 1100, 65, 180], [385, 1140, 95, 140],
-     [500, 1110, 70, 170], [590, 1155, 80, 125], [685, 1125, 60, 155]].forEach(function (b) { c.fillRect(b[0], b[1], b[2], b[3]); });
-    var win = ["#ffd93d", "#ff6ec7", "#4deeea"];
-    [[30, 1175], [135, 1150], [230, 1185], [325, 1130], [420, 1165], [525, 1140], [615, 1180], [705, 1155],
-     [60, 1210], [160, 1190], [350, 1170], [550, 1185]].forEach(function (p, i) {
-      c.fillStyle = win[i % 3]; c.globalAlpha = 0.85; c.fillRect(p[0], p[1], 7, 7); c.globalAlpha = 1;
-    });
+    // 반짝이 장식 (포인트 컬러, 은은하게)
+    c.font = "30px sans-serif"; c.textAlign = "center";
+    c.globalAlpha = 0.7; c.fillStyle = "#f5a623";
+    c.fillText("✦", 110, 218); c.fillText("✧", W - 120, 176);
+    c.fillStyle = accent;
+    c.fillText("✧", 126, 660); c.fillText("✦", W - 104, 620);
+    c.globalAlpha = 1;
 
-    // 네온 프레임
-    c.save(); c.shadowColor = neon; c.shadowBlur = 24; c.strokeStyle = neon; c.lineWidth = 5;
-    roundRect(c, 28, 28, W - 56, H - 56, 32); c.stroke(); c.restore();
-    c.strokeStyle = "rgba(255,255,255,0.55)"; c.lineWidth = 1.5;
-    roundRect(c, 28, 28, W - 56, H - 56, 32); c.stroke();
-
-    // 반짝이 장식
-    c.fillStyle = "#ffd93d"; c.font = "30px sans-serif"; c.textAlign = "center";
-    c.save(); c.shadowColor = "#ffd93d"; c.shadowBlur = 14;
-    c.fillText("✦", 96, 200); c.fillText("✦", W - 90, 620); c.fillText("✧", W - 120, 160); c.fillText("✧", 110, 660);
-    c.restore();
-
-    // 상단 네온 pill 배지
+    // 상단 유리 pill 배지
     var badge = spec.badge || "goblub 판정 결과";
     c.font = "30px Jua, sans-serif";
     var bw = c.measureText(badge).width + 56;
-    c.save(); c.shadowColor = neon; c.shadowBlur = 16; c.strokeStyle = neon; c.lineWidth = 3;
-    roundRect(c, (W - bw) / 2, 96, bw, 62, 31); c.stroke(); c.restore();
-    c.fillStyle = "#fff";
-    c.save(); c.shadowColor = neon; c.shadowBlur = 10; c.fillText(badge, W / 2, 138); c.restore();
+    c.fillStyle = "rgba(255,255,255,0.72)";
+    roundRect(c, (W - bw) / 2, 108, bw, 62, 31); c.fill();
+    c.strokeStyle = hexToRgba(accent, 0.55); c.lineWidth = 2.5;
+    roundRect(c, (W - bw) / 2, 108, bw, 62, 31); c.stroke();
+    c.fillStyle = accent; c.fillText(badge, W / 2, 150);
 
-    // 이모지 (레트로 선 위)
-    c.font = "150px sans-serif";
-    c.save(); c.shadowColor = neon; c.shadowBlur = 30; c.fillText(spec.emoji || "👾", W / 2, 455); c.restore();
+    // 이모지 — 뒤에 파스텔 헤일로
+    blob(c, W / 2, 400, 190, hexToRgba(accent, 0.55), 0.30);
+    c.beginPath(); c.arc(W / 2, 400, 128, 0, Math.PI * 2);
+    c.fillStyle = "rgba(255,255,255,0.55)"; c.fill();
+    c.strokeStyle = "rgba(255,255,255,0.95)"; c.lineWidth = 2; c.stroke();
+    c.font = "130px sans-serif"; c.fillStyle = INK;
+    c.fillText(spec.emoji || "👾", W / 2, 448);
 
-    // 타이틀 — 네온사인
-    c.font = "58px Jua, sans-serif"; c.fillStyle = "#ffffff";
-    c.save(); c.shadowColor = neon; c.shadowBlur = 26;
-    c.fillText(spec.title || "", W / 2, 590); c.fillText(spec.title || "", W / 2, 590);
-    c.restore();
+    // 타이틀 + 포인트 언더라인
+    c.font = "58px Jua, sans-serif"; c.fillStyle = INK;
+    c.fillText(spec.title || "", W / 2, 610);
+    c.fillStyle = hexToRgba(accent, 0.9);
+    roundRect(c, W / 2 - 46, 634, 92, 9, 5); c.fill();
 
-    // 본문/해시태그 — #으로 시작하는 줄은 네온색으로
-    var yy = 690;
+    // 본문 — #으로 시작하는 줄은 포인트 컬러로
+    var yy = 712;
     (spec.lines || []).forEach(function (ln) {
-      if (/^#/.test(ln)) {
-        c.font = "30px Jua, sans-serif"; c.fillStyle = neon;
-        c.save(); c.shadowColor = neon; c.shadowBlur = 12;
-        yy = wrapText(c, ln, W / 2, yy, W - 150, 46) + 58;
-        c.restore();
-      } else {
-        c.font = "30px Jua, sans-serif"; c.fillStyle = "#cdbdf6";
-        yy = wrapText(c, ln, W / 2, yy, W - 150, 46) + 58;
-      }
+      c.font = "30px Jua, sans-serif";
+      c.fillStyle = /^#/.test(ln) ? accent : INK_BODY;
+      yy = wrapText(c, ln, W / 2, yy, W - 170, 46) + 58;
     });
 
     // 하단 CTA
-    c.font = "26px Jua, sans-serif"; c.fillStyle = "#b9a8e8";
-    c.fillText(spec.footer || "🌃 goblub · 대환장 놀이터", W / 2, H - 116);
-    c.font = "28px Jua, sans-serif"; c.fillStyle = "#4deeea";
-    c.save(); c.shadowColor = "#4deeea"; c.shadowBlur = 12;
-    c.fillText("나도 해보기 ▶ goblub-2.vercel.app", W / 2, H - 72);
-    c.restore();
+    c.font = "26px Jua, sans-serif"; c.fillStyle = INK_SOFT;
+    c.fillText(spec.footer || "goblub · 대환장 놀이터", W / 2, H - 148);
+    c.font = "28px Jua, sans-serif"; c.fillStyle = PALETTE.sky;
+    c.fillText("나도 해보기 ▶ goblub-2.vercel.app", W / 2, H - 104);
     c.textAlign = "center";
   }
 
