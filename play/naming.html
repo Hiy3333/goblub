@@ -17,8 +17,12 @@
     .cat-tile.sel { border-color: var(--purple); background: rgba(157, 107, 255, 0.16); }
     .kw-input { width: 100%; font-family: inherit; font-size: 0.95rem; padding: 12px 14px;
       border: 2px solid var(--line); border-radius: 12px; background: var(--surface); color: var(--ink); margin-bottom: 12px; }
-    #name-out { display: none; white-space: pre-wrap; line-height: 1.9; margin-top: 14px;
-      background: var(--cream); border-radius: 14px; padding: 18px; }
+    #name-out { display: none; white-space: pre-wrap; line-height: 2.0; font-size: 1.02rem; margin-top: 14px;
+      background: var(--cream); border: 1.5px solid var(--line); border-radius: 14px; padding: 18px 20px; }
+    .vibe-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+    .vibe-chip { border: 1.5px solid var(--line); background: var(--cream); border-radius: 999px;
+      padding: 6px 13px; font-family: inherit; font-size: 0.9rem; color: var(--ink-soft); cursor: pointer; }
+    .vibe-chip.sel { border-color: var(--purple); color: var(--purple); background: rgba(143, 91, 255, 0.12); }
   </style>
 </head>
 <body class="clay">
@@ -26,15 +30,16 @@
   <main>
     <section class="hero">
       <h1><span class="e">📛</span> 고브럽 작명소</h1>
-      <p>이름 짓기 어렵죠? 고브럽이 센스있게 여러 개 뽑아드려요</p>
+      <p>닉네임 고민만 3시간… 고브럽이 10초 컷으로 뽑아드림</p>
     </section>
 
     <section class="panel">
       <h2>뭐 이름을 지을까요?</h2>
       <div class="cat-grid" id="cat-grid"></div>
-      <input type="text" class="kw-input" id="kw" maxlength="100" placeholder="키워드·분위기 (선택 — 예: 귀엽게, 고양이, 힙한, 커피)" />
+      <div class="vibe-row" id="vibe-row"></div>
+      <input type="text" class="kw-input" id="kw" maxlength="80" placeholder="키워드 (선택 — 예: 고양이, 커피, 우주)" />
       <div class="result-actions" style="margin-top:4px">
-        <button class="btn-primary" id="btn-go">✨ 이름 지어줘</button>
+        <button class="btn-primary" id="btn-go">✨ 작명 ㄱㄱ</button>
       </div>
       <p class="fine-print" id="status" style="display:none; margin-top:10px"></p>
       <div id="name-out"></div>
@@ -51,10 +56,11 @@
       var $ = function (id) { return document.getElementById(id); };
       var CATS = [
         { k: "nickname", em: "🎮", t: "게임·SNS 닉네임" },
+        { k: "group", em: "👥", t: "단톡방·팀 이름" },
         { k: "pet", em: "🐾", t: "반려동물 이름" },
         { k: "shop", em: "🏪", t: "가게·브랜드" },
-        { k: "baby", em: "🍼", t: "태명" },
-        { k: "character", em: "🗡️", t: "캐릭터 이름" }
+        { k: "character", em: "🗡️", t: "캐릭터 이름" },
+        { k: "baby", em: "🍼", t: "태명" }
       ];
       var chosen = "nickname";
       var grid = $("cat-grid");
@@ -70,18 +76,33 @@
         grid.appendChild(b);
       });
 
+      var VIBES = ["귀엽게", "힙하게", "감성적으로", "웃기게", "시크하게", "중2병 가득"];
+      var vibeSel = [];
+      var vrow = $("vibe-row");
+      VIBES.forEach(function (v) {
+        var b = document.createElement("button");
+        b.type = "button"; b.className = "vibe-chip"; b.textContent = v;
+        b.onclick = function () {
+          var i = vibeSel.indexOf(v);
+          if (i >= 0) { vibeSel.splice(i, 1); b.classList.remove("sel"); }
+          else { vibeSel.push(v); b.classList.add("sel"); }
+        };
+        vrow.appendChild(b);
+      });
+
       $("btn-go").onclick = function () {
         var btn = $("btn-go"), out = $("name-out"), st = $("status");
         btn.disabled = true;
         st.style.display = "block";
-        st.textContent = "🐙 고브럽이 이름을 궁리하는 중…";
+        st.textContent = "🐙 고브럽이 소매 걷고 작명 중…";
         out.style.display = "block";
         out.textContent = "";
-        Dosa.fetchAI("/api/naming", { naming: { category: chosen, keywords: $("kw").value.trim() } }, "goblub_name_", {
+        var kw = vibeSel.concat($("kw").value.trim() || []).join(", ").slice(0, 100);
+        Dosa.fetchAI("/api/naming", { naming: { category: chosen, keywords: kw } }, "goblub_name_", {
           noCache: true, cooldownMs: 8000, cooldownKey: "goblub_name_last",
           onChunk: function (t) { out.textContent += t; },
           onDone: function () {
-            st.textContent = "🐙 짜잔! 맘에 드는 게 있나요? (다시 누르면 새 이름!)";
+            st.textContent = "🐙 완성! 맘에 안 들면 리롤 ㄱㄱ (다시 누르면 새 이름)";
             btn.disabled = false;
             if (window.GoblubFeed) GoblubFeed.grant("naming");
           },

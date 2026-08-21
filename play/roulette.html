@@ -29,6 +29,11 @@
     .wheel-hub { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:48px; height:48px; border-radius:50%;
       background:var(--surface); box-shadow:0 2px 8px rgba(0,0,0,.25); display:flex; align-items:center; justify-content:center; font-size:1.5rem; z-index:2; }
     .wheel-empty { text-align:center; color:var(--ink-soft); padding:40px 0; }
+    #result-box .result-name { color:var(--purple); font-size:1.45rem; }
+    .result-pop { animation:rl-pop .5s cubic-bezier(.2,1.6,.4,1); }
+    @keyframes rl-pop { from { transform:scale(.4); opacity:0; } to { transform:scale(1); opacity:1; } }
+    .cf { position:fixed; top:-36px; font-size:1.35rem; z-index:99; pointer-events:none;
+      transition:transform 1.7s ease-in, opacity 1.7s; }
   </style>
 </head>
 <body class="clay">
@@ -36,15 +41,16 @@
   <main>
     <section class="hero">
       <h1><span class="e">🎡</span> 복불복 룰렛</h1>
-      <p>벌칙, 점심 메뉴, 청소 당번까지 — 빙글빙글 돌려서 정해버리자</p>
+      <p>점메추부터 벌칙까지 — 오늘의 운명, 룰렛이 정한다 (이의 제기 불가)</p>
     </section>
 
     <section class="panel">
-      <h2 style="text-align:center">항목을 정하고 돌려보세요</h2>
+      <h2 style="text-align:center">돌리면 끝. 번복은 없다</h2>
       <div class="preset-row">
         <button class="btn-ghost" id="preset-1">🍗 벌칙</button>
-        <button class="btn-ghost" id="preset-2">🍽 점심 메뉴</button>
-        <button class="btn-ghost" id="preset-3">🧹 청소 당번</button>
+        <button class="btn-ghost" id="preset-2">🍜 점메추</button>
+        <button class="btn-ghost" id="preset-3">🎯 오늘 뭐 하지</button>
+        <button class="btn-ghost" id="preset-4">💸 누가 쏘냐</button>
       </div>
       <div id="item-list"></div>
       <button class="btn-ghost" id="btn-add" type="button">＋ 항목 추가</button>
@@ -79,9 +85,10 @@
         "#9fe0e0", "#f7bcda", "#cfe08f", "#f2a8a8", "#bcd2f2", "#efc9a0"];
 
       var PRESETS = {
-        1: ["꿀밤 한 대", "애교 부리기", "다음 판 사기", "아무 노래 부르기", "물 원샷", "벌칙 면제!", "칭찬하기", "셀카 인증"],
-        2: ["김밥", "라면", "국밥", "돈까스", "마라탕", "햄버거", "파스타", "아무거나"],
-        3: ["설거지", "분리수거", "화장실", "바닥 쓸기", "오늘은 쉼", "걸레질"]
+        1: ["아이돌 안무 풀버전", "셀카 바로 스토리 업로드", "다음 판 벌칙 2배", "프사 하루 박제", "물 원샷", "벌칙 면제!", "옆 사람 칭찬 30초", "애교 3종 세트"],
+        2: ["마라탕", "국밥", "떡볶이", "편의점 꿀조합", "샐러드 (갑자기 건강)", "돈까스", "햄버거", "어제 먹은 거 또"],
+        3: ["노래방", "인생네컷", "방탈출", "한강 피크닉", "PC방", "보드게임카페", "집이 최고", "즉흥 당일치기"],
+        4: ["N빵 (평화)", "막내가 쏨", "첫 번째로 웃는 사람", "가위바위보 3판 2선", "오늘 지각한 사람", "최근에 월급 받은 사람"]
       };
       var MIN = 2, MAX = 12;
       var list = $("item-list");
@@ -118,6 +125,7 @@
       $("preset-1").onclick = function () { setItems(PRESETS[1]); };
       $("preset-2").onclick = function () { setItems(PRESETS[2]); };
       $("preset-3").onclick = function () { setItems(PRESETS[3]); };
+      $("preset-4").onclick = function () { setItems(PRESETS[4]); };
 
       function readItems() {
         return Array.prototype.map.call(list.querySelectorAll(".item-input"), function (i) { return i.value.trim(); })
@@ -185,11 +193,32 @@
         return items;
       }
 
-      var LINES = ["고브럽의 선택은…!", "운명은 이미 정해졌습니다.", "이의 제기는 받지 않습니다!", "짜잔, 이걸로 결정!"];
+      var LINES = ["이의 제기는 기각되었습니다.", "운명 확정. 도망은 불가능합니다.", "다시 돌려도 결과는 같습니다 (아마)", "고브럽의 선택은 절대적입니다.", "축하합니다? …축하합니다."];
+      function confetti() {
+        var ems = ["🎉", "✨", "🎊", "💥", "⭐"];
+        for (var i = 0; i < 26; i++) {
+          var s = document.createElement("span"); s.className = "cf";
+          s.textContent = ems[Math.floor(Math.random() * ems.length)];
+          s.style.left = (Math.random() * 100) + "vw";
+          s.style.transitionDelay = (Math.random() * 0.25).toFixed(2) + "s";
+          document.body.appendChild(s);
+          (function (el) {
+            requestAnimationFrame(function () { requestAnimationFrame(function () {
+              el.style.transform = "translateY(" + (window.innerHeight + 90) + "px) rotate(" + Math.round(Math.random() * 540 - 270) + "deg)";
+              el.style.opacity = "0.1";
+            }); });
+            setTimeout(function () { el.remove(); }, 2300);
+          })(s);
+        }
+      }
       function showResult(text) {
+        var box = $("result-box");
         $("result-name").textContent = "🎯 " + text;
         $("result-line").textContent = LINES[Math.floor(Math.random() * LINES.length)];
-        $("result-box").style.display = "block";
+        box.classList.remove("result-pop"); void box.offsetWidth;
+        box.style.display = "block"; box.classList.add("result-pop");
+        confetti();
+        box.scrollIntoView({ behavior: "smooth", block: "center" });
       }
 
       function spin() {
