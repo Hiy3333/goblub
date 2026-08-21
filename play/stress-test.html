@@ -18,6 +18,14 @@
     .gob-muncher.chew { animation: gob-chew .45s ease 3; }
     @keyframes gob-chew { 30% { transform: scale(1.15) rotate(-5deg);} 65%{ transform: scale(1.1) rotate(5deg);} }
     .cure-line { color: var(--mint, #6bffa0); font-size:1.05rem; margin-top:8px; }
+    .mon-tag { text-align:center; color:#8f5bff; font-size:1.02rem; margin:2px 0 10px; }
+    .mon-traits { max-width:420px; margin:12px auto 4px; padding:0; list-style:none; text-align:left; }
+    .mon-traits li { position:relative; padding-left:22px; margin:7px 0; line-height:1.6; font-size:.95rem; }
+    .mon-traits li::before { content:"⚡"; position:absolute; left:0; }
+    .mon-chemi { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin:12px 0 4px; }
+    .mon-chemi span { background:rgba(143,91,255,.1); border:1px solid rgba(143,91,255,.3);
+      border-radius:999px; padding:7px 14px; font-size:.88rem; }
+    .mon-chemi b { font-weight:700; }
   </style>
 </head>
 <body class="clay">
@@ -33,75 +41,106 @@
   <script src="js/goblub-art.js"></script>
   <script>
     var MONS = {
-      pokbal:{emoji:"🌋",name:"폭발몬",desc:"참을 인 세 번은커녕 한 번도 못 참고 그대로 터지는 타입. 화끈하게 분출하고 나면 뒤끝은 없지만, 터지는 순간 옆 사람이 파편에 맞을 수 있어요. 화산도 분화구가 필요하듯, 터지기 전에 미리 빼는 안전밸브 하나쯤은 마련해두세요.",cure:"고브럽이 화를 냠— 이제 심호흡 세 번, 물 한 잔."},
-      jamsu:{emoji:"🌊",name:"잠수몬",desc:"힘들면 일단 연락부터 끊고 물속으로 숨어버리는 타입. 혼자만의 시간이 회복에 도움되는 건 맞지만, 너무 오래 잠수 타면 걱정하던 사람들도 지쳐서 물 밖으로 안 나오게 됩니다. 가끔은 숨만 쉬러라도 수면 위로 올라와 주세요.",cure:"고브럽이 잠수를 냠— 한 사람에게만 '나 힘들어' 한마디."},
-      nunmul:{emoji:"💧",name:"눈물몬",desc:"감정이 차오르면 말보다 눈물이 먼저 나오는 타입. 참는 것보다 훨씬 건강한 배출법이지만, 정작 왜 우는지는 본인도 정리가 안 될 때가 많아요. 실컷 울고 난 뒤엔 꼭 원인 한 줄 정리해보는 습관을 들여보세요.",cure:"고브럽이 눈물을 냠— 실컷 울었으면 따뜻한 거 먹기."},
-      meokbo:{emoji:"🍔",name:"먹보몬",desc:"스트레스는 입으로 푸는 게 국룰인 타입. 먹는 순간엔 세상 행복하지만 배부름이 가시면 스트레스는 고스란히 그대로 남아있는 경우가 많죠. 먹는 즐거움은 지키되, 배달앱 켜기 전에 노래 한 곡만 먼저 틀어보길.",cure:"고브럽이 폭식을 냠— 대신 좋아하는 노래 한 곡."},
-      yemin:{emoji:"🌵",name:"예민몬",desc:"스트레스 받으면 온몸에 가시부터 돋는 타입. 별거 아닌 말에도 발끈하고, 정작 본인도 왜 이렇게 날카로운지 몰라 당황하죠. 가시가 돋았다는 건 위험 신호니, 사람 만나기 전에 혼자 쿨다운할 시간을 꼭 확보하세요.",cure:"고브럽이 가시를 냠— 30분만 알림 끄고 혼자."},
-      eoreum:{emoji:"🧊",name:"얼음몬",desc:"버거워지면 그대로 얼어붙어 아무것도 못 하는 타입. 게으른 게 아니라 뇌가 잠시 정지 버튼을 누른 것뿐인데, 자책까지 더해지면 얼음이 더 두꺼워져요. 완벽하게 녹이려 하지 말고 딱 손톱만큼만 움직여보세요.",cure:"고브럽이 무기력을 냠— 딱 5분, 제일 작은 일 하나만."}
+      pokbal:{emoji:"🌋",name:"즉발화산몬",tag:"참을 인? 그게 뭔데 먹는 건가",
+        desc:"스트레스 도착 0.3초 만에 분화하는 국내 최속 화산. 화끈하게 터지고 나면 본인은 개운한데, 파편 맞은 주변인들은 아직 안 개운합니다. 장점은 뒤끝 제로, 단점은 앞끝이 너무 셈.",
+        traits:["빡침 도착 → 발사까지 평균 0.3초","화내고 10분 뒤 「아까 미안」 장인","본인 화산재는 본인이 제일 늦게 발견함"],
+        friend:"eoreum", enemy:"yemin",
+        cure:"고브럽이 화를 냠— 이제 심호흡 세 번, 물 한 잔."},
+      jamsu:{emoji:"🌊",name:"읽씹잠수몬",tag:"생존신고는 3주 뒤에",
+        desc:"힘들면 조용히 폰을 뒤집고 심해로 내려가는 타입. 혼자 충전하는 시간이 진짜로 필요한 건데, 잠수가 길어지면 지상팀이 실종 신고 직전까지 갑니다. 숨만 쉬러라도 가끔 수면 위로 올라와 주세요.",
+        traits:["프사·스토리 업로드 전면 중단이 위험 신호","「살아있음?」 톡이 5개 쌓이면 그제야 부상","복귀할 땐 아무 일 없던 것처럼 밈 하나 툭"],
+        friend:"nunmul", enemy:"pokbal",
+        cure:"고브럽이 잠수를 냠— 한 사람에게만 「나 힘들어」 한마디."},
+      nunmul:{emoji:"💧",name:"수도꼭지몬",tag:"눈물 버튼 상시 대기 중",
+        desc:"감정이 차오르면 말보다 눈물이 먼저 출동하는 타입. 참는 것보다 백배 건강한 배출법인데, 정작 왜 우는지는 본인도 몰라서 울면서 검색합니다. 실컷 울고 나면 원인 한 줄만 정리해 보기.",
+        traits:["슬픈 릴스 알고리즘의 VIP 고객","「너 요즘 괜찮아?」 한마디에 댐 붕괴","울고 나면 리셋되는 의외의 회복 천재"],
+        friend:"jamsu", enemy:"meokbo",
+        cure:"고브럽이 눈물을 냠— 실컷 울었으면 따뜻한 거 먹기."},
+      meokbo:{emoji:"🍔",name:"홧김먹방몬",tag:"일단 시키고 생각한다",
+        desc:"스트레스는 입으로 푸는 게 국룰인 타입. 장바구니에 담는 순간부터 이미 치유가 시작되지만, 배부름이 꺼지면 스트레스가 소화 안 된 채 그대로 남아 있죠. 먹는 즐거움은 지키되, 배달앱 켜기 전 노래 한 곡 먼저.",
+        traits:["빡친 날 배달앱 체류시간 3배 증가","「맵단짠」 3종 세트로 감정 코스요리","먹으면서 이미 다음 메뉴 고르는 중"],
+        friend:"pokbal", enemy:"nunmul",
+        cure:"고브럽이 폭식을 냠— 대신 좋아하는 노래 한 곡."},
+      yemin:{emoji:"🌵",name:"가시돋침몬",tag:"오늘 나 건들면 큰일 남",
+        desc:"스트레스 받으면 온몸에 가시부터 돋는 타입. 볼펜 딸깍 소리, 다리 떠는 진동, 숨소리까지 전부 수신되는 초고성능 안테나가 문제입니다. 가시가 돋았다 싶으면 사람 만나기 전 혼자 쿨다운 필수.",
+        traits:["「^^」 하나로 온도 -20도 만들 수 있음","예민한 날엔 이어폰이 생명유지장치","본인 가시에 본인이 제일 많이 찔림"],
+        friend:"meokbo", enemy:"pokbal",
+        cure:"고브럽이 가시를 냠— 30분만 알림 끄고 혼자."},
+      eoreum:{emoji:"🧊",name:"강제절전몬",tag:"뇌가 꺼졌습니다. 잠시 후 다시…",
+        desc:"버거워지면 그대로 얼어붙어 아무것도 못 하는 타입. 게으른 게 아니라 뇌가 과부하로 절전모드에 들어간 것뿐인데, 자책까지 더하면 얼음이 두꺼워집니다. 다 녹이려 하지 말고 손톱만큼만 움직여 보기.",
+        traits:["할 일이 3개 넘으면 0개 하게 되는 역설","침대에서 천장 보기 국가대표","한번 시동 걸리면 의외로 폭주 기관차"],
+        friend:"pokbal", enemy:"jamsu",
+        cure:"고브럽이 무기력을 냠— 딱 5분, 제일 작은 일 하나만."}
     };
     var MORDER = ["pokbal","jamsu","nunmul","meokbo","yemin","eoreum"];
 
     var QUESTIONS = [
-      { q:"출근/등교했는데 오늘 내가 발표라는 걸 방금 알았다. 심지어 주제도 모른다.", choices:[
-        { text:"뇌 강제 재부팅 — 화면보호기 상태로 그 자리에 서 있음", scores:{ eoreum:2 } },
-        { text:"'왜 아무도 말 안 해줬어?!' 복도가 울리는 사자후", scores:{ pokbal:2 } },
-        { text:"목소리부터 떨리고 시야가 뿌옇게 촉촉해짐", scores:{ nunmul:2 } },
-        { text:"일단 매점부터 간다. 초코바 없이는 못 싸우는 몸", scores:{ meokbo:2 } } ] },
-      { q:"엘리베이터에 제일 어려운 상사/교수님과 단둘이 갇혔다. 구조까지 1시간.", choices:[
-        { text:"영혼의 전원을 끄고 벽지와 물아일체", scores:{ jamsu:2 } },
-        { text:"상대 숨소리, 시계 초침 소리까지 하나하나 거슬리기 시작", scores:{ yemin:2 } },
-        { text:"비상벨을 광클 연타하며 '여기 사람 있어요!!' 절규", scores:{ pokbal:2 } },
-        { text:"그대로 시스템 종료. 1시간째 같은 자세로 발견됨", scores:{ eoreum:2 } } ] },
-      { q:"내 스트레스가 실체화되어 몬스터로 눈앞에 나타났다. 첫마디는?", choices:[
-        { text:"'너 잘 만났다. 오늘 여기서 끝장 보자'", scores:{ pokbal:2 } },
-        { text:"몬스터를 보자마자 내가 먼저 울어버림 — 몬스터가 당황함", scores:{ nunmul:2 } },
-        { text:"'너도 배고파서 그러는 거지? 뭐 시켜줄까?'", scores:{ meokbo:2 } },
-        { text:"몬스터를 차단하고 이불 속으로 로그아웃", scores:{ jamsu:2 } } ] },
-      { q:"폰을 켜니 단톡 300개, 부재중 5통, 메일 27통이 동시에 나를 기다리고 있다.", choices:[
-        { text:"폰을 뒤집어 놓는다. 못 본 알림은 없는 알림이다", scores:{ jamsu:2 } },
-        { text:"알림 목록을 바라보다 그대로 프리즈. 아무것도 못 누름", scores:{ eoreum:2 } },
-        { text:"진동 소리마다 어깨가 움찔. 오늘 만나는 사람들 다 조심해라", scores:{ yemin:2 } },
-        { text:"'다들 나한테 왜 그러는데!!' 허공에 외침", scores:{ pokbal:2 } } ] },
-      { q:"신이 '스트레스 1개 영구 삭제권'을 줬다. 단, 고르는 시간은 10초.", choices:[
-        { text:"10초 내내 버퍼링만 돌다가 기회가 증발함", scores:{ eoreum:2 } },
-        { text:"'야식 먹고 드는 죄책감 삭제해주세요' 0.5초 컷 대답", scores:{ meokbo:2 } },
-        { text:"뭘 지울지 고르다가 서러워져서 눈물부터 남", scores:{ nunmul:2 } },
-        { text:"'10초 안에 고르라는 것 자체가 새 스트레스인데요?'", scores:{ yemin:2 } } ] },
-      { q:"여행 전날 밤 11시, 캐리어가 안 닫힌다. 멘탈 과부하 시작.", choices:[
-        { text:"짐은 내일의 나에게 맡기고 일단 라면 물부터 올림", scores:{ meokbo:2 } },
-        { text:"캐리어에게 화를 낸다. '네가 그러고도 캐리어야?!'", scores:{ pokbal:2 } },
-        { text:"'안 가면 그만이야…' 하며 캐리어 옆에서 잠수", scores:{ jamsu:1, eoreum:1 } },
-        { text:"양말 한 짝이 없다는 이유로 울컥 눈물이 차오름", scores:{ nunmul:2 } } ] },
-      { q:"노래방에서 아껴둔 내 18번을 친구가 먼저 불렀다. 심지어 나보다 잘 부름.", choices:[
-        { text:"미소는 유지 중인데 탬버린 치는 소리가 점점 타악기 공연이 됨", scores:{ yemin:2 } },
-        { text:"마이크 강탈해서 2절부터 기습 참전", scores:{ pokbal:2 } },
-        { text:"화장실 간다고 나가서 30분째 미귀환", scores:{ jamsu:2 } },
-        { text:"말없이 서비스 안주를 폭풍 흡입하며 화풀이", scores:{ meokbo:2 } } ] },
-      { q:"시험/마감 5분 전. 지금 내 뇌 속을 스캔해 보면?", choices:[
-        { text:"새하얀 설원. 텅 비어서 오히려 평화로움", scores:{ eoreum:2 } },
-        { text:"옆 사람 볼펜 딸깍 소리에 살의 감지 센서 작동 중", scores:{ yemin:2 } },
-        { text:"눈물 반, 글자 반이라 화면이 잘 안 보임", scores:{ nunmul:2 } },
-        { text:"활화산 분화 3초 전 카운트다운", scores:{ pokbal:1, yemin:1 } } ] },
+      { q:"발표 전날 밤 11시, 조별과제 빌런이 톡을 보냈다. 「저 내일 못 할 것 같아요…」", choices:[
+        { text:"즉시 통화 버튼. 「지금 통화 가능하실까요?^^」 (전혀 ^^아님)", scores:{ pokbal:2 } },
+        { text:"톡을 30분째 바라만 봄. 답장 창에 커서만 깜빡깜빡", scores:{ eoreum:2 } },
+        { text:"답장은 「넵 알겠습니다~」인데 온몸에 가시 돋는 소리가 들림", scores:{ yemin:2 } },
+        { text:"읽고 폰 뒤집음. 내일의 나야 미안, 오늘의 나는 퇴근할게", scores:{ jamsu:2 } } ] },
+      { q:"3시간 갈아 넣은 과제가 저장 안 된 채 꺼졌다. 자동복구 파일: 없음.", choices:[
+        { text:"모니터 앞에서 오열 시작. 키보드에 눈물 워터마크 찍는 중", scores:{ nunmul:2 } },
+        { text:"「아아아악!!」 자취방 벽이 얇다는 걸 온 동네가 알게 됨", scores:{ pokbal:2 } },
+        { text:"허공 응시 20분. 영혼이 과제 파일과 함께 삭제됨", scores:{ eoreum:2 } },
+        { text:"말없이 배달앱 켬. 이 슬픔은 최소 2만 원어치", scores:{ meokbo:2 } } ] },
+      { q:"좋아하는 사람이 내 스토리는 칼같이 보는데, 내 톡은 3일째 읽씹 중.", choices:[
+        { text:"새벽 2시 슬픈 플레이리스트 + 눈물 콤보 발동", scores:{ nunmul:2 } },
+        { text:"스토리 본 시간, 접속 시간, 좋아요 패턴까지 분석 — 국정원이냐", scores:{ yemin:2 } },
+        { text:"좋아, 그럼 나도 전체 잠수다. 스토리 업로드 전면 중단", scores:{ jamsu:2 } },
+        { text:"떡볶이 시킴. 로제냐 마라냐가 지금 유일하게 중요한 문제", scores:{ meokbo:2 } } ] },
+      { q:"랭크 게임, 우리 팀이 시작 3분 만에 던지기 시작했다. 이번 판이 승급전이다.", choices:[
+        { text:"채팅창이 불바다가 됨. 정지 사유 셀프 제조 중", scores:{ pokbal:2 } },
+        { text:"팀원 숨소리까지 거슬려서 조용히 전체 뮤트", scores:{ yemin:2 } },
+        { text:"마우스에서 손 뗌. 미니맵만 바라보는 관전자 모드", scores:{ eoreum:2 } },
+        { text:"조용히 게임 끄고 3일간 접속 안 함. 폰 게임도 안 켬", scores:{ jamsu:2 } } ] },
+      { q:"「살짝만 다듬을게요~」 했는데 거울 속에 낯선 사람이 앉아 있다.", choices:[
+        { text:"「네 예뻐요…」 하고 집 와서 거울 보며 서럽게 오열", scores:{ nunmul:2 } },
+        { text:"일주일째 모자 착용 + 모자 얘기 꺼내는 사람 전원 경계 대상", scores:{ yemin:2 } },
+        { text:"슬픔은 마라탕으로 헹군다. 오늘은 3단계다", scores:{ meokbo:2 } },
+        { text:"리뷰창에 장문의 화산 폭발. 별점 1개도 아까움", scores:{ pokbal:2 } } ] },
+      { q:"시험 시작 5분 전, 친구가 지나가며 말했다. 「야 근데 그 범위 아니라던데?」", choices:[
+        { text:"그 자리에서 시스템 정지. 눈만 깜빡이는 화면보호기 상태", scores:{ eoreum:2 } },
+        { text:"「그걸 왜 지금 말해?!」 복도가 울리는 사자후", scores:{ pokbal:2 } },
+        { text:"시험지 받기도 전에 시야가 뿌옇게 촉촉해짐", scores:{ nunmul:2 } },
+        { text:"이어폰 꽂고 세상과 단절. 어차피 이번 생 시험은 틀렸어", scores:{ jamsu:2 } } ] },
+      { q:"알바 중, 진상 손님이 반말로 무리한 요구를 시전했다. 사장님은 부재중.", choices:[
+        { text:"미소는 유지 중. 근데 등 뒤로 가시가 한 뼘씩 자라는 중", scores:{ yemin:2 } },
+        { text:"「고객님^^」 뒤에 숨긴 화산이 마그마 만조 상태", scores:{ pokbal:2 } },
+        { text:"포스기 앞에서 프리즈. 결제 버튼이 어디였더라", scores:{ eoreum:2 } },
+        { text:"퇴근하자마자 야식 2인분. 오늘 수고비는 내 위장에게", scores:{ meokbo:2 } } ] },
+      { q:"단톡에서 내 말만 3번 연속 읽씹되고 다른 주제로 넘어갔다.", choices:[
+        { text:"조용히 그 방 알림 끄기. 나만의 방 나가기 없는 방 나가기", scores:{ jamsu:2 } },
+        { text:"현타와 서러움이 동시에 밀려옴. 나 여기서 뭐 하는 거지…", scores:{ nunmul:2 } },
+        { text:"과자 봉지 뜯는 소리로 서러움을 덮는다", scores:{ meokbo:2 } },
+        { text:"이때부터 단톡 전원의 말투가 하나하나 거슬리기 시작", scores:{ yemin:2 } } ] },
       { q:"스트레스 게이지 100% 돌파! 몬스터 변신 직전, 몸에 나타나는 신호는?", choices:[
         { text:"눈에 수도꼭지 장착 — 틀면 바로 나옴", scores:{ nunmul:2 } },
-        { text:"위장이 블랙홀로 진화 — 냉장고가 위험하다", scores:{ meokbo:2 } },
-        { text:"온몸이 서서히 석상화 — 침대에서 화석 발굴 예정", scores:{ eoreum:2 } },
-        { text:"다리에 잠수함 엔진 장착 — 연락 두절 카운트다운", scores:{ jamsu:2 } } ] },
-      { q:"고브럽이 다가와 묻는다. '네 스트레스, 어떻게 요리해 줄까?'", choices:[
-        { text:"'터지기 전에 통째로 삼켜줘. 지금 3초 남았어'", scores:{ pokbal:2 } },
-        { text:"'당분간 나 대신 세상이랑 연락 좀 해줘'", scores:{ jamsu:2 } },
-        { text:"'가시부터 좀 뽑아줘… 나도 나한테 찔려'", scores:{ yemin:2 } },
-        { text:"'얼음땡의 땡… 땡만 좀 해줘'", scores:{ eoreum:2 } } ] }
+        { text:"위장이 블랙홀로 진화 — 배달앱이 위험하다", scores:{ meokbo:2 } },
+        { text:"온몸이 서서히 석상화 — 침대에서 화석으로 발굴 예정", scores:{ eoreum:2 } },
+        { text:"다리에 잠수함 엔진 장착 — 연락 두절 카운트다운 시작", scores:{ jamsu:2 } } ] },
+      { q:"고브럽이 다가와 묻는다. 「네 스트레스, 어떻게 요리해 줄까?」", choices:[
+        { text:"「터지기 전에 통째로 삼켜줘. 지금 3초 남았어」", scores:{ pokbal:2 } },
+        { text:"「당분간 나 대신 세상이랑 연락 좀 해줘」", scores:{ jamsu:2 } },
+        { text:"「가시부터 좀 뽑아줘… 나도 나한테 찔려」", scores:{ yemin:2 } },
+        { text:"「얼음땡의 땡… 땡만 좀 해줘」", scores:{ eoreum:2 } } ] }
     ];
 
     function renderResult(totals, el, api){
       var key = Quiz.top(totals, MORDER), r = MONS[key];
       if (window.GoblubFeed && GoblubFeed.record) GoblubFeed.record("stress", { emoji: r.emoji, title: r.name });
+      var fr=MONS[r.friend], en=MONS[r.enemy];
       el.innerHTML =
         '<span class="result-emoji">'+r.emoji+'</span>'+
         '<p class="result-name">스트레스 받으면… '+r.name+' 변신!</p>'+
+        '<p class="mon-tag">“'+r.tag+'”</p>'+
         '<p class="result-desc">'+r.desc+'</p>'+
+        '<ul class="mon-traits">'+r.traits.map(function(t){return "<li>"+t+"</li>";}).join("")+'</ul>'+
+        '<div class="mon-chemi">'+
+          '<span>🤝 최고의 케미 <b>'+fr.emoji+' '+fr.name+'</b></span>'+
+          '<span>💥 만나면 대환장 <b>'+en.emoji+' '+en.name+'</b></span>'+
+        '</div>'+
         '<div class="mon-stage"><span class="mon-emoji" id="mon">'+r.emoji+'</span></div>'+
         '<div class="result-actions"><button class="btn-primary" id="summon">🌀 고브럽 소환 — 이 몬스터 먹어치우기</button></div>'+
         '<div id="after" style="display:none">'+
@@ -126,7 +165,7 @@
           el.querySelector("#after").style.display="block";
           el.querySelector("#card-slot").appendChild(ShareCard.render({
             palette:"yellow", emoji:r.emoji, badge:"나의 스트레스 몬스터", title:r.name,
-            lines:[r.desc, r.cure]
+            lines:["“"+r.tag+"”", r.traits[0], r.cure]
           }));
           el.querySelector("#qz-retry").onclick=api.restart;
           el.querySelector("#qz-share").onclick=function(){ api.shareLink(el.querySelector("#qz-share")); };
@@ -136,7 +175,7 @@
 
     Quiz.init(document.getElementById("quiz"), {
       emoji: "🌋", title: "스트레스 몬스터 변신",
-      intro: "스트레스 받으면 내 안에서 튀어나오는 몬스터가 있다. 10문항으로 정체를 밝히고, 고브럽이 냠 먹어드립니다.",
+      intro: "빡치는 순간, 내 안에서 튀어나오는 몬스터가 있다. 10문항으로 정체를 밝히면 — 고브럽이 냠 먹어드립니다.",
       feedSrc: "stress", questions: QUESTIONS, renderResult: renderResult
     });
   </script>
