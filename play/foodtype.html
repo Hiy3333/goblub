@@ -10,9 +10,20 @@
   <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../css/style.css?v=cl7" />
   <style>
-    .tags { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 14px 0 4px; }
-    .tag { background: var(--cream); border: 1.5px solid var(--line); border-radius: 999px; padding: 5px 12px; font-size: 0.9rem; color: var(--ink-soft); }
-    .match-line { margin-top: 12px; color: var(--ink-soft); }
+    .fd-tag { text-align:center; color:#ff7a3d; font-size:1.02rem; margin:2px 0 10px; }
+    .fd-rate { display:flex; align-items:center; gap:10px; max-width:340px; margin:0 auto 12px; }
+    .fd-rate span { font-size:.85rem; color:var(--ink-soft); flex:none; }
+    .fd-rate b { font-size:1.05rem; flex:none; }
+    .fd-bar { flex:1; height:12px; border-radius:999px; background:rgba(0,0,0,.12); overflow:hidden; }
+    .fd-bar i { display:block; height:100%; border-radius:999px;
+      background:linear-gradient(90deg,#ff7a3d,#ff4d6d); }
+    .fd-traits { max-width:420px; margin:12px auto 4px; padding:0; list-style:none; text-align:left; }
+    .fd-traits li { position:relative; padding-left:24px; margin:7px 0; line-height:1.6; font-size:.95rem; }
+    .fd-traits li::before { content:"🍴"; position:absolute; left:0; font-size:.85rem; }
+    .fd-item { text-align:center; margin:10px 0 2px; font-size:.95rem; }
+    .fd-chemi { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin:12px 0 4px; }
+    .fd-chemi span { background:rgba(255,122,61,.1); border:1px solid rgba(255,122,61,.35);
+      border-radius:999px; padding:7px 14px; font-size:.88rem; }
   </style>
 </head>
 <body class="clay">
@@ -27,37 +38,43 @@
   <script src="js/sharecard.js"></script>
   <script>
     var TYPES = {
-      mala:       { emoji:"🌶️", name:"화끈 중독성 마라탕형",         short:"마라탕",  desc:"한번 빠지면 헤어나올 수 없는 강렬한 매력의 소유자. 평소엔 잔잔하다가도 꽂히면 그 열정이 주변까지 얼얼하게 만듭니다. 호불호는 갈려도 한번 맛본 사람은 꼭 다시 찾아요.",
-        tags:["자극추구","화끈해","직진본능","심심한건못참아"], match:"tteokbokki", clash:"naengmyeon" },
-      naengmyeon: { emoji:"🧊", name:"시원 쿨한 물냉면형",           short:"물냉면",  desc:"어떤 상황에서도 좀처럼 동요하지 않는 쿨함의 정석. 겉으론 심심해 보여도 알고 보면 깊은 육수 같은 매력이 있어서, 알아갈수록 자꾸 생각나는 타입입니다.",
-        tags:["쿨거지","츤데레감성","은근진국","동요는없다"], match:"gukbap", clash:"mala" },
-      gukbap:     { emoji:"🍲", name:"든든 정 많은 국밥형",           short:"국밥",    desc:"언제 만나도 편하고 든든한, 정 많은 사람. 화려하진 않아도 곁에 있으면 마음이 놓이는 존재감이라 다들 은근히 자주 찾게 됩니다.",
-        tags:["정많음","든든존재감","어디서든무난","새벽에도콜"], match:"naengmyeon", clash:"mintcho" },
-      mintcho:    { emoji:"🍫", name:"호불호 확실 민초형",           short:"민초",    desc:"취향이 확고하고 자기 색이 뚜렷한 타입. 누가 뭐래도 내 스타일을 밀고 나가는 소신파라, 싫어하는 사람도 있지만 좋아하는 사람은 진심으로 좋아합니다.",
-        tags:["소신발언","호불호극혐","내길간다","논쟁각오완료"], match:"dosirak", clash:"gukbap" },
-      tteokbokki: { emoji:"❤️", name:"만인의 인싸 떡볶이형",         short:"떡볶이",  desc:"누구와도 금방 친해지는 만인의 인기스타. 어디에 있어도 분위기를 화기애애하게 만드는 힘이 있어서, 모임에 꼭 있어야 할 존재로 통합니다.",
-        tags:["인싸력만렙","분위기메이커","매콤달콤","핵인싸"], match:"mala", clash:"dosirak" },
-      dosirak:    { emoji:"🍱", name:"가성비 효율 편의점 도시락형",   short:"도시락",  desc:"군더더기 없이 실속을 챙기는 효율의 아이콘. 필요한 걸 빠르고 정확하게 해결하는 타입이라, 함께 일하거나 지내면 은근히 편하고 믿음직합니다.",
-        tags:["효율극대화","군더더기없음","계획적인생","혼밥능력자"], match:"mintcho", clash:"tteokbokki" }
+      mala:       { emoji:"🌶️", name:"화끈 중독성 마라탕형", short:"마라탕", tag:"인생은 맵기 3단계부터", rate:91, side:"후식 탕후루 (마라탕후루 풀코스)",
+        desc:"한번 빠지면 못 헤어나오는 강렬한 중독성의 소유자. 평소엔 잔잔한데 꽂히는 순간 텐션이 화산처럼 폭발해 주변까지 얼얼하게 만듭니다. 호불호는 갈려도 한번 맛본 사람은 반드시 돌아옵니다.",
+        traits:["꽂히면 3일 밤새는 과몰입 장인","심심한 것보단 차라리 매운 게 낫다 주의","텐션 터지면 아무도 못 말림"], match:"tteokbokki", clash:"naengmyeon" },
+      naengmyeon: { emoji:"🧊", name:"시원 쿨한 물냉면형", short:"물냉면", tag:"호들갑은 육수에 말아먹었어", rate:77, side:"식초 두 바퀴 + 겨자 정량",
+        desc:"무슨 일이 터져도 살얼음 멘탈이 안 녹는 쿨함의 정석. 처음엔 밍밍해 보여도 알수록 깊은 육수 같은 반전 매력이 있어서, 곁에 둬본 사람만 그 진가를 압니다.",
+        traits:["카톡은 용건만 간단히 파","리액션은 작아도 챙길 건 다 챙김","화내는 걸 본 사람이 없다는 전설 보유"], match:"gukbap", clash:"mala" },
+      gukbap:     { emoji:"🍲", name:"든든 정 많은 국밥형", short:"국밥", tag:"밥은 먹고 다니냐가 안부 인사", rate:96, side:"깍두기 국물 (셀프바 3회전)",
+        desc:"언제 만나도 편하고 든든한 국민 소울푸드 같은 사람. 화려한 이벤트는 없어도 힘들 때 제일 먼저 생각나는 존재라, 다들 새벽에도 이 사람부터 찾습니다.",
+        traits:["고민 상담 들어주다 밥까지 사주는 타입","유행 안 타는 대신 실망도 안 시킴","「내가 살게」 발동 속도 전국 1위"], match:"naengmyeon", clash:"mintcho" },
+      mintcho:    { emoji:"🍫", name:"호불호 확실 민초형", short:"민초", tag:"치약이라니, 이건 청량함이야", rate:52, side:"논쟁 상대 (없으면 심심함)",
+        desc:"누가 뭐래도 내 취향은 내가 정하는 소신 만렙 타입. 세상을 민초단과 반민초단으로 가르는 화제성의 주인공이라, 싫어하는 사람도 있지만 좋아하는 사람은 팬클럽급으로 좋아합니다.",
+        traits:["최애 앞에선 논리학 박사로 변신","「그게 왜 좋아?」 소리 듣는 게 일상","트렌드보다 내 취향 아카이브가 우선"], match:"dosirak", clash:"gukbap" },
+      tteokbokki: { emoji:"❤️", name:"만인의 인싸 떡볶이형", short:"떡볶이", tag:"오늘도 모임의 중심은 나야", rate:94, side:"모둠 튀김 + 순대 (국물 찍먹 필수)",
+        desc:"누구랑 있어도 3분 만에 친해지는 국민 인기 메뉴. 이 사람이 등장하면 조용하던 모임도 화기애애해지는 마법이 일어나서, 어느 약속이든 「걔도 불러」 1순위로 소환됩니다.",
+        traits:["단톡방 3개 이상에서 동시 활동 중","처음 본 사람과 맞팔까지 10분 컷","분위기 죽으면 본인이 제일 못 견딤"], match:"mala", clash:"dosirak" },
+      dosirak:    { emoji:"🍱", name:"가성비 효율 도시락형", short:"도시락", tag:"감성 좋지, 근데 그거 얼마인데?", rate:82, side:"전자레인지 2분 + 1+1 음료",
+        desc:"군더더기 없이 실속만 챙기는 효율의 아이콘. 시간·돈·동선 낭비를 못 참는 계획형 인간이라, 같이 다니면 알아서 최적 루트가 나오는 인간 내비게이션입니다.",
+        traits:["앱 3개 비교 후 최저가로만 결제","약속 전 이동 동선 시뮬레이션 완료","충동구매 대신 장바구니 2주 숙성"], match:"mintcho", clash:"tteokbokki" }
     };
     var ORDER = ["mala","naengmyeon","gukbap","mintcho","tteokbokki","dosirak"];
 
     var QUESTIONS = [
-      { q: "무인도에 떨어졌다. 구조 요정이 나타나 '평생 한 가지 음식 무한 제공' 소원을 들어준단다.", choices: [
-        { text: "물냉면. 무인도 더위엔 살얼음 육수가 답이다", scores: { naengmyeon: 2 } },
-        { text: "국밥. 어디서든 속이 든든해야 버틴다", scores: { gukbap: 2 } },
-        { text: "편의점 도시락. 반찬 구성 완벽, 영양 균형, 효율 갑", scores: { dosirak: 2 } },
-        { text: "민초 아이스크림. 논쟁할 사람이 없는 게 좀 아쉽지만", scores: { mintcho: 2 } } ] },
+      { q: "단톡방에 「점메추 좀」이 올라왔다. 나의 대응은?", choices: [
+        { text: "「아무거나」 (진심으로 다 괜찮아서 하는 말)", scores: { naengmyeon: 2 } },
+        { text: "「국밥 가자. 실패가 없다」 정석 추천", scores: { gukbap: 2 } },
+        { text: "어제 뭐 먹었는지 취조 후 안 겹치는 최적 메뉴 산출", scores: { dosirak: 2 } },
+        { text: "아무도 예상 못 한 메뉴를 던져 단톡방을 정적에 빠뜨림", scores: { mintcho: 2 } } ] },
       { q: "내 인생이 요리 서바이벌 프로그램이라면, 심사위원의 평가는?", choices: [
         { text: "'자극적인데… 자꾸 손이 갑니다. 이거 위험한데요'", scores: { mala: 2 } },
         { text: "'첫맛은 밍밍한데 끝에서 깊은 육수가 올라옵니다'", scores: { naengmyeon: 2 } },
         { text: "'전 국민 취향 저격. 이 맛은 미워할 수가 없어요'", scores: { tteokbokki: 2 } },
         { text: "'심사위원단 의견이 갈립니다. 지금 싸우고 있습니다'", scores: { mintcho: 2 } } ] },
-      { q: "새벽 냉장고에서 요정이 튀어나왔다. '네 성격을 온도로 표현해봐라.'", choices: [
-        { text: "'영하 1도. 살얼음 동동, 시원한 게 최고'", scores: { naengmyeon: 2 } },
-        { text: "'화산 온도. 만지면 데이니까 조심하도록'", scores: { mala: 2 } },
-        { text: "'뚝배기 온도. 늦게 데워져도 끝까지 안 식음'", scores: { gukbap: 2 } },
-        { text: "'전자레인지 2분. 필요할 때 딱 맞게 데워짐'", scores: { dosirak: 2 } } ] },
+      { q: "새벽 1시, 유튜브 알고리즘이 4시간짜리 먹방을 띄웠다.", choices: [
+        { text: "「저걸 왜 밤에 보지」 하면서 끝까지 정주행 (동요 없음)", scores: { naengmyeon: 2 } },
+        { text: "10분 만에 배달 앱 오픈. 새벽 배달비쯤은 감수한다", scores: { mala: 2 } },
+        { text: "냉장고 털어 야식 끓이고 가족 몫까지 챙김", scores: { gukbap: 2 } },
+        { text: "새벽 배달비는 비효율. 내일 점심 메뉴로 저장", scores: { dosirak: 2 } } ] },
       { q: "친구 넷이 배달 메뉴로 1시간째 전쟁 중이다. 나의 등판!", choices: [
         { text: "'떡볶이 세트 시켜서 다 같이 나눠 먹자!' 만장일치 유도", scores: { tteokbokki: 2 } },
         { text: "'난 이거 먹을래.' 혼자 다른 가게에서 단독 주문", scores: { mintcho: 2 } },
@@ -98,28 +115,36 @@
     function renderResult(totals, el, api) {
       var key = Quiz.top(totals, ORDER);
       var r = TYPES[key];
-      var tagsHtml = '<div class="tags">' + r.tags.map(function (t) { return '<span class="tag">#' + t + '</span>'; }).join("") + '</div>';
+      var fr = TYPES[r.match], en = TYPES[r.clash];
       el.innerHTML =
         '<span class="result-emoji">' + r.emoji + "</span>" +
         '<p class="result-name">' + r.name + "</p>" +
-        '<p class="result-desc">' + r.desc + "</p>" + tagsHtml +
-        '<p class="match-line">💛 찰떡궁합: <b>' + TYPES[r.match].short + '</b> &nbsp;·&nbsp; ⚡ 상극: <b>' + TYPES[r.clash].short + '</b></p>' +
+        '<p class="fd-tag">“' + r.tag + '”</p>' +
+        '<div class="fd-rate"><span>재주문율</span>' +
+          '<div class="fd-bar"><i style="width:' + r.rate + '%"></i></div><b>' + r.rate + '%</b></div>' +
+        '<p class="result-desc">' + r.desc + "</p>" +
+        '<ul class="fd-traits">' + r.traits.map(function (t) { return "<li>" + t + "</li>"; }).join("") + '</ul>' +
+        '<p class="fd-item">🥢 소울 사이드 — <b>' + r.side + '</b></p>' +
+        '<div class="fd-chemi">' +
+          '<span>🤝 최고의 밥약 짝꿍 <b>' + fr.emoji + ' ' + fr.short + '</b></span>' +
+          '<span>💥 같이 시키면 대참사 <b>' + en.emoji + ' ' + en.short + '</b></span>' +
+        '</div>' +
         '<div id="card-slot"></div>' +
         '<div class="result-actions">' +
         '<button class="btn-primary" id="qz-retry">다시하기</button>' +
         '<button class="btn-ghost" id="qz-share">링크 복사</button></div>';
       el.querySelector("#card-slot").appendChild(ShareCard.render({
         palette: "purple", emoji: r.emoji, badge: "음식형 인간", title: r.name,
-        lines: [r.desc, "#" + r.tags.slice(0, 3).join(" #")]
+        lines: ["“" + r.tag + "”", "재주문율 " + r.rate + "%", "소울 사이드: " + r.side]
       }));
       el.querySelector("#qz-retry").onclick = api.restart;
       el.querySelector("#qz-share").onclick = function () { api.shareLink(el.querySelector("#qz-share")); };
-      if (window.GoblubFeed && GoblubFeed.record) GoblubFeed.record("foodtype", { emoji: r.emoji, title: (r.short || r.name), tags: r.tags });
+      if (window.GoblubFeed && GoblubFeed.record) GoblubFeed.record("foodtype", { emoji: r.emoji, title: (r.short || r.name), tags: r.traits });
     }
 
     Quiz.init(document.getElementById("quiz"), {
       emoji: "🍜", title: "나는 무슨 음식형 인간?",
-      intro: "성격을 음식에 비유하면 어떤 맛일까? 10가지 질문으로 나의 음식형을 찾아봐요.",
+      intro: "내 성격을 음식으로 환산하면 무슨 맛일까? 10문항이면 재주문율과 소울 사이드까지 나온다.",
       feedSrc: "foodtype", questions: QUESTIONS, renderResult: renderResult
     });
   </script>
