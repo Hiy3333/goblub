@@ -10,9 +10,20 @@
   <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../css/style.css?v=cl7" />
   <style>
-    .tags { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 14px 0 4px; }
-    .tag { background: var(--cream); border: 1.5px solid var(--line); border-radius: 999px; padding: 5px 12px; font-size: 0.9rem; color: var(--ink-soft); }
-    .match-line { margin-top: 12px; color: var(--ink-soft); }
+    .z-tag { text-align:center; color:#35c98a; font-size:1.02rem; margin:2px 0 10px; }
+    .z-surv { display:flex; align-items:center; gap:10px; max-width:340px; margin:0 auto 12px; }
+    .z-surv span { font-size:.85rem; color:var(--ink-soft); flex:none; }
+    .z-surv b { font-size:1.05rem; flex:none; }
+    .z-bar { flex:1; height:12px; border-radius:999px; background:rgba(0,0,0,.12); overflow:hidden; }
+    .z-bar i { display:block; height:100%; border-radius:999px;
+      background:linear-gradient(90deg,#35c98a,#3a8bff); }
+    .z-traits { max-width:420px; margin:12px auto 4px; padding:0; list-style:none; text-align:left; }
+    .z-traits li { position:relative; padding-left:24px; margin:7px 0; line-height:1.6; font-size:.95rem; }
+    .z-traits li::before { content:"🧟"; position:absolute; left:0; font-size:.85rem; }
+    .z-item { text-align:center; margin:10px 0 2px; font-size:.95rem; }
+    .z-chemi { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin:12px 0 4px; }
+    .z-chemi span { background:rgba(53,201,138,.1); border:1px solid rgba(53,201,138,.35);
+      border-radius:999px; padding:7px 14px; font-size:.88rem; }
   </style>
 </head>
 <body class="clay">
@@ -27,108 +38,128 @@
   <script src="js/sharecard.js"></script>
   <script>
     var TYPES = {
-      leader:   { emoji:"🛡️", name:"무리를 이끄는 리더형",     short:"리더",    desc:"패닉에 빠진 사람들 사이에서 혼자 침착하게 상황을 정리하고 있죠. 다들 당신만 보고 움직이는데, 정작 본인 체력은 하나도 안 챙기는 게 함정입니다.",
-        tags:["타고난두목","위기에침착","다이끌어","책임감갑"], match:"supplier", clash:"traitor" },
-      fighter:  { emoji:"🪓", name:"좀비 때려잡는 전투형",     short:"전투",    desc:"위협이 나타나면 일단 몸이 먼저 나가는 타입. 무리의 방패 역할을 자처하지만, 가끔은 무기보다 머리를 먼저 쓰는 연습도 필요합니다.",
-        tags:["일단몸이먼저","방패자처","무기부터챙김","근손실없음"], match:"leader", clash:"hermit" },
-      supplier: { emoji:"🎒", name:"팀의 생명줄 살림꾼형",     short:"살림꾼",  desc:"물, 식량, 배터리까지 야무지게 챙기는 진짜 생존 실세. 다들 당신 가방만 믿고 따라다니는데, 정작 본인 몫은 늘 제일 적게 챙깁니다.",
-        tags:["가방이생명줄","야무진살림","내몫은늘꼴찌","진짜생존실세"], match:"leader", clash:"traitor" },
-      hermit:   { emoji:"🏚️", name:"혼자 살아남는 은둔형",     short:"은둔",    desc:"무리보다는 나 혼자가 편한 스타일. 아무도 못 찾는 안전가옥을 귀신같이 찾아내지만, 정작 마지막에 문 두드릴 사람이 없어서 조금 외롭습니다.",
-        tags:["혼자가편해","안전가옥귀신","무리는사양","은근외로움"], match:"supplier", clash:"fighter" },
-      traitor:  { emoji:"🔪", name:"살기 위해선 뭐든 배신자형", short:"배신",    desc:"위기의 순간 계산이 제일 빠른 사람. 생존율은 확실히 높지만, 사태가 끝나고 나면 같이 살아남은 사람들 얼굴 보기가 좀 민망할 겁니다.",
-        tags:["계산빠름","생존율갑","의리는패스","뒷맛은씁쓸"], match:"firstday", clash:"supplier" },
-      firstday: { emoji:"💀", name:"호기심이 부른 첫날 사망형", short:"첫날사망", desc:"사이렌 울리자마자 창문 열고 밖부터 구경하는 스타일. 궁금한 건 못 참는 성격이 이번만큼은 수명을 크게 단축시킬 것 같습니다.",
-        tags:["호기심천국","일단구경부터","못참는성격","수명단축각"], match:"traitor", clash:"leader" }
+      leader:   { emoji:"🛡️", name:"인간 내비게이션 리더형", short:"리더", tag:"패닉? 그건 제 담당이 아닌데요", surv:87, item:"확성기 (없으면 목청)",
+        desc:"세상이 뒤집힌 순간에도 혼자 침착하게 동선을 짜고 있는 타입. 다들 당신 뒤통수만 보고 따라 걷는데, 정작 본인 밥이랑 잠은 제일 뒤로 미루는 게 최대 리스크입니다.",
+        traits:["단톡 공지 쓰는 속도가 재난문자보다 빠름","「일단 진정하고」가 시그니처 대사","본인 컨디션은 항상 담당자 부재중"],
+        match:"supplier", clash:"traitor" },
+      fighter:  { emoji:"🪓", name:"프라이팬 전투민족형", short:"전투", tag:"말보다 스윙이 빠름", surv:74, item:"이모님 프라이팬 (28cm 이상)",
+        desc:"위협 감지 즉시 몸이 먼저 나가는 타입. 무리의 방패를 자처하는 든든함이 무기지만, 가끔은 프라이팬보다 머리를 먼저 쓰는 연습이 필요합니다. 좀비보다 문틀에 부딪혀 다칠 확률이 더 높음.",
+        traits:["헬스장 3대 운동이 드디어 빛을 보는 순간","도망 루트보다 정면 루트를 먼저 검토","전투 후 「별거 아니네」 (손 떨면서)"],
+        match:"leader", clash:"hermit" },
+      supplier: { emoji:"🎒", name:"인간 편의점 살림꾼형", short:"살림꾼", tag:"말만 해, 가방에서 나오니까", surv:91, item:"27칸 수납 배낭",
+        desc:"물·식량·보조배터리·상비약까지 야무지게 갖춘 진짜 생존 실세. 다들 당신 가방만 믿고 다니는데, 정작 본인 몫은 늘 제일 적게 챙기는 게 유일한 버그입니다. 아포칼립스 최고 연봉 직군.",
+        traits:["재난 나기 전부터 이미 반쯤 준비돼 있었음","「그거 나한테 있어」 발동 확률 99%","물물교환 시세를 혼자 다 꿰고 있음"],
+        match:"leader", clash:"traitor" },
+      hermit:   { emoji:"🏚️", name:"자발적 무인도 은둔형", short:"은둔", tag:"인류보다 와이파이가 그리움", surv:83, item:"자물쇠 3종 세트",
+        desc:"무리 생활보다 혼자가 백배 편한 타입. 아무도 못 찾는 안전가옥을 귀신같이 발굴하고 조용히 오래 살아남습니다. 다만 세상이 복구된 뒤에도 3주쯤 더 은둔하다가 뉴스 보고 나올 예정.",
+        traits:["집순이/집돌이 경력이 곧 생존 스펙","기척 지우기 패시브 스킬 보유","가끔 사람 목소리가 그리워서 라디오 켬"],
+        match:"supplier", clash:"fighter" },
+      traitor:  { emoji:"🔪", name:"생존 지상주의 계산형", short:"계산", tag:"미안, 근데 나는 살아야겠어", surv:96, item:"혼자만 아는 지도",
+        desc:"위기의 순간 손익 계산이 제일 빠른 타입. 생존율은 전 유형 1위지만, 사태가 끝난 뒤 동창회 참석률은 전 유형 꼴찌가 될 예정입니다. 당신과 같은 조가 된 사람들에게 미리 심심한 위로를 전합니다.",
+        traits:["비상구 위치를 무의식적으로 먼저 확인","「우리」보다 「나」가 0.3초 빠름","살아남고 나서 사과문 초안 작성 중"],
+        match:"firstday", clash:"supplier" },
+      firstday: { emoji:"💀", name:"호기심 만렙 첫날사망형", short:"첫날사망", tag:"그래도 궁금한 건 궁금한 거잖아", surv:3, item:"유서 겸 브이로그 카메라",
+        desc:"사이렌이 울리면 숨는 게 아니라 창문부터 여는 타입. 「진짜 좀비인지 눈으로 봐야 믿지」라는 실증주의 정신이 이번 생에서만큼은 수명을 크게 단축시킵니다. 대신 당신이 남긴 영상은 인류의 귀중한 자료가 될 것입니다.",
+        traits:["재난 영상 항상 제일 앞에서 찍는 사람","「에이 설마」가 마지막 유언 유력 후보","전생에 고양이었다면 이미 9번 다 씀"],
+        match:"traitor", clash:"leader" }
     };
     var ORDER = ["leader","fighter","supplier","hermit","traitor","firstday"];
 
     var QUESTIONS = [
-      { q: "새벽 3시, 창밖에서 '우어어…' 소리. 원래 옆집 아저씨가 좀 그러시긴 하는데, 확인해보니 진짜 좀비 사태다!", choices: [
-        { text: "폰 들고 나가서 좀비와 셀카부터 — 인증이 먼저다", scores: { firstday: 2 } },
-        { text: "아파트 안내방송 마이크를 잡는다. '주민 여러분, 침착하십시오'", scores: { leader: 2 } },
+      { q: "새벽 3시, 커뮤에 「우리 동네 좀비 실화냐」 글이 실검 1위. 창밖에서 진짜 「우어어…」 소리가 들린다.", choices: [
+        { text: "창문 열고 직접 확인 + 세로 영상 촬영. 「와 미쳤다 이거 실화임?」", scores: { firstday: 2 } },
+        { text: "가족톡·친구톡에 즉시 행동지침 전파. 「1. 문 잠가 2. 불 꺼 3. 톡 확인」", scores: { leader: 2 } },
         { text: "프라이팬 들고 현관 앞 1인 방어선 구축", scores: { fighter: 2 } },
-        { text: "조용히 불 끄고 '이 집은 빈집입니다' 컨셉 유지", scores: { hermit: 2 } } ] },
+        { text: "조용히 소등 + 커튼 클로즈. 오늘부로 이 집은 빈집이다", scores: { hermit: 2 } } ] },
 
-      { q: "마트에 딱 하나 남은 카트. 저쪽에서 다른 생존자도 눈독 들이고 있다.", choices: [
-        { text: "카트는 양보하고 장바구니 12개를 몸에 두르는 쪽을 택함", scores: { supplier: 2 } },
-        { text: "상대가 통조림에 한눈판 사이 카트 끌고 유유히 퇴장", scores: { traitor: 2 } },
-        { text: "'먼저 잡는 사람이 임자죠?' 전력질주 스피드 대결 신청", scores: { fighter: 2 } },
-        { text: "카트 필요 없음. 어차피 혼자 다닐 거라 배낭 하나면 충분", scores: { hermit: 2 } } ] },
+      { q: "단톡 3개가 동시에 폭발 중 — 가족톡 47, 친구톡 213, 과톡/회사톡 89. 뭐부터 하지?", choices: [
+        { text: "과톡에 집결지·시간 공지 박고 고정. 「이견 있으면 3분 안에」", scores: { leader: 2 } },
+        { text: "각 톡방에 준비물 리스트 전송 — 물 2L, 보조배터리, 상비약…", scores: { supplier: 2 } },
+        { text: "전부 읽씹하고 조용히 혼자 짐 싸는 중. 단체행동은 느리다", scores: { traitor: 2 } },
+        { text: "친구톡에 「ㄹㅇ?ㅋㅋ」 보내고 구경하러 나갈 채비", scores: { firstday: 2 } } ] },
 
-      { q: "일행 중 한 명이 '좀비도 사실 착할지 몰라'라며 대화를 시도하러 걸어간다.", choices: [
-        { text: "'오? 통하려나?' 옆에서 팔짱 끼고 같이 구경", scores: { firstday: 2 } },
-        { text: "목덜미 잡고 끌고 온다. '단체 행동 규칙 1조 낭독해봐'", scores: { leader: 2 } },
-        { text: "말리진 않되 뒤에서 무기 들고 엄호 자세", scores: { fighter: 2 } },
-        { text: "'이 무리랑 다니면 죽겠구나' 조용히 이탈 준비", scores: { hermit: 2, traitor: 1 } } ] },
+      { q: "대피소에서 마지막 남은 보조배터리 1개. 옆 생존자도 폰 배터리 3%다.", choices: [
+        { text: "「팔씨름으로 정하죠」 (소매 걷으며 이미 이긴 표정)", scores: { fighter: 2 } },
+        { text: "상대가 한눈판 사이에… 어? 내 주머니에 있네?", scores: { traitor: 2 } },
+        { text: "양보한다. 그리고 가방에서 태양광 충전기를 꺼낸다", scores: { supplier: 2 } },
+        { text: "「전 괜찮아요」 — 어차피 연락 올 사람 없음", scores: { hermit: 2 } } ] },
 
-      { q: "좀비들이 이상하게 나만 안 문다. 알고 보니 내가 마늘을 너무 먹어서(그런 설정이다).", choices: [
-        { text: "이 능력으로 '좀비 구역 안전 통행' 유료 서비스 개업", scores: { traitor: 2 } },
-        { text: "'내가 미끼가 된다. 다들 그 사이에 도망쳐!'", scores: { leader: 2 } },
-        { text: "위험 구역 물자 회수 전담 셔틀을 자원함", scores: { supplier: 2 } },
-        { text: "좀비 무리 한가운데로 산책 가서 어깨동무 시도", scores: { firstday: 2 } } ] },
+      { q: "무법지대 된 편의점, 사실상 합법 약탈 타임. 너의 장바구니는?", choices: [
+        { text: "물·통조림·건전지 — 동선 최적화로 3분 컷 스윕", scores: { supplier: 2 } },
+        { text: "과자 코너에서 신상 발견. 「어? 이거 나온 거 몰랐는데」 시식 중", scores: { firstday: 2 } },
+        { text: "우산·야구방망이·프라이팬 — 무기 코너(원래는 생활용품 코너)만 털음", scores: { fighter: 2 } },
+        { text: "직접 안 담음. 남들이 담은 카트에서 필요한 것만 회수 예정", scores: { traitor: 2 } } ] },
 
-      { q: "은신처 냉장고에 마지막 초코파이 1개. 그리고 그걸 목격한 6명.", choices: [
-        { text: "6등분 칼질 장인 등판. 부스러기까지 공평 분배", scores: { supplier: 2 } },
-        { text: "새벽에 몰래 냉장고를… 어? 이미 내 입안에 있네", scores: { traitor: 2 } },
-        { text: "초코파이 포기 선언 후 그 논쟁 자체에서 이탈", scores: { hermit: 2 } },
-        { text: "'팔씨름 토너먼트로 정하자' 제안 (본인 우승 확신)", scores: { fighter: 2 } } ] },
+      { q: "일행 중 한 명의 팔에 수상한 자국. 본인은 「모기 물린 거야!」라고 주장 중.", choices: [
+        { text: "「확인만 하자. 규칙대로.」 침착하게 검사 절차 진행", scores: { leader: 2 } },
+        { text: "구급상자 들고 접근. 「일단 소독부터 하자, 응?」", scores: { supplier: 2 } },
+        { text: "그 사람 뒤쪽 자리로 조용히 이동 + 프라이팬 스탠바이", scores: { fighter: 2 } },
+        { text: "그날 밤 짐 싸서 조용히 단독 이탈. 쪽지도 안 남김", scores: { hermit: 2 } } ] },
 
-      { q: "라디오: '남쪽 캠프가 안전합니다.' 근데 어제는 분명 북쪽이 안전하댔는데?", choices: [
-        { text: "지도 펴고 정보 교차검증 후 무리 투표에 부침", scores: { leader: 2 } },
-        { text: "방송 자체를 안 믿음. 내 안전가옥 2층 증축이나 하련다", scores: { hermit: 2 } },
-        { text: "'일단 남쪽 가보자! 아니면 어때, 궁금하잖아!'", scores: { firstday: 2 } },
-        { text: "어느 쪽이 됐든 떠날 수 있게 비상 배낭 2세트 준비", scores: { supplier: 2 } } ] },
+      { q: "인플루언서가 옥상에서 「좀비 챌린지」를 찍고 있다. 좀비들이 계단으로 올라가는 중.", choices: [
+        { text: "「저거 찍히면 대박이다」 나도 옆 건물 옥상으로 이동", scores: { firstday: 2 } },
+        { text: "확성기 들고 「그 건물 즉시 대피하세요!」 방송", scores: { leader: 2 } },
+        { text: "저 사람 장비… 삼각대랑 짐벌 좋은 거 쓰네. 이따 챙겨야지", scores: { traitor: 2 } },
+        { text: "관심 없음. 그 시간에 은신처 2중 잠금장치 보강", scores: { hermit: 2 } } ] },
 
-      { q: "한밤중 보초 근무 중, 문 두드리는 소리. '살려주세요… 사람이에요…'", choices: [
-        { text: "규칙대로 진행. '손 보여주시고, 물린 자국 검사부터 할게요'", scores: { leader: 2 } },
-        { text: "못 들은 척 스르륵 자리 이동. 우리 식량도 간당한데…", scores: { traitor: 2 } },
-        { text: "문은 열어주되 프라이팬은 머리 위에서 대기", scores: { fighter: 2 } },
-        { text: "문구멍에 눈 딱 붙이고 '누구세요~? 진짜 사람이에요~?'", scores: { firstday: 2 } } ] },
-
-      { q: "옆 생존자 캠프가 우리 물자를 노린다는 소문이 돈다.", choices: [
-        { text: "방어 훈련 개시. 내 프라이팬은 오늘부로 명검이다", scores: { fighter: 2 } },
-        { text: "오히려 저쪽 캠프에 이직 면접 보러 감(연봉: 통조림)", scores: { traitor: 2 } },
-        { text: "물자 분산 은닉 완료. 창고 위치는 나만 안다", scores: { supplier: 2 } },
-        { text: "저쪽 대표에게 정상회담 제안 — 의제: 라면 반 나누기", scores: { leader: 2 } } ] },
+      { q: "생존자 캠프 도착. 돌아가며 자기소개 겸 역할 지원 시간이다.", choices: [
+        { text: "「동선 짜고 인원 관리하겠습니다」 — 어느새 화이트보드 앞에 서 있음", scores: { leader: 2 } },
+        { text: "「야간 경비 서겠습니다」 (프라이팬 들어 보이며)", scores: { fighter: 2 } },
+        { text: "「물자 관리요. 참고로 지금 재고표 이미 만들었습니다」", scores: { supplier: 2 } },
+        { text: "「정찰 담당 하겠습니다」 (사실 그냥 구경 다니고 싶음)", scores: { firstday: 2 } } ] },
 
       { q: "구조 헬기 등장! 남은 좌석은 1개, 우리 일행은 4명.", choices: [
-        { text: "'미안!' …소리가 들릴 땐 이미 탑승 완료", scores: { traitor: 2 } },
+        { text: "「미안!」 …소리가 들릴 땐 이미 탑승 완료", scores: { traitor: 2 } },
         { text: "제일 약한 사람 태워 보내고 손 흔들어줌", scores: { leader: 2 } },
-        { text: "'헬기? 난 저거 안 믿어.' 걸어서 살아남는 길 선택", scores: { hermit: 2 } },
+        { text: "「헬기? 난 저거 안 믿어.」 걸어서 살아남는 길 선택", scores: { hermit: 2 } },
         { text: "타는 사람 주머니에 비상식량 쑤셔 넣어 보냄", scores: { supplier: 2 } } ] },
 
+      { q: "폐허가 된 거리에서 좀비가 된 절친(혹은 전 애인)과 눈이 마주쳤다.", choices: [
+        { text: "「야… 나 기억나?」 한 발짝 다가가며 말 걸어봄", scores: { firstday: 2 } },
+        { text: "눈 질끈 감고 스윙. 「미안… 이게 내 방식의 작별인사야」", scores: { fighter: 2 } },
+        { text: "눈 마주치기 전에 이미 옆 골목으로 증발한 상태", scores: { hermit: 2 } },
+        { text: "천천히 뒷걸음질하며 다른 좀비들 쪽으로 유인… 미안", scores: { traitor: 2 } } ] },
+
       { q: "6개월 뒤, 생존자 다큐멘터리에 내가 나왔다. 화면 아래 소개 자막은?", choices: [
-        { text: "'프라이팬의 전설 — 좀비 격퇴 137회'", scores: { fighter: 2 } },
-        { text: "'목격담만 존재하는 유령 생존자'", scores: { hermit: 2 } },
-        { text: "'1화에서 하차 (시청자 여러분이 많이 우셨습니다)'", scores: { firstday: 2 } },
-        { text: "'전국 생존 캠프를 먹여 살린 물류왕'", scores: { supplier: 2 } } ] }
+        { text: "「프라이팬의 전설 — 좀비 격퇴 137회」", scores: { fighter: 2 } },
+        { text: "「목격담만 존재하는 유령 생존자」", scores: { hermit: 2 } },
+        { text: "「1화에서 하차 (시청자 여러분이 많이 우셨습니다)」", scores: { firstday: 2 } },
+        { text: "「전국 생존 캠프를 먹여 살린 물류왕」", scores: { supplier: 2 } } ] }
     ];
 
     function renderResult(totals, el, api) {
       var key = Quiz.top(totals, ORDER);
       var r = TYPES[key];
-      var tagsHtml = '<div class="tags">' + r.tags.map(function (t) { return '<span class="tag">#' + t + '</span>'; }).join("") + '</div>';
+      var fr = TYPES[r.match], en = TYPES[r.clash];
       el.innerHTML =
         '<span class="result-emoji">' + r.emoji + "</span>" +
         '<p class="result-name">' + r.name + "</p>" +
-        '<p class="result-desc">' + r.desc + "</p>" + tagsHtml +
-        '<p class="match-line">💛 찰떡궁합: <b>' + TYPES[r.match].short + '</b> &nbsp;·&nbsp; ⚡ 상극: <b>' + TYPES[r.clash].short + '</b></p>' +
+        '<p class="z-tag">“' + r.tag + '”</p>' +
+        '<div class="z-surv"><span>생존 확률</span>' +
+          '<div class="z-bar"><i style="width:' + r.surv + '%"></i></div><b>' + r.surv + '%</b></div>' +
+        '<p class="result-desc">' + r.desc + "</p>" +
+        '<ul class="z-traits">' + r.traits.map(function (t) { return "<li>" + t + "</li>"; }).join("") + '</ul>' +
+        '<p class="z-item">🎒 생존 필수템 — <b>' + r.item + '</b></p>' +
+        '<div class="z-chemi">' +
+          '<span>🤝 같은 조 하고 싶은 <b>' + fr.emoji + ' ' + fr.short + '형</b></span>' +
+          '<span>💥 같은 조 되면 대환장 <b>' + en.emoji + ' ' + en.short + '형</b></span>' +
+        '</div>' +
         '<div id="card-slot"></div>' +
         '<div class="result-actions">' +
         '<button class="btn-primary" id="qz-retry">다시하기</button>' +
         '<button class="btn-ghost" id="qz-share">링크 복사</button></div>';
       el.querySelector("#card-slot").appendChild(ShareCard.render({
         palette: "mint", emoji: r.emoji, badge: "좀비 생존 유형", title: r.name,
-        lines: [r.desc, "#" + r.tags.slice(0, 3).join(" #")]
+        lines: ["“" + r.tag + "”", "생존 확률 " + r.surv + "%", "필수템: " + r.item]
       }));
       el.querySelector("#qz-retry").onclick = api.restart;
       el.querySelector("#qz-share").onclick = function () { api.shareLink(el.querySelector("#qz-share")); };
-      if (window.GoblubFeed && GoblubFeed.record) GoblubFeed.record("zombie", { emoji: r.emoji, title: (r.short || r.name), tags: r.tags });
+      if (window.GoblubFeed && GoblubFeed.record) GoblubFeed.record("zombie", { emoji: r.emoji, title: (r.short || r.name), tags: r.traits });
     }
 
     Quiz.init(document.getElementById("quiz"), {
       emoji: "🧟", title: "좀비 아포칼립스 생존 유형",
-      intro: "좀비 사태가 터졌다. 사이렌이 울리고 세상이 뒤집혔다. 이 아수라장에서 너는 어떤 인간이 될까?",
+      intro: "새벽 3시, 실검 1위 「좀비 실화냐」. 세상이 뒤집혔다. 이 아수라장에서 너는 며칠 버틸 인간일까?",
       feedSrc: "zombie", questions: QUESTIONS, renderResult: renderResult
     });
   </script>
