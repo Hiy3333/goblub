@@ -22,6 +22,9 @@
     .preset-row { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-bottom:12px; }
     .err-msg { text-align:center; color:var(--coral); font-weight:bold; margin:8px 0; }
     .wheel-wrap { position:relative; width:320px; max-width:84vw; aspect-ratio:1/1; margin:18px auto 8px; }
+    /* 원판이 회전하면 사각 바운딩 박스가 원보다 커져 모바일에서 가로 스크롤이 생긴다.
+       보이는 건 원뿐이라 패널에서 잘라내도 잘리는 그림은 없다. */
+    main .panel { overflow-x: hidden; }
     .wheel-spin { width:100%; height:100%; transition: transform 4.2s cubic-bezier(.15,.86,.28,1); transform-origin:50% 50%; }
     .wheel-spin svg { width:100%; height:100%; display:block; }
     .wheel-pointer { position:absolute; top:-4px; left:50%; transform:translateX(-50%); font-size:2rem; z-index:3;
@@ -199,7 +202,7 @@
         for (var i = 0; i < 26; i++) {
           var s = document.createElement("span"); s.className = "cf";
           s.textContent = ems[Math.floor(Math.random() * ems.length)];
-          s.style.left = (Math.random() * 100) + "vw";
+          s.style.left = (Math.random() * 92) + "vw";
           s.style.transitionDelay = (Math.random() * 0.25).toFixed(2) + "s";
           document.body.appendChild(s);
           (function (el) {

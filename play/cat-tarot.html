@@ -186,7 +186,8 @@ video::-webkit-media-controls-overlay-play-button{display:none!important;-webkit
   <p class="hintbar" id="hintbar">고민을 적고 카드를 펼치면, 끌리는 한 장을 고를 수 있다옹.</p>
 </div>
 
-<script src="js/dosa.js?v=ct2"></script>
+<script src="js/feed.js?v=10"></script>
+<script src="js/dosa.js?v=2"></script>
 <script>
 var SPREAD="img/cat/cat2-spread.mp4", CAT_IDLE="img/cat/cat2-start.webp",
     TABLE="img/cat/cat2-tablecat.mp4",
@@ -358,6 +359,7 @@ function revealResult(cardIdx, orient, fromLock){
     readingEl.style.display="block"; statusEl.style.display="none";
     readingEl.innerHTML=fmt(saved.reading); lastReading=saved.reading;
     onceBar.style.display="block";
+    if(window.GoblubFeed) GoblubFeed.grant("tarot");
     return;
   }
 
@@ -373,6 +375,7 @@ function revealResult(cardIdx, orient, fromLock){
         // 완성된 해석을 통째로 저장 → 재방문 시 API 호출 없이 바로 다시 보기
         try{ var rec=JSON.parse(localStorage.getItem(LOCK_KEY))||{};
           rec.reading=acc; localStorage.setItem(LOCK_KEY, JSON.stringify(rec)); }catch(e){}
+        if(window.GoblubFeed) GoblubFeed.grant("tarot");
       },
       onError:function(code, sec){
         statusEl.style.display="block";
