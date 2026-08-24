@@ -11,11 +11,15 @@
   <link rel="stylesheet" href="css/style.css?v=cl7" />
   <style>
     /* ===== 홈: 달나라 고브럽 ===== */
-    /* body의 overflow:hidden만으론 뷰포트 가로 팬이 안 막힌다(토성 링·로켓이 화면 밖에 있음) — html에서 잠근다 */
-    html { background: #14224a; overflow: hidden; }
+    /* 모바일 터치 팬 원천 차단: overflow:hidden만으론 iOS 등에서 드래그로 화면 밖(파란 배경)이
+       끌려나온다. body를 뷰포트에 고정하면 끌 수 있는 스크롤 영역 자체가 사라지고,
+       화면 밖 장식(토성 링 등)도 body에서 잘려 보이지 않는다. */
+    html { background: #14224a; overflow: hidden; overscroll-behavior: none; }
     html, body { height: 100%; }
     body.home-moon {
       margin: 0; overflow: hidden;
+      position: fixed; inset: 0; width: 100%;
+      overscroll-behavior: none;
       background: url("design/img/moon-5b.webp") center bottom / cover no-repeat #14224a !important;
       font-family: "Jua", "Malgun Gothic", sans-serif;
     }
