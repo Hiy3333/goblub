@@ -11,7 +11,8 @@
   <link rel="stylesheet" href="css/style.css?v=cl7" />
   <style>
     /* ===== 홈: 달나라 고브럽 ===== */
-    html { background: #14224a; }
+    /* body의 overflow:hidden만으론 뷰포트 가로 팬이 안 막힌다(토성 링·로켓이 화면 밖에 있음) — html에서 잠근다 */
+    html { background: #14224a; overflow: hidden; }
     html, body { height: 100%; }
     body.home-moon {
       margin: 0; overflow: hidden;
