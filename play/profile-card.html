@@ -19,8 +19,10 @@
     .pc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 14px 0 6px; }
     .pc-tile { background: var(--surface); border: 2px solid var(--line); border-radius: 14px; padding: 12px 10px; display: flex; align-items: center; gap: 10px; }
     .pc-tile .em { font-size: 1.9rem; flex: none; }
-    .pc-tile .tx .lb { font-size: 0.72rem; color: var(--ink-soft); }
-    .pc-tile .tx .vl { font-size: 0.98rem; color: var(--ink); line-height: 1.25; }
+    .pc-tile .tx { min-width: 0; }
+    .pc-tile .tx .lb { display: block; font-size: 0.72rem; color: var(--ink-soft); }
+    .pc-tile .tx .vl { display: block; font-size: 0.98rem; color: var(--ink); line-height: 1.25;
+      word-break: keep-all; overflow-wrap: anywhere; }
     .pc-tile.empty { opacity: 0.65; }
     .pc-tile.empty .vl { color: var(--ink-soft); }
     .pc-tags { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin: 10px 4px 4px; }
@@ -90,7 +92,7 @@
         var card = (window.GoblubFeed && GoblubFeed.cardData()) || {};
         sajuInfo = computeSaju();
         var out = ITEMS.map(function (it) {
-          if (it.key === "saju") return { label: it.label, url: it.url, done: !!sajuInfo, emoji: sajuInfo ? sajuInfo.emoji : "🔮", title: sajuInfo ? sajuInfo.title : "사주 프로필 입력하기" };
+          if (it.key === "saju") return { label: it.label, url: it.url, done: !!sajuInfo, emoji: sajuInfo ? sajuInfo.emoji : "🔮", title: sajuInfo ? sajuInfo.title : "생일 입력하기" };
           var d = card[it.key];
           return { label: it.label, url: it.url, done: !!(d && d.t), emoji: d ? d.e : "❓", title: d && d.t ? d.t : "아직 안 했어요", tags: d && d.tags || [] };
         });

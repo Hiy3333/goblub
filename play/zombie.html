@@ -41,27 +41,27 @@
       leader:   { emoji:"🛡️", name:"인간 내비게이션 리더형", short:"리더", tag:"패닉? 그건 제 담당이 아닌데요", surv:87, item:"확성기 (없으면 목청)",
         desc:"세상이 뒤집힌 순간에도 혼자 침착하게 동선을 짜고 있는 타입. 다들 당신 뒤통수만 보고 따라 걷는데, 정작 본인 밥이랑 잠은 제일 뒤로 미루는 게 최대 리스크입니다.",
         traits:["단톡 공지 쓰는 속도가 재난문자보다 빠름","「일단 진정하고」가 시그니처 대사","본인 컨디션은 항상 담당자 부재중"],
-        match:"supplier", clash:"traitor" },
+        match:"supplier", clash:"traitor", keys:["통솔력만렙","패닉담당아님","공지속도1위"] },
       fighter:  { emoji:"🪓", name:"프라이팬 전투민족형", short:"전투", tag:"말보다 스윙이 빠름", surv:74, item:"이모님 프라이팬 (28cm 이상)",
         desc:"위협 감지 즉시 몸이 먼저 나가는 타입. 무리의 방패를 자처하는 든든함이 무기지만, 가끔은 프라이팬보다 머리를 먼저 쓰는 연습이 필요합니다. 좀비보다 문틀에 부딪혀 다칠 확률이 더 높음.",
         traits:["헬스장 3대 운동이 드디어 빛을 보는 순간","도망 루트보다 정면 루트를 먼저 검토","전투 후 「별거 아니네」 (손 떨면서)"],
-        match:"leader", clash:"hermit" },
+        match:"leader", clash:"hermit", keys:["프라이팬장인","말보다스윙","몸이먼저"] },
       supplier: { emoji:"🎒", name:"인간 편의점 살림꾼형", short:"살림꾼", tag:"말만 해, 가방에서 나오니까", surv:91, item:"27칸 수납 배낭",
         desc:"물·식량·보조배터리·상비약까지 야무지게 갖춘 진짜 생존 실세. 다들 당신 가방만 믿고 다니는데, 정작 본인 몫은 늘 제일 적게 챙기는 게 유일한 버그입니다. 아포칼립스 최고 연봉 직군.",
         traits:["재난 나기 전부터 이미 반쯤 준비돼 있었음","「그거 나한테 있어」 발동 확률 99%","물물교환 시세를 혼자 다 꿰고 있음"],
-        match:"leader", clash:"traitor" },
+        match:"leader", clash:"traitor", keys:["인간편의점","27칸배낭","없는게없음"] },
       hermit:   { emoji:"🏚️", name:"자발적 무인도 은둔형", short:"은둔", tag:"인류보다 와이파이가 그리움", surv:83, item:"자물쇠 3종 세트",
         desc:"무리 생활보다 혼자가 백배 편한 타입. 아무도 못 찾는 안전가옥을 귀신같이 발굴하고 조용히 오래 살아남습니다. 다만 세상이 복구된 뒤에도 3주쯤 더 은둔하다가 뉴스 보고 나올 예정.",
         traits:["집순이/집돌이 경력이 곧 생존 스펙","기척 지우기 패시브 스킬 보유","가끔 사람 목소리가 그리워서 라디오 켬"],
-        match:"supplier", clash:"fighter" },
+        match:"supplier", clash:"fighter", keys:["자발적은둔","와이파이금단","잠금3종세트"] },
       traitor:  { emoji:"🔪", name:"생존 지상주의 계산형", short:"계산", tag:"미안, 근데 나는 살아야겠어", surv:96, item:"혼자만 아는 지도",
         desc:"위기의 순간 손익 계산이 제일 빠른 타입. 생존율은 전 유형 1위지만, 사태가 끝난 뒤 동창회 참석률은 전 유형 꼴찌가 될 예정입니다. 당신과 같은 조가 된 사람들에게 미리 심심한 위로를 전합니다.",
         traits:["비상구 위치를 무의식적으로 먼저 확인","「우리」보다 「나」가 0.3초 빠름","살아남고 나서 사과문 초안 작성 중"],
-        match:"firstday", clash:"supplier" },
+        match:"firstday", clash:"supplier", keys:["생존제일주의","계산기내장","각자도생"] },
       firstday: { emoji:"💀", name:"호기심 만렙 첫날사망형", short:"첫날사망", tag:"그래도 궁금한 건 궁금한 거잖아", surv:3, item:"유서 겸 브이로그 카메라",
         desc:"사이렌이 울리면 숨는 게 아니라 창문부터 여는 타입. 「진짜 좀비인지 눈으로 봐야 믿지」라는 실증주의 정신이 이번 생에서만큼은 수명을 크게 단축시킵니다. 대신 당신이 남긴 영상은 인류의 귀중한 자료가 될 것입니다.",
         traits:["재난 영상 항상 제일 앞에서 찍는 사람","「에이 설마」가 마지막 유언 유력 후보","전생에 고양이었다면 이미 9번 다 씀"],
-        match:"traitor", clash:"leader" }
+        match:"traitor", clash:"leader", keys:["호기심만렙","첫날사망확정","브이로그유서"] }
     };
     var ORDER = ["leader","fighter","supplier","hermit","traitor","firstday"];
 
@@ -154,7 +154,7 @@
       }));
       el.querySelector("#qz-retry").onclick = api.restart;
       el.querySelector("#qz-share").onclick = function () { api.shareLink(el.querySelector("#qz-share")); };
-      if (window.GoblubFeed && GoblubFeed.record) GoblubFeed.record("zombie", { emoji: r.emoji, title: (r.short || r.name), tags: r.traits });
+      if (window.GoblubFeed && GoblubFeed.record) GoblubFeed.record("zombie", { emoji: r.emoji, title: (r.short || r.name), tags: r.keys });
     }
 
     Quiz.init(document.getElementById("quiz"), {

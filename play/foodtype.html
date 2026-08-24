@@ -40,22 +40,22 @@
     var TYPES = {
       mala:       { emoji:"🌶️", name:"화끈 중독성 마라탕형", short:"마라탕", tag:"인생은 맵기 3단계부터", rate:91, side:"후식 탕후루 (마라탕후루 풀코스)",
         desc:"한번 빠지면 못 헤어나오는 강렬한 중독성의 소유자. 평소엔 잔잔한데 꽂히는 순간 텐션이 화산처럼 폭발해 주변까지 얼얼하게 만듭니다. 호불호는 갈려도 한번 맛본 사람은 반드시 돌아옵니다.",
-        traits:["꽂히면 3일 밤새는 과몰입 장인","심심한 것보단 차라리 매운 게 낫다 주의","텐션 터지면 아무도 못 말림"], match:"tteokbokki", clash:"naengmyeon" },
+        traits:["꽂히면 3일 밤새는 과몰입 장인","심심한 것보단 차라리 매운 게 낫다 주의","텐션 터지면 아무도 못 말림"], match:"tteokbokki", clash:"naengmyeon", keys:["과몰입장인","맵기3단계","텐션화산"] },
       naengmyeon: { emoji:"🧊", name:"시원 쿨한 물냉면형", short:"물냉면", tag:"호들갑은 육수에 말아먹었어", rate:77, side:"식초 두 바퀴 + 겨자 정량",
         desc:"무슨 일이 터져도 살얼음 멘탈이 안 녹는 쿨함의 정석. 처음엔 밍밍해 보여도 알수록 깊은 육수 같은 반전 매력이 있어서, 곁에 둬본 사람만 그 진가를 압니다.",
-        traits:["카톡은 용건만 간단히 파","리액션은 작아도 챙길 건 다 챙김","화내는 걸 본 사람이 없다는 전설 보유"], match:"gukbap", clash:"mala" },
+        traits:["카톡은 용건만 간단히 파","리액션은 작아도 챙길 건 다 챙김","화내는 걸 본 사람이 없다는 전설 보유"], match:"gukbap", clash:"mala", keys:["살얼음멘탈","용건만간단히","화낸적없음"] },
       gukbap:     { emoji:"🍲", name:"든든 정 많은 국밥형", short:"국밥", tag:"밥은 먹고 다니냐가 안부 인사", rate:96, side:"깍두기 국물 (셀프바 3회전)",
         desc:"언제 만나도 편하고 든든한 국민 소울푸드 같은 사람. 화려한 이벤트는 없어도 힘들 때 제일 먼저 생각나는 존재라, 다들 새벽에도 이 사람부터 찾습니다.",
-        traits:["고민 상담 들어주다 밥까지 사주는 타입","유행 안 타는 대신 실망도 안 시킴","「내가 살게」 발동 속도 전국 1위"], match:"naengmyeon", clash:"mintcho" },
+        traits:["고민 상담 들어주다 밥까지 사주는 타입","유행 안 타는 대신 실망도 안 시킴","「내가 살게」 발동 속도 전국 1위"], match:"naengmyeon", clash:"mintcho", keys:["새벽에도콜","내가살게","실패없는선택"] },
       mintcho:    { emoji:"🍫", name:"호불호 확실 민초형", short:"민초", tag:"치약이라니, 이건 청량함이야", rate:52, side:"논쟁 상대 (없으면 심심함)",
         desc:"누가 뭐래도 내 취향은 내가 정하는 소신 만렙 타입. 세상을 민초단과 반민초단으로 가르는 화제성의 주인공이라, 싫어하는 사람도 있지만 좋아하는 사람은 팬클럽급으로 좋아합니다.",
-        traits:["최애 앞에선 논리학 박사로 변신","「그게 왜 좋아?」 소리 듣는 게 일상","트렌드보다 내 취향 아카이브가 우선"], match:"dosirak", clash:"gukbap" },
+        traits:["최애 앞에선 논리학 박사로 변신","「그게 왜 좋아?」 소리 듣는 게 일상","트렌드보다 내 취향 아카이브가 우선"], match:"dosirak", clash:"gukbap", keys:["소신만렙","호불호극과극","취향아카이브"] },
       tteokbokki: { emoji:"❤️", name:"만인의 인싸 떡볶이형", short:"떡볶이", tag:"오늘도 모임의 중심은 나야", rate:94, side:"모둠 튀김 + 순대 (국물 찍먹 필수)",
         desc:"누구랑 있어도 3분 만에 친해지는 국민 인기 메뉴. 이 사람이 등장하면 조용하던 모임도 화기애애해지는 마법이 일어나서, 어느 약속이든 「걔도 불러」 1순위로 소환됩니다.",
-        traits:["단톡방 3개 이상에서 동시 활동 중","처음 본 사람과 맞팔까지 10분 컷","분위기 죽으면 본인이 제일 못 견딤"], match:"mala", clash:"dosirak" },
+        traits:["단톡방 3개 이상에서 동시 활동 중","처음 본 사람과 맞팔까지 10분 컷","분위기 죽으면 본인이 제일 못 견딤"], match:"mala", clash:"dosirak", keys:["10분맞팔","모임의중심","1순위소환"] },
       dosirak:    { emoji:"🍱", name:"가성비 효율 도시락형", short:"도시락", tag:"감성 좋지, 근데 그거 얼마인데?", rate:82, side:"전자레인지 2분 + 1+1 음료",
         desc:"군더더기 없이 실속만 챙기는 효율의 아이콘. 시간·돈·동선 낭비를 못 참는 계획형 인간이라, 같이 다니면 알아서 최적 루트가 나오는 인간 내비게이션입니다.",
-        traits:["앱 3개 비교 후 최저가로만 결제","약속 전 이동 동선 시뮬레이션 완료","충동구매 대신 장바구니 2주 숙성"], match:"mintcho", clash:"tteokbokki" }
+        traits:["앱 3개 비교 후 최저가로만 결제","약속 전 이동 동선 시뮬레이션 완료","충동구매 대신 장바구니 2주 숙성"], match:"mintcho", clash:"tteokbokki", keys:["최저가스캔","동선시뮬완료","장바구니2주숙성"] }
     };
     var ORDER = ["mala","naengmyeon","gukbap","mintcho","tteokbokki","dosirak"];
 
@@ -139,7 +139,7 @@
       }));
       el.querySelector("#qz-retry").onclick = api.restart;
       el.querySelector("#qz-share").onclick = function () { api.shareLink(el.querySelector("#qz-share")); };
-      if (window.GoblubFeed && GoblubFeed.record) GoblubFeed.record("foodtype", { emoji: r.emoji, title: (r.short || r.name), tags: r.traits });
+      if (window.GoblubFeed && GoblubFeed.record) GoblubFeed.record("foodtype", { emoji: r.emoji, title: (r.short || r.name), tags: r.keys });
     }
 
     Quiz.init(document.getElementById("quiz"), {
