@@ -11,9 +11,12 @@
   <link rel="stylesheet" href="../css/style.css?v=cl7" />
   <style>
     /* 밤하늘 배경(남색 밤+보름달+연보라 땅) — 뷰포트 고정 레이어 */
+    /* 고무줄 당김·주소창 수축 시에도 배경이 안 밀리게: html도 같은 색 + 오버스크롤 차단 */
+    html { background: #181d3c; overscroll-behavior-y: none; }
+    body { overscroll-behavior-y: none; }
     body.clay { background: #181d3c !important; }
     body.clay::before {
-      content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+      content: ""; position: fixed; inset: -80px; z-index: -1; pointer-events: none;
       background: url("../design/img/home-bg-22.webp") center bottom / cover no-repeat;
     }
     /* 카드 팔레트 — Daring Indigo → Plum Perfect (전 페이지 공통) */
@@ -25,7 +28,11 @@
     body.clay .card { border: 3px solid rgba(255, 255, 255, .22) !important; }
     body.clay .card h2 { color: #fff; }
     body.clay .card p { color: #e4dff4; }
-    body.clay .card .icon { background: rgba(255, 255, 255, .92); border-radius: 50%; padding: 6px; }
+    /* 이모지·원형 아이콘 없이 제목이 주인공 */
+    body.clay .card .icon { display: none; }
+    body.clay .card h2 { font-size: 1.32rem; letter-spacing: .3px; margin: 4px 0 9px;
+      text-shadow: 0 2px 6px rgba(10, 14, 40, .45); }
+    body.clay .card p { font-size: .92rem; line-height: 1.55; }
     body.clay a.card:hover, body.clay .card[data-href]:hover { border-color: rgba(255, 255, 255, .5) !important; }
     body.clay .hero h1 {
       background: none; -webkit-background-clip: initial; background-clip: initial; color: #fdf3cf;

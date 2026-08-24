@@ -147,7 +147,7 @@
       backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
     }
     body.home-moon .logo { font-size: 1.7rem; letter-spacing: 2px; display: flex; }
-    body.home-moon .site-nav { display: flex; gap: 8px; }
+    body.home-moon .site-nav { display: none; } /* 홈은 로고만 — 메뉴는 카드/⚙️로 */
     body.home-moon .site-nav a {
       color: #d9f1ef; font-size: .92rem; margin: 0; padding: 6px 14px;
       border-radius: 999px; background: rgba(255,255,255,.1);
@@ -180,11 +180,22 @@
     .gm-satmenu.on a:nth-child(3) { animation-delay: .2s; }
     @keyframes gm-mdeal { to { opacity: 1; transform: translateX(0) rotate(0); } }
     @media (max-width: 700px) {
-      body.home-moon .site-header { gap: 10px; padding: 7px 10px 7px 16px; }
+      body.home-moon .site-header { gap: 10px; padding: 6px 13px; top: 12px; }
       body.home-moon .logo { font-size: 1.25rem; }
-      body.home-moon .site-nav { gap: 5px; }
-      body.home-moon .site-nav a { font-size: .8rem; padding: 5px 10px; }
     }
+    /* 오른쪽 위 설정(⚙️) — 로그인/설정 페이지로 */
+    .gm-set {
+      position: fixed; top: 14px; right: 14px; z-index: 60;
+      font-size: 1.5rem; line-height: 1; text-decoration: none;
+      padding: 8px; border-radius: 50%;
+      background: linear-gradient(180deg, rgba(255,255,255,.22), rgba(255,255,255,.10));
+      border: 1.5px solid rgba(255,255,255,.45);
+      box-shadow: 0 8px 20px rgba(0, 20, 30, .35), inset 0 1px 0 rgba(255,255,255,.55);
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+      filter: drop-shadow(0 1px 3px rgba(0, 20, 30, .4));
+      transition: transform .12s;
+    }
+    .gm-set:hover { transform: rotate(28deg) scale(1.08); }
 
     /* 워드마크 */
     .gm-word {
@@ -291,6 +302,7 @@
 </head>
 <body class="home-moon">
   <div id="site-header"></div>
+  <a class="gm-set" href="mypage.html" aria-label="로그인·설정">⚙️</a>
 
   <div class="gm-word" id="gm-word">
     <h1>고브럽</h1>
