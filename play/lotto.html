@@ -57,7 +57,7 @@
   <div id="site-header"></div>
   <main>
     <section class="hero">
-      <h1><span class="e">🎱</span> 고브럽 로또 번호 뱉기</h1>
+      <h1><span class="e">🍀</span> 고브럽 로또 번호 뱉기</h1>
       <p>고브럽이 오늘의 행운 번호를 하나씩 뱉어드려요 — 재미로!</p>
     </section>
 
@@ -67,7 +67,7 @@
       <p class="fine-print" id="status" style="text-align:center; min-height:1.2em"></p>
 
       <div class="result-actions">
-        <button class="btn-primary" id="btn-spit">🎱 번호 뱉어줘!</button>
+        <button class="btn-primary" id="btn-spit">🍀 번호 뱉어줘!</button>
         <button class="btn-ghost" id="btn-auto">🎰 자동 5줄</button>
       </div>
 
@@ -103,7 +103,7 @@
   <div id="site-footer"></div>
   <script src="../js/common.js?v=24" data-root=".."></script>
   <script src="js/goblub-art.js"></script>
-  <script src="js/feed.js?v=10"></script>
+  <script src="js/feed.js?v=11"></script>
   <script src="js/sharecard.js?v=2"></script>
   <script src="js/dosa.js?v=2"></script>
   <script>
@@ -160,7 +160,7 @@
           } else {
             $("status").textContent = "🍀 오늘의 행운 번호! (재미로 봐주세요)";
             $("card-slot").appendChild(ShareCard.render({
-              palette: "sky", emoji: "🎱", badge: "고브럽 로또 번호",
+              palette: "sky", emoji: "🍀", badge: "고브럽 로또 번호",
               title: g.nums.join("  "), lines: ["🍀 재미로 뽑은 랜덤 번호예요"]
             }));
             if (window.GoblubFeed) GoblubFeed.grant("lotto");

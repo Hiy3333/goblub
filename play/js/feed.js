@@ -36,7 +36,7 @@
     naming: { label: "📛 네이밍 생성기", url: "naming.html" },
     whack: { label: "🕳️ 감정 몬스터 팡팡", url: "whack.html" },
     reflex: { label: "⚡ 고브럽 반응속도", url: "reflex.html" },
-    lotto: { label: "🎱 고브럽 로또 번호", url: "lotto.html" }
+    lotto: { label: "🍀 고브럽 로또 번호", url: "lotto.html" }
   };
 
   function load() {
