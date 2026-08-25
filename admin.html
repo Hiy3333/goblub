@@ -163,7 +163,7 @@
         <nav id="side-nav">
           <button data-v="dash" class="on">📊 대시보드</button>
           <button data-v="users">👥 가입 회원 관리</button>
-          <button data-v="sales">💰 매출 · 노바</button>
+          <button data-v="sales">💰 매출 · 별</button>
           <button data-v="ai">🤖 AI 사용량</button>
           <button data-v="notice">📢 공지사항</button>
         </nav>
@@ -208,33 +208,33 @@
                 <thead><tr>
                   <th>가입일</th><th>경로</th><th>이메일</th><th>닉네임</th>
                   <th class="hide-m">최근 접속</th>
-                  <th>대기 노바<br /><span style="font-weight:400">(놀이)</span></th>
-                  <th>잔여 유료 노바</th><th>유료 노바 지급·회수</th>
-                  <th class="hide-m">놀이 노바 지급</th><th>관리</th>
+                  <th>대기 별<br /><span style="font-weight:400">(놀이)</span></th>
+                  <th>잔여 유료 별</th><th>유료 별 지급·회수</th>
+                  <th class="hide-m">놀이 별 지급</th><th>관리</th>
                 </tr></thead>
                 <tbody id="u-body"><tr><td colspan="10" class="empty">불러오는 중…</td></tr></tbody>
               </table>
             </div>
             <div class="pager" id="u-pager"></div>
-            <p class="hint">놀이 노바는 해당 유저가 <b>다음 로그인 시</b> 지갑에 들어갑니다 · 유료 노바는 서버 잔액이 즉시 바뀝니다 · 강퇴된 계정은 다음 로그인부터 차단됩니다</p>
+            <p class="hint">놀이 별는 해당 유저가 <b>다음 로그인 시</b> 지갑에 들어갑니다 · 유료 별는 서버 잔액이 즉시 바뀝니다 · 강퇴된 계정은 다음 로그인부터 차단됩니다</p>
           </div>
         </section>
 
         <!-- 매출 -->
         <section class="view" id="v-sales">
           <div class="stat-grid" style="margin-bottom:12px">
-            <div class="stat hot"><div class="n" id="sl-today">–</div><div class="l">오늘 사용 노바</div></div>
-            <div class="stat"><div class="n" id="sl-week">–</div><div class="l">최근 7일 사용 노바</div></div>
+            <div class="stat hot"><div class="n" id="sl-today">–</div><div class="l">오늘 사용 별</div></div>
+            <div class="stat"><div class="n" id="sl-week">–</div><div class="l">최근 7일 사용 별</div></div>
           </div>
           <div class="panel">
             <div class="toolbar" style="justify-content:flex-end"><button class="btn gold" id="sl-csv">⬇ 엑셀 내보내기</button></div>
             <div style="overflow-x:auto">
               <table>
-                <thead><tr><th>콘텐츠</th><th>누적 사용 횟수</th><th>누적 사용 노바</th></tr></thead>
+                <thead><tr><th>콘텐츠</th><th>누적 사용 횟수</th><th>누적 사용 별</th></tr></thead>
                 <tbody id="sl-body"><tr><td colspan="3" class="empty">불러오는 중…</td></tr></tbody>
               </table>
             </div>
-            <p class="hint">유료 콘텐츠에서 노바가 차감될 때마다 집계됩니다 · 아직 유료 차감 기능이 붙기 전이면 비어 있는 게 정상입니다</p>
+            <p class="hint">유료 콘텐츠에서 별이 차감될 때마다 집계됩니다 · 아직 유료 차감 기능이 붙기 전이면 비어 있는 게 정상입니다</p>
           </div>
         </section>
 
@@ -347,7 +347,7 @@
       var VIEWS = {
         dash: { title: "대시보드", load: loadStats },
         users: { title: "가입 회원 관리", load: loadUsers },
-        sales: { title: "매출 · 노바", load: loadSales },
+        sales: { title: "매출 · 별", load: loadSales },
         ai: { title: "AI 사용량", load: loadAi },
         notice: { title: "공지사항", load: loadNotices }
       };
@@ -445,7 +445,7 @@
 
       // 엑셀(CSV) 내보내기 — 현재 검색 결과 전체
       $("u-csv").onclick = function () {
-        var rows = [["가입일", "가입방법", "이메일", "닉네임", "최근접속", "대기노바(놀이)", "잔여유료노바", "상태"]];
+        var rows = [["가입일", "가입방법", "이메일", "닉네임", "최근접속", "대기별(놀이)", "잔여유료별", "상태"]];
         filteredUsers().forEach(function (u) {
           rows.push([fmtDate(u.created), u.provider || "구글", u.email || "", u.name || "",
             fmtDate(u.seen), u.gems || 0, u.pgems || 0, u.banned ? "강퇴" : "정상"]);
@@ -463,10 +463,10 @@
       // 매출 내보내기 — 콘텐츠별 + 일자별
       $("sl-csv").onclick = function () {
         if (!lastSales) return;
-        var rows = [["콘텐츠", "누적 사용 횟수", "누적 사용 노바"]];
+        var rows = [["콘텐츠", "누적 사용 횟수", "누적 사용 별"]];
         (lastSales.rows || []).forEach(function (r) { rows.push([r.content, r.cnt, r.gems]); });
         rows.push([""]);
-        rows.push(["날짜", "사용 노바"]);
+        rows.push(["날짜", "사용 별"]);
         Object.keys(lastSales.daily || {}).forEach(function (d) {
           rows.push([d.slice(0, 4) + "-" + d.slice(4, 6) + "-" + d.slice(6, 8), lastSales.daily[d] || 0]);
         });

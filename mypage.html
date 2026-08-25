@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>마이페이지 — goblub</title>
-  <meta name="description" content="내 프로필, 보유 노바, 설정까지 — goblub 마이페이지" />
+  <meta name="description" content="내 프로필, 보유 별, 설정까지 — goblub 마이페이지" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
@@ -41,13 +41,13 @@
   <main>
     <section class="hero">
       <h1><span class="e">👤</span> 마이페이지</h1>
-      <p>내 프로필과 노바, 설정을 한곳에서</p>
+      <p>내 프로필과 별, 설정을 한곳에서</p>
     </section>
 
     <!-- 로그인 전 -->
     <section class="panel" id="login-panel" style="display:none; text-align:center">
       <h2>🔑 로그인</h2>
-      <p class="result-desc" style="margin:8px 0 18px">구글 계정으로 3초 만에 시작해요.<br>로그인하면 이 페이지에서 노바·설정·프로필 카드를 한 번에 관리할 수 있어요.</p>
+      <p class="result-desc" style="margin:8px 0 18px">구글 계정으로 3초 만에 시작해요.<br>로그인하면 이 페이지에서 별·설정·프로필 카드를 한 번에 관리할 수 있어요.</p>
       <div id="gsi-btn" style="display:flex; justify-content:center"></div>
       <p class="fine-print" style="margin-top:14px">지금은 로그인 없이도 모든 콘텐츠를 즐길 수 있어요 🙂</p>
     </section>
@@ -64,13 +64,13 @@
       </div>
     </section>
 
-    <!-- 보유 노바 -->
+    <!-- 보유 별 -->
     <section class="panel">
       <div class="sec-head">
-        <h2>💫 보유 노바</h2>
+        <h2>⭐ 보유 별</h2>
       </div>
-      <p class="jelly-big">💫 <b id="w-bal">0</b> 노바 <span id="w-streak" style="font-size:0.9rem; color:var(--ink-soft)"></span></p>
-      <p class="result-desc" style="margin-top:6px">콘텐츠를 즐길 때마다 쌓이고, ✨프리미엄 풀이에 쓸 수 있어요.</p>
+      <p class="jelly-big">⭐ <b id="w-bal">0</b> 별 <span id="w-streak" style="font-size:0.9rem; color:var(--ink-soft)"></span></p>
+      <p class="result-desc" style="margin-top:6px">✨프리미엄 풀이에 쓸 수 있어요 — 별 충전이 곧 열려요.</p>
     </section>
 
     <!-- 나의 프로필 카드 -->
@@ -94,7 +94,7 @@
         <a class="btn-ghost" href="play/today.html" style="padding:7px 14px; font-size:0.85rem; flex:none">수정하기</a>
       </div>
       <div class="set-row danger">
-        <span class="lb">전체 데이터 초기화<span class="hint">노바·테스트 기록 등 이 기기의 모든 goblub 데이터 삭제</span></span>
+        <span class="lb">전체 데이터 초기화<span class="hint">별·테스트 기록 등 이 기기의 모든 goblub 데이터 삭제</span></span>
         <button class="btn-ghost danger" id="btn-reset" style="padding:7px 14px; font-size:0.85rem; flex:none">초기화</button>
       </div>
     </section>
@@ -105,15 +105,15 @@
         <h2>💳 결제</h2>
         <span class="pay-badge">준비 중</span>
       </div>
-      <p class="result-desc">노바 충전과 프리미엄 상품 결제를 준비하고 있어요. 지금은 출석·플레이로 노바를 모아주세요! 💫</p>
+      <p class="result-desc">별 충전과 프리미엄 상품 결제를 준비하고 있어요. 조금만 기다려주세요! ⭐</p>
     </section>
 
     <p class="fine-print">모든 데이터는 이 브라우저에 저장돼요</p>
   </main>
   <div id="site-footer"></div>
   <script src="js/common.js?v=25" data-root="."></script>
-  <script src="js/auth.js?v=3"></script>
-  <script src="play/js/feed.js?v=13"></script>
+  <script src="js/auth.js?v=4"></script>
+  <script src="play/js/feed.js?v=14"></script>
   <script>
     (function () {
       var $ = function (id) { return document.getElementById(id); };
@@ -175,7 +175,7 @@
       };
 
       $("btn-reset").onclick = function () {
-        if (!confirm("정말 초기화할까요?\n노바·테스트 기록·사주 프로필 등 이 기기의 모든 goblub 데이터가 삭제되고, 로그인도 해제됩니다.")) return;
+        if (!confirm("정말 초기화할까요?\n별·테스트 기록·사주 프로필 등 이 기기의 모든 goblub 데이터가 삭제되고, 로그인도 해제됩니다.")) return;
         try {
           Object.keys(localStorage).filter(function (k) { return k.indexOf("goblub") === 0; })
             .forEach(function (k) { localStorage.removeItem(k); });

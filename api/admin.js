@@ -1,7 +1,7 @@
 // goblub 관리자 API — 아이디/암호(SHA-256 해시 검증) 또는 구글 ID 토큰(관리자 이메일)으로 인증.
 // 암호 평문은 저장소에 없다: sha256("아이디:암호") 해시만 보관. ADMIN_ID/ADMIN_PW 환경변수가 있으면 그것이 우선.
-// actions: stats(요약+최근 이벤트) / users(회원 목록) / grant(놀이 노바 지급) / ban / unban
-//          ai(AI 사용량) / pgems(유료 노바 지급·회수) / sales(콘텐츠별 매출)
+// actions: stats(요약+최근 이벤트) / users(회원 목록) / grant(놀이 별 지급) / ban / unban
+//          ai(AI 사용량) / pgems(유료 별 지급·회수) / sales(콘텐츠별 매출)
 //          nlist / nsave / ntoggle / ndel (공지 관리)
 import crypto from "crypto";
 import { kv, kvPipe, kvConfigured, verifyGoogleToken, isAdmin } from "../lib/kv.js";
@@ -126,7 +126,7 @@ export default async function handler(req, res) {
       if (!subs.length) return res.status(200).json({ ok: true, users: [] });
       const capped = subs.slice(0, 500);
       const raws = await kvPipe(capped.map((s) => ["GET", "u:" + s]));
-      const pbals = await kvPipe(capped.map((s) => ["GET", "pg:" + s]));   // 유료 노바 잔액
+      const pbals = await kvPipe(capped.map((s) => ["GET", "pg:" + s]));   // 유료 별 잔액
       const pmap = {};
       capped.forEach((s, i) => { pmap[s] = +pbals[i] || 0; });
       const users = raws
@@ -167,7 +167,7 @@ export default async function handler(req, res) {
     }
 
     if (action === "pgems") {
-      // 유료 노바 지급(+)/회수(-) — 서버 원장(pg:{sub})을 즉시 조정. 대기 개념 없음.
+      // 유료 별 지급(+)/회수(-) — 서버 원장(pg:{sub})을 즉시 조정. 대기 개념 없음.
       const sub = String((req.body && req.body.sub) || "");
       const n = Math.floor(Number(req.body && req.body.amount));
       if (!sub || sub.length > 64) return res.status(400).json({ error: "bad_sub" });
@@ -184,7 +184,7 @@ export default async function handler(req, res) {
     }
 
     if (action === "sales") {
-      // 콘텐츠별 누적 사용 횟수·노바 (spendPaidGems 가 적재) + 최근 7일 일자별 노바
+      // 콘텐츠별 누적 사용 횟수·별 (spendPaidGems 가 적재) + 최근 7일 일자별 별
       const idx = (await kv("SMEMBERS", "sales:idx")) || [];
       const days = [0, 1, 2, 3, 4, 5, 6].map(kstDay);
       const cmds = [];
