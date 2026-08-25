@@ -14,10 +14,10 @@
     /* 오버스크롤 고무줄만 차단. html에 배경을 주면 body 배경의 캔버스 전파가 끊겨
        z-index:-1 행성 배경 레이어가 body 색에 덮여 사라진다 — 절대 넣지 말 것 */
     html, body { overscroll-behavior-y: none; }
-    body.clay { background: #1e3d33 !important; }
+    body.clay { background: #21262b !important; }
     body.clay::before {
       content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
-      background: url("../design/img/home-bg-25.webp") center bottom / cover no-repeat;
+      background: url("../design/img/home-bg-28.webp") center bottom / cover no-repeat;
     }
     /* 카드 팔레트 — Daring Indigo → Plum Perfect (전 페이지 공통) */
     body.clay .card[class*="tint-"]:nth-child(5n+1) { background: linear-gradient(180deg, #4b5d8f, #374874) !important; }
@@ -174,7 +174,7 @@
       var vp = document.createElement("div");
       vp.style.cssText = "position:fixed;inset:0;pointer-events:none;visibility:hidden";
       document.body.appendChild(vp);
-      var SAT = { w: 1376, h: 768, x: 1152, y: 154, r: 45, rx: 78, ry: 78 }; // home-bg-25는 달이 규격(190)보다 위 — 픽셀 실측 중심(1152,154)
+      var SAT = { w: 1376, h: 768, x: 1151, y: 190, r: 45, rx: 78, ry: 78 }; // 홈과 동일 규격 — home-bg-28 행성 실측 중심(1151,189)이 규격과 일치
       function place() {
         var vb = vp.getBoundingClientRect();
         var W = vb.width, H = vb.height;
