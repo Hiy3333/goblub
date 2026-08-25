@@ -14,10 +14,10 @@
     /* 오버스크롤 고무줄만 차단. html에 배경을 주면 body 배경의 캔버스 전파가 끊겨
        z-index:-1 행성 배경 레이어가 body 색에 덮여 사라진다 — 절대 넣지 말 것 */
     html, body { overscroll-behavior-y: none; }
-    body.clay { background: #3a1f3c !important; }
+    body.clay { background: #1e3d33 !important; }
     body.clay::before {
       content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
-      background: url("../design/img/home-bg-26.webp") center bottom / cover no-repeat;
+      background: url("../design/img/home-bg-25.webp") center bottom / cover no-repeat;
     }
     /* 카드 팔레트 — Daring Indigo → Plum Perfect (전 페이지 공통) */
     body.clay .card[class*="tint-"]:nth-child(5n+1) { background: linear-gradient(180deg, #4b5d8f, #374874) !important; }
