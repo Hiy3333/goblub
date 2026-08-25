@@ -252,14 +252,14 @@
       </div>
 
       <div id="gate" style="display:none">
-        <div class="cost-row">가격 <span class="cost">🍬 <span id="cost">100</span> 젬리</span></div>
-        <p class="wallet-mini">보유 젬리: 🍬 <b id="w-have">0</b></p>
+        <div class="cost-row">가격 <span class="cost">💫 <span id="cost">100</span> 노바</span></div>
+        <p class="wallet-mini">보유 노바: 💫 <b id="w-have">0</b></p>
         <div class="result-actions">
-          <button class="btn-primary prem-btn" id="btn-unlock" style="display:none">🍬 젬리 내고 리포트 받기</button>
+          <button class="btn-primary prem-btn" id="btn-unlock" style="display:none">💫 노바 내고 리포트 받기</button>
           <button class="btn-ghost" id="btn-tale">🎬 이계 스토리 다시 체험하기</button>
           <a class="btn-ghost" href="saju.html">🔮 무료 사주팔자 심층 먼저 보기</a>
         </div>
-        <p class="need-more" id="need-more" style="display:none">젬리가 <b id="need-gap">0</b> 개 더 필요해요 — <a href="goblub.html" style="color:var(--sky)">고브럽 키우기</a>에서 출석·케어로 모아보세요!</p>
+        <p class="need-more" id="need-more" style="display:none">노바가 <b id="need-gap">0</b> 개 더 필요해요 — <a href="goblub.html" style="color:var(--sky)">고브럽 키우기</a>에서 출석·케어로 모아보세요!</p>
         <p class="fine-print" id="gender-hint" style="display:none">💡 사주 프로필에 성별까지 저장하면 시기(대운) 분석이 훨씬 깊어져요.</p>
         <p class="fine-print" id="hour-hint" style="display:none">💡 태어난 시(時)까지 저장하면 시주 분석이 더해져 한층 깊어져요.</p>
       </div>
@@ -309,7 +309,7 @@
   <script src="js/saju.js"></script>
   <script src="js/saju-deep.js"></script>
   <script src="js/dosa.js?v=2"></script>
-  <script src="js/feed.js?v=11"></script>
+  <script src="js/feed.js?v=12"></script>
   <script src="js/goblub-art.js"></script>
   <script src="js/report-ui.js?v=7"></script>
   <script src="js/gwigok-audio.js?v=1"></script>
@@ -318,7 +318,7 @@
   <script>
     (function () {
       var $ = function (id) { return document.getElementById(id); };
-      var COST = 0; // 런칭 기념 무료 — 추후 젬리 가격 부여 예정
+      var COST = 0; // 런칭 기념 무료 — 추후 노바 가격 부여 예정
       var PARTS = [
         { id: "p1", title: "제1장 · 혼(魂)의 감정서" },
         { id: "p2", title: "제2장 · 가면 대장(臺帳)" },
@@ -446,7 +446,7 @@
         if (!base) { $("no-profile").style.display = "block"; return; }
         renderGate();
       }
-      function costLabel() { return COST > 0 ? ("젬리 " + COST + "개") : ""; }
+      function costLabel() { return COST > 0 ? ("노바 " + COST + "개") : ""; }
 
       function startTale(b) {
         document.body.classList.add("story-mode");   // 페이지 어둡게 — 진입 번쩍임 방지
@@ -483,7 +483,7 @@
         $("report-panel").style.display = "none";
         if (COST === 0) {
           document.querySelector(".cost-row").innerHTML = '지금은 <span class="cost">🎁 무료 공개</span>';
-          document.querySelector(".wallet-mini").textContent = "오픈 기념 무료! 나중에 젬리 상품으로 바뀔 예정이에요.";
+          document.querySelector(".wallet-mini").textContent = "오픈 기념 무료! 나중에 노바 상품으로 바뀔 예정이에요.";
           $("btn-unlock").style.display = "inline-block";
           $("btn-unlock").textContent = "🎁 무료로 심층 리포트 받기";
           $("need-more").style.display = "none";
@@ -904,7 +904,7 @@
       function enterReport() {
         GwigokAudio.begin();   // 유저 제스처 체인 안에서 오디오 언락+프리로드
         if (base && unlocked()) { openReport(); return; }   // 이미 새겨둔 명부는 무료 재열람
-        if (!GoblubFeed.spend(COST)) { renderGate(); return; }  // 젬리 소비 (COST=0이면 통과)
+        if (!GoblubFeed.spend(COST)) { renderGate(); return; }  // 노바 소비 (COST=0이면 통과)
         paid = COST > 0;
         try { localStorage.setItem(paidKey(), String(Date.now())); } catch (e) {}
         // 발급 이벤트 기록(관리자 현황용) — 실패해도 무시

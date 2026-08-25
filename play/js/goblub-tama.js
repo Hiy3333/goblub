@@ -244,7 +244,7 @@
       msg = "나쁜 기분을 고브럽 입에 쏙!";
       setTimeout(function () { say("우걱우걱… 꺼억! 나쁜 기분 냠 — 개운하지? 😎"); }, 700);
     }
-    if (window.GoblubFeed && GoblubFeed.earnCare) GoblubFeed.earnCare(); // 케어 → 젬리 +1 (하루 최대 5)
+    if (window.GoblubFeed && GoblubFeed.earnCare) GoblubFeed.earnCare(); // 케어 → 노바 +1 (하루 최대 5)
     save(s); render();
     if (msg) say(msg);
   }

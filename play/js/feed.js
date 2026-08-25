@@ -82,8 +82,8 @@
     p.log[key] = 1;
     p.pending = (p.pending || 0) + 1;
     save(p);
-    var g = earnOnce("play_" + src, 2); // 콘텐츠 즐기기 → 젬리 +2 (소스당 하루 1회)
-    toast("🍬 먹이 +1" + (g ? " · 젬리 +" + g : "") + " (" + SOURCES[src].label + ")");
+    var g = earnOnce("play_" + src, 2); // 콘텐츠 즐기기 → 노바 +2 (소스당 하루 1회)
+    toast("🍬 먹이 +1" + (g ? " · 노바 +" + g : "") + " (" + SOURCES[src].label + ")");
     return true;
   }
 
@@ -103,11 +103,11 @@
     p.xp++;
     save(p);
     var after = levelOf(p.xp);
-    if (after > before) earn(20); // 진화(레벨업) 보너스 젬리
+    if (after > before) earn(20); // 진화(레벨업) 보너스 노바
     return { fed: true, levelUp: after > before, level: after };
   }
 
-  // ================= 가상재화 '젬리' 지갑 + 출석 =================
+  // ================= 가상재화 '노바' 지갑 + 출석 =================
   var WKEY = "goblub_wallet";
   function today() { var d = new Date(); return "" + d.getFullYear() + ("0" + (d.getMonth() + 1)).slice(-2) + ("0" + d.getDate()).slice(-2); }
   function yesterday() { var d = new Date(); d.setDate(d.getDate() - 1); return "" + d.getFullYear() + ("0" + (d.getMonth() + 1)).slice(-2) + ("0" + d.getDate()).slice(-2); }
@@ -115,7 +115,7 @@
   function wsave(w) { try { localStorage.setItem(WKEY, JSON.stringify(w)); } catch (e) {} }
 
   function wallet() { var w = wload(); return { balance: w.balance, streak: w.streak, checkedToday: w.lastCheck === today() }; }
-  function earn(n, silent) { var w = wload(); w.balance += n; wsave(w); if (!silent) toast("🍬 젬리 +" + n + "! (보유 " + w.balance + ")"); return w.balance; }
+  function earn(n, silent) { var w = wload(); w.balance += n; wsave(w); if (!silent) toast("💫 노바 +" + n + "! (보유 " + w.balance + ")"); return w.balance; }
   function earnOnce(reason, n) { var w = wload(); var k = reason + "_" + today(); if (w.earnLog[k]) return 0; w.earnLog[k] = 1; w.balance += n; wsave(w); return n; }
   function spend(n) { var w = wload(); if (w.balance < n) return false; w.balance -= n; wsave(w); return true; }
   function earnCare() { var w = wload(); var t = today(); if (w.careDate !== t) { w.careDate = t; w.careCount = 0; } if (w.careCount >= 5) return 0; w.careCount++; w.balance += 1; wsave(w); return 1; }
@@ -155,13 +155,13 @@
   }
   function cardData() { try { return JSON.parse(localStorage.getItem("goblub_card") || "{}"); } catch (e) { return {}; } }
 
-  // 관리자 지급 젬리 보관분 수령(로그인 순간 feed.js가 없던 페이지 대비)
+  // 관리자 지급 노바 보관분 수령(로그인 순간 feed.js가 없던 페이지 대비)
   try {
     var gift = +(localStorage.getItem("goblub_gift_pending") || 0);
     if (gift > 0) {
       localStorage.removeItem("goblub_gift_pending");
       earn(gift, true);
-      toast("🎁 운영자가 보낸 젬리 +" + gift + " 도착!");
+      toast("🎁 운영자가 보낸 노바 +" + gift + " 도착!");
     }
   } catch (e) {}
 

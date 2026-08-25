@@ -14,7 +14,7 @@
   }
   function save(u) { try { localStorage.setItem(KEY, JSON.stringify(u)); } catch (e) {} }
 
-  // 서버 회원 동기화: 등록/강퇴 확인/관리자 지급 젬리 수령
+  // 서버 회원 동기화: 등록/강퇴 확인/관리자 지급 노바 수령
   function syncServer(u, done) {
     if (!u || !u.tok) { if (done) done(); return; }
     fetch(API_BASE + "/api/auth-sync", {
@@ -34,7 +34,7 @@
           GoblubFeed.earn(res.pendingGems, true);
           try {
             var t = document.createElement("div");
-            t.textContent = "🎁 운영자가 보낸 젬리 +" + res.pendingGems + " 도착!";
+            t.textContent = "🎁 운영자가 보낸 노바 +" + res.pendingGems + " 도착!";
             t.style.cssText = "position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:rgba(255,255,255,.94);color:#2b3057;padding:10px 18px;border-radius:999px;border:1px solid rgba(255,255,255,.95);box-shadow:0 12px 26px rgba(88,99,172,.28);font-family:inherit;z-index:9999";
             document.body.appendChild(t);
             setTimeout(function () { t.remove(); }, 3200);
