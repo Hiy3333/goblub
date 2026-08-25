@@ -135,7 +135,7 @@
       function renderWallet() {
         var w = GoblubFeed.wallet();
         $("w-bal").textContent = w.balance;
-        $("w-streak").textContent = w.streak > 0 ? "· 🔥 연속 출석 " + w.streak + "일" : "";
+        $("w-streak").textContent = ""; // 출석 기능 폐지 — 연속 출석 표시 제거
       }
 
       function renderCardSummary() {
