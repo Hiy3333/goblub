@@ -11,12 +11,12 @@
   <link rel="stylesheet" href="../css/style.css?v=cl7" />
   <style>
     /* 남색 밤+분홍 진주달+바다 배경 — 뷰포트 고정 레이어 */
-    /* 고무줄 당김·주소창 수축 시에도 배경이 안 밀리게: html도 같은 색 + 오버스크롤 차단 */
-    html { background: #131c3e; overscroll-behavior-y: none; }
-    body { overscroll-behavior-y: none; }
+    /* 오버스크롤 고무줄만 차단. html에 배경을 주면 body 배경의 캔버스 전파가 끊겨
+       z-index:-1 행성 배경 레이어가 body 색에 덮여 사라진다 — 절대 넣지 말 것 */
+    html, body { overscroll-behavior-y: none; }
     body.clay { background: #131c3e !important; }
     body.clay::before {
-      content: ""; position: fixed; inset: -80px; z-index: -1; pointer-events: none;
+      content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
       background: url("../design/img/home-bg-27.webp") center bottom / cover no-repeat;
     }
     /* 카드 팔레트 — Daring Indigo → Plum Perfect (전 페이지 공통) */
