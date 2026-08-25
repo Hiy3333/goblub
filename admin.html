@@ -515,8 +515,8 @@
       }
 
       /* ── AI 사용량 ── */
-      var AI_COST = { gunghap: 5, saju: 12, report: 35, pastlife: 120, naming: 35, gwigok: 3, decide: 2, lotto: 2 };
-      var AI_LABEL = { gunghap: "별자리", saju: "사주", report: "명부", pastlife: "전생", naming: "작명", gwigok: "귀곡", decide: "결정", lotto: "로또" };
+      var AI_COST = { gunghap: 5, saju: 12, report: 35, naming: 35, gwigok: 3, decide: 2, lotto: 2 };
+      var AI_LABEL = { gunghap: "별자리", saju: "사주", report: "명부", naming: "작명", gwigok: "귀곡", decide: "결정", lotto: "로또" };
       function loadAi() {
         call({ action: "ai" }, function (j) {
           if (!j || !j.ok) return;

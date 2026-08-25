@@ -68,10 +68,9 @@
     <section class="panel">
       <div class="sec-head">
         <h2>💫 보유 노바</h2>
-        <a class="btn-ghost" href="play/goblub.html" style="padding:8px 16px; font-size:0.88rem">출석하고 모으기 →</a>
       </div>
       <p class="jelly-big">💫 <b id="w-bal">0</b> 노바 <span id="w-streak" style="font-size:0.9rem; color:var(--ink-soft)"></span></p>
-      <p class="result-desc" style="margin-top:6px">출석 도장·콘텐츠 즐기기·다마고치 케어로 모으고, ✨프리미엄 풀이에 쓸 수 있어요.</p>
+      <p class="result-desc" style="margin-top:6px">콘텐츠를 즐길 때마다 쌓이고, ✨프리미엄 풀이에 쓸 수 있어요.</p>
     </section>
 
     <!-- 나의 프로필 카드 -->
@@ -87,7 +86,7 @@
     <section class="panel">
       <h2 style="margin-bottom:12px">⚙️ 설정</h2>
       <div class="set-row">
-        <span class="lb">떠다니는 고브럽 마스코트 표시<span class="hint">끄면 화면 구석 버튼으로 접혀요 (새로고침 후 적용)</span></span>
+        <span class="lb">떠다니는 고브럽 마스코트 표시<span class="hint">끄면 화면에서 바로 사라져요</span></span>
         <label class="toggle"><input type="checkbox" id="tg-buddy" /><span class="knob"></span></label>
       </div>
       <div class="set-row">
@@ -95,7 +94,7 @@
         <a class="btn-ghost" href="play/today.html" style="padding:7px 14px; font-size:0.85rem; flex:none">수정하기</a>
       </div>
       <div class="set-row danger">
-        <span class="lb">전체 데이터 초기화<span class="hint">노바·고브럽·테스트 기록 등 이 기기의 모든 goblub 데이터 삭제</span></span>
+        <span class="lb">전체 데이터 초기화<span class="hint">노바·테스트 기록 등 이 기기의 모든 goblub 데이터 삭제</span></span>
         <button class="btn-ghost danger" id="btn-reset" style="padding:7px 14px; font-size:0.85rem; flex:none">초기화</button>
       </div>
     </section>
@@ -112,9 +111,9 @@
     <p class="fine-print">모든 데이터는 이 브라우저에 저장돼요</p>
   </main>
   <div id="site-footer"></div>
-  <script src="js/common.js?v=24" data-root="."></script>
+  <script src="js/common.js?v=25" data-root="."></script>
   <script src="js/auth.js?v=3"></script>
-  <script src="play/js/feed.js?v=12"></script>
+  <script src="play/js/feed.js?v=13"></script>
   <script>
     (function () {
       var $ = function (id) { return document.getElementById(id); };
@@ -159,11 +158,16 @@
 
       // 설정: 마스코트 토글
       var buddyOn = true;
-      try { buddyOn = localStorage.getItem("goblub_buddy") !== "min"; } catch (e) {}
+      try { var bv = localStorage.getItem("goblub_buddy"); buddyOn = bv !== "off"; } catch (e) {}
       $("tg-buddy").checked = buddyOn;
-      $("tg-buddy").onchange = function () {
-        try { localStorage.setItem("goblub_buddy", this.checked ? "on" : "min"); } catch (e) {}
-      };
+      function applyBuddy(on) {  // 저장 + 이 화면에서 즉시 반영
+        try { localStorage.setItem("goblub_buddy", on ? "on" : "off"); } catch (e) {}
+        var w = document.querySelector(".gbd-wrap"), m = document.querySelector(".gbd-min");
+        if (!on) { if (w) w.style.display = "none"; if (m) m.style.display = "none"; }
+        else if (w) { w.style.display = ""; if (m) m.style.display = "none"; }
+        else { var sc = document.createElement("script"); sc.src = "play/js/goblub-buddy.js?v=6"; document.head.appendChild(sc); }
+      }
+      $("tg-buddy").onchange = function () { applyBuddy(this.checked); };
 
       $("btn-logout").onclick = function () {
         GoblubAuth.signOut();
@@ -171,7 +175,7 @@
       };
 
       $("btn-reset").onclick = function () {
-        if (!confirm("정말 초기화할까요?\n노바·고브럽 성장·테스트 기록·사주 프로필 등 이 기기의 모든 goblub 데이터가 삭제되고, 로그인도 해제됩니다.")) return;
+        if (!confirm("정말 초기화할까요?\n노바·테스트 기록·사주 프로필 등 이 기기의 모든 goblub 데이터가 삭제되고, 로그인도 해제됩니다.")) return;
         try {
           Object.keys(localStorage).filter(function (k) { return k.indexOf("goblub") === 0; })
             .forEach(function (k) { localStorage.removeItem(k); });

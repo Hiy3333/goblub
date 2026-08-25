@@ -1,12 +1,12 @@
 // 고브럽 마스코트 — 화면을 둥둥 떠다니다 가끔 쓱 이동, 클릭하면 말풍선 리액션.
 // common.js가 모든 페이지에서 로드. GoblubArt(goblub-art.js) 필요.
-// 상태: localStorage "goblub_buddy" = "on"(기본) | "min"(최소화)
+// 상태: localStorage "goblub_buddy" = "on"(기본) | "min"(구석 버튼으로 최소화) | "off"(완전 숨김 — 설정 토글)
 (function () {
+  var KEY = "goblub_buddy";
+  try { if (localStorage.getItem(KEY) === "off") return; } catch (e) {}
   if (window.__goblubBuddy) return;
   window.__goblubBuddy = true;
   if (!window.GoblubArt || !document.body) return;
-
-  var KEY = "goblub_buddy";
   var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
   var SIZE = window.innerWidth < 520 ? 54 : 74;
   var base = (function () {
@@ -14,13 +14,6 @@
     if (!b) { var ss = document.getElementsByTagName("script"); for (var i = 0; i < ss.length; i++) if (ss[i].src && /\/play\/js\/goblub-/.test(ss[i].src)) { b = ss[i].src; break; } }
     return b.replace(/[^/]+$/, "");
   })();
-
-  function openTama() {
-    if (window.GoblubTama) { GoblubTama.open(); return; }
-    var sc = document.createElement("script"); sc.src = base + "goblub-tama.js?v=2";
-    sc.onload = function () { if (window.GoblubTama) GoblubTama.open(); };
-    document.head.appendChild(sc);
-  }
 
   var LINES = [
     "냠냠, 나쁜 기분 없어?", "오늘도 잘 놀다 가!", "심심하면 날 눌러줘~",
@@ -110,14 +103,13 @@
     if (e.target === xBtn) return;
     bodyEl.classList.remove("bob"); void bodyEl.offsetWidth; bodyEl.classList.add("pop");
     setTimeout(function () { bodyEl.classList.remove("pop"); if (!reduce) bodyEl.classList.add("bob"); }, 520);
-    // 제자리에 있으면 폴짝 도망(움직임), 쫓아가 다시 잡으면 키우기 열림
+    // 제자리에 있으면 폴짝 도망(움직임), 쫓아가 다시 잡으면 한마디 하고 복귀
     if (atHome && !reduce) {
       say(LINES[Math.floor(Math.random() * LINES.length)]);
       moveRandom();
     } else {
       say("히히, 잡았다 요놈!");
       clearTimeout(homeTimer);
-      openTama();
       goHome();
     }
   });

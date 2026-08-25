@@ -102,7 +102,7 @@ export default async function handler(req, res) {
     if (action === "ai") {
       // 최근 7일 AI 호출 계량 (lib/ratelimit.js 의 aiGuard 가 적재).
       // _total=허용 합계, _denied=레이트리밋 거절 수. 비용 추정 단가(원)는 프런트에서 곱한다.
-      const NAMES = ["gunghap", "saju", "report", "pastlife", "naming", "gwigok", "decide", "lotto", "_total", "_denied"];
+      const NAMES = ["gunghap", "saju", "report", "naming", "gwigok", "decide", "lotto", "_total", "_denied"];
       const days = [0, 1, 2, 3, 4, 5, 6].map(kstDay);
       const cmds = [];
       for (const d of days) for (const n of NAMES) cmds.push(["GET", "aiuse:" + d + ":" + n]);
