@@ -5,7 +5,7 @@
 //   https://goblub-2.vercel.app / https://hiy3333.github.io / http://localhost:8777
 // 발급한 ID를 아래 상수에 넣으면 로그인 버튼이 활성화된다.
 (function () {
-  var CLIENT_ID = ""; // TODO: 구글 OAuth 클라이언트 ID 입력 (예: "1234567890-abc.apps.googleusercontent.com")
+  var CLIENT_ID = "887530184165-4tg7f5mpjn3ufj97ai98d8mel0ue1ist.apps.googleusercontent.com";
   var KEY = "goblub_user";
   var API_BASE = (/\.vercel\.app$/.test(location.hostname) ? location.origin : "https://goblub-2.vercel.app");   // vercel 배포본은 자기 도메인, 그 외(GitHub Pages)는 고정 주소
 
