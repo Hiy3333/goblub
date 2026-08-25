@@ -89,10 +89,6 @@
     </section>
 
     <div id="result-area" style="display:none">
-      <section class="panel">
-        <h2 id="r-head"></h2>
-        <p id="r-mod" style="margin-top:8px; line-height:1.6"></p>
-      </section>
       <section class="panel"><h2>🍀 오늘의 총운 <span class="stars" id="s-total"></span></h2><p class="result-desc" id="t-total"></p></section>
       <section class="panel"><h2>💘 오늘의 연애운 <span class="stars" id="s-love"></span></h2><p class="result-desc" id="t-love"></p><div class="luck-cta" id="cta-love"></div></section>
       <section class="panel"><h2>💰 오늘의 재물운 <span class="stars" id="s-money"></span></h2><p class="result-desc" id="t-money"></p><div class="luck-cta" id="cta-money"></div></section>
@@ -165,10 +161,6 @@
           (birth.hour != null ? " " + birth.hour + "시" : "") +
           (birth.gender === "M" ? " · 남" : birth.gender === "F" ? " · 여" : "") +
           " · " + f.me.strength.label;
-        $("r-head").textContent = (now.getMonth() + 1) + "월 " + now.getDate() + "일, " +
-          birth.y + "년생 " + f.me.zodiac + "띠님의 운세";
-        $("r-mod").textContent = f.modMsg || "";
-        $("r-mod").style.display = f.modMsg ? "block" : "none";
         $("s-total").textContent = stars(f.total.score); $("t-total").textContent = f.total.text;
         $("s-love").textContent = stars(f.love.score); $("t-love").textContent = f.love.text;
         $("s-money").textContent = stars(f.money.score); $("t-money").textContent = f.money.text;
