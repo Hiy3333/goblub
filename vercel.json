@@ -8,9 +8,6 @@
     },
     "api/decide.js": {
       "maxDuration": 300
-    },
-    "api/pastlife.js": {
-      "maxDuration": 300
     }
   },
   "rewrites": [
