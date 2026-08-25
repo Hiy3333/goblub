@@ -29,6 +29,16 @@
     body.clay .card h2 { color: #fff; }
     body.clay .card p { color: #e4dff4; }
     body.clay .card .icon { background: rgba(255, 255, 255, .92); border-radius: 50%; padding: 6px; }
+    /* 모바일: 이모지·원형 아이콘 없이 제목이 주인공 — 제목 아래 포인트 라인 (허브 5곳 공통) */
+    @media (max-width: 700px) {
+      body.clay .card .icon { display: none; }
+      body.clay .card h2 { font-size: 1.28rem; letter-spacing: .3px; margin: 2px 0 12px;
+        padding-bottom: 10px; position: relative; text-shadow: 0 2px 6px rgba(10, 14, 40, .45); }
+      body.clay .card h2::after { content: ""; position: absolute; left: 0; bottom: 0;
+        width: 36px; height: 4px; border-radius: 4px;
+        background: linear-gradient(90deg, #ffd57e, #ff9d6b); }
+      body.clay .card p { font-size: .92rem; line-height: 1.55; }
+    }
     body.clay a.card:hover, body.clay .card[data-href]:hover { border-color: rgba(255, 255, 255, .5) !important; }
     body.clay .hero h1 {
       background: none; -webkit-background-clip: initial; background-clip: initial; color: #fdf3cf;
