@@ -58,9 +58,10 @@
     .pl-ring { position: fixed; z-index: 3; pointer-events: none;
       background: url("../design/img/glow-tests.png") center / 100% 100% no-repeat;
       animation: plRing 2.6s ease-in-out infinite; }
+    /* 홈(.gm-satring)과 동일: 크기는 고정, 밝기만 맥동 */
     @keyframes plRing {
-      0%, 100% { opacity: .5; transform: scale(.985); }
-      50% { opacity: 1; transform: scale(1.04); }
+      0%, 100% { opacity: .5; filter: brightness(1); }
+      50% { opacity: 1; filter: brightness(1.12); }
     }
     .pl-hot:hover ~ .pl-ring, .pl-ring.hot { animation-duration: 1.1s; }
     /* 행성을 두르는 CLICK 표시 — 뒤쪽 반원은 행성 뒤로 지나간다 */
