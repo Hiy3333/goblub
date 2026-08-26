@@ -68,26 +68,32 @@
   <div id="site-footer"></div>
   <script src="../js/common.js?v=27" data-root=".."></script>
   <script src="js/saju.js"></script>
+  <script src="js/i18n-fortune.js?v=1"></script>
   <script src="js/dosa.js?v=3"></script>
   <script src="js/profile.js"></script>
   <script src="js/feed.js?v=14"></script>
   <script>
     (function () {
       var $ = function (id) { return document.getElementById(id); };
+      var tr = window.GoblubI18n ? GoblubI18n.t : function (s) { return s; };
+      var GAN_RO = ["Gap","Eul","Byeong","Jeong","Mu","Gi","Gyeong","Sin","Im","Gye"];
+      var JI_RO = ["Ja","Chuk","In","Myo","Jin","Sa","O","Mi","Sin","Yu","Sul","Hae"];
+      var isKo = !window.GoblubI18n || GoblubI18n.lang === "ko";
+      function gjText(p) { var t = Saju.pillarText(p); if (isKo) return t; return { hanja: t.hanja, hangul: GAN_RO[p[0]] + "-" + JI_RO[p[1]] }; }
       var data = null;
 
       fetch("data/saju-terms.json")
         .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
         .then(function (d) { data = d; })
-        .catch(function () { showErr("데이터를 불러오지 못했어요. 새로고침 해주세요."); });
+        .catch(function () { showErr(tr("데이터를 불러오지 못했어요. 새로고침 해주세요.")); });
 
       // 셀렉트 채우기
       var y = $("in-year"), m = $("in-month"), d = $("in-day"), h = $("in-hour");
-      for (var i = 2100; i >= 1900; i--) y.add(new Option(i + "년", i));
+      for (var i = 2100; i >= 1900; i--) y.add(new Option(tr("{N}년").replace("{N}", i), i));
       y.value = 1995;
-      for (i = 1; i <= 12; i++) m.add(new Option(i + "월", i));
-      for (i = 1; i <= 31; i++) d.add(new Option(i + "일", i));
-      for (i = 0; i <= 23; i++) h.add(new Option(i + "시", i));
+      for (i = 1; i <= 12; i++) m.add(new Option(tr("{N}월").replace("{N}", i), i));
+      for (i = 1; i <= 31; i++) d.add(new Option(tr("{N}일").replace("{N}", i), i));
+      for (i = 0; i <= 23; i++) h.add(new Option(tr("{N}시").replace("{N}", i), i));
 
       // 공유 프로필 프리필
       (function () {
@@ -104,11 +110,11 @@
 
       $("btn-go").onclick = function () {
         $("err").style.display = "none";
-        if (!data) { showErr("데이터를 불러오지 못했어요. 새로고침 해주세요."); return; }
+        if (!data) { showErr(tr("데이터를 불러오지 못했어요. 새로고침 해주세요.")); return; }
         var yy = +y.value, mm = +m.value, dd = +d.value;
         var date = new Date(yy, mm - 1, dd);
         if (date.getFullYear() !== yy || date.getMonth() !== mm - 1 || date.getDate() !== dd) {
-          showErr("없는 날짜예요. 다시 확인해주세요!"); return;
+          showErr(tr("없는 날짜예요. 다시 확인해주세요!")); return;
         }
         var hour = h.value === "" ? null : +h.value;
         var min = Math.min(59, Math.max(0, +($("in-min").value || 0)));
@@ -129,19 +135,20 @@
       };
 
       function render(r) {
-        $("r-title").textContent = zodiacEmoji(r.zodiac) + " " + r.zodiac + "띠의 사주";
+        $("r-title").textContent = zodiacEmoji(r.zodiac) + " " + tr("{Z}띠의 사주").replace("{Z}", tr(r.zodiac));
         var roles = [["시주", r.pillars.hour], ["일주", r.pillars.day], ["월주", r.pillars.month], ["년주", r.pillars.year]];
+        var roleTr = { "시주": tr("시주"), "일주": tr("일주"), "월주": tr("월주"), "년주": tr("년주") };
         var html = "";
         roles.forEach(function (pair) {
           if (!pair[1]) {
-            html += '<div class="pillar"><span class="role">' + pair[0] + '</span><span class="hanja">?</span><span class="hangul">몰라요</span></div>';
+            html += '<div class="pillar"><span class="role">' + roleTr[pair[0]] + '</span><span class="hanja">?</span><span class="hangul">' + tr("몰라요") + '</span></div>';
             return;
           }
-          var t = Saju.pillarText(pair[1]);
+          var t = gjText(pair[1]);
           var roleKey = { "시주": "hour", "일주": "day", "월주": "month", "년주": "year" }[pair[0]];
-          var ssGan = roleKey === "day" ? "나(일간)" : Saju.SIPSEONG[Saju.sipseong(r.ilgan, pair[1][0])];
-          var ssJi = Saju.SIPSEONG[Saju.sipseong(r.ilgan, Saju.branchMainGan(pair[1][1]))];
-          html += '<div class="pillar"><span class="role">' + pair[0] + '</span><span class="hanja">' + t.hanja +
+          var ssGan = roleKey === "day" ? tr("나(일간)") : tr(Saju.SIPSEONG[Saju.sipseong(r.ilgan, pair[1][0])]);
+          var ssJi = tr(Saju.SIPSEONG[Saju.sipseong(r.ilgan, Saju.branchMainGan(pair[1][1]))]);
+          html += '<div class="pillar"><span class="role">' + roleTr[pair[0]] + '</span><span class="hanja">' + t.hanja +
             '</span><span class="hangul">' + t.hangul + '</span><span class="ss">' + ssGan + "<br>" + ssJi + "</span></div>";
         });
         $("r-pillars").innerHTML = html;
@@ -151,34 +158,34 @@
         var bars = "";
         ["목", "화", "토", "금", "수"].forEach(function (k) {
           var n = r.oheng[k];
-          bars += '<div class="oheng-row"><span class="name">' + k + '</span><div class="bar oheng-' + k + '" style="width:' + (n / total * 100) + '%"></div><span class="cnt">' + (Math.round(n * 10) / 10) + "</span></div>";
+          bars += '<div class="oheng-row"><span class="name">' + tr(k) + '</span><div class="bar oheng-' + k + '" style="width:' + (n / total * 100) + '%"></div><span class="cnt">' + (Math.round(n * 10) / 10) + "</span></div>";
         });
         $("r-oheng").innerHTML = bars;
 
-        $("r-strength").textContent = "⚖️ " + SajuText.strengthDesc[r.strength.label];
-        $("r-sipseong").textContent = r.topSipseong == null ? "" : "🧭 " + SajuText.sipseongDesc[r.topSipseong];
+        $("r-strength").textContent = "⚖️ " + tr(SajuText.strengthDesc[r.strength.label]);
+        $("r-sipseong").textContent = r.topSipseong == null ? "" : "🧭 " + tr(SajuText.sipseongDesc[r.topSipseong]);
 
         var dv = $("r-daeun");
         if (r.daeun) {
-          var dh = '<h2 style="font-size:1.05rem; margin-bottom:8px">🚉 대운 흐름 (' + (r.daeun.forward ? "순행" : "역행") +
-            (r.daeun.approx ? " · 근사" : "") + ')</h2><div class="daeun-list">';
+          var dh = '<h2 style="font-size:1.05rem; margin-bottom:8px">' + tr("🚉 대운 흐름 (") + tr(r.daeun.forward ? "순행" : "역행") +
+            (r.daeun.approx ? tr(" · 근사") : "") + ')</h2><div class="daeun-list">';
           r.daeun.list.forEach(function (du) {
             var t2 = Saju.pillarText([du.gan, du.ji]);
-            dh += '<div class="daeun-item"><span class="age">' + du.age + '세~</span><span class="gj">' + t2.hanja +
-              '</span><span class="ss">' + Saju.SIPSEONG[Saju.sipseong(r.ilgan, du.gan)] + "</span></div>";
+            dh += '<div class="daeun-item"><span class="age">' + tr("{A}세~").replace("{A}", du.age) + '</span><span class="gj">' + t2.hanja +
+              '</span><span class="ss">' + tr(Saju.SIPSEONG[Saju.sipseong(r.ilgan, du.gan)]) + "</span></div>";
           });
           dv.innerHTML = dh + "</div>";
         } else dv.innerHTML = "";
 
-        $("r-ilgan").textContent = "🌱 나의 일간은 「" + Saju.GAN[r.ilgan] + "」 — " + SajuText.ilgan[r.ilgan];
+        $("r-ilgan").textContent = tr("🌱 나의 일간은 「{G}」 —").replace("{G}", isKo ? Saju.GAN[r.ilgan] : GAN_RO[r.ilgan]) + " " + tr(SajuText.ilgan[r.ilgan]);
 
         var most = "목", none = [];
         ["목", "화", "토", "금", "수"].forEach(function (k) {
           if (r.oheng[k] > r.oheng[most]) most = k;
           if (r.oheng[k] === 0) none.push(k);
         });
-        var txt = SajuText.ohengMost[most];
-        if (none.length) txt += " " + SajuText.ohengNone[none[0]];
+        var txt = tr(SajuText.ohengMost[most]);
+        if (none.length) txt += " " + tr(SajuText.ohengNone[none[0]]);
         $("r-oheng-txt").textContent = txt;
       }
 
@@ -188,21 +195,21 @@
         var btn = $("btn-dosa"), txt = $("dosa-text"), st = $("dosa-status");
         btn.disabled = true;
         st.style.display = "block";
-        st.textContent = "🧙 도사님이 팔자를 찬찬히 들여다보는 중…";
+        st.textContent = tr("🧙 도사님이 팔자를 찬찬히 들여다보는 중…");
         txt.style.display = "block";
         txt.textContent = "";
         var payload = Dosa.buildPayload(lastCtx.r, lastCtx.birth, lastCtx.gender, lastCtx.trueSolar);
         Dosa.fetchReading(payload, {
           onChunk: function (t) { txt.textContent += t; },
           onDone: function (fromCache) {
-            st.textContent = fromCache ? "🧙 (지난번에 봐드린 풀이예요)" : "🧙 풀이 끝!";
+            st.textContent = fromCache ? tr("🧙 (지난번에 봐드린 풀이예요)") : tr("🧙 풀이 끝!");
           },
           onError: function (code, sec) {
             txt.style.display = "none";
             st.textContent =
-              code === "not_configured" ? "도사님이 아직 수련 중이에요. 곧 찾아옵니다!" :
-              code === "cooldown" ? "도사님이 숨 고르는 중… " + sec + "초 후에 다시 눌러주세요!" :
-              "도사님이 지금 손님이 많아요. 잠시 후 다시 시도해 주세요.";
+              code === "not_configured" ? tr("도사님이 아직 수련 중이에요. 곧 찾아옵니다!") :
+              code === "cooldown" ? tr("도사님이 숨 고르는 중…") + " " + sec + tr("초 후에 다시 눌러주세요!") :
+              tr("도사님이 지금 손님이 많아요. 잠시 후 다시 시도해 주세요.");
             btn.disabled = false;
           }
         });

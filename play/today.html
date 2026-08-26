@@ -109,20 +109,26 @@
   <script src="../js/common.js?v=27" data-root=".."></script>
   <script src="js/saju.js"></script>
   <script src="js/fortune.js"></script>
+  <script src="js/i18n-fortune.js?v=1"></script>
   <script src="js/profile.js"></script>
   <script src="js/feed.js?v=14"></script>
   <script>
     (function () {
       var $ = function (id) { return document.getElementById(id); };
+      var tr = window.GoblubI18n ? GoblubI18n.t : function (s) { return s; };
+      var GAN_RO = ["Gap","Eul","Byeong","Jeong","Mu","Gi","Gyeong","Sin","Im","Gye"];
+      var JI_RO = ["Ja","Chuk","In","Myo","Jin","Sa","O","Mi","Sin","Yu","Sul","Hae"];
+      var isKo = !window.GoblubI18n || GoblubI18n.lang === "ko";
+      function gjText(p) { var t = Saju.pillarText(p); if (isKo) return t; return { hanja: t.hanja, hangul: GAN_RO[p[0]] + "-" + JI_RO[p[1]] }; }
       var data = null, now = new Date();
-      $("date-label").textContent = now.getFullYear() + "년 " + (now.getMonth() + 1) + "월 " + now.getDate() + "일, 오늘은 무슨 날?";
+      $("date-label").textContent = tr("{Y}년 {M}월 {D}일, 오늘은 무슨 날?").replace("{Y}", now.getFullYear()).replace("{M}", now.getMonth() + 1).replace("{D}", now.getDate());
 
       var y = $("in-year"), m = $("in-month"), d = $("in-day"), h = $("in-hour");
-      for (var i = 2100; i >= 1900; i--) y.add(new Option(i + "년", i));
+      for (var i = 2100; i >= 1900; i--) y.add(new Option(tr("{N}년").replace("{N}", i), i));
       y.value = 1995;
-      for (i = 1; i <= 12; i++) m.add(new Option(i + "월", i));
-      for (i = 1; i <= 31; i++) d.add(new Option(i + "일", i));
-      for (i = 0; i <= 23; i++) h.add(new Option(i + "시", i));
+      for (i = 1; i <= 12; i++) m.add(new Option(tr("{N}월").replace("{N}", i), i));
+      for (i = 1; i <= 31; i++) d.add(new Option(tr("{N}일").replace("{N}", i), i));
+      for (i = 0; i <= 23; i++) h.add(new Option(tr("{N}시").replace("{N}", i), i));
 
       function showErr(msg) { var e = $("err"); e.textContent = msg; e.style.display = "block"; }
       function stars(n) { return "★★★★★".slice(0, n) + "☆☆☆☆☆".slice(0, 5 - n); }
@@ -137,40 +143,40 @@
       // 오늘의 간지 — 프로필 없어도 항상 보인다
       function renderToday(dd) {
         var td = Fortune.todayGanji(dd, now);
-        var roles = [["오늘의 해", td.pillars.year], ["이달", td.pillars.month], ["오늘", td.pillars.day]];
+        var roles = [[tr("오늘의 해"), td.pillars.year], [tr("이달"), td.pillars.month], [tr("오늘"), td.pillars.day]];
         var html = "";
         roles.forEach(function (pair) {
-          var t = Saju.pillarText(pair[1]);
+          var t = gjText(pair[1]);
           html += '<div class="pillar"><span class="role">' + pair[0] + '</span><span class="hanja">' + t.hanja +
             '</span><span class="hangul">' + t.hangul + "</span></div>";
         });
         $("t-pillars").innerHTML = html;
         var dt = Fortune.dayText(td);
-        $("t-gan").textContent = "🌤️ " + dt.gan;
-        $("t-ji").textContent = dt.ji;
-        $("t-good").innerHTML = dt.dos.good.map(function (g) { return "<li>" + g + "</li>"; }).join("");
-        $("t-care").innerHTML = dt.dos.care.map(function (c) { return "<li>" + c + "</li>"; }).join("");
+        $("t-gan").textContent = "🌤️ " + tr(dt.gan);
+        $("t-ji").textContent = tr(dt.ji);
+        $("t-good").innerHTML = dt.dos.good.map(function (g) { return "<li>" + tr(g) + "</li>"; }).join("");
+        $("t-care").innerHTML = dt.dos.care.map(function (c) { return "<li>" + tr(c) + "</li>"; }).join("");
       }
 
       // 내 사주로 보는 오늘 운세
       function showMine(birth) {
         var f = Fortune.get(data, birth, now);
-        var meT = Saju.pillarText(f.me.pillars.day);
-        $("p-who").textContent = meT.hanja + " " + meT.hangul + "일주 · " + f.me.zodiac + "띠";
-        $("p-sub").textContent = birth.y + "년 " + birth.m + "월 " + birth.d + "일" +
-          (birth.hour != null ? " " + birth.hour + "시" : "") +
-          (birth.gender === "M" ? " · 남" : birth.gender === "F" ? " · 여" : "") +
-          " · " + f.me.strength.label;
-        $("s-total").textContent = stars(f.total.score); $("t-total").textContent = f.total.text;
-        $("s-love").textContent = stars(f.love.score); $("t-love").textContent = f.love.text;
-        $("s-money").textContent = stars(f.money.score); $("t-money").textContent = f.money.text;
-        $("s-study").textContent = stars(f.study.score); $("t-study").textContent = f.study.text;
-        $("s-month").textContent = stars(f.month.score); $("t-month").textContent = f.month.text;
+        var meT = gjText(f.me.pillars.day);
+        $("p-who").textContent = meT.hanja + " " + tr("{H}일주 · {Z}띠").replace("{H}", meT.hangul).replace("{Z}", tr(f.me.zodiac));
+        $("p-sub").textContent = tr("{Y}년 {M}월 {D}일").replace("{Y}", birth.y).replace("{M}", birth.m).replace("{D}", birth.d) +
+          (birth.hour != null ? " " + tr("{N}시").replace("{N}", birth.hour) : "") +
+          (birth.gender === "M" ? tr(" · 남") : birth.gender === "F" ? tr(" · 여") : "") +
+          " · " + tr(f.me.strength.label);
+        $("s-total").textContent = stars(f.total.score); $("t-total").textContent = tr(f.total.text);
+        $("s-love").textContent = stars(f.love.score); $("t-love").textContent = tr(f.love.text);
+        $("s-money").textContent = stars(f.money.score); $("t-money").textContent = tr(f.money.text);
+        $("s-study").textContent = stars(f.study.score); $("t-study").textContent = tr(f.study.text);
+        $("s-month").textContent = stars(f.month.score); $("t-month").textContent = tr(f.month.text);
 
         function luckCta(id, score, hotLabel, mildLabel, url) {
           var hot = score >= 4;
           $(id).innerHTML = '<a href="' + url + '"' + (hot ? ' class="hot"' : "") + ">" +
-            (hot ? hotLabel : mildLabel) + " →</a>";
+            tr(hot ? hotLabel : mildLabel) + " →</a>";
         }
         luckCta("cta-money", f.money.score,
           "💰 재물운 만렙! 이 기세로 고브럽 로또 번호 뽑으러 가기",
@@ -197,15 +203,15 @@
           var p = GoblubProfile.get();
           if (p) { fillForm(p); showMine(p); }
         })
-        .catch(function () { $("t-err").textContent = "데이터를 불러오지 못했어요. 새로고침 해주세요."; });
+        .catch(function () { $("t-err").textContent = tr("데이터를 불러오지 못했어요. 새로고침 해주세요."); });
 
       $("btn-go").onclick = function () {
         $("err").style.display = "none";
-        if (!data) { showErr("데이터를 불러오지 못했어요. 새로고침 해주세요."); return; }
+        if (!data) { showErr(tr("데이터를 불러오지 못했어요. 새로고침 해주세요.")); return; }
         var yy = +y.value, mm = +m.value, dd2 = +d.value;
         var date = new Date(yy, mm - 1, dd2);
         if (date.getFullYear() !== yy || date.getMonth() !== mm - 1 || date.getDate() !== dd2) {
-          showErr("없는 날짜예요. 다시 확인해주세요!"); return;
+          showErr(tr("없는 날짜예요. 다시 확인해주세요!")); return;
         }
         var gender = document.querySelector('input[name="gender"]:checked').value;
         var min = h.value === "" ? 0 : Math.min(59, Math.max(0, +($("in-min").value || 0)));
