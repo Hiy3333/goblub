@@ -93,7 +93,7 @@
   }
 
   function say(txt) {
-    bubble.textContent = txt;
+    bubble.textContent = (window.GoblubI18n ? GoblubI18n.t(txt) : txt);
     bubble.classList.add("show");
     clearTimeout(sayTimer);
     sayTimer = setTimeout(function () { bubble.classList.remove("show"); }, 2600);

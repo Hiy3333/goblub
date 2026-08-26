@@ -1,7 +1,7 @@
 // 고브럽 도사 — 프리미엄 심층 리포트(성격+인연) 분할 생성 프록시.
 // 계산은 사이트의 만세력 엔진(saju.js + saju-deep.js)이 하고, 이 함수는 파트별 집필만 맡긴다.
 // 4개 파트(p1·p2·l1·l2)를 클라이언트가 순차 호출해 1만자급 리포트를 완성한다.
-import { streamGemini, geminiConfigured } from "../lib/gemini.js";
+import { streamGemini, geminiConfigured, langNote } from "../lib/gemini.js";
 import { aiGuard } from "../lib/ratelimit.js";
 
 const ALLOWED_ORIGINS = [
@@ -228,7 +228,7 @@ export default async function handler(req, res) {
 
   try {
     const wrote = await streamGemini(res, {
-      system: PERSONA + guestBlock + "\n\n" + PARTS[part],
+      system: PERSONA + guestBlock + "\n\n" + PARTS[part] + langNote(req.body && req.body.lang),
       user: pairBlock
         ? "다음은 만세력 엔진이 계산한 두 사람의 사주 팩트 데이터다. A/B 각각 base(원국)·deep(신살·용신 등), pair는 두 명식 사이의 합충·보완 관계(엔진 계산), relation은 두 사람의 관계다. 이 데이터만 근거로 궁합을 집필하라. A를 '너', B를 '상대'(이름 있으면 이름)로 불러라.\n" +
           JSON.stringify({

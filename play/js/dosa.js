@@ -72,6 +72,7 @@
     if (wait > 0) { cb.onError("cooldown", Math.ceil(wait / 1000)); return; }
     try { localStorage.setItem(cdKey, String(Date.now())); } catch (e) {}
 
+    if (window.GoblubI18n && GoblubI18n.lang && GoblubI18n.lang !== "ko") body.lang = GoblubI18n.lang; // AI 응답 언어
     fetch(API_BASE + path, {
       method: "POST",
       headers: { "Content-Type": "application/json" },

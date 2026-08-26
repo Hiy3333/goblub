@@ -389,7 +389,7 @@
   <div class="gm-footer">© 2026 goblub</div>
 
   <div id="site-footer"></div>
-  <script src="js/common.js?v=25" data-root="."></script>
+  <script src="js/common.js?v=26" data-root="."></script>
   <script>
   (function () {
     var WALK_IMG = "design/img/home/gb-walk.webp";
@@ -735,7 +735,7 @@
                 nextTalkAt = now + 2500;
               } else {
                 var tl = timeLines();
-                hint.textContent = tl[talkIdx % tl.length]; talkIdx++;
+                hint.textContent = (window.GoblubI18n ? GoblubI18n.t(tl[talkIdx % tl.length]) : tl[talkIdx % tl.length]); talkIdx++;
                 hint.style.transition = "none"; hint.style.opacity = "1";
                 talkUntil = now + 4200;
                 nextTalkAt = now + 40000 + Math.random() * 25000;
@@ -932,7 +932,7 @@
       hintIdx = (hintIdx + 1) % HINTS.length;
       hint.style.transition = "none";
       hint.style.opacity = "0";
-      hint.textContent = HINTS[hintIdx];
+      hint.textContent = (window.GoblubI18n ? GoblubI18n.t(HINTS[hintIdx]) : HINTS[hintIdx]);
       setTimeout(function () {
         hint.style.transition = "opacity .25s";
         hint.style.opacity = "1";

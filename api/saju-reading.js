@@ -1,7 +1,7 @@
 // 고브럽 도사 — AI 심층 사주 풀이 프록시.
 // 계산은 사이트의 만세력 엔진이 하고, 이 함수는 그 결과를 검증해 Gemini에 해석만 맡긴다.
 // API 키는 Vercel 환경변수 GEMINI_API_KEY 에만 존재한다.
-import { streamGemini, geminiConfigured } from "../lib/gemini.js";
+import { streamGemini, geminiConfigured, langNote } from "../lib/gemini.js";
 import { aiGuard } from "../lib/ratelimit.js";
 
 const ALLOWED_ORIGINS = [
@@ -94,7 +94,7 @@ export default async function handler(req, res) {
 
   try {
     const wrote = await streamGemini(res, {
-      system: premium ? SYSTEM + PREMIUM_EXTRA : SYSTEM,
+      system: (premium ? SYSTEM + PREMIUM_EXTRA : SYSTEM) + langNote(req.body && req.body.lang),
       user:
         "다음은 만세력 엔진이 계산한 사주 데이터입니다. 규칙에 따라 풀이해 주세요.\n" +
         JSON.stringify(saju),

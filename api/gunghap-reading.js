@@ -1,6 +1,6 @@
 // 고브럽 도사 — AI 궁합 리포트 프록시.
 // 두 사람의 사주(엔진 계산)와 궁합 점수를 검증해 Gemini에 해석만 맡긴다.
-import { streamGemini, geminiConfigured } from "../lib/gemini.js";
+import { streamGemini, geminiConfigured, langNote } from "../lib/gemini.js";
 import { aiGuard } from "../lib/ratelimit.js";
 
 const ALLOWED_ORIGINS = [
@@ -133,7 +133,7 @@ export default async function handler(req, res) {
 
   try {
     const wrote = await streamGemini(res, {
-      system: SYSTEM,
+      system: SYSTEM + langNote(req.body && req.body.lang),
       user:
         "relation(관계)은 " + ({ couple: "커플", some: "썸 타는 중", crush: "짝사랑" }[gunghap.relation] || "커플") +
         "입니다 — 이 전제에 맞는 섹션 세트와 시점으로 쓰세요. " +

@@ -80,7 +80,8 @@
           syncServer(u, function () { if (onLogin) onLogin(u); });
         }
       });
-      google.accounts.id.renderButton(el, { theme: "outline", size: "large", shape: "pill", text: "signin_with", locale: "ko" });
+      var loc = { ko: "ko", en: "en", es: "es", id: "id", ja: "ja", th: "th", zh: "zh-CN", tw: "zh-TW" }[(window.GoblubI18n && GoblubI18n.lang) || "ko"] || "ko";
+      google.accounts.id.renderButton(el, { theme: "outline", size: "large", shape: "pill", text: "signin_with", locale: loc });
     }
     if (window.google && google.accounts && google.accounts.id) init();
     else {

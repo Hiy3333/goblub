@@ -1,6 +1,6 @@
 // 고브럽 로또 도사 — 역대 당첨 통계 요약을 받아 유쾌한 분석 + 추천 조합을 스트리밍.
 // 주의: 로또는 매 회차 독립 추첨이라 어떤 조합도 확률이 같음 — 프롬프트에 고지 의무를 강제(재미 콘텐츠).
-import { streamGemini, geminiConfigured } from "../lib/gemini.js";
+import { streamGemini, geminiConfigured, langNote } from "../lib/gemini.js";
 import { aiGuard } from "../lib/ratelimit.js";
 
 const ALLOWED_ORIGINS = [
@@ -60,7 +60,7 @@ export default async function handler(req, res) {
 
   try {
     const wrote = await streamGemini(res, {
-      system: SYSTEM,
+      system: SYSTEM + langNote(req.body && req.body.lang),
       user:
         "역대 로또 6/45 당첨 통계 요약입니다(1회~최신 " + stats.latest + "회 전수 집계). " +
         "이 기운을 읽어 분석과 추천 조합을 주세요.\n" + JSON.stringify(stats),

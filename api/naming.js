@@ -1,5 +1,5 @@
 // 고브럽 작명소 — 카테고리·키워드로 이름을 지어주는 AI 프록시.
-import { streamGemini, geminiConfigured } from "../lib/gemini.js";
+import { streamGemini, geminiConfigured, langNote } from "../lib/gemini.js";
 import { aiGuard } from "../lib/ratelimit.js";
 
 const ALLOWED_ORIGINS = [
@@ -58,7 +58,7 @@ export default async function handler(req, res) {
 
   try {
     const wrote = await streamGemini(res, {
-      system: SYSTEM,
+      system: SYSTEM + langNote(req.body && req.body.lang),
       user: "카테고리: " + CATS[n.category] + "\n키워드/분위기: " + ((kw && kw.trim()) || "자유롭게 센스있게") + "\n\n이름을 지어주세요.",
       maxTokens: 1600,
       temperature: 0.8,

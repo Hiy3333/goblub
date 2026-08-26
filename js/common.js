@@ -111,7 +111,7 @@
   // 고브럽 마스코트(모든 페이지) — GoblubArt가 없으면 먼저 로드한 뒤 buddy 실행
   function initBuddy() {
     if (window.__goblubBuddy) return;
-    loadScript(root + "/play/js/goblub-buddy.js?v=6");
+    loadScript(root + "/play/js/goblub-buddy.js?v=7");
   }
 
   document.addEventListener("DOMContentLoaded", function () {
@@ -146,3 +146,6 @@
     window.goblubToast(t.getAttribute("data-soon") || "준비 중이에요!");
   }, true);
 })();
+
+// ===== 다국어(i18n) 로드 — common.js 바로 다음에 실행되도록 동기 삽입 =====
+document.write('<script src="' + (document.currentScript && document.currentScript.getAttribute("data-root") || (function(){var ss=document.getElementsByTagName("script");for(var i=0;i<ss.length;i++){var m=(ss[i].src||"").match(/^(.*)\/js\/common\.js/);if(m)return m[1].replace(location.origin,"")||".";}return ".";})()) + '/js/i18n.js?v=1"><\/script>');

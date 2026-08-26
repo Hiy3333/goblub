@@ -1,5 +1,5 @@
 // 결정의 신 — A vs B 고민을 단호하게 판결해주는 AI 프록시.
-import { streamGemini, geminiConfigured } from "../lib/gemini.js";
+import { streamGemini, geminiConfigured, langNote } from "../lib/gemini.js";
 import { aiGuard } from "../lib/ratelimit.js";
 
 const ALLOWED_ORIGINS = [
@@ -60,7 +60,7 @@ export default async function handler(req, res) {
       (d.context && d.context.trim() ? "\n상황: " + d.context.trim() : "") +
       "\n\n판결을 내려주소서.";
     const wrote = await streamGemini(res, {
-      system: SYSTEM,
+      system: SYSTEM + langNote(req.body && req.body.lang),
       user: userMsg,
       maxTokens: 400,
       temperature: 0.85,

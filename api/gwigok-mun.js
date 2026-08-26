@@ -2,7 +2,7 @@
 //   { ask:   { question, saju } }  → 귀곡 문답
 //   { dream: { text, ilju? } }     → 간밤의 장부(해몽)
 //   { tarot: { worry?, card, keyword, orient } } → 고양이 타로
-import { streamGemini, geminiConfigured } from "../lib/gemini.js";
+import { streamGemini, geminiConfigured, langNote } from "../lib/gemini.js";
 import { aiGuard } from "../lib/ratelimit.js";
 
 const ALLOWED_ORIGINS = [
@@ -185,7 +185,7 @@ export default async function handler(req, res) {
 
   try {
     const wrote = await streamGemini(res, {
-      system: spec.system,
+      system: spec.system + langNote(req.body && req.body.lang),
       user: spec.user,
       maxTokens: spec.maxTokens,
       temperature: spec.temperature,
