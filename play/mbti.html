@@ -87,9 +87,11 @@
   <div id="site-footer"></div>
   <script src="../js/common.js?v=26" data-root=".."></script>
   <script src="js/feed.js?v=14"></script>
+  <script src="js/i18n-mbti.js?v=1"></script>
   <script>
     (function () {
       var $ = function (id) { return document.getElementById(id); };
+      var tr = window.GoblubI18n ? GoblubI18n.t : function (s) { return s; };
 
       // 축마다 한 문항만 3점 → 축 총점이 홀수가 되어 동점(무조건 E/S/T/J) 이 나올 수 없음
       var QUESTIONS = [
@@ -286,9 +288,9 @@
         v.textContent = q.visual;
         v.className = "visual-card card " + q.tint;
         v.style.boxShadow = "none";
-        $("q-text").textContent = "Q" + (idx + 1) + ". " + q.q;
-        $("q-a").textContent = "A. " + q.a.text;
-        $("q-b").textContent = "B. " + q.b.text;
+        $("q-text").textContent = "Q" + (idx + 1) + ". " + tr(q.q);
+        $("q-a").textContent = "A. " + tr(q.a.text);
+        $("q-b").textContent = "B. " + tr(q.b.text);
       }
 
       function pick(choice) {
@@ -302,17 +304,17 @@
       function renderResult(type, setHash) {
         var r = RESULTS[type];
         $("r-emoji").textContent = r.emoji;
-        $("r-meme").textContent = "「" + r.memeTitle + "」";
-        $("r-name").textContent = type + " · " + r.title;
-        $("r-roast").textContent = "💥 성격 팩폭: " + r.roast;
-        var STAT_NAMES = ["🔥 추진력", "⚡ 텐션", "👀 눈치", "🧠 현실감각"];
-        var sh = '<p class="result-desc" style="margin-bottom:6px">📊 대환장 스탯</p>';
+        $("r-meme").textContent = "「" + tr(r.memeTitle) + "」";
+        $("r-name").textContent = type + " · " + tr(r.title);
+        $("r-roast").textContent = tr("💥 성격 팩폭:") + " " + tr(r.roast);
+        var STAT_NAMES = [tr("🔥 추진력"), tr("⚡ 텐션"), tr("👀 눈치"), tr("🧠 현실감각")];
+        var sh = '<p class="result-desc" style="margin-bottom:6px">' + tr("📊 대환장 스탯") + '</p>';
         r.stats.forEach(function (v, i) {
           sh += '<div class="stat-row"><span class="name">' + STAT_NAMES[i] + '</span><div class="track"><div class="fill" style="width:' + v + '%"></div></div><span class="val">' + v + "</span></div>";
         });
         $("r-stats").innerHTML = sh;
-        var ch = '<p class="result-desc" style="margin:12px 0 6px">💬 단톡방 반응</p>';
-        r.chat.forEach(function (t) { ch += '<div class="bubble">' + t + "</div>"; });
+        var ch = '<p class="result-desc" style="margin:12px 0 6px">' + tr("💬 단톡방 반응") + '</p>';
+        r.chat.forEach(function (b) { ch += '<div class="bubble">' + tr(b) + "</div>"; });
         $("r-chat").innerHTML = ch;
         if (setHash) history.replaceState(null, "", "#" + type);
         show("result");
@@ -397,7 +399,7 @@
         g.fillText("✦", 96, 200); g.fillText("✦", W - 90, 660); g.fillText("✧", W - 120, 160); g.fillText("✧", 110, 700);
         g.restore();
         // 상단 네온 pill 배지
-        var badge = "대환장 상황극 MBTI";
+        var badge = tr("대환장 상황극 MBTI");
         g.font = "30px 'Jua', 'Malgun Gothic', sans-serif";
         var bw = g.measureText(badge).width + 56;
         g.save(); g.shadowColor = neon; g.shadowBlur = 16; g.strokeStyle = neon; g.lineWidth = 3;
@@ -415,11 +417,11 @@
         // 타이틀 — 핑크 글로우
         g.font = "42px 'Jua', 'Malgun Gothic', sans-serif"; g.fillStyle = "#ffffff";
         g.save(); g.shadowColor = "#ff6ec7"; g.shadowBlur = 22;
-        g.fillText(r.title, W / 2, 712);
+        g.fillText(tr(r.title), W / 2, 712);
         g.restore();
         // 밈 타이틀 줄바꿈 — 연보라
         g.font = "30px 'Jua', 'Malgun Gothic', sans-serif"; g.fillStyle = "#cdbdf6";
-        var words = r.memeTitle.split(" ");
+        var words = tr(r.memeTitle).split(" ");
         var lines = [], line = "";
         words.forEach(function (w) {
           var t = line ? line + " " + w : w;
