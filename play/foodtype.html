@@ -36,6 +36,7 @@
   <script src="js/feed.js?v=14"></script>
   <script src="js/quiz.js?v=6"></script>
   <script src="js/sharecard.js?v=3"></script>
+  <script src="js/i18n-foodtype.js?v=1"></script>
   <script>
     var TYPES = {
       mala:       { emoji:"🌶️", name:"화끈 중독성 마라탕형", short:"마라탕", tag:"인생은 맵기 3단계부터", rate:91, side:"후식 탕후루 (마라탕후루 풀코스)",
@@ -116,26 +117,27 @@
       var key = Quiz.top(totals, ORDER);
       var r = TYPES[key];
       var fr = TYPES[r.match], en = TYPES[r.clash];
+      var t = window.GoblubI18n ? GoblubI18n.t : function (s) { return s; };
       el.innerHTML =
         '<span class="result-emoji">' + r.emoji + "</span>" +
         '<p class="result-name">' + r.name + "</p>" +
-        '<p class="fd-tag">“' + r.tag + '”</p>' +
+        '<p class="fd-tag">“' + t(r.tag) + '”</p>' +
         '<div class="fd-rate"><span>재주문율</span>' +
           '<div class="fd-bar"><i style="width:' + r.rate + '%"></i></div><b>' + r.rate + '%</b></div>' +
         '<p class="result-desc">' + r.desc + "</p>" +
         '<ul class="fd-traits">' + r.traits.map(function (t) { return "<li>" + t + "</li>"; }).join("") + '</ul>' +
-        '<p class="fd-item">🥢 소울 사이드 — <b>' + r.side + '</b></p>' +
+        '<p class="fd-item">🥢 소울 사이드 — <b>' + t(r.side) + '</b></p>' +
         '<div class="fd-chemi">' +
-          '<span>🤝 최고의 밥약 짝꿍 <b>' + fr.emoji + ' ' + fr.short + '</b></span>' +
-          '<span>💥 같이 시키면 대참사 <b>' + en.emoji + ' ' + en.short + '</b></span>' +
+          '<span>🤝 최고의 밥약 짝꿍 <b>' + fr.emoji + ' ' + t(fr.short) + '</b></span>' +
+          '<span>💥 같이 시키면 대참사 <b>' + en.emoji + ' ' + t(en.short) + '</b></span>' +
         '</div>' +
         '<div id="card-slot"></div>' +
         '<div class="result-actions">' +
         '<button class="btn-primary" id="qz-retry">다시하기</button>' +
         '<button class="btn-ghost" id="qz-share">링크 복사</button></div>';
       el.querySelector("#card-slot").appendChild(ShareCard.render({
-        palette: "orange", emoji: r.emoji, badge: "음식형 인간", title: r.name,
-        lines: ["“" + r.tag + "”", "재주문율 " + r.rate + "%", "소울 사이드: " + r.side]
+        palette: "orange", emoji: r.emoji, badge: t("음식형 인간"), title: t(r.name),
+        lines: ["“" + t(r.tag) + "”", t("재주문율") + " " + r.rate + "%", t("소울 사이드:") + " " + t(r.side)]
       }));
       el.querySelector("#qz-retry").onclick = api.restart;
       el.querySelector("#qz-share").onclick = function () { api.shareLink(el.querySelector("#qz-share")); };

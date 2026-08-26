@@ -36,6 +36,7 @@
   <script src="js/feed.js?v=14"></script>
   <script src="js/quiz.js?v=6"></script>
   <script src="js/sharecard.js?v=3"></script>
+  <script src="js/i18n-chatroom.js?v=1"></script>
   <script>
     var TYPES = {
       dobae:  { emoji:"🌊", name:"새벽 감성 도배왕", short:"도배왕", tag:"답장 안 와도 나는 보낸다", share:68, reply:"3초 (자다가도 답장 옴)",
@@ -116,26 +117,27 @@
       var key = Quiz.top(totals, ORDER);
       var r = TYPES[key];
       var fr = TYPES[r.match], en = TYPES[r.clash];
+      var t = window.GoblubI18n ? GoblubI18n.t : function (s) { return s; };
       el.innerHTML =
         '<span class="result-emoji">' + r.emoji + "</span>" +
         '<p class="result-name">' + r.name + "</p>" +
-        '<p class="ct-tag">“' + r.tag + '”</p>' +
+        '<p class="ct-tag">“' + t(r.tag) + '”</p>' +
         '<div class="ct-share"><span>단톡방 지분율</span>' +
           '<div class="ct-bar"><i style="width:' + r.share + '%"></i></div><b>' + r.share + '%</b></div>' +
         '<p class="result-desc">' + r.desc + "</p>" +
         '<ul class="ct-traits">' + r.traits.map(function (t) { return "<li>" + t + "</li>"; }).join("") + '</ul>' +
-        '<p class="ct-item">📱 평균 답장 속도 — <b>' + r.reply + '</b></p>' +
+        '<p class="ct-item">📱 평균 답장 속도 — <b>' + t(r.reply) + '</b></p>' +
         '<div class="ct-chemi">' +
-          '<span>🤝 같은 방 최고 케미 <b>' + fr.emoji + ' ' + fr.short + '</b></span>' +
-          '<span>💥 만나면 대환장 <b>' + en.emoji + ' ' + en.short + '</b></span>' +
+          '<span>🤝 같은 방 최고 케미 <b>' + fr.emoji + ' ' + t(fr.short) + '</b></span>' +
+          '<span>💥 만나면 대환장 <b>' + en.emoji + ' ' + t(en.short) + '</b></span>' +
         '</div>' +
         '<div id="card-slot"></div>' +
         '<div class="result-actions">' +
         '<button class="btn-primary" id="qz-retry">다시하기</button>' +
         '<button class="btn-ghost" id="qz-share">링크 복사</button></div>';
       el.querySelector("#card-slot").appendChild(ShareCard.render({
-        palette: "sky", emoji: r.emoji, badge: "단톡방 캐릭터", title: r.name,
-        lines: ["“" + r.tag + "”", "단톡방 지분율 " + r.share + "%", "답장 속도: " + r.reply]
+        palette: "sky", emoji: r.emoji, badge: t("단톡방 캐릭터"), title: t(r.name),
+        lines: ["“" + t(r.tag) + "”", t("단톡방 지분율") + " " + r.share + "%", t("답장 속도:") + " " + t(r.reply)]
       }));
       el.querySelector("#qz-retry").onclick = api.restart;
       el.querySelector("#qz-share").onclick = function () { api.shareLink(el.querySelector("#qz-share")); };
