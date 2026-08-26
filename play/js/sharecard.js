@@ -131,7 +131,8 @@
     paint();
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(paint); // Jua 로드 후 재렌더
     var actions = document.createElement("div"); actions.className = "result-actions";
-    var btn = document.createElement("button"); btn.className = "btn-primary"; btn.textContent = "🖼 결과 짤 저장";
+    var btn = document.createElement("button"); btn.className = "btn-primary";
+    btn.textContent = window.GoblubI18n ? GoblubI18n.t("🖼 결과 짤 저장") : "🖼 결과 짤 저장";
     btn.onclick = function () { save(canvas, spec.title || "goblub"); };
     actions.appendChild(btn);
     wrap.appendChild(canvas); wrap.appendChild(actions);

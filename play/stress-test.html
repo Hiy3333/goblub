@@ -37,8 +37,9 @@
   <script src="../js/common.js?v=26" data-root=".."></script>
   <script src="js/feed.js?v=14"></script>
   <script src="js/quiz.js?v=6"></script>
-  <script src="js/sharecard.js?v=2"></script>
+  <script src="js/sharecard.js?v=3"></script>
   <script src="js/goblub-art.js"></script>
+  <script src="js/i18n-stress.js?v=1"></script>
   <script>
     var MONS = {
       pokbal:{emoji:"🌋",name:"즉발화산몬",tag:"참을 인? 그게 뭔데 먹는 건가",
@@ -131,15 +132,17 @@
       var key = Quiz.top(totals, MORDER), r = MONS[key];
       if (window.GoblubFeed && GoblubFeed.record) GoblubFeed.record("stress", { emoji: r.emoji, title: r.name });
       var fr=MONS[r.friend], en=MONS[r.enemy];
+      var t = window.GoblubI18n ? GoblubI18n.t : function (s) { return s; };
+      var isKo = !window.GoblubI18n || GoblubI18n.lang === "ko";
       el.innerHTML =
         '<span class="result-emoji">'+r.emoji+'</span>'+
-        '<p class="result-name">스트레스 받으면… '+r.name+' 변신!</p>'+
-        '<p class="mon-tag">“'+r.tag+'”</p>'+
+        '<p class="result-name">' + (isKo ? ('스트레스 받으면… '+r.name+' 변신!') : (t('나의 스트레스 몬스터')+': '+t(r.name)+'!')) + '</p>'+
+        '<p class="mon-tag">“'+t(r.tag)+'”</p>'+
         '<p class="result-desc">'+r.desc+'</p>'+
         '<ul class="mon-traits">'+r.traits.map(function(t){return "<li>"+t+"</li>";}).join("")+'</ul>'+
         '<div class="mon-chemi">'+
-          '<span>🤝 최고의 케미 <b>'+fr.emoji+' '+fr.name+'</b></span>'+
-          '<span>💥 만나면 대환장 <b>'+en.emoji+' '+en.name+'</b></span>'+
+          '<span>🤝 최고의 케미 <b>'+fr.emoji+' '+t(fr.name)+'</b></span>'+
+          '<span>💥 만나면 대환장 <b>'+en.emoji+' '+t(en.name)+'</b></span>'+
         '</div>'+
         '<div class="mon-stage"><span class="mon-emoji" id="mon">'+r.emoji+'</span></div>'+
         '<div class="result-actions"><button class="btn-primary" id="summon">🌀 고브럽 소환 — 이 몬스터 먹어치우기</button></div>'+
@@ -161,11 +164,11 @@
         setTimeout(function(){ el.querySelector("#mon").classList.add("eaten"); }, 500);
         setTimeout(function(){
           gob.classList.remove("chew");
-          el.querySelector("#cure").textContent = "🌟 "+r.cure;
+          el.querySelector("#cure").textContent = "🌟 "+t(r.cure);
           el.querySelector("#after").style.display="block";
           el.querySelector("#card-slot").appendChild(ShareCard.render({
-            palette:"yellow", emoji:r.emoji, badge:"나의 스트레스 몬스터", title:r.name,
-            lines:["“"+r.tag+"”", r.traits[0], r.cure]
+            palette:"yellow", emoji:r.emoji, badge:t("나의 스트레스 몬스터"), title:t(r.name),
+            lines:["“"+t(r.tag)+"”", t(r.traits[0]), t(r.cure)]
           }));
           el.querySelector("#qz-retry").onclick=api.restart;
           el.querySelector("#qz-share").onclick=function(){ api.shareLink(el.querySelector("#qz-share")); };
