@@ -364,10 +364,13 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
 <script src="js/astro.js?v=1"></script>
 <script src="js/lunar.js?v=1"></script>
 <script src="js/stars.js?v=2"></script>
+<script src="js/i18n-gunghap.js?v=1"></script>
+<script src="js/i18n-stars.js?v=1"></script>
 <script src="js/dosa.js?v=3"></script>
 <script src="js/feed.js?v=14"></script>
 <script>
 var $=function(id){return document.getElementById(id);};
+var tr=window.GoblubI18n?GoblubI18n.t:function(s){return s;};
 var scIntro=$("scIntro"), scOwl=$("scOwl"), scSky=$("scSky"), cv=$("cv"), ctx=cv.getContext("2d");
 var data=null, last=null, star=null, anim=null;
 var OWL_FLY="img/stars/owl-fly.mp4", OWL_LOOK="img/stars/owl-look.mp4";
@@ -377,11 +380,11 @@ try{ fetch(OWL_FLY).catch(function(){}); fetch(OWL_LOOK).catch(function(){}); }c
 /* ── 입력 ── */
 function fillSelects(p){
   var y=$(p+"-year"), m=$(p+"-month"), d=$(p+"-day"), h=$(p+"-hour"), c=$(p+"-cal"), now=new Date().getFullYear();
-  c.add(new Option("양력","")); c.add(new Option("음력","L")); c.add(new Option("음력 윤달","LL"));
-  for(var i=now;i>=1930;i--) y.add(new Option(i+"년", i));
-  for(var j=1;j<=12;j++) m.add(new Option(j+"월", j));
-  for(var k=1;k<=31;k++) d.add(new Option(k+"일", k));
-  for(var t=0;t<24;t++) h.add(new Option(("0"+t).slice(-2)+"시", t));
+  c.add(new Option(tr("양력"),"")); c.add(new Option(tr("음력"),"L")); c.add(new Option(tr("음력 윤달"),"LL"));
+  for(var i=now;i>=1930;i--) y.add(new Option(tr("{N}년").replace("{N}",i), i));
+  for(var j=1;j<=12;j++) m.add(new Option(tr("{N}월").replace("{N}",j), j));
+  for(var k=1;k<=31;k++) d.add(new Option(tr("{N}일").replace("{N}",k), k));
+  for(var t=0;t<24;t++) h.add(new Option(tr("{N}시").replace("{N}",("0"+t).slice(-2)), t));
   y.value=1995; m.value=1; d.value=1;
 }
 fillSelects("a"); fillSelects("b");
@@ -465,19 +468,19 @@ function showErr(msg){ var e=$("err"); e.textContent=msg; e.style.display="block
 
 fetch("data/saju-terms.json").then(function(r){ if(!r.ok) throw 0; return r.json(); })
   .then(function(d){ data=d; })
-  .catch(function(){ showErr("성도를 못 펼쳤어요. 새로고침 해주세요."); });
+  .catch(function(){ showErr(tr("성도를 못 펼쳤어요. 새로고침 해주세요.")); });
 
 $("btn-go").onclick=function(){
   $("err").style.display="none";
-  if(!data){ showErr("성도를 못 펼쳤어요. 새로고침 해주세요."); return; }
+  if(!data){ showErr(tr("성도를 못 펼쳤어요. 새로고침 해주세요.")); return; }
   if(!relSel){
-    showErr("지금 어떤 사이인지 먼저 골라 주세요!");
+    showErr(tr("지금 어떤 사이인지 먼저 골라 주세요!"));
     var rr=$("rel-row"); rr.classList.remove("shake"); void rr.offsetWidth; rr.classList.add("shake");
     if(rr.scrollIntoView) rr.scrollIntoView({behavior:"smooth", block:"center"});
     return;
   }
   var ba=readBirth("a"), bb=readBirth("b");
-  if(!ba||!bb){ showErr("없는 날짜가 있어요. 다시 확인해 주세요!"); return; }
+  if(!ba||!bb){ showErr(tr("없는 날짜가 있어요. 다시 확인해 주세요!")); return; }
   var rA=Saju.compute(data,ba,{trueSolar:true}), rB=Saju.compute(data,bb,{trueSolar:true});
   var s=Gunghap.score(rA,rB);
   last={rA:rA,rB:rB,ba:ba,bb:bb,s:s,rel:relSel};
@@ -547,14 +550,14 @@ function playOwl(){
   askBtn.onclick=function(){
     if(confirmed) return; confirmed=true;
     ask.style.display="none";
-    cap.textContent="부엉이가 관측 언덕으로 출발했습니다…";
+    cap.textContent=tr("부엉이가 관측 언덕으로 출발했습니다…");
     var p=v.play(); if(p&&p.catch) p.catch(function(){});
     setTimeout(toSky, 16000);                          // 전체 상한은 확인 뒤부터
   };
-  playClip(OWL_FLY, "부엉이가 신청서를 확인하는 중…", function(){
+  playClip(OWL_FLY, tr("부엉이가 신청서를 확인하는 중…"), function(){
     if(stepped) return; stepped=true;
     v.ontimeupdate=null; ask.style.display="none";
-    playClip(OWL_LOOK, "망원경을 두 분의 하늘에 맞추는 중…", toSky);
+    playClip(OWL_LOOK, tr("망원경을 두 분의 하늘에 맞추는 중…"), toSky);
   });
   // 팝업 전에 영상이 죽으면 playClip의 폴백(onerror·6초 미시작)이 알아서 진행한다
 }
@@ -719,7 +722,7 @@ function drawSky(t, withPlate){
   var np=clamp((t-lastLink-100)/700);
   if(np>0 || withPlate){
     var a=withPlate?1:np;
-    var nm=(star.naming && last && last.customName) ? last.customName : star.name;
+    var nm=(star.naming && last && last.customName) ? last.customName : tr(star.name);
     ctx.save(); ctx.globalAlpha=a; ctx.textAlign="center";
     var oy=H-80*S;
     ctx.strokeStyle="rgba(214,228,248,.35)"; ctx.lineWidth=1*S;
@@ -763,7 +766,7 @@ function reveal(){
   scIntro.classList.remove("on"); scSky.classList.add("on");
   window.scrollTo(0,0);
   BACK=null;                                  // 새 관측마다 배경판을 새로 그린다
-  $("skycap").textContent="🦉 부엉이가 별을 잇는 중…";
+  $("skycap").textContent=tr("🦉 부엉이가 별을 잇는 중…");
   $("skycap").classList.add("on");
   $("panel").classList.remove("on");
   var t0=Date.now(), done=false;
@@ -780,11 +783,11 @@ function reveal(){
 // 달 위상을 문장으로
 function phaseLine(c){
   var p=c.phase;
-  if(p.illum>=97) return p.emo+" 달이 꽉 찬 보름밤에 태어났어요";
+  if(p.illum>=97) return tr("{E} 달이 꽉 찬 보름밤에 태어났어요").replace("{E}",p.emo);
   // 위상명이 "삭"이면 달이 안 보이는 밤 — "~이 뜬 밤"이라고 쓰면 모순이 된다
   if(p.illum<=6 || p.name.indexOf("삭")===0)
-    return p.emo+" 달이 숨은 캄캄한 밤에 태어났어요";
-  return p.emo+" "+p.name+"이 뜬 밤 · 달빛 "+p.illum+"%";
+    return tr("{E} 달이 숨은 캄캄한 밤에 태어났어요").replace("{E}",p.emo);
+  return tr("{E} {P}이 뜬 밤 · 달빛 {L}%").replace("{E}",p.emo).replace("{P}",tr(p.name)).replace("{L}",p.illum);
 }
 // ── 어스펙트 결과지 — 행성 조합마다 고유한 장면, 각도마다 다른 맛 ──
 // 태그: 합=겹침🌟 육각=순풍🍃 사각=스파크⚡ 삼각=찰떡🧩 대극=자석🧲
@@ -847,18 +850,18 @@ function aspDomain(pa,pb){
 function renderAstro(){
   var box=$("r-astro");
   if(!last.astA || !last.asp || !last.asp.length){ box.style.display="none"; return; }
-  var h='<h4>💥 우리 케미 포인트</h4>'+
-    '<p class="lead">두 사람이 태어난 날, 실제 하늘에서 찾아낸 케미예요.</p>';
+  var h='<h4>'+tr("💥 우리 케미 포인트")+'</h4>'+
+    '<p class="lead">'+tr("두 사람이 태어난 날, 실제 하늘에서 찾아낸 케미예요.")+'</p>';
   var seen={};
   last.asp.forEach(function(a){
     var dk=[a.pa,a.pb].sort().join("-")+"|"+a.type;   // 거울 조합(금성×화성 ↔ 화성×금성) 중복 카드 방지
     if(seen[dk]) return; seen[dk]=1;
     var dom=aspDomain(a.pa,a.pb), tag=ASP_TAG[a.type]||["✨",a.type];
-    h+='<div class="aspcard"><b>'+tag[0]+' '+dom.nm+' <em>'+tag[1]+'</em></b>'+
-       '<p>'+(dom.t[a.type]||a.feel)+'</p></div>';
+    h+='<div class="aspcard"><b>'+tag[0]+' '+tr(dom.nm)+' <em>'+tr(tag[1])+'</em></b>'+
+       '<p>'+tr(dom.t[a.type]||a.feel)+'</p></div>';
   });
-  h+='<div class="foot">실제 천문 계산으로 찾은 그날의 별 배치예요'+
-     (last.astA.asc&&last.astB.asc?'':' · 태어난 시각까지 적으면 더 정확해져요')+'</div>';
+  h+='<div class="foot">'+tr("실제 천문 계산으로 찾은 그날의 별 배치예요")+
+     (last.astA.asc&&last.astB.asc?'':tr(" · 태어난 시각까지 적으면 더 정확해져요"))+'</div>';
   box.innerHTML=h; box.style.display="block";
 }
 
@@ -917,18 +920,18 @@ function chemTags(){
 }
 function profCard(who,c){
   return '<div class="prof"><b>'+who+'</b>'+
-    '<p>☀️ <i>'+c.signs.sun.ko+'</i> · '+(SIGN_SHORT[c.signs.sun.ko]||"")+' <s>— 겉모습</s></p>'+
-    '<p>🌙 <i>'+c.signs.moon.ko+'</i> · '+(SIGN_SHORT[c.signs.moon.ko]||"")+' <s>— 찐 속마음</s></p>'+
-    '<p>💗 <i>'+c.signs.venus.ko+'</i> · '+(SIGN_SHORT[c.signs.venus.ko]||"")+' <s>— 연애 스타일</s></p>'+
+    '<p>☀️ <i>'+tr(c.signs.sun.ko)+'</i> · '+tr(SIGN_SHORT[c.signs.sun.ko]||"")+' <s>'+tr("— 겉모습")+'</s></p>'+
+    '<p>🌙 <i>'+tr(c.signs.moon.ko)+'</i> · '+tr(SIGN_SHORT[c.signs.moon.ko]||"")+' <s>'+tr("— 찐 속마음")+'</s></p>'+
+    '<p>💗 <i>'+tr(c.signs.venus.ko)+'</i> · '+tr(SIGN_SHORT[c.signs.venus.ko]||"")+' <s>'+tr("— 연애 스타일")+'</s></p>'+
     '<p class="ph">'+phaseLine(c)+'</p></div>';
 }
 function fillPanel(){
   var s=last.s;
-  $("r-name").textContent=star.name;
-  $("r-sub").textContent=star.sub;
-  $("r-chem").textContent=GRADE_BADGE[s.grade]||s.grade;
-  $("r-desc").textContent=star.desc;
-  $("r-care").textContent=star.care;
+  $("r-name").textContent=tr(star.name);
+  $("r-sub").textContent=tr(star.sub);
+  $("r-chem").textContent=tr(GRADE_BADGE[s.grade]||s.grade);
+  $("r-desc").textContent=tr(star.desc);
+  $("r-care").textContent=tr(star.care);
 
   // 케미 지수 카운트업
   (function(){
@@ -938,24 +941,24 @@ function fillPanel(){
       if(p<1) requestAnimationFrame(up); })();
   })();
 
-  $("r-tags").innerHTML=chemTags().map(function(t){ return '<span class="tag">'+t+'</span>'; }).join("");
+  $("r-tags").innerHTML=chemTags().map(function(t){ return '<span class="tag">'+tr(t)+'</span>'; }).join("");
 
   var stats=chemStats();
   $("r-stats").innerHTML=stats.map(function(st){
-    return '<div class="strow"><span class="k">'+st.e+' '+st.k+'</span>'+
+    return '<div class="strow"><span class="k">'+st.e+' '+tr(st.k)+'</span>'+
       '<span class="bar"><i data-w="'+st.v+'"></i></span><span class="v">'+st.v+'%</span></div>';
   }).join("");
   setTimeout(function(){
     document.querySelectorAll("#r-stats .bar i").forEach(function(b){ b.style.width=b.dataset.w+"%"; });
   }, 60);
 
-  $("r-warnhd").textContent={ couple:"🚨 싸움 나는 포인트 미리보기",
-    some:"🚨 애매해질 수 있는 포인트", crush:"🚨 삐끗하기 쉬운 포인트" }[last.rel||"couple"];
+  $("r-warnhd").textContent=tr({ couple:"🚨 싸움 나는 포인트 미리보기",
+    some:"🚨 애매해질 수 있는 포인트", crush:"🚨 삐끗하기 쉬운 포인트" }[last.rel||"couple"]);
 
   if(last.astA&&last.astB){
     var bEmo={couple:"😍",some:"👀",crush:"🫣"}[last.rel||"couple"];
     $("r-profs").style.display="";
-    $("r-profs").innerHTML=profCard("😎 나",last.astA)+profCard(bEmo+" 그 사람",last.astB);
+    $("r-profs").innerHTML=profCard(tr("😎 나"),last.astA)+profCard(bEmo+" "+tr("그 사람"),last.astB);
   } else $("r-profs").style.display="none";
 
   renderAstro();
@@ -967,7 +970,7 @@ function fillPanel(){
     inp.value="";
     inp.oninput=function(){
       last.customName=inp.value.trim();
-      $("r-name").textContent=last.customName || star.name;
+      $("r-name").textContent=last.customName || tr(star.name);
     };
   }
 
@@ -985,10 +988,10 @@ $("btn-save").onclick=function(){
   p.drawImage(cv,0,0);
   p.textAlign="center"; p.fillStyle="#7d93ad";
   p.font=(18*S)+"px Jua, 'Malgun Gothic', sans-serif";
-  p.fillText(star.mag+"등성 · "+star.obsText, plate.width/2, cv.height+27*S);
+  p.fillText(tr("{M}등성 · {O}").replace("{M}",star.mag).replace("{O}",(function(){var o=star.obs;if(!o)return star.obsText;var mid=o.dir==="하늘 한가운데";return tr(mid?"{S} {H}, 하늘 한가운데에서 가장 높이 뜹니다":"{S} {H}, {D} 하늘에서 가장 높이 뜹니다").replace("{S}",tr(o.season)).replace("{H}",tr(o.hour)).replace("{D}",tr(o.dir));})()), plate.width/2, cv.height+27*S);
   p.fillStyle="#5d738d";
   p.font=(15*S)+"px Jua, 'Malgun Gothic', sans-serif";
-  p.fillText("goblub · 부엉이 별자리 궁합", plate.width/2, cv.height+55*S);
+  p.fillText(tr("goblub · 부엉이 별자리 궁합"), plate.width/2, cv.height+55*S);
   var a=document.createElement("a");
   a.download="goblub-우리별자리.png";
   a.href=plate.toDataURL("image/png"); a.click();
@@ -1001,7 +1004,7 @@ $("btn-retry").onclick=function(){
   $("st-text").style.display="none"; $("st-status").style.display="none";
   $("btn-report").disabled=false;
   // 부엉이는 이미 깨어 있으니 마지막(초롱초롱) 프레임 그대로 두고, 말풍선만 새로
-  $("owl-say").innerHTML="다른 분들의 하늘도 봐 줄게! 🌟<br /><b>생년월일을 적어 줘!</b>";
+  $("owl-say").innerHTML=tr("다른 분들의 하늘도 봐 줄게! 🌟")+"<br /><b>"+tr("생년월일을 적어 줘!")+"</b>";
   window.scrollTo(0,0);
 };
 
@@ -1009,7 +1012,7 @@ $("btn-retry").onclick=function(){
 $("btn-report").onclick=function(){
   if(!last) return;
   var btn=this, txt=$("st-text"), st=$("st-status");
-  btn.disabled=true; st.style.display="block"; st.textContent="🔮 별지기가 둘의 하늘을 읽는 중…";
+  btn.disabled=true; st.style.display="block"; st.textContent=tr("🔮 별지기가 둘의 하늘을 읽는 중…");
   txt.style.display="block"; txt.innerHTML="";
   var acc="";
   Dosa.fetchGunghap({
@@ -1034,22 +1037,23 @@ $("btn-report").onclick=function(){
     noCache:true,   // 볼 때마다 새 리포트 — 지난 글이 되살아나지 않는다
     onChunk:function(t){ acc+=t; txt.innerHTML=fmt(acc); },
     onDone:function(){ txt.innerHTML=fmt(acc);
-      st.textContent="🔮 리포트 끝! 캡처해서 공유해 보세요."; },
+      st.textContent=tr("🔮 리포트 끝! 캡처해서 공유해 보세요."); },
     onError:function(code,sec){
       txt.style.display="none";
-      st.textContent = code==="not_configured" ? "관측소가 아직 문을 열지 않았어요. 곧 엽니다!" :
-        code==="cooldown" ? "렌즈에 김이 서렸어요… "+sec+"초 뒤에 다시 불러 주세요." :
-        "지금 관측 신청이 많아요. 잠시 후 다시 시도해 주세요.";
+      st.textContent = code==="not_configured" ? tr("관측소가 아직 문을 열지 않았어요. 곧 엽니다!") :
+        code==="cooldown" ? tr("렌즈에 김이 서렸어요…")+" "+sec+tr("초 뒤에 다시 불러 주세요.") :
+        tr("지금 관측 신청이 많아요. 잠시 후 다시 시도해 주세요.");
       btn.disabled=false;
     }
   });
 };
 function fmt(s){
   var out=s.replace(/</g,"&lt;");
-  ["✦ 처음 끌린 이유","✦ 심장이 가장 빨리 뛰는 순간","✦ 구름이 끼는 날 — 이렇게 다툰다","✦ 다시 반짝이는 법",
+  var subs=["✦ 처음 끌린 이유","✦ 심장이 가장 빨리 뛰는 순간","✦ 구름이 끼는 날 — 이렇게 다툰다","✦ 다시 반짝이는 법",
    "✦ 지금 이 기류의 정체","✦ 상대도 흔들리고 있다는 신호","✦ 조심해야 할 순간","✦ 썸에서 연애로 넘어가는 법",
    "✦ 내가 끌린 진짜 이유","✦ 그 사람은 이런 사람","✦ 통하는 다가가기","✦ 마음을 전한다면",
-   "✦ 오늘 밤의 처방"].forEach(function(h){
+   "✦ 오늘 밤의 처방"];
+  subs.concat(subs.map(tr).filter(function(x){return subs.indexOf(x)<0;})).forEach(function(h){
     out=out.replace(h,'<span class="hd">'+h+'</span>');
   });
   return out;
