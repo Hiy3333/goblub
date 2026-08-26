@@ -25,6 +25,7 @@
   <script src="js/feed.js?v=14"></script>
   <script src="js/quiz.js?v=6"></script>
   <script src="js/sharecard.js?v=3"></script>
+  <script src="js/i18n-love.js?v=1"></script>
   <script>
     var CELLS = {
       mildang:  { emoji:"🎭", name:"밀당세포 우세형", short:"밀당세포", tags:["밀당의고수","여유로운척","답장은계산","티안내기달인"], desc:"좋아하면서도 절대 티 안 내죠. 여유로운 미소 뒤에서 답장 타이밍을 계산하는 당신… 근데 상대도 밀당 중이면 둘 다 평생 썸만 탑니다.", match:"tsundere", clash:"jikjin" },
@@ -120,21 +121,22 @@
     // setHash=true 는 방금 푼 사람, false 는 공유 링크로 결과만 보러 온 사람.
     function showCell(key, el, api, setHash) {
       var r = CELLS[key];
-      var tagsHtml = '<div class="tags">' + r.tags.map(function (t) { return '<span class="tag">#' + t + '</span>'; }).join("") + '</div>';
+      var t = window.GoblubI18n ? GoblubI18n.t : function (s) { return s; };
+      var tagsHtml = '<div class="tags">' + r.tags.map(function (tg) { return '<span class="tag">#' + t(tg) + '</span>'; }).join("") + '</div>';
 
       el.innerHTML =
         '<span class="result-emoji">' + r.emoji + "</span>" +
         '<p class="result-name">' + r.name + "</p>" +
         '<p class="result-desc">' + r.desc + "</p>" + tagsHtml +
-        '<p class="match-line">💞 환상의 짝꿍세포: <b>' + CELLS[r.match].short + "</b> &nbsp;·&nbsp; ⚡ 상극세포: <b>" + CELLS[r.clash].short + "</b></p>" +
+        '<p class="match-line">' + t("💞 환상의 짝꿍세포:") + ' <b>' + t(CELLS[r.match].short) + "</b> &nbsp;·&nbsp; " + t("⚡ 상극세포:") + ' <b>' + t(CELLS[r.clash].short) + "</b></p>" +
         '<div id="card-slot"></div>' +
         '<div class="result-actions">' +
         '<button class="btn-primary" id="qz-retry">다시하기</button>' +
         '<button class="btn-ghost" id="qz-share">링크 복사</button></div>';
 
       el.querySelector("#card-slot").appendChild(ShareCard.render({
-        palette: "coral", emoji: r.emoji, badge: "연애세포 테스트 결과", title: r.name,
-        lines: [r.desc, "#" + r.tags.slice(0, 3).join(" #")]
+        palette: "coral", emoji: r.emoji, badge: t("연애세포 테스트 결과"), title: t(r.name),
+        lines: [t(r.desc), "#" + r.tags.slice(0, 3).map(t).join(" #")]
       }));
       if (setHash) history.replaceState(null, "", location.pathname + "#" + key);
       el.querySelector("#qz-retry").onclick = function () {
@@ -145,6 +147,7 @@
       // location.href 를 쓰므로 해시를 먼저 붙여두면 그대로 실려 나간다.
       el.querySelector("#qz-share").onclick = function () { api.shareLink(el.querySelector("#qz-share")); };
       // 남의 결과를 열어본 것뿐이니 내 프로필 카드에 기록하면 안 된다.
+      if (window.GoblubI18n) GoblubI18n.apply(el);
       if (setHash && window.GoblubFeed && GoblubFeed.record) {
         GoblubFeed.record("love", { emoji: r.emoji, title: (r.short || r.name), tags: r.tags });
       }

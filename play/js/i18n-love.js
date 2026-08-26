@@ -1,0 +1,131 @@
+// 연애세포 테스트 — 언어팩 [en, es, id, ja, th, zh, tw]
+(function () {
+  if (!window.GoblubI18n) return;
+  GoblubI18n.add({
+    "연애세포 테스트": ["Love Cell Test", "Test de células del amor", "Tes Sel Cinta", "恋愛細胞テスト", "เทสต์เซลล์ความรัก", "恋爱细胞测试", "戀愛細胞測試"],
+    "당신의 연애를 좌우하는 6가지 세포. 12가지 상황 속 선택으로 내 안의 우세 세포를 찾아봐요!": ["Six cells rule your love life. Find your dominant cell through choices in 12 situations!", "Seis células rigen tu vida amorosa. ¡Descubre tu célula dominante en 12 situaciones!", "Enam sel menguasai kisah cintamu. Temukan sel dominanmu lewat pilihan di 12 situasi!", "あなたの恋愛を左右する6つの細胞。12のシチュエーションの選択で優勢細胞を探そう！", "เซลล์ 6 ชนิดที่กุมชะตารักของคุณ ค้นหาเซลล์เด่นผ่านการเลือกใน 12 สถานการณ์!", "左右你恋爱的6种细胞。通过12个情境的选择找出你的优势细胞！", "左右你戀愛的6種細胞。通過12個情境的選擇找出你的優勢細胞！"],
+    "연애세포 테스트 결과": ["Love Cell Test Result", "Resultado del test", "Hasil Tes Sel Cinta", "恋愛細胞テスト結果", "ผลเทสต์เซลล์ความรัก", "恋爱细胞测试结果", "戀愛細胞測試結果"],
+    "💞 환상의 짝꿍세포:": ["💞 Perfect partner cell:", "💞 Célula pareja ideal:", "💞 Sel pasangan sempurna:", "💞 相性抜群の細胞:", "💞 เซลล์คู่แท้:", "💞 天作之合细胞:", "💞 天作之合細胞:"],
+    "⚡ 상극세포:": ["⚡ Clashing cell:", "⚡ Célula incompatible:", "⚡ Sel musuh bebuyutan:", "⚡ 相性最悪の細胞:", "⚡ เซลล์ขั้วตรงข้าม:", "⚡ 相克细胞:", "⚡ 相剋細胞:"],
+
+    "밀당세포 우세형": ["Push-Pull Cell Dominant", "Dominio de la célula del tira y afloja", "Dominan Sel Tarik-Ulur", "駆け引き細胞優勢型", "เซลล์แกล้งเล่นตัวครองอำนาจ", "推拉细胞优势型", "推拉細胞優勢型"],
+    "밀당세포": ["Push-Pull Cell", "Célula tira-afloja", "Sel Tarik-Ulur", "駆け引き細胞", "เซลล์เล่นตัว", "推拉细胞", "推拉細胞"],
+    "좋아하면서도 절대 티 안 내죠. 여유로운 미소 뒤에서 답장 타이밍을 계산하는 당신… 근데 상대도 밀당 중이면 둘 다 평생 썸만 탑니다.": ["You like them but never show it. Behind that easy smile, you're calculating reply timing… but if they're playing push-pull too, you'll both stay in the talking stage forever.", "Te gusta pero jamás lo demuestras. Tras esa sonrisa relajada calculas cuándo responder… pero si el otro también juega, se quedarán en el coqueteo eterno.", "Suka tapi tak pernah menunjukkan. Di balik senyum santai itu kamu menghitung timing balasan… tapi kalau dia juga tarik-ulur, kalian berdua bakal PDKT selamanya.", "好きなのに絶対に態度に出さない。余裕の笑顔の裏で返信タイミングを計算するあなた…でも相手も駆け引き中なら、二人とも一生「いい感じ」止まり。", "ชอบแต่ไม่มีทางแสดงออก หลังรอยยิ้มสบาย ๆ คุณกำลังคำนวณจังหวะตอบแชท… แต่ถ้าอีกฝ่ายก็เล่นตัวเหมือนกัน ทั้งคู่ก็จะคุย ๆ กันไปทั้งชาติ", "喜欢却绝不表现。从容微笑背后你在计算回复时机…但对方也在推拉的话，你俩就一辈子停在暧昧期。", "喜歡卻絕不表現。從容微笑背後你在計算回覆時機…但對方也在推拉的話，你倆就一輩子停在曖昧期。"],
+    "밀당의고수": ["PushPullMaster", "MaestroDelTiraAfloja", "MasterTarikUlur", "駆け引きの達人", "เซียนเล่นตัว", "推拉高手", "推拉高手"],
+    "여유로운척": ["ActingChill", "FingiendoCalma", "PuraPuraSantai", "余裕なフリ", "ทำเป็นชิล", "假装从容", "假裝從容"],
+    "답장은계산": ["CalculatedReplies", "RespuestasCalculadas", "BalasPenuhHitungan", "返信は計算", "ตอบแบบคำนวณ", "回复靠计算", "回覆靠計算"],
+    "티안내기달인": ["MasterOfHidingIt", "ExpertoEnDisimular", "AhliJaim", "隠すの名人", "เก็บอาการขั้นเทพ", "藏心思大师", "藏心思大師"],
+
+    "직진세포 우세형": ["Full-Speed Cell Dominant", "Dominio de la célula directa", "Dominan Sel Gaspol", "一直線細胞優勢型", "เซลล์พุ่งตรงครองอำนาจ", "直球细胞优势型", "直球細胞優勢型"],
+    "직진세포": ["Full-Speed Cell", "Célula directa", "Sel Gaspol", "一直線細胞", "เซลล์พุ่งตรง", "直球细胞", "直球細胞"],
+    "좋으면 바로 고백, 재고 따지는 시간에 이미 손 잡고 있음. 화끈해서 좋지만 상대가 아직 준비 안 됐을 땐 혼자 앞서가다 넘어지기도 합니다.": ["Like them? Confess immediately — while others deliberate, you're already holding hands. Refreshingly bold, but when they're not ready yet, you sometimes trip by running ahead alone.", "¿Te gusta? Te declaras ya — mientras otros lo piensan, tú ya vas de la mano. Tu arrojo encanta, pero si el otro no está listo, a veces tropiezas por adelantarte.", "Suka? Langsung tembak — saat orang lain menimbang, kamu sudah gandengan. Berani itu keren, tapi kalau dia belum siap, kadang kamu jatuh karena lari sendirian di depan.", "好きならすぐ告白、検討する時間にもう手を繋いでいる。熱くて良いが、相手の準備ができていない時は一人で先走って転ぶことも。", "ชอบปุ๊บสารภาพปั๊บ ระหว่างคนอื่นชั่งใจ คุณจับมือไปแล้ว ใจร้อนแบบนี้ดี แต่ถ้าอีกฝ่ายยังไม่พร้อม บางทีก็วิ่งนำหน้าจนล้มคนเดียว", "喜欢就立刻告白，别人还在权衡你已经牵上手了。火热固然好，但对方还没准备好时，你有时会独自冲太快摔一跤。", "喜歡就立刻告白，別人還在權衡你已經牽上手了。火熱固然好，但對方還沒準備好時，你有時會獨自衝太快摔一跤。"],
+    "좋으면돌격": ["ChargeWhenInLove", "AlAtaquePorAmor", "SukaLangsungSerbu", "好きなら突撃", "ชอบคือบุก", "喜欢就冲", "喜歡就衝"],
+    "고백선빵": ["FirstToConfess", "PrimeroEnDeclararse", "TembakDuluan", "告白は先手", "สารภาพก่อนใคร", "告白先发制人", "告白先發制人"],
+    "화끈본능": ["BoldInstinct", "InstintoArdiente", "InstingBerani", "熱血本能", "สัญชาตญาณใจร้อน", "火热本能", "火熱本能"],
+    "재고안따짐": ["NoSecondThoughts", "SinPensarloDosVeces", "TanpaMikirUlang", "在庫確認しない", "ไม่คิดหน้าคิดหลัง", "从不犹豫", "從不猶豫"],
+
+    "집착세포 우세형": ["Obsession Cell Dominant", "Dominio de la célula obsesiva", "Dominan Sel Posesif", "執着細胞優勢型", "เซลล์หมกมุ่นครองอำนาจ", "执着细胞优势型", "執著細胞優勢型"],
+    "집착세포": ["Obsession Cell", "Célula obsesiva", "Sel Posesif", "執着細胞", "เซลล์หมกมุ่น", "执着细胞", "執著細胞"],
+    "사랑하면 올인, 읽씹 3분만 넘어가도 심장이 쿵. 애정이 넘치는 건 매력이지만 가끔은 상대에게 숨 쉴 틈도 좀 줘야 오래갑니다.": ["When in love, you go all-in — three minutes of being left on read and your heart drops. Overflowing affection is charming, but giving them room to breathe is what makes it last.", "Cuando amas, apuestas todo — tres minutos en visto y el corazón se te cae. Tu cariño desbordante encanta, pero dejarle respirar es lo que hace durar la relación.", "Kalau cinta, all-in — dibiarkan read 3 menit saja jantung sudah jedar. Kasih sayang melimpah itu menarik, tapi sesekali beri dia ruang bernapas agar awet.", "愛したらオールイン、既読スルー3分で心臓がドキッ。愛情たっぷりなのは魅力だが、たまには相手に息をつく隙を与えてこそ長続きする。", "รักเมื่อไหร่ทุ่มหมดหน้าตัก โดนอ่านไม่ตอบ 3 นาทีหัวใจก็ร่วง ความรักล้นเหลือคือเสน่ห์ แต่ต้องให้อีกฝ่ายมีที่หายใจบ้างถึงจะรักกันยืด", "爱了就全押，已读不回超过3分钟心脏就咯噔。爱意满溢是魅力，但偶尔给对方喘息空间才能长久。", "愛了就全押，已讀不回超過3分鐘心臟就咯噔。愛意滿溢是魅力，但偶爾給對方喘息空間才能長久。"],
+    "사랑하면올인": ["AllInWhenInLove", "TodoPorAmor", "CintaBerartiAllIn", "愛したらオールイン", "รักคือออลอิน", "爱就全押", "愛就全押"],
+    "읽씹은고문": ["GhostingIsTorture", "ElVistoEsTortura", "DiReadItuSiksaan", "既読スルーは拷問", "อ่านไม่ตอบคือทรมาน", "已读不回是酷刑", "已讀不回是酷刑"],
+    "애정과다": ["AffectionOverload", "ExcesoDeCariño", "KelebihanKasih", "愛情過多", "ความรักเกินขนาด", "爱意过载", "愛意過載"],
+    "24시간연결": ["Connected24-7", "Conectados24-7", "Terhubung24Jam", "24時間接続", "ต่อติด24ชม", "24小时在线", "24小時在線"],
+
+    "모솔세포 우세형": ["Forever-Single Cell Dominant", "Dominio de la célula soltera", "Dominan Sel Jomblo Abadi", "恋愛経験ゼロ細胞優勢型", "เซลล์โสดตลอดกาลครองอำนาจ", "母胎单身细胞优势型", "母胎單身細胞優勢型"],
+    "모솔세포": ["Forever-Single Cell", "Célula soltera", "Sel Jomblo Abadi", "モテない細胞", "เซลล์โสด", "母单细胞", "母單細胞"],
+    "머릿속 시뮬레이션은 이미 결혼까지 갔는데 현실은 대화 시작도 못 함. 상상력 하나는 국가대표급이니 이제 실전 배치만 하면 됩니다.": ["In your head, the simulation has reached marriage — in reality, you haven't even started a conversation. Your imagination is national-team level; all that's left is field deployment.", "En tu mente la simulación ya llegó al matrimonio — en la realidad ni empezaste la charla. Tu imaginación es de selección nacional; solo falta desplegarla en el campo.", "Simulasi di kepalamu sudah sampai pernikahan — kenyataannya memulai obrolan saja belum. Imajinasimu kelas timnas; tinggal diterjunkan ke lapangan saja.", "頭の中のシミュレーションはもう結婚まで行ったのに、現実は会話も始められない。想像力だけは国家代表級だから、あとは実戦配備するだけ。", "ในหัวจำลองไปถึงงานแต่งแล้ว แต่ความจริงยังไม่ได้เริ่มคุยเลย จินตนาการระดับทีมชาติขนาดนี้ เหลือแค่เอาไปใช้สนามจริงเท่านั้น", "脑内模拟已经进行到结婚——现实中连对话都没开始。想象力是国家队水平，就差实战部署了。", "腦內模擬已經進行到結婚——現實中連對話都沒開始。想像力是國家隊水平，就差實戰部署了。"],
+    "상상은결혼까지": ["ImaginedTheWedding", "BodaImaginaria", "KhayalSampaiNikah", "妄想は結婚まで", "ฝันถึงงานแต่ง", "幻想到结婚", "幻想到結婚"],
+    "실전은0": ["ZeroFieldExperience", "CeroExperiencia", "PraktekNol", "実戦は0", "สนามจริง0", "实战为0", "實戰為0"],
+    "설렘만렙": ["MaxLevelButterflies", "MariposasAlMáximo", "DebarMaksimal", "トキメキMAX", "ใจเต้นเลเวลแม็กซ์", "心动满级", "心動滿級"],
+    "표현법몰라": ["CantExpressIt", "NoSéExpresarlo", "TakTahuCaraUngkap", "伝え方わからない", "ไม่รู้จะบอกยังไง", "不会表达", "不會表達"],
+
+    "츤데레세포 우세형": ["Tsundere Cell Dominant", "Dominio de la célula tsundere", "Dominan Sel Tsundere", "ツンデレ細胞優勢型", "เซลล์ซึนเดเระครองอำนาจ", "傲娇细胞优势型", "傲嬌細胞優勢型"],
+    "츤데레세포": ["Tsundere Cell", "Célula tsundere", "Sel Tsundere", "ツンデレ細胞", "เซลล์ซึน", "傲娇细胞", "傲嬌細胞"],
+    "좋아할수록 말이 퉁명스러워지는 신기한 회로. 본인은 '냉정한 척'이라 믿지만 주변 사람들은 이미 다 눈치챘습니다.": ["A curious circuit: the more you like someone, the blunter your words get. You believe you're 'acting cool' — everyone around you figured it out ages ago.", "Un circuito curioso: cuanto más te gusta alguien, más seco hablas. Crees que «finges frialdad» — todos a tu alrededor ya lo notaron hace tiempo.", "Sirkuit aneh: makin suka, makin ketus bicaramu. Kamu yakin sedang 'berlagak dingin' — padahal semua orang di sekitarmu sudah lama sadar.", "好きになるほど言葉がぶっきらぼうになる不思議な回路。本人は『クールなフリ』と信じているが、周りの人はとっくに全員気づいている。", "วงจรแปลก ยิ่งชอบยิ่งพูดห้วน ตัวเองเชื่อว่า 'ทำเป็นเย็นชา' แต่คนรอบข้างรู้ทันกันหมดแล้ว", "神奇回路：越喜欢说话越冲。你以为自己在「装高冷」——周围人早就全看穿了。", "神奇迴路:越喜歡說話越衝。你以為自己在「裝高冷」——周圍人早就全看穿了。"],
+    "좋아할수록퉁명": ["BlunterWhenSmitten", "MásSecoSiLeGustas", "MakinSukaMakinKetus", "好きなほどツンツン", "ยิ่งชอบยิ่งห้วน", "越喜欢越嘴硬", "越喜歡越嘴硬"],
+    "속마음은반대": ["HeartSaysOpposite", "ElCorazónDiceLoContrario", "HatiBilangSebaliknya", "本心は真逆", "ใจคิดตรงข้าม", "心口不一", "心口不一"],
+    "냉정한척": ["PretendingToBecold", "FingiendoFrialdad", "SokDingin", "冷静なフリ", "ทำเป็นเย็นชา", "假装冷静", "假裝冷靜"],
+    "다들킴": ["EveryoneKnows", "TodosLoSaben", "SemuaSudahTahu", "全部バレてる", "โป๊ะแตกหมดแล้ว", "全被看穿", "全被看穿"],
+
+    "헌신세포 우세형": ["Devotion Cell Dominant", "Dominio de la célula devota", "Dominan Sel Pengabdi", "献身細胞優勢型", "เซลล์ทุ่มเทครองอำนาจ", "奉献细胞优势型", "奉獻細胞優勢型"],
+    "헌신세포": ["Devotion Cell", "Célula devota", "Sel Pengabdi", "献身細胞", "เซลล์ทุ่มเท", "奉献细胞", "奉獻細胞"],
+    "사랑하면 다 퍼주는 타입, 상대 기념일이 내 기념일보다 중요. 마음은 참 예쁜데, 나 자신도 좀 챙기면서 사랑해도 됩니다.": ["When you love, you give everything — their anniversaries matter more than your own. Your heart is beautiful, but it's okay to love while taking care of yourself too.", "Cuando amas, lo das todo — sus fechas importan más que las tuyas. Tu corazón es hermoso, pero también puedes amar cuidándote a ti.", "Kalau cinta, semuanya diberikan — hari penting dia lebih utama daripada milikmu. Hatimu indah, tapi boleh kok mencintai sambil menjaga dirimu sendiri.", "愛したら全部あげちゃうタイプ、相手の記念日が自分の記念日より大事。心は本当に綺麗だけど、自分も大切にしながら愛していいんだよ。", "รักใครก็เทหมดใจ วันสำคัญของเขาสำคัญกว่าของตัวเอง จิตใจงดงามมาก แต่รักไปด้วยดูแลตัวเองไปด้วยก็ได้นะ", "爱了就掏心掏肺，对方的纪念日比自己的还重要。心地真美，但爱人的同时也照顾一下自己吧。", "愛了就掏心掏肺，對方的紀念日比自己的還重要。心地真美，但愛人的同時也照顧一下自己吧。"],
+    "다퍼주는사랑": ["GiveItAllLove", "AmorQueLoDaTodo", "CintaSerahkanSemua", "全部あげる愛", "รักแบบให้หมด", "倾其所有的爱", "傾其所有的愛"],
+    "상대가1순위": ["TheyComeFirst", "ElOtroPrimero", "DiaNomorSatu", "相手が最優先", "เขาคือที่หนึ่ง", "对方第一位", "對方第一位"],
+    "기념일수호신": ["AnniversaryGuardian", "GuardiánDeAniversarios", "PenjagaHariJadi", "記念日の守護神", "เทพพิทักษ์วันครบรอบ", "纪念日守护神", "紀念日守護神"],
+    "나도좀챙겨": ["CareForYourselfToo", "CuídateTúTambién", "SayangiDiriJuga", "自分も大事にして", "ดูแลตัวเองบ้าง", "也照顾下自己", "也照顧下自己"],
+
+    "💬 카톡 답장이 왔다": ["💬 A reply just arrived", "💬 Llegó una respuesta", "💬 Balasan chat datang", "💬 トークの返信が来た", "💬 มีข้อความตอบกลับมา", "💬 收到回复了", "💬 收到回覆了"],
+    "읽자마자 바로 답장": ["Reply the instant you read it", "Respondes apenas lo lees", "Balas begitu terbaca", "読んだ瞬間すぐ返信", "อ่านปุ๊บตอบปั๊บ", "秒读秒回", "秒讀秒回"],
+    "5분 기다렸다 보낸다": ["Wait 5 minutes, then send", "Esperas 5 minutos y envías", "Tunggu 5 menit baru kirim", "5分待ってから送る", "รอ 5 นาทีค่อยส่ง", "等5分钟再发", "等5分鐘再發"],
+    "답장 오기 전에 이미 서른 번 확인함": ["Checked the chat thirty times before the reply even came", "Revisaste el chat treinta veces antes de que respondiera", "Sudah cek chat tiga puluh kali sebelum balasannya datang", "返信が来る前にすでに30回確認済み", "เช็กแชทไป 30 รอบก่อนเขาจะตอบซะอีก", "回复来之前已经看了三十遍", "回覆來之前已經看了三十遍"],
+    "초안을 세 번 고쳐 쓴다": ["Rewrite the draft three times", "Reescribes el borrador tres veces", "Menulis ulang draf tiga kali", "下書きを3回書き直す", "ร่างข้อความแก้สามรอบ", "草稿改写三遍", "草稿改寫三遍"],
+
+    "📱 상대가 스토리를 올렸다": ["📱 They posted a story", "📱 Subió una historia", "📱 Dia mengunggah story", "📱 相手がストーリーを上げた", "📱 เขาลงสตอรี่", "📱 对方发了动态", "📱 對方發了動態"],
+    "좋아요 눌렀다 취소했다 다시 누른다": ["Like, unlike, then like again", "Like, quitar like, y like otra vez", "Like, batal, like lagi", "いいねを押して取り消してまた押す", "กดไลก์ ยกเลิก แล้วกดใหม่", "点赞又取消又点回去", "按讚又取消又按回去"],
+    "봤지만 좋아요는 안 누른다": ["Watched it, but no like", "Lo viste, pero sin like", "Sudah lihat, tapi tak di-like", "見たけどいいねは押さない", "ดูแล้วแต่ไม่กดไลก์", "看了但不点赞", "看了但不按讚"],
+    "\"관심 없는데\" 하며 세 번 돌려본다": ["\"Not interested\" — replays it three times", "«No me interesa» — y lo repites tres veces", "\"Nggak tertarik kok\" — tapi diputar tiga kali", "「興味ないし」と言いながら3回リピート", "«ไม่สนหรอก» แต่วนดูสามรอบ", "「没兴趣」嘴上说着回看三遍", "「沒興趣」嘴上說著回看三遍"],
+    "바로 DM을 보낸다": ["Send a DM right away", "Mandas un DM de inmediato", "Langsung kirim DM", "すぐDMを送る", "ส่ง DM ทันที", "立刻发私信", "立刻發私信"],
+
+    "🍽️ 첫 데이트 메뉴를 고른다": ["🍽️ Choosing the first-date menu", "🍽️ Eligiendo el menú de la primera cita", "🍽️ Memilih menu kencan pertama", "🍽️ 初デートのメニューを選ぶ", "🍽️ เลือกเมนูเดตแรก", "🍽️ 挑选初次约会的菜单", "🍽️ 挑選初次約會的菜單"],
+    "상대 취향으로 전부 맞춘다": ["Match everything to their taste", "Todo según su gusto", "Semua disesuaikan dengan seleranya", "全部相手の好みに合わせる", "จัดตามใจเขาทั้งหมด", "全部迁就对方口味", "全部遷就對方口味"],
+    "\"난 아무거나\" (사실 싫어하는 게 많다)": ["\"Anything's fine\" (actually a picky eater)", "«Lo que sea» (en realidad odias muchas cosas)", "\"Aku apa aja\" (padahal banyak yang tak disukai)", "「僕は何でもいい」（実は嫌いな物が多い）", "«อะไรก็ได้» (จริง ๆ ไม่กินเยอะมาก)", "「我随便」（其实挑食得很）", "「我隨便」（其實挑食得很）"],
+    "인스타 뒤져서 취향 파악 완료": ["Scoured their Instagram — taste analysis complete", "Revisaste su Instagram — gustos identificados", "Sudah gali Instagram-nya — selera teridentifikasi", "インスタを漁って好みの把握完了", "ส่องไอจีจนรู้รสนิยมครบ", "翻完对方Ins，口味摸排完毕", "翻完對方Ins，口味摸排完畢"],
+    "3일 전부터 후기를 정독한다": ["Studying reviews thoroughly since 3 days ago", "Leyendo reseñas a fondo desde hace 3 días", "Membaca ulasan dengan saksama sejak 3 hari lalu", "3日前からレビューを熟読する", "อ่านรีวิวอย่างละเอียดมาตั้งแต่ 3 วันก่อน", "提前3天精读点评", "提前3天精讀點評"],
+
+    "🎂 상대 생일이 다가온다": ["🎂 Their birthday is coming up", "🎂 Se acerca su cumpleaños", "🎂 Ulang tahunnya makin dekat", "🎂 相手の誕生日が近づいてきた", "🎂 วันเกิดเขาใกล้เข้ามา", "🎂 对方生日快到了", "🎂 對方生日快到了"],
+    "\"생일이었어?\" (선물은 이미 샀다)": ["\"Oh, it's your birthday?\" (gift already bought)", "«¿Era tu cumple?» (el regalo ya está comprado)", "\"Oh, kamu ulang tahun?\" (kado sudah dibeli)", "「誕生日だったの？」（プレゼントはもう買った）", "«วันเกิดเหรอ?» (ของขวัญซื้อไว้แล้ว)", "「你过生日？」（礼物早买好了）", "「你過生日？」（禮物早買好了）"],
+    "한 달 전부터 준비한다": ["Preparing since a month ago", "Preparando desde hace un mes", "Sudah menyiapkan sejak sebulan lalu", "1ヶ月前から準備する", "เตรียมมาตั้งแต่เดือนก่อน", "提前一个月开始准备", "提前一個月開始準備"],
+    "살짝 늦게 축하해서 존재감을 남긴다": ["Congratulate slightly late to leave an impression", "Felicitas con leve retraso para dejar huella", "Mengucapkan agak telat demi meninggalkan kesan", "少し遅れて祝って存在感を残す", "อวยพรช้ากว่าใครนิดหน่อยเพื่อให้จำได้", "稍微晚点祝福以留存在感", "稍微晚點祝福以留存在感"],
+    "당일 아침에 꽃 들고 등장": ["Show up that morning holding flowers", "Apareces esa mañana con flores", "Muncul pagi harinya membawa bunga", "当日の朝、花を持って登場", "เช้าวันนั้นโผล่มาพร้อมดอกไม้", "当天早上捧花登场", "當天早上捧花登場"],
+
+    "😴 새벽 2시, 상대가 \"자?\" 하고 보냈다": ["😴 2 AM — they text \"you up?\"", "😴 2 AM — te escribe «¿duermes?»", "😴 Jam 2 pagi — dia chat \"udah tidur?\"", "😴 深夜2時、相手が「寝た？」と送ってきた", "😴 ตี 2 เขาทักมา «หลับยัง?»", "😴 凌晨2点，对方发来「睡了吗？」", "😴 凌晨2點，對方發來「睡了嗎？」"],
+    "왜 하필 이 시간에 보냈는지 분석한다": ["Analyzing why they texted at this exact hour", "Analizas por qué escribió justo a esta hora", "Menganalisis kenapa dia chat di jam segini", "なぜこの時間に送ってきたのか分析する", "วิเคราะห์ว่าทำไมต้องทักมาเวลานี้", "分析为什么偏偏这个点发", "分析為什麼偏偏這個點發"],
+    "\"무슨 일 있어? 지금 갈까?\"": ["\"Is something wrong? Should I come over?\"", "«¿Pasó algo? ¿Voy para allá?»", "\"Ada apa? Perlu kusamperin sekarang?\"", "「何かあった？今から行こうか？」", "«มีอะไรหรือเปล่า? ให้ไปหาไหม?»", "「出什么事了？要我现在过去吗？」", "「出什麼事了？要我現在過去嗎？」"],
+    "\"왜\" (한 글자)": ["\"Why\" (one word)", "«Qué» (una palabra)", "\"Knp\" (satu kata)", "「なに」（一言）", "«ไร» (คำเดียว)", "「咋」（一个字）", "「咋」（一個字）"],
+    "바로 전화를 건다": ["Call them immediately", "Llamas de inmediato", "Langsung menelepon", "すぐ電話をかける", "โทรหาทันที", "立刻打电话过去", "立刻打電話過去"],
+
+    "🚶 길에서 상대를 우연히 마주쳤다": ["🚶 You bump into them on the street", "🚶 Te lo cruzas por la calle", "🚶 Tak sengaja papasan di jalan", "🚶 道で相手に偶然出くわした", "🚶 บังเอิญเจอเขากลางถนน", "🚶 在街上偶遇对方", "🚶 在街上偶遇對方"],
+    "못 본 척 지나간다": ["Pretend not to see them and walk past", "Finges no verlo y pasas de largo", "Pura-pura tak lihat dan lewat saja", "見なかったフリして通り過ぎる", "ทำเป็นมองไม่เห็นแล้วเดินผ่าน", "装没看见走过去", "裝沒看見走過去"],
+    "\"야!!\" 하고 뛰어간다": ["\"HEY!!\" — running over", "«¡¡Oye!!» — y corres hacia él", "\"WOI!!\" — langsung lari menghampiri", "「おーい！！」と走っていく", "«เฮ้ย!!» แล้ววิ่งเข้าไปหา", "「喂！！」冲过去", "「喂！！」衝過去"],
+    "마침 들고 있던 음료를 건넨다": ["Hand over the drink you happened to be holding", "Le das la bebida que justo llevabas", "Menyerahkan minuman yang kebetulan kamu pegang", "ちょうど持っていた飲み物を渡す", "ยื่นเครื่องดื่มที่ถืออยู่พอดีให้", "把手里正好拿着的饮料递给TA", "把手裡正好拿著的飲料遞給TA"],
+    "\"여긴 웬일이야\" (일부러 왔다)": ["\"What brings you here\" (came on purpose)", "«¿Qué haces aquí?» (viniste a propósito)", "\"Ngapain di sini\" (padahal sengaja datang)", "「こんな所で何してるの」（わざと来た）", "«มาทำอะไรแถวนี้» (ตั้งใจมาเอง)", "「你怎么在这」（其实是特意来的）", "「你怎麼在這」（其實是特意來的）"],
+
+    "💔 상대가 다른 사람 얘기를 꺼냈다": ["💔 They brought up someone else", "💔 Mencionó a otra persona", "💔 Dia menyebut orang lain", "💔 相手が他の人の話を持ち出した", "💔 เขาพูดถึงคนอื่นขึ้นมา", "💔 对方提起了别人", "💔 對方提起了別人"],
+    "\"잘 됐네\" (표정이 굳는다)": ["\"Good for you\" (face stiffens)", "«Qué bien» (se te congela la cara)", "\"Bagus deh\" (wajah membeku)", "「良かったね」（表情が固まる）", "«ดีแล้วนี่» (หน้าแข็งเป็นหิน)", "「挺好的」（表情僵住）", "「挺好的」（表情僵住）"],
+    "관심 없는 척 화제를 돌린다": ["Feign indifference and change the subject", "Finges indiferencia y cambias de tema", "Pura-pura tak peduli dan alihkan topik", "興味ないフリで話題を変える", "ทำเป็นไม่สนแล้วเปลี่ยนเรื่อง", "装不在意岔开话题", "裝不在意岔開話題"],
+    "잘되라고 응원해준다 (속으로 운다)": ["Cheer them on (crying inside)", "Lo animas (llorando por dentro)", "Menyemangati dia (menangis dalam hati)", "うまくいくよう応援する（心の中で泣く）", "เชียร์ให้สมหวัง (ในใจร้องไห้)", "祝福支持（内心在哭）", "祝福支持（內心在哭）"],
+    "이름 듣자마자 검색을 시작한다": ["Start searching the name the moment you hear it", "Buscas el nombre apenas lo oyes", "Begitu dengar namanya langsung mulai mencari", "名前を聞いた瞬間に検索を開始", "ได้ยินชื่อปุ๊บเริ่มเสิร์ชปั๊บ", "一听到名字立刻开始搜索", "一聽到名字立刻開始搜尋"],
+
+    "📸 둘이 찍은 사진이 생겼다": ["📸 You got a photo of the two of you", "📸 Tienen una foto juntos", "📸 Ada foto kalian berdua", "📸 二人で撮った写真ができた", "📸 มีรูปคู่ของสองคนแล้ว", "📸 有了两人的合照", "📸 有了兩人的合照"],
+    "상대가 잘 나온 걸로만 고른다": ["Pick only the shots where they look best", "Eliges solo donde el otro sale mejor", "Pilih hanya yang dia terlihat bagus", "相手がよく写っているものだけ選ぶ", "เลือกเฉพาะรูปที่เขาออกมาดูดี", "只挑对方好看的那张", "只挑對方好看的那張"],
+    "배경화면 했다가 들킬까 봐 바꾼다": ["Set it as wallpaper, then change it fearing exposure", "La pones de fondo y la cambias por miedo a que te pillen", "Jadikan wallpaper lalu ganti karena takut ketahuan", "壁紙にしたけどバレそうで変える", "ตั้งเป็นวอลเปเปอร์แล้วรีบเปลี่ยนเพราะกลัวโดนจับได้", "设成壁纸又怕被发现改回来", "設成桌布又怕被發現改回來"],
+    "바로 프로필 사진으로 건다": ["Set it as your profile picture immediately", "La pones de foto de perfil al instante", "Langsung jadikan foto profil", "すぐプロフィール写真に設定", "ตั้งเป็นรูปโปรไฟล์ทันที", "立刻设为头像", "立刻設為頭像"],
+    "폴더를 만들어 정리한다": ["Create a folder and organize them", "Creas una carpeta y las organizas", "Bikin folder khusus dan merapikannya", "フォルダを作って整理する", "สร้างโฟลเดอร์จัดเก็บเป็นระเบียบ", "建文件夹分类整理", "建資料夾分類整理"],
+
+    "🎧 상대가 좋아하는 노래를 알려줬다": ["🎧 They told you their favorite song", "🎧 Te dijo su canción favorita", "🎧 Dia memberitahu lagu favoritnya", "🎧 相手が好きな歌を教えてくれた", "🎧 เขาบอกเพลงโปรดให้ฟัง", "🎧 对方告诉了你TA喜欢的歌", "🎧 對方告訴了你TA喜歡的歌"],
+    "다음에 아는 척 흘린다": ["Casually mention it later like you knew it all along", "Luego lo mencionas como si ya la conocieras", "Nanti disebut-sebut seolah sudah tahu dari dulu", "今度知ってるフリでさらっと出す", "คราวหน้าแกล้งพูดถึงเหมือนรู้จักอยู่แล้ว", "下次装作早就知道随口提起", "下次裝作早就知道隨口提起"],
+    "플레이리스트를 통째로 외운다": ["Memorize their entire playlist", "Memorizas su playlist completa", "Menghafal seluruh playlist-nya", "プレイリストを丸ごと覚える", "จำเพลย์ลิสต์เขาทั้งชุด", "把整个歌单背下来", "把整個歌單背下來"],
+    "100번 듣는다": ["Listen to it 100 times", "La escuchas 100 veces", "Mendengarkannya 100 kali", "100回聴く", "ฟัง 100 รอบ", "听100遍", "聽100遍"],
+    "\"내 취향은 아닌데\" (매일 듣는다)": ["\"Not really my taste\" (listens daily)", "«No es mi estilo» (la escuchas a diario)", "\"Bukan seleraku sih\" (tiap hari didengarkan)", "「僕の趣味じゃないけど」（毎日聴く）", "«ไม่ใช่แนวฉันหรอก» (ฟังทุกวัน)", "「不是我的菜」（天天在听）", "「不是我的菜」（天天在聽）"],
+
+    "🌧️ 비가 오는데 상대가 우산이 없다": ["🌧️ It's raining and they have no umbrella", "🌧️ Llueve y no tiene paraguas", "🌧️ Hujan turun dan dia tak bawa payung", "🌧️ 雨なのに相手が傘を持っていない", "🌧️ ฝนตกแต่เขาไม่มีร่ม", "🌧️ 下雨了对方没带伞", "🌧️ 下雨了對方沒帶傘"],
+    "우산 있는데 없는 척한다": ["Have an umbrella but pretend you don't", "Tienes paraguas pero finges que no", "Bawa payung tapi pura-pura tidak", "傘あるのに無いフリをする", "มีร่มแต่ทำเป็นไม่มี", "有伞却装没有", "有傘卻裝沒有"],
+    "말을 못 걸고 옆에서 같이 젖는다": ["Can't speak up — just getting soaked beside them", "No te atreves a hablar — te empapas a su lado", "Tak berani menyapa — ikut basah di sebelahnya", "声をかけられず隣で一緒に濡れる", "ไม่กล้าทัก ยืนเปียกข้าง ๆ ไปด้วยกัน", "不敢搭话，在旁边一起淋", "不敢搭話，在旁邊一起淋"],
+    "내 우산 주고 나는 뛴다": ["Give them your umbrella and run", "Le das tu paraguas y corres", "Berikan payungmu lalu kamu lari", "傘を渡して自分は走る", "ยกร่มให้เขาแล้วตัวเองวิ่งฝ่าฝน", "把伞给TA自己跑", "把傘給TA自己跑"],
+    "일부러 우산 하나만 챙겨 나왔다": ["Deliberately brought only one umbrella", "Trajiste un solo paraguas a propósito", "Sengaja bawa satu payung saja", "わざと傘を一本だけ持ってきた", "ตั้งใจพกร่มมาแค่คันเดียว", "故意只带了一把伞", "故意只帶了一把傘"],
+
+    "🔔 읽었는데 답장이 없다": ["🔔 Read, but no reply", "🔔 Visto, sin respuesta", "🔔 Sudah dibaca, tapi tak dibalas", "🔔 既読なのに返信がない", "🔔 อ่านแล้วแต่ไม่ตอบ", "🔔 已读却没有回复", "🔔 已讀卻沒有回覆"],
+    "프로필 사진이 바뀌었나 확인한다": ["Check if their profile picture changed", "Revisas si cambió su foto de perfil", "Cek apakah foto profilnya berganti", "プロフィール写真が変わったか確認する", "เช็กว่ารูปโปรไฟล์เขาเปลี่ยนไหม", "查看头像是不是换了", "查看頭像是不是換了"],
+    "내가 뭘 잘못 썼나 스크롤을 올린다": ["Scroll up wondering what you wrote wrong", "Subes el chat buscando qué escribiste mal", "Scroll ke atas mencari salah ketikmu", "何を書き間違えたかスクロールを遡る", "เลื่อนขึ้นไปดูว่าตัวเองพิมพ์อะไรผิด", "往上翻看自己是不是说错了什么", "往上翻看自己是不是說錯了什麼"],
+    "나도 안 읽은 척한다": ["Pretend you haven't read theirs either", "Tú también finges no haber leído", "Kamu pun pura-pura belum baca", "こっちも読んでないフリをする", "งั้นฉันก็แกล้งทำเป็นยังไม่อ่านบ้าง", "我也装没读", "我也裝沒讀"],
+    "\"바빠?\" 하고 하나 더 보낸다": ["Send one more: \"busy?\"", "Mandas otro: «¿ocupado?»", "Kirim satu lagi: \"sibuk?\"", "「忙しい？」ともう一通送る", "ส่งเพิ่มอีกข้อความ «ยุ่งอยู่เหรอ?»", "再发一条「忙吗？」", "再發一條「忙嗎？」"],
+
+    "💍 상대가 \"우리 무슨 사이야?\"라고 물었다": ["💍 They asked, \"What are we?\"", "💍 Te preguntó: «¿Qué somos?»", "💍 Dia bertanya, \"Kita ini apa?\"", "💍 相手が「僕たちどういう関係？」と聞いてきた", "💍 เขาถามว่า «เราเป็นอะไรกัน?»", "💍 对方问「我们算什么关系？」", "💍 對方問「我們算什麼關係？」"],
+    "\"사귀자\"": ["\"Let's date\"", "«Seamos novios»", "\"Ayo pacaran\"", "「付き合おう」", "«คบกันเถอะ»", "「在一起吧」", "「在一起吧」"],
+    "\"몰라\" (심장은 폭발 중)": ["\"Dunno\" (heart exploding)", "«No sé» (corazón estallando)", "\"Nggak tahu\" (jantung meledak-ledak)", "「知らない」（心臓は爆発中）", "«ไม่รู้» (หัวใจกำลังระเบิด)", "「不知道」（心脏爆炸中）", "「不知道」（心臟爆炸中）"],
+    "\"너는 어떻게 생각하는데?\"": ["\"What do you think we are?\"", "«¿Tú qué crees?»", "\"Menurutmu kita apa?\"", "「君はどう思うの？」", "«แล้วเธอคิดว่าไงล่ะ?»", "「那你觉得呢？」", "「那你覺得呢？」"],
+    "드디어 확실히 정할 수 있겠다": ["Finally — we can make it official", "Por fin podremos definirlo", "Akhirnya bisa dipastikan dengan jelas", "ついにハッキリ決められる", "ในที่สุดก็ได้ชัดเจนสักที", "终于可以确定关系了", "終於可以確定關係了"]
+  });
+})();
