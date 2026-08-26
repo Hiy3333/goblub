@@ -48,12 +48,13 @@
     <p class="fine-print">이름은 참고용이에요 — 마음에 드는 걸 골라 쓰세요 🙂</p>
   </main>
   <div id="site-footer"></div>
-  <script src="../js/common.js?v=26" data-root=".."></script>
+  <script src="../js/common.js?v=27" data-root=".."></script>
   <script src="js/feed.js?v=14"></script>
   <script src="js/dosa.js?v=3"></script>
   <script>
     (function () {
       var $ = function (id) { return document.getElementById(id); };
+      var tr = window.GoblubI18n ? GoblubI18n.t : function (s) { return s; };
       var CATS = [
         { k: "nickname", em: "🎮", t: "게임·SNS 닉네임" },
         { k: "group", em: "👥", t: "단톡방·팀 이름" },
@@ -67,7 +68,7 @@
       CATS.forEach(function (c) {
         var b = document.createElement("button");
         b.className = "cat-tile" + (c.k === chosen ? " sel" : "");
-        b.innerHTML = '<span class="em">' + c.em + "</span>" + c.t;
+        b.innerHTML = '<span class="em">' + c.em + "</span>" + tr(c.t);
         b.onclick = function () {
           chosen = c.k;
           grid.querySelectorAll(".cat-tile").forEach(function (x) { x.classList.remove("sel"); });
@@ -81,7 +82,7 @@
       var vrow = $("vibe-row");
       VIBES.forEach(function (v) {
         var b = document.createElement("button");
-        b.type = "button"; b.className = "vibe-chip"; b.textContent = v;
+        b.type = "button"; b.className = "vibe-chip"; b.textContent = tr(v);
         b.onclick = function () {
           var i = vibeSel.indexOf(v);
           if (i >= 0) { vibeSel.splice(i, 1); b.classList.remove("sel"); }
@@ -94,7 +95,7 @@
         var btn = $("btn-go"), out = $("name-out"), st = $("status");
         btn.disabled = true;
         st.style.display = "block";
-        st.textContent = "🐙 고브럽이 소매 걷고 작명 중…";
+        st.textContent = tr("🐙 고브럽이 소매 걷고 작명 중…");
         out.style.display = "block";
         out.textContent = "";
         var kw = vibeSel.concat($("kw").value.trim() || []).join(", ").slice(0, 100);
@@ -102,16 +103,16 @@
           noCache: true, cooldownMs: 8000, cooldownKey: "goblub_name_last",
           onChunk: function (t) { out.textContent += t; },
           onDone: function () {
-            st.textContent = "🐙 완성! 맘에 안 들면 리롤 ㄱㄱ (다시 누르면 새 이름)";
+            st.textContent = tr("🐙 완성! 맘에 안 들면 리롤 ㄱㄱ (다시 누르면 새 이름)");
             btn.disabled = false;
             if (window.GoblubFeed) GoblubFeed.grant("naming");
           },
           onError: function (code, sec) {
             out.style.display = "none";
             st.textContent =
-              code === "not_configured" ? "작명가가 아직 수련 중이에요. 곧 찾아옵니다!" :
-              code === "cooldown" ? "고브럽이 숨 고르는 중… " + sec + "초 후에 다시 눌러주세요!" :
-              "지금 손님이 많아요. 잠시 후 다시 시도해 주세요.";
+              code === "not_configured" ? tr("작명가가 아직 수련 중이에요. 곧 찾아옵니다!") :
+              code === "cooldown" ? tr("고브럽이 숨 고르는 중…") + " " + sec + tr("초 후에 다시 눌러주세요!") :
+              tr("지금 손님이 많아요. 잠시 후 다시 시도해 주세요.");
             btn.disabled = false;
           }
         });

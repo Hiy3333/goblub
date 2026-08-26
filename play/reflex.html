@@ -54,12 +54,13 @@
     </section>
   </main>
   <div id="site-footer"></div>
-  <script src="../js/common.js?v=26" data-root=".."></script>
+  <script src="../js/common.js?v=27" data-root=".."></script>
   <script src="js/feed.js?v=14"></script>
   <script src="js/sharecard.js?v=3"></script>
   <script>
     (function () {
       var $ = function (id) { return document.getElementById(id); };
+      var tr = window.GoblubI18n ? GoblubI18n.t : function (s) { return s; };
       var pad = $("pad");
       var ROUNDS = 5, BEST_KEY = "goblub_reflex_best";
       var state = "idle", round = 0, t0 = 0, results = [], timers = [], goTimer = null;
@@ -94,20 +95,20 @@
       }
 
       function armRound() {
-        set("wait", "😤", "기다려…", "초록불에만!");
+        set("wait", "😤", tr("기다려…"), tr("초록불에만!"));
         clearTimers();
         var delay = 1100 + Math.random() * 2600;
         var fakes = Math.random() < 0.65 ? (Math.random() < 0.4 ? 2 : 1) : 0;
         for (var i = 0; i < fakes; i++) {
           var ft = 400 + Math.random() * (delay - 750);
-          timers.push(setTimeout(function () { if (state === "wait") { set("fake", "😮", "아직!", ""); timers.push(setTimeout(function () { if (state === "fake") set("wait", "😤", "기다려…", ""); }, 240)); } }, ft));
+          timers.push(setTimeout(function () { if (state === "wait") { set("fake", "😮", tr("아직!"), ""); timers.push(setTimeout(function () { if (state === "fake") set("wait", "😤", tr("기다려…"), ""); }, 240)); } }, ft));
         }
-        goTimer = setTimeout(function () { set("go", "😆", "지금!! 탭!", ""); t0 = performance.now(); }, delay);
+        goTimer = setTimeout(function () { set("go", "😆", tr("지금!! 탭!"), ""); t0 = performance.now(); }, delay);
       }
 
       function falseStart() {
         clearTimers();
-        set("false", "🚫", "부정출발!", "초록불일 때만 눌러요 — 이 라운드 다시!");
+        set("false", "🚫", tr("부정출발!"), tr("초록불일 때만 눌러요 — 이 라운드 다시!"));
         timers.push(setTimeout(armRound, 950));
       }
 
@@ -133,12 +134,12 @@
         var b = best(), isBest = !b || avg < b;
         if (isBest) { try { localStorage.setItem(BEST_KEY, avg); } catch (e) {} $("best").textContent = avg + "ms"; }
         var g = gradeOf(avg);
-        set("result", g.e, "평균 " + avg + "ms", g.n + (isBest ? " · 🏆 신기록!" : ""));
+        set("result", g.e, tr("평균 {A}ms").replace("{A}", avg), tr(g.n) + (isBest ? " · " + tr("🏆 신기록!") : ""));
         $("round").textContent = "0";
         state = "idle";
         $("card-slot").appendChild(ShareCard.render({
-          palette: "purple", emoji: g.e, badge: "고브럽 반응속도", title: "평균 " + avg + "ms",
-          lines: [g.n, "5라운드 " + results.join(" / ") + "ms"]
+          palette: "purple", emoji: g.e, badge: tr("고브럽 반응속도"), title: tr("평균 {A}ms").replace("{A}", avg),
+          lines: [tr(g.n), tr("5라운드 {R}ms").replace("{R}", results.join(" / "))]
         }));
       }
 

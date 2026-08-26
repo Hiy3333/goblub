@@ -66,7 +66,7 @@
     </section>
   </main>
   <div id="site-footer"></div>
-  <script src="../js/common.js?v=26" data-root=".."></script>
+  <script src="../js/common.js?v=27" data-root=".."></script>
   <script src="js/feed.js?v=14"></script>
   <script>
     (function () {
@@ -88,6 +88,7 @@
         { id: 12, a: "기억 갖고 10년 전으로 ⏰", b: "지금 이대로 10억 받기 💰" }
       ];
 
+      var tr = window.GoblubI18n ? GoblubI18n.t : function (s) { return s; };
       var idx = 0, minority = 0, answered = 0, statsOn = true;
 
       function show(s) {
@@ -99,9 +100,9 @@
       function renderQ() {
         var q = QUESTIONS[idx];
         $("q-fill").style.width = Math.round(idx / QUESTIONS.length * 100) + "%";
-        $("q-text").textContent = "Q" + (idx + 1) + ". 둘 중 하나!";
-        $("q-a").textContent = q.a;
-        $("q-b").textContent = q.b;
+        $("q-text").textContent = tr("Q{N}. 둘 중 하나!").replace("{N}", idx + 1);
+        $("q-a").textContent = tr(q.a);
+        $("q-b").textContent = tr(q.b);
         $("q-a").disabled = false; $("q-b").disabled = false;
         $("q-stat").style.display = "none";
       }
@@ -117,10 +118,10 @@
         var isMinority = myPct < 50;
         if (isMinority) minority++;
         $("q-verdict").textContent = total > 1
-          ? (isMinority ? "🐸 당신은 소수파! 전국의 " + myPct + "%만 이쪽을 골랐어요." :
-             myPct === 50 ? "⚖️ 정확히 반반! 우주의 균형이 당신 손에." :
-             "🙌 다수파! 전국의 " + myPct + "%가 같은 편이에요.")
-          : "🥇 이 문제의 첫 투표자! 전국 통계를 개척하셨습니다.";
+          ? (isMinority ? tr("🐸 당신은 소수파! 전국의 {P}%만 이쪽을 골랐어요.").replace("{P}", myPct) :
+             myPct === 50 ? tr("⚖️ 정확히 반반! 우주의 균형이 당신 손에.") :
+             tr("🙌 다수파! 전국의 {P}%가 같은 편이에요.").replace("{P}", myPct))
+          : tr("🥇 이 문제의 첫 투표자! 전국 통계를 개척하셨습니다.");
         $("q-stat").style.display = "block";
       }
 
@@ -146,9 +147,9 @@
       }
 
       function offlineStat(pick) {
-        $("s-a").style.width = pick === "a" ? "92%" : "8%"; $("s-a").textContent = pick === "a" ? "나" : "";
-        $("s-b").style.width = pick === "b" ? "92%" : "8%"; $("s-b").textContent = pick === "b" ? "나" : "";
-        $("q-verdict").textContent = "선택 완료!";
+        $("s-a").style.width = pick === "a" ? "92%" : "8%"; $("s-a").textContent = pick === "a" ? tr("나") : "";
+        $("s-b").style.width = pick === "b" ? "92%" : "8%"; $("s-b").textContent = pick === "b" ? tr("나") : "";
+        $("q-verdict").textContent = tr("선택 완료!");
         $("q-offline").style.display = "block";
         $("q-stat").style.display = "block";
       }
@@ -163,13 +164,13 @@
       };
 
       function finish() {
-        var r = minority >= 8 ? { e: "👽", n: "완전 별종", d: "12판 중 " + minority + "판 소수파. 지구인 맞으신가요? (칭찬)" } :
-                minority >= 5 ? { e: "🐸", n: "청개구리 유형", d: "12판 중 " + minority + "판 소수파. 남들과 다른 길이 편한 타입!" } :
-                minority >= 2 ? { e: "🦉", n: "균형 잡힌 반골", d: "12판 중 " + minority + "판 소수파. 대세도 알고 내 취향도 있는 밸런스형." } :
-                { e: "🐑", n: "국민 표준", d: "12판 중 소수파 " + minority + "판. 당신의 취향이 곧 대한민국 평균입니다." };
+        var r = minority >= 8 ? { e: "👽", n: tr("완전 별종"), d: tr("12판 중 {M}판 소수파. 지구인 맞으신가요? (칭찬)").replace("{M}", minority) } :
+                minority >= 5 ? { e: "🐸", n: tr("청개구리 유형"), d: tr("12판 중 {M}판 소수파. 남들과 다른 길이 편한 타입!").replace("{M}", minority) } :
+                minority >= 2 ? { e: "🦉", n: tr("균형 잡힌 반골"), d: tr("12판 중 {M}판 소수파. 대세도 알고 내 취향도 있는 밸런스형.").replace("{M}", minority) } :
+                { e: "🐑", n: tr("국민 표준"), d: tr("12판 중 소수파 {M}판. 당신의 취향이 곧 대한민국 평균입니다.").replace("{M}", minority) };
         $("d-emoji").textContent = r.e;
         $("d-name").textContent = r.n;
-        $("d-desc").textContent = r.d + (statsOn ? "" : " (전국 통계는 준비 중이라 이번 판은 내 기록 기준!)");
+        $("d-desc").textContent = r.d + (statsOn ? "" : tr(" (전국 통계는 준비 중이라 이번 판은 내 기록 기준!)"));
         show("done");
         if (window.GoblubFeed) GoblubFeed.grant("balance");
         window.__balResult = r.n + " — " + r.d;
@@ -179,8 +180,8 @@
         var text = "⚖️ 대환장 밸런스 게임 결과: " + (window.__balResult || "") + "\n👉 나도 하기: " + location.origin + location.pathname;
         var btn = $("btn-copy");
         (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject())
-          .then(function () { btn.textContent = "복사됨!"; setTimeout(function () { btn.textContent = "📋 결과 복사"; }, 1500); })
-          .catch(function () { prompt("복사해 주세요:", text); });
+          .then(function () { btn.textContent = tr("복사됨!"); setTimeout(function () { btn.textContent = tr("📋 결과 복사"); }, 1500); })
+          .catch(function () { prompt(tr("복사해 주세요:"), text); });
       };
       $("btn-redo").onclick = function () { show("intro"); };
 

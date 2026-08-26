@@ -125,12 +125,13 @@
     </section>
   </main>
   <div id="site-footer"></div>
-  <script src="../js/common.js?v=26" data-root=".."></script>
+  <script src="../js/common.js?v=27" data-root=".."></script>
   <script src="js/feed.js?v=14"></script>
   <script src="js/goblub-art.js"></script>
   <script>
   (function () {
     var $ = function (id) { return document.getElementById(id); };
+    var tr = window.GoblubI18n ? GoblubI18n.t : function (s) { return s; };
     var MIN = 2, MAX = 8;
     var SKIN = ["#ffd479", "#8fe0a6", "#8fc4ff", "#ff9aa8", "#d3a8ff", "#7fdede", "#ffb185", "#f5a9d0"];
 
@@ -151,7 +152,7 @@
       var row = document.createElement("div");
       row.className = "item-row";
       row.innerHTML = '<span class="idx"></span>' +
-        '<input class="item-input" type="text" maxlength="10" placeholder="이름" />' +
+        '<input class="item-input" type="text" maxlength="10" placeholder="' + tr("이름") + '" />' +
         '<button class="item-del" type="button" aria-label="삭제">×</button>';
       row.querySelector(".item-input").value = val || "";
       row.querySelector(".item-del").onclick = function () {
@@ -182,11 +183,11 @@
       for (var r = 1; r <= n; r++) {
         var o = document.createElement("option");
         o.value = r;
-        o.textContent = r === 1 ? "🥇 1등" : r === n ? "🔥 꼴찌(" + r + "등)" : r + "등";
+        o.textContent = r === 1 ? tr("🥇 1등") : r === n ? tr("🔥 꼴찌({R}등)").replace("{R}", r) : tr("{R}등").replace("{R}", r);
         pick.appendChild(o);
       }
       var ro = document.createElement("option");            // 맨 아래 랜덤
-      ro.value = "random"; ro.textContent = "🎲 랜덤 (몇 등일지 비밀)";
+      ro.value = "random"; ro.textContent = tr("🎲 랜덤 (몇 등일지 비밀)");
       pick.appendChild(ro);
       pick.value = keep === "random" ? "random" : String(Math.min(+keep || n, n));
     }
@@ -947,7 +948,7 @@
 
     function start() {
       var names = readItems();
-      if (names.length < MIN) return showErr("이름을 " + MIN + "개 이상 넣어주세요");
+      if (names.length < MIN) return showErr(tr("이름을 {M}개 이상 넣어주세요").replace("{M}", MIN));
       hideErr();
       busy = true;
       $("btn-go").disabled = true;
@@ -1025,7 +1026,7 @@
       draw(0, n, 0, 1, 0);
       (function cd() {
         cbox.innerHTML = "<span>" + steps[ci] + "</span>";
-        $("hud-left").textContent = ci < 3 ? "🏁 출발 준비" : "🏁 출발!";
+        $("hud-left").textContent = ci < 3 ? tr("🏁 출발 준비") : tr("🏁 출발!");
         ci++;
         if (ci < steps.length) return setTimeout(cd, 800);
         setTimeout(function () { cbox.classList.remove("on"); run(n, loseRankSel); }, 700);
@@ -1097,7 +1098,7 @@
             // 결승 앞 별은 짧게. 다들 붙어 있는 구간이라 0.9초 3배속이면
             // 이미 여러 명을 제친다 — 1.3초를 주면 순간이동처럼 보인다.
             rn.dashT = o.late ? 900 : 1300;
-            flash = (o.late ? "⭐ 막판 역전! " : "⭐ ") + rn.name + " 부스트!"; flashT = 1200;
+            flash = tr(o.late ? "⭐ 막판 역전! {N} 부스트!" : "⭐ {N} 부스트!").replace("{N}", rn.name); flashT = 1200;
             for (var b = 0; b < 16; b++) bits.push({ x: o.x, y: wy, vx: (Math.random() - .5) * 11,
               vy: -Math.random() * 7, life: 1, c: b % 2 ? "#fff3b0" : "#ffd479" });
           });
@@ -1159,7 +1160,7 @@
               // 전부 소진하면 결승 앞 역전용 별까지 같이 사라진다.
               orbs.forEach(function (o) { if (o.x <= BOSS_P * TRACK) o.got = true; });
               sfx.whoosh();
-              flash = "🕳 블랙홀이 열렸다!"; flashT = 1500;
+              flash = tr("🕳 블랙홀이 열렸다!"); flashT = 1500;
               for (var d3 = 0; d3 < 46; d3++) bits.push({ x: BOSS_P * TRACK, y: VH * .5,
                 vx: (Math.random() - .5) * 22, vy: (Math.random() - .5) * 20, life: 1,
                 c: d3 % 3 === 0 ? "#cdb0ff" : d3 % 3 === 1 ? "#8a5cff" : "#ffffff" });
@@ -1167,7 +1168,7 @@
             rn.sucked = true; rn.suckT = 0;
             vortex.queue.push(i);                    // 들어간 순서 그대로 쌓인다
             rn.p = BOSS_P;
-            flash = "🕳 " + rn.name + " 블랙홀에 빨려든다!"; flashT = 950;
+            flash = tr("🕳 {N} 블랙홀에 빨려든다!").replace("{N}", rn.name); flashT = 950;
             sfx.hit();
             wrap.classList.add("shake");
             setTimeout(function () { wrap.classList.remove("shake"); }, 260);
@@ -1177,7 +1178,7 @@
             rn.p = 1; rn.done = true; done++; rn.rank = done; rn.finT = el; arrived.push(i);
             ship.seats[rn.rank - 1].idx = i;   // 도착 순서대로 창문에 앉는다
             rn.boarded = true;
-            flash = "🚀 " + rn.name + " 탑승 (" + rn.rank + "등)"; flashT = 1000;
+            flash = tr("🚀 {N} 탑승 ({R}등)").replace("{N}", rn.name).replace("{R}", rn.rank); flashT = 1000;
           }
         });
 
@@ -1194,7 +1195,7 @@
             r.dashT = 9e5;                            // 잔상·속도선 — 속도를 눈에 보이게
           });
           if (vortex) vortex.queue.length = 0;
-          flash = "🚀 나머지 전원 탑승 —!"; flashT = 1300;
+          flash = tr("🚀 나머지 전원 탑승 —!"); flashT = 1300;
           sfx.whoosh();
         }
 
@@ -1217,7 +1218,7 @@
               ro.p = BOSS_P + .0015;
               ro.prevX = ro.p * TRACK;                 // 뒤에 남은 아이템을 소급 판정하지 않게
               var heavy = ro.grav > .62;
-              flash = "🌀 " + ro.name + (heavy ? " — 중력이 놔주질 않는다!" : " 빠져나오는 중…");
+              flash = tr(heavy ? "🌀 {N} — 중력이 놔주질 않는다!" : "🌀 {N} 빠져나오는 중…").replace("{N}", ro.name);
               flashT = heavy ? 1300 : 900;
               sfx.pop();
               for (var e2 = 0; e2 < 18; e2++) bits.push({ x: BOSS_P * TRACK, y: laneY(qi, n),
@@ -1274,7 +1275,7 @@
               // 배속 기준을 추격자에게 옮긴다. 안 옮기면 되먹임이 '너무 빨리
               // 진행 중'으로 오판해 슬로모션을 도로 풀어 버린다.
               deepP0 = cr.p; deepTS0 = (1 - cr.p) * 15000 / DEEP_MS; deepBase = deepUsed;
-              flash = "⭐ " + cr.name + " 막판 대역전!!"; flashT = 2000;
+              flash = tr("⭐ {N} 막판 대역전!!").replace("{N}", cr.name); flashT = 2000;
               sfx.pop(); sfx.whoosh();
               for (var rv = 0; rv < 26; rv++) bits.push({ x: cr.p * TRACK, y: laneY(chaser.i, n),
                 vx: (Math.random() - .5) * 14, vy: -Math.random() * 9, life: 1,
@@ -1313,7 +1314,7 @@
           * Math.min(1, rawDt / (deep ? 90 : 140));
         var mode = slow ? (deep ? "deep" : "photo") : "";
         if (mode && mode !== slowNote) {
-          flash = deep ? "🎬 운명의 골 라인…" : "📸 포토피니시 각!"; flashT = 1400;
+          flash = deep ? tr("🎬 운명의 골 라인…") : tr("📸 포토피니시 각!"); flashT = 1400;
         }
         slowNote = mode;
 
@@ -1379,8 +1380,8 @@
         }
         if (flashT > 0) flashT -= dt;
         $("hud-left").textContent = flashT > 0 ? flash
-          : rushOn ? "🚀 탑승 중…" : "🥇 " + runners[liveOrd[0].i].name;
-        $("hud-right").textContent = done + " / " + n + " 도착";
+          : rushOn ? tr("🚀 탑승 중…") : "🥇 " + runners[liveOrd[0].i].name;
+        $("hud-right").textContent = tr("{D} / {N} 도착").replace("{D}", done).replace("{N}", n);
         updateLive();
 
         draw(el, n, cam.x, cam.z, speed);
@@ -1406,13 +1407,13 @@
       // 표에 미리 표시돼 도화선의 긴장이 통째로 사라진다(랜덤 모드면 특히).
       pendingRank = arrived.map(function (idx, place) {
         var r = place + 1, isPick = r === loseRank;
-        var medal = r === 1 ? "🥇" : r === 2 ? "🥈" : r === 3 ? "🥉" : r + "위";
+        var medal = r === 1 ? "🥇" : r === 2 ? "🥈" : r === 3 ? "🥉" : tr("{R}위").replace("{R}", r);
         return '<div class="r' + (isPick ? " loser" : "") + '">' +
           '<span class="no">' + medal + "</span>" +
           '<span class="nm">' + runners[idx].name.replace(/[<>&]/g, "") + "</span>" +
-          '<span class="tag">' + (isPick ? "걸림" : "") + "</span></div>";
+          '<span class="tag">' + (isPick ? tr("걸림") : "") + "</span></div>";
       }).join("");
-      $("hud-left").textContent = "🚀 전원 탑승 — 출발 준비";
+      $("hud-left").textContent = tr("🚀 전원 탑승 — 출발 준비");
 
       // 카메라를 우주선으로 옮기며 잠깐 다 같이 신나 하다가, 걸린 창문이 펑 터진다
       var bt0 = performance.now(), blown = false, bPrev = bt0;
@@ -1443,7 +1444,7 @@
             L.thrust = Math.min(1, L.t / 1800);
             if (Math.random() < .5) sfx.crackle();
             var cd2 = 3 - Math.floor(L.t / 600);
-            $("hud-left").textContent = "🚀 " + (cd2 > 0 ? cd2 + "…" : "발사!");
+            $("hud-left").textContent = "🚀 " + (cd2 > 0 ? cd2 + "…" : tr("발사!"));
           } else {
             L.thrust = 1;
             // 불이 붙으면 먼저 한 명이 튕겨 나가고, 그다음에 우주선이 떠오른다
@@ -1466,7 +1467,7 @@
           for (var b2 = 0; b2 < 46; b2++) bits.push({ x: ship.x + sp2.x, y: VH * .5 + sp2.y,
             vx: 1 + Math.random() * 15, vy: (Math.random() - .5) * 16, life: 1,
             c: b2 % 3 === 0 ? "#ffd479" : b2 % 3 === 1 ? "#ff8a5c" : "#e8eefc" });
-          $("hud-left").textContent = "💥 " + loser.name + " 좌석 이탈!";
+          $("hud-left").textContent = tr("💥 {N} 좌석 이탈!").replace("{N}", loser.name);
         }
         // 폭발 뒤 0.9초 동안 파편이 날리는 걸 보여주고 클로즈업으로 넘어간다
         if (blown && now - bt0 > 900) return showLoser(loser, loseRank, n);
@@ -1510,16 +1511,16 @@
         g.globalAlpha = k;
         g.fillStyle = "#ffd479"; g.font = "700 46px 'Jua', sans-serif";
         g.textAlign = "center"; g.textBaseline = "middle";
-        g.fillText(loseRank + "등 — " + loser.name, VW / 2, VH * .84);
+        g.fillText(tr("{R}등 — {N}").replace("{R}", loseRank).replace("{N}", loser.name), VW / 2, VH * .84);
         g.fillStyle = "#e8eeff"; g.font = "600 26px 'Jua', sans-serif";
-        g.fillText("우주선은 떠났습니다…", VW / 2, VH * .91);
+        g.fillText(tr("우주선은 떠났습니다…"), VW / 2, VH * .91);
         g.globalAlpha = 1;
         if (k < 1) return requestAnimationFrame(zoom);
         // 걸린 사람은 캔버스 클로즈업이 '몇 등 — 누구'로 이미 보여 준다.
         // 아래에 같은 문구를 또 띄우지 않고, 전체 순위표만 남긴다.
         $("rank").innerHTML = pendingRank;
         $("rank").style.display = "block";
-        $("hud-left").textContent = "🏁 경주 종료";
+        $("hud-left").textContent = tr("🏁 경주 종료");
         $("btn-again").style.display = ""; $("btn-edit").style.display = "";
         busy = false;
         // 클로즈업을 2초 보여준 뒤 전체 화면을 접고 결과로

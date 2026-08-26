@@ -78,11 +78,12 @@
     </section>
   </main>
   <div id="site-footer"></div>
-  <script src="../js/common.js?v=26" data-root=".."></script>
+  <script src="../js/common.js?v=27" data-root=".."></script>
   <script src="js/feed.js?v=14"></script>
   <script>
     (function () {
       var $ = function (id) { return document.getElementById(id); };
+      var tr = window.GoblubI18n ? GoblubI18n.t : function (s) { return s; };
       var SVGNS = "http://www.w3.org/2000/svg";
       var COLS = ["#ffb3b3", "#ffe79a", "#a9e3af", "#a8c8ff", "#dcbcff", "#ffcaa3",
         "#9fe0e0", "#f7bcda", "#cfe08f", "#f2a8a8", "#bcd2f2", "#efc9a0"];
@@ -108,7 +109,7 @@
         var row = document.createElement("div"); row.className = "item-row";
         var idx = document.createElement("span"); idx.className = "idx";
         var inp = document.createElement("input"); inp.type = "text"; inp.className = "item-input";
-        inp.maxLength = 20; inp.placeholder = "항목 입력"; inp.value = value || "";
+        inp.maxLength = 20; inp.placeholder = tr("항목 입력"); inp.value = value || "";
         inp.addEventListener("input", build);
         var del = document.createElement("button"); del.type = "button"; del.className = "item-del";
         del.textContent = "−"; del.setAttribute("aria-label", "삭제");
@@ -119,7 +120,7 @@
       }
       function setItems(arr) {
         list.innerHTML = "";
-        var vals = (arr && arr.length) ? arr.slice(0, MAX) : ["", "", ""];
+        var vals = (arr && arr.length) ? arr.slice(0, MAX).map(tr) : ["", "", ""];
         while (vals.length < MIN) vals.push("");
         vals.forEach(function (v) { addRow(v); });
         build();
@@ -157,7 +158,7 @@
       function build() {
         var items = readItems();
         var wrap = $("wheel-spin");
-        if (items.length < 2) { wrap.innerHTML = '<div class="wheel-empty" id="wheel-empty">항목을 2개 이상 넣어보세요 🎡</div>'; return null; }
+        if (items.length < 2) { var we = document.createElement("div"); we.className = "wheel-empty"; we.id = "wheel-empty"; we.textContent = tr("항목을 2개 이상 넣어보세요 🎡"); wrap.innerHTML = ""; wrap.appendChild(we); return null; }
         var n = items.length, seg = 360 / n;
         var fs = n > 9 ? 7 : n > 6 ? 8.5 : 10;
         var svg = document.createElementNS(SVGNS, "svg");
@@ -217,7 +218,7 @@
       function showResult(text) {
         var box = $("result-box");
         $("result-name").textContent = "🎯 " + text;
-        $("result-line").textContent = LINES[Math.floor(Math.random() * LINES.length)];
+        $("result-line").textContent = tr(LINES[Math.floor(Math.random() * LINES.length)]);
         box.classList.remove("result-pop"); void box.offsetWidth;
         box.style.display = "block"; box.classList.add("result-pop");
         confetti();
@@ -227,7 +228,7 @@
       function spin() {
         hideErr(); $("result-box").style.display = "none";
         var items = build();
-        if (!items) { showErr("항목을 2개 이상 적어주세요!"); return; }
+        if (!items) { showErr(tr("항목을 2개 이상 적어주세요!")); return; }
         var btn = $("btn-spin"); btn.disabled = true;
         if (window.GoblubFeed) GoblubFeed.grant("roulette");
         var n = items.length, seg = 360 / n, winner = Math.floor(Math.random() * n);

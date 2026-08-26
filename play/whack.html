@@ -64,12 +64,13 @@
     </section>
   </main>
   <div id="site-footer"></div>
-  <script src="../js/common.js?v=26" data-root=".."></script>
+  <script src="../js/common.js?v=27" data-root=".."></script>
   <script src="js/feed.js?v=14"></script>
   <script src="js/sharecard.js?v=3"></script>
   <script>
     (function () {
       var $ = function (id) { return document.getElementById(id); };
+      var tr = window.GoblubI18n ? GoblubI18n.t : function (s) { return s; };
       var MONS = ["🌋", "🌊", "💧", "🍔", "🌵", "🧊", "😡", "😱", "😭", "🤬"];
       var HOLES = 9, GAME_MS = 30000;
       var BEST_KEY = "goblub_whack_best";
@@ -174,15 +175,16 @@
         var g = gradeOf(score);
         var ov = $("overlay");
         $("ov-emoji").textContent = g.e;
-        $("ov-title").textContent = "최종 " + score + "점!";
-        $("ov-desc").innerHTML = '<span class="grade">' + g.n + "</span><br>" +
-          "최고 콤보 " + maxCombo + " · 최고 기록 " + (isBest ? score + " 🏆 신기록!" : Math.max(b, score)) + "점";
-        $("ov-btn").textContent = "다시 도전!";
+        $("ov-title").textContent = tr("최종 {S}점!").replace("{S}", score);
+        $("ov-desc").innerHTML = '<span class="grade">' + tr(g.n) + "</span><br>" +
+          tr("최고 콤보 {C} · 최고 기록 {B}점").replace("{C}", maxCombo).replace("{B}", Math.max(b, score)) +
+          (isBest ? " " + tr("🏆 신기록!") : "");
+        $("ov-btn").textContent = tr("다시 도전!");
         $("ov-extra").innerHTML = "";
         ov.style.display = "flex";
         $("card-slot").appendChild(ShareCard.render({
-          palette: "coral", emoji: g.e, badge: "감정 몬스터 팡팡", title: score + "점 · " + g.n,
-          lines: ["최고 콤보 " + maxCombo + "연타!", "너의 기록에 도전해봐 🔥"]
+          palette: "coral", emoji: g.e, badge: tr("감정 몬스터 팡팡"), title: score + tr("점") + " · " + tr(g.n),
+          lines: [tr("최고 콤보 {C}연타!").replace("{C}", maxCombo), tr("너의 기록에 도전해봐 🔥")]
         }));
       }
 

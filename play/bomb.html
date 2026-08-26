@@ -88,12 +88,13 @@
     </section>
   </main>
   <div id="site-footer"></div>
-  <script src="../js/common.js?v=26" data-root=".."></script>
+  <script src="../js/common.js?v=27" data-root=".."></script>
   <script src="js/feed.js?v=14"></script>
   <script src="js/goblub-art.js"></script>
   <script>
   (function () {
     var $ = function (id) { return document.getElementById(id); };
+    var tr = window.GoblubI18n ? GoblubI18n.t : function (s) { return s; };
     var MIN = 2, MAX = 8;
     var SKIN = ["#ffd479", "#8fe0a6", "#8fc4ff", "#ff9aa8", "#d3a8ff", "#7fdede", "#ffb185", "#f5a9d0"];
 
@@ -113,7 +114,7 @@
       var row = document.createElement("div");
       row.className = "item-row";
       row.innerHTML = '<span class="idx"></span>' +
-        '<input class="item-input" type="text" maxlength="10" placeholder="이름" />' +
+        '<input class="item-input" type="text" maxlength="10" placeholder="' + tr("이름") + '" />' +
         '<button class="item-del" type="button" aria-label="삭제">×</button>';
       row.querySelector(".item-input").value = val || "";
       row.querySelector(".item-del").onclick = function () {
@@ -239,7 +240,7 @@
         if (t !== lastLine[kind]) break;
       }
       lastLine[kind] = t;
-      return t.replace("{n}", name);
+      return tr(t).replace("{n}", name);
     }
     var wrap = $("track-wrap");
 
@@ -402,7 +403,7 @@
 
     function start() {
       var names = readItems();
-      if (names.length < MIN) { showErr("이름을 " + MIN + "명 이상 넣어주세요"); return; }
+      if (names.length < MIN) { showErr(tr("이름을 {M}명 이상 넣어주세요").replace("{M}", MIN)); return; }
       hideErr(); audioInit();
       lobbyStop();
       busy = true;
@@ -457,7 +458,7 @@
       var cam = { x: VW / 2, y: VH * .52, z: 1, fx: VW / 2, fy: VH * .52, fz: 1 };
       var t0 = performance.now(), last = t0;
 
-      $("hud-left").textContent = "🔥 심지에 불이 붙었다";
+      $("hud-left").textContent = tr("🔥 심지에 불이 붙었다");
       $("hud-right").textContent = "";
 
       function tempo() { return Math.max(0, Math.min(1, el / armT)); }
@@ -475,7 +476,7 @@
         var tp = tempo();
         if (n >= 3 && Math.random() < .10 + .16 * tp) {
           dir = -dir;
-          flash = "🔄 급반전!"; flashT = 900; sfx.swish();
+          flash = tr("🔄 급반전!"); flashT = 900; sfx.swish();
         }
         var to, cross = false;
         if (n >= 4 && Math.random() < .09 + .14 * tp) {
@@ -490,7 +491,7 @@
           if (to === holder) to = (to + dir + n) % n;
           cross = false;
         }
-        if (cross) { flash = "💨 크로스 패스!"; flashT = 900; }
+        if (cross) { flash = tr("💨 크로스 패스!"); flashT = 900; }
         return { to: to, cross: cross };
       }
 
@@ -538,10 +539,10 @@
           if (dk >= 0) {
             finalDecoy = dk; finalStage = "decoy";
             pick = { to: dk, cross: true };
-            flash = "💥 설마… " + players[dk].name + "?!"; flashT = 2000;
+            flash = tr("💥 설마… {N}?!").replace("{N}", players[dk].name); flashT = 2000;
           } else {
             finalStage = "direct";
-            flash = "💥 설마… " + players[loser].name + "?!"; flashT = 2000;
+            flash = tr("💥 설마… {N}?!").replace("{N}", players[loser].name); flashT = 2000;
           }
         }
         var from = players[holder], to = players[pick.to];
@@ -751,7 +752,7 @@
               smoke.push({ x: players[holder].x + (Math.random() - .5) * 60,
                 y: players[holder].y + (Math.random() - .5) * 40,
                 r: 24 + Math.random() * 30, vy: -.4 - Math.random() * .8, life: 1 });
-            $("hud-left").textContent = "💥 " + players[holder].name + " 당첨!";
+            $("hud-left").textContent = tr("💥 {N} 당첨!").replace("{N}", players[holder].name);
             sfx.cheer();
             if (window.GoblubFeed) GoblubFeed.grant("bomb");
             if (window.gbTrack) window.gbTrack("minigame_play",
@@ -803,7 +804,7 @@
           g.textAlign = "center"; g.textBaseline = "middle";
           g.globalAlpha = Math.min(1, stT / 600);
           g.fillStyle = "#ffb185"; g.font = "700 30px 'Jua', sans-serif";
-          g.fillText("💥 벌칙 당첨자!", VW / 2, VH * .74);
+          g.fillText(tr("💥 벌칙 당첨자!"), VW / 2, VH * .74);
           g.fillStyle = "#ffffff"; g.font = "700 76px 'Jua', sans-serif";
           g.fillText(players[holder].name, VW / 2, VH * .84);
           g.globalAlpha = 1;

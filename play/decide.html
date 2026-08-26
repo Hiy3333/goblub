@@ -55,12 +55,13 @@
     <p class="fine-print">중요한 결정은 그대의 몫!</p>
   </main>
   <div id="site-footer"></div>
-  <script src="../js/common.js?v=26" data-root=".."></script>
+  <script src="../js/common.js?v=27" data-root=".."></script>
   <script src="js/dosa.js?v=3"></script>
   <script src="js/feed.js?v=14"></script>
   <script>
     (function () {
       var $ = function (id) { return document.getElementById(id); };
+      var tr = window.GoblubI18n ? GoblubI18n.t : function (s) { return s; };
 
       function setBusy(b) {
         $("thunder").style.display = b ? "block" : "none";
@@ -71,18 +72,18 @@
         var a = $("in-a").value.trim(), b = $("in-b").value.trim(), ctx = $("in-ctx").value.trim();
         var err = $("err");
         err.style.display = "none";
-        if (!a || !b) { err.textContent = "A와 B를 모두 채워주세요!"; err.style.display = "block"; return; }
+        if (!a || !b) { err.textContent = tr("A와 B를 모두 채워주세요!"); err.style.display = "block"; return; }
         var txt = $("d-text"), st = $("d-status");
         setBusy(true);
         st.style.display = "block";
-        st.textContent = "⚡ 신께서 우주의 저울을 기울이는 중…";
+        st.textContent = tr("⚡ 신께서 우주의 저울을 기울이는 중…");
         txt.style.display = "block"; txt.textContent = "";
         $("d-actions").style.display = "none";
         Dosa.fetchAI("/api/decide", { decide: { a: a, b: b, context: ctx } }, "goblub_dc_", {
           onChunk: function (t) { txt.textContent += t; },
           onDone: function (fromCache) {
             setBusy(false);
-            st.textContent = fromCache ? "⚡ (같은 고민엔 같은 신탁이 내려온다)" : "⚡ 신탁이 내려왔다.";
+            st.textContent = fromCache ? tr("⚡ (같은 고민엔 같은 신탁이 내려온다)") : tr("⚡ 신탁이 내려왔다.");
             $("d-actions").style.display = "flex";
             if (window.GoblubFeed) GoblubFeed.grant("decide");
           },
@@ -90,9 +91,9 @@
             setBusy(false);
             txt.style.display = "none";
             st.textContent =
-              code === "not_configured" ? "신께서 아직 강림 전이에요. 곧 찾아옵니다!" :
-              code === "cooldown" ? "신께서 숨 고르는 중… " + sec + "초 후에 다시!" :
-              "신전에 참배객이 너무 많아요. 잠시 후 다시!";
+              code === "not_configured" ? tr("신께서 아직 강림 전이에요. 곧 찾아옵니다!") :
+              code === "cooldown" ? tr("신께서 숨 고르는 중…") + " " + sec + tr("초 후에 다시!") :
+              tr("신전에 참배객이 너무 많아요. 잠시 후 다시!");
           }
         });
       };

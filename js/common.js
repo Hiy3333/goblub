@@ -148,4 +148,8 @@
 })();
 
 // ===== 다국어(i18n) 로드 — common.js 바로 다음에 실행되도록 동기 삽입 =====
-document.write('<script src="' + (document.currentScript && document.currentScript.getAttribute("data-root") || (function(){var ss=document.getElementsByTagName("script");for(var i=0;i<ss.length;i++){var m=(ss[i].src||"").match(/^(.*)\/js\/common\.js/);if(m)return m[1].replace(location.origin,"")||".";}return ".";})()) + '/js/i18n.js?v=1"><\/script>');
+(function () {
+  var root = (document.currentScript && document.currentScript.getAttribute("data-root")) || (function(){var ss=document.getElementsByTagName("script");for(var i=0;i<ss.length;i++){var m=(ss[i].src||"").match(/^(.*)\/js\/common\.js/);if(m)return m[1].replace(location.origin,"")||".";}return ".";})();
+  document.write('<script src="' + root + '/js/i18n.js?v=1"><\/script>');
+  document.write('<script src="' + root + '/js/i18n-more.js?v=1"><\/script>');
+})();
