@@ -111,7 +111,7 @@
     <p class="fine-print">모든 데이터는 이 브라우저에 저장돼요</p>
   </main>
   <div id="site-footer"></div>
-  <script src="js/common.js?v=27" data-root="."></script>
+  <script src="js/common.js?v=28" data-root="."></script>
   <script src="js/auth.js?v=6"></script>
   <script src="play/js/feed.js?v=14"></script>
   <script>
@@ -145,14 +145,14 @@
           var hasBirth = !!JSON.parse(localStorage.getItem("goblub_birth") || "null");
           var total = 7;
           var n = done + (hasBirth ? 1 : 0);
-          if (n > 0) $("card-summary").textContent = "완성도 " + Math.min(n, total) + "/" + total + " — 채울수록 카드가 꽉 차요!";
+          if (n > 0) $("card-summary").textContent = (window.GoblubI18n?GoblubI18n.t("완성도 {N}/{T} — 채울수록 카드가 꽉 차요!"):"완성도 {N}/{T} — 채울수록 카드가 꽉 차요!").replace("{N}", Math.min(n, total)).replace("{T}", total);
         } catch (e) {}
       }
 
       function renderBirth() {
         try {
           var b = JSON.parse(localStorage.getItem("goblub_birth"));
-          if (b && b.y) $("birth-hint").textContent = b.y + "년 " + b.m + "월 " + b.d + "일" + (b.hour != null ? " " + b.hour + "시" : "");
+          if (b && b.y) { var _t = window.GoblubI18n ? GoblubI18n.t : function (x) { return x; }; $("birth-hint").textContent = _t("{Y}년 {M}월 {D}일").replace("{Y}", b.y).replace("{M}", b.m).replace("{D}", b.d) + (b.hour != null ? " " + _t("{N}시").replace("{N}", b.hour) : ""); }
         } catch (e) {}
       }
 

@@ -175,14 +175,16 @@
         fetch("data/saju-terms.json").then(function (r) { return r.json(); }).then(function (data) {
           var t = GwigokToday.line(data, b);
           if (!t) return;
-          document.getElementById("tb-gj").textContent = t.ganji + "(" + t.hj + ")일 · " + t.group;
-          document.getElementById("tb-tx").textContent = t.text.split("\n")[0];
+          var _t = window.GoblubI18n ? GoblubI18n.t : function (x) { return x; };
+          document.getElementById("tb-gj").textContent = _t("{G}({H})일 · {P}").replace("{G}", t.ganji).replace("{H}", t.hj).replace("{P}", _t(t.group));
+          document.getElementById("tb-tx").textContent = _t(t.text.split("\n")[0]);
           band.style.display = "flex";
         }).catch(function () {});
       } else {
         document.getElementById("tb-gj").style.display = "none";
+        var _t3 = window.GoblubI18n ? GoblubI18n.t : function (x) { return x; };
         document.getElementById("tb-tx").innerHTML =
-          '네 명부를 새기면, 매일 오늘의 운을 한 마디씩 들려주마. <a href="saju-premium.html">명부 새기러 가기 ⟶</a>';
+          _t3("네 명부를 새기면, 매일 오늘의 운을 한 마디씩 들려주마.") + ' <a href="saju-premium.html">' + _t3("명부 새기러 가기 ⟶") + '</a>';
         band.style.display = "flex";
       }
     })();

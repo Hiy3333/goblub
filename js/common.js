@@ -151,5 +151,5 @@
 (function () {
   var root = (document.currentScript && document.currentScript.getAttribute("data-root")) || (function(){var ss=document.getElementsByTagName("script");for(var i=0;i<ss.length;i++){var m=(ss[i].src||"").match(/^(.*)\/js\/common\.js/);if(m)return m[1].replace(location.origin,"")||".";}return ".";})();
   document.write('<script src="' + root + '/js/i18n.js?v=1"><\/script>');
-  document.write('<script src="' + root + '/js/i18n-more.js?v=1"><\/script>');
+  document.write('<script src="' + root + '/js/i18n-more.js?v=2"><\/script>');
 })();

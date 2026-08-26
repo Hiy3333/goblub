@@ -60,33 +60,36 @@ a{color:inherit;text-decoration:none}
   <p class="foot">goblub · 冥 簿 館</p>
 </div>
 
+<script src="../js/i18n.js?v=1"></script>
+<script src="../js/i18n-more.js?v=2"></script>
 <script src="js/gwigok-log.js?v=1"></script>
 <script>
 (function(){
   var $=function(id){return document.getElementById(id);};
+  var tr=window.GoblubI18n?GoblubI18n.t:function(s){return s;};
   var ICON={ day:"日", cal:"曆", sinsal:"煞", ask:"問", dream:"夢", bujeok:"符", myeongbu:"對", book:"冥" };
 
   function render(){
     var list=GwigokLog.list();
     var book=$("book");
     if(!list.length){
-      book.innerHTML='<div class="empty">아직 아무것도 적혀 있지 않다.<br>'+
-        '<a href="gwigok-day.html">오늘 치 운</a>부터 읽고 오너라 — 그때부터 장부가 시작된다.</div>';
+      book.innerHTML='<div class="empty">'+tr("아직 아무것도 적혀 있지 않다.")+'<br>'+
+        '<a href="gwigok-day.html">'+tr("오늘 치 운")+'</a>'+tr("부터 읽고 오너라 — 그때부터 장부가 시작된다.")+'</div>';
       $("cnt").textContent=""; $("burnWrap").style.display="none";
       return;
     }
     book.innerHTML=list.map(function(e){
       return '<div class="entry"><span class="d">'+e.d+'</span>'+
         '<span class="ic">'+(ICON[e.t]||"·")+'</span>'+
-        '<span class="h">'+String(e.h).replace(/</g,"&lt;")+'</span>'+
+        '<span class="h">'+tr(String(e.h)).replace(/</g,"&lt;")+'</span>'+
         '<span class="l">'+String(e.l).replace(/</g,"&lt;")+'</span></div>';
     }).join("");
-    $("cnt").innerHTML="지금까지 <b>"+list.length+"건</b>이 적혀 있다.";
+    $("cnt").innerHTML=tr("지금까지 <b>{N}건</b>이 적혀 있다.").replace("{N}",list.length);
     $("burnWrap").style.display="flex";
   }
 
   $("burn").onclick=function(){
-    if(!confirm("기록을 전부 태운다. 되돌릴 수 없다 — 태우겠느냐?")) return;
+    if(!confirm(tr("기록을 전부 태운다. 되돌릴 수 없다 — 태우겠느냐?"))) return;
     GwigokLog.clear(); render();
   };
 
