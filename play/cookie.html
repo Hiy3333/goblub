@@ -166,6 +166,7 @@ video::-webkit-media-controls-overlay-play-button{display:none!important;-webkit
 </div>
 
 <script src="../js/common.js?v=27" data-root=".."></script>
+<script src="js/i18n-cookie.js?v=1"></script>
 <script src="js/feed.js?v=14"></script>
 <script>
 var IMG="img/otter/",
@@ -182,6 +183,7 @@ var SEG=[
 [ENDIMG, INTRO, MID1, MID2].forEach(function(u){ var im=new Image(); im.src=u; });
 try{ fetch(V_ALL).catch(function(){}); }catch(e){}
 var $=function(id){return document.getElementById(id);};
+var tr=window.GoblubI18n?GoblubI18n.t:function(s){return s;};
 var scIntro=$("scIntro"), scPlay=$("scPlay"), scResult=$("scResult"),
     vid=$("vid"), still=$("still"), cap=$("cap"), hintbar=$("hintbar");
 
@@ -208,7 +210,7 @@ function show(sc){ [scIntro,scPlay,scResult].forEach(function(s){s.classList.rem
   document.body.classList.toggle("top", sc===scResult); if(sc===scResult) window.scrollTo(0,0); }
 
 function playSeq(src, capText, bridge, onEnd){
-  cap.textContent=capText;
+  cap.textContent=tr(capText);
   // src 교체 순간 video가 검게 비는 것을 다음 영상 첫 장면 스틸로 가린다
   // 나타날 때는 즉시(페이드 없이), 걷을 때만 0.3s 페이드 — 페이드인 중 검은 video가 비치는 것 방지
   if(bridge){
@@ -237,7 +239,7 @@ function choose(i){
 // 본편 한 파일을 끊김 없이 재생 — 자막·안내만 장면 시각에 맞춰 바뀐다
 function playAll(){
   var seg=-1, started=false;
-  cap.textContent=SEG[0].cap; hintbar.textContent=SEG[0].hint;
+  cap.textContent=tr(SEG[0].cap); hintbar.textContent=tr(SEG[0].hint);
   // 첫 프레임이 디코딩되기 전 검은 화면을 인트로 스틸로 가린다
   still.style.transition="none"; still.style.backgroundImage="url('"+INTRO+"')";
   still.classList.add("on"); void still.offsetWidth; still.style.transition="";
@@ -247,7 +249,7 @@ function playAll(){
   vid.ontimeupdate=function(){
     var i=0;
     for(var k=0;k<SEG.length;k++) if(vid.currentTime>=SEG[k].t) i=k;
-    if(i!==seg){ seg=i; cap.textContent=SEG[i].cap; hintbar.textContent=SEG[i].hint; }
+    if(i!==seg){ seg=i; cap.textContent=tr(SEG[i].cap); hintbar.textContent=tr(SEG[i].hint); }
   };
   vid.onended=function(){ vid.ontimeupdate=null; finish(false); };
   vid.onerror=function(){ chainFallback(); };   // 본편을 못 받으면 예전처럼 세 편을 이어 재생
@@ -260,11 +262,11 @@ function playAll(){
 
 function chainFallback(){
   vid.onerror=null; vid.ontimeupdate=null;
-  hintbar.textContent=SEG[0].hint;
+  hintbar.textContent=tr(SEG[0].hint);
   playSeq(V_TAKE, SEG[0].cap, INTRO, function(){
-    hintbar.textContent=SEG[1].hint;
+    hintbar.textContent=tr(SEG[1].hint);
     playSeq(V_CRACK, SEG[1].cap, MID1, function(){
-      hintbar.textContent=SEG[2].hint;
+      hintbar.textContent=tr(SEG[2].hint);
       playSeq(V_GIVE, SEG[2].cap, MID2, function(){ finish(false); });
     });
   });
@@ -281,8 +283,8 @@ function finish(fromLock){
   $("endimg").style.backgroundImage="url('"+ENDIMG+"')";
   show(scResult);
   setTimeout(function(){ try{ vid.pause(); vid.removeAttribute("src"); vid.load(); }catch(e){} }, 80);
-  $("fortune").textContent=fortune;
-  $("slipdate").textContent=d.getFullYear()+". "+(d.getMonth()+1)+". "+d.getDate()+" · 하루 한 장";
+  $("fortune").textContent=tr(fortune);
+  $("slipdate").textContent=d.getFullYear()+". "+(d.getMonth()+1)+". "+d.getDate()+tr(" · 하루 한 장");
   hintbar.textContent="";
   if(fromLock){ showSlip(); }
   else { $("revealbar").style.display="block"; }
@@ -300,7 +302,7 @@ function replay(){
   $("resultBody").style.display="none";
   $("revealbar").style.display="none";
   show(scIntro);
-  hintbar.textContent="한 번 더 깨면 새 운세가 나온달 — 마음에 들 때까지 깨 보달.";
+  hintbar.textContent=tr("한 번 더 깨면 새 운세가 나온달 — 마음에 들 때까지 깨 보달.");
 }
 
 /* ── 이미지로 저장: 해달 사진 + 아래 오늘의 한 줄 ── */
@@ -331,11 +333,11 @@ function ensureFonts(){
 
 function saveCard(){
   var btn=$("btn-save"), old=btn.textContent;
-  btn.disabled=true; btn.textContent="쪽지 만드는 중…";
+  btn.disabled=true; btn.textContent=tr("쪽지 만드는 중…");
   function done(){ btn.disabled=false; btn.textContent=old; }
 
   var im=new Image();
-  im.onerror=function(){ done(); alert("이미지를 불러오지 못했다달… 잠시 후 다시 시도해달."); };
+  im.onerror=function(){ done(); alert(tr("이미지를 불러오지 못했다달… 잠시 후 다시 시도해달.")); };
   im.onload=function(){ ensureFonts().then(function(){ draw(im); done(); }); };
   im.src=ENDIMG;
 
@@ -348,7 +350,7 @@ function saveCard(){
     // 줄 수 먼저 계산 → 최종 높이 결정
     var m=document.createElement("canvas").getContext("2d");
     m.font="700 46px "+MJ;
-    var lines=wrap(m,fortune,CW-120), LH=78;
+    var lines=wrap(m,tr(fortune),CW-120), LH=78;
     var SH=44+30+26+lines.length*LH+28+26+40;
     var H=SY+SH+150;
 
@@ -374,7 +376,7 @@ function saveCard(){
     fd.addColorStop(0,"rgba(11,18,32,0)"); fd.addColorStop(1,"rgba(11,18,32,.92)");
     g.fillStyle=fd; g.fillRect(PAD,PY+PH*0.55,CW,PH*0.45);
     g.textAlign="left"; g.fillStyle="#ffce7a"; g.font="30px "+MJ;
-    g.fillText("🦦 부둣가 해달이 건넨 쪽지", PAD+34, PY+PH-72);
+    g.fillText(tr("🦦 부둣가 해달이 건넨 쪽지"), PAD+34, PY+PH-72);
     g.restore();
     g.strokeStyle="rgba(255,206,122,.28)"; g.lineWidth=2; rr(g,PAD,PY,CW,PH,26); g.stroke();
 
@@ -389,16 +391,16 @@ function saveCard(){
 
     g.textAlign="center";
     g.fillStyle="#a58a55"; g.font="26px "+MJ;
-    g.fillText("오 늘 의 한 줄", W/2, SY+72);
+    g.fillText(tr("오 늘 의 한 줄"), W/2, SY+72);
     g.fillStyle="#3c2f1c"; g.font="700 46px "+MJ;
     var y=SY+72+26+56;
     lines.forEach(function(ln){ g.fillText(ln,W/2,y); y+=LH; });
     g.fillStyle="#b09a6c"; g.font="24px "+MJ;
-    g.fillText(d.getFullYear()+". "+(d.getMonth()+1)+". "+d.getDate()+" · 하루 한 장", W/2, y+6);
+    g.fillText(d.getFullYear()+". "+(d.getMonth()+1)+". "+d.getDate()+tr(" · 하루 한 장"), W/2, y+6);
 
     // 발문
     g.fillStyle="#aab6cc"; g.font="28px "+MJ;
-    g.fillText("🥠 goblub · 해달의 포춘쿠키", W/2, H-84);
+    g.fillText(tr("🥠 goblub · 해달의 포춘쿠키"), W/2, H-84);
     g.fillStyle="#ffce7a"; g.font="26px "+MJ;
     g.fillText("goblub-2.vercel.app", W/2, H-44);
 

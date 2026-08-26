@@ -61,11 +61,20 @@
   </main>
   <div id="site-footer"></div>
   <script src="../js/common.js?v=27" data-root=".."></script>
+  <script src="js/i18n-mbti.js?v=1"></script>
+  <script src="js/i18n-love.js?v=1"></script>
+  <script src="js/i18n-stress.js?v=1"></script>
+  <script src="js/i18n-foodtype.js?v=1"></script>
+  <script src="js/i18n-zombie.js?v=1"></script>
+  <script src="js/i18n-chatroom.js?v=1"></script>
+  <script src="js/i18n-tags.js?v=1"></script>
   <script src="js/feed.js?v=14"></script>
   <script src="js/saju.js"></script>
   <script>
     (function () {
       var $ = function (id) { return document.getElementById(id); };
+      var tr = window.GoblubI18n ? GoblubI18n.t : function (s) { return s; };
+      function trx(v) { return String(v).split(" · ").map(tr).join(" · "); }
       var ZE = { 쥐: "🐭", 소: "🐮", 호랑이: "🐯", 토끼: "🐰", 용: "🐲", 뱀: "🐍", 말: "🐴", 양: "🐑", 원숭이: "🐵", 닭: "🐔", 개: "🐶", 돼지: "🐷" };
       var ITEMS = [
         { key: "saju", label: "사주", url: "saju.html" },
@@ -84,7 +93,7 @@
           if (!b || !b.y || !data) return null;
           var r = Saju.compute(data, { y: b.y, m: b.m, d: b.d, hour: b.hour, min: b.min || 0 }, { trueSolar: true });
           var most = "목"; ["목", "화", "토", "금", "수"].forEach(function (k) { if (r.oheng[k] > r.oheng[most]) most = k; });
-          return { emoji: ZE[r.zodiac] || "🔮", title: r.zodiac + "띠 · " + Saju.GAN[r.ilgan] + "일간 · " + most + " 기운" };
+          return { emoji: ZE[r.zodiac] || "🔮", title: tr("{Z}띠 · {G}일간 · {O} 기운").replace("{Z}", tr(r.zodiac)).replace("{G}", tr(Saju.GAN[r.ilgan])).replace("{O}", tr(most)) };
         } catch (e) { return null; }
       }
 
@@ -92,9 +101,9 @@
         var card = (window.GoblubFeed && GoblubFeed.cardData()) || {};
         sajuInfo = computeSaju();
         var out = ITEMS.map(function (it) {
-          if (it.key === "saju") return { label: it.label, url: it.url, done: !!sajuInfo, emoji: sajuInfo ? sajuInfo.emoji : "🔮", title: sajuInfo ? sajuInfo.title : "생일 입력하기" };
+          if (it.key === "saju") return { label: it.label, url: it.url, done: !!sajuInfo, emoji: sajuInfo ? sajuInfo.emoji : "🔮", title: sajuInfo ? sajuInfo.title : tr("생일 입력하기") };
           var d = card[it.key];
-          return { label: it.label, url: it.url, done: !!(d && d.t), emoji: d ? d.e : "❓", title: d && d.t ? d.t : "아직 안 했어요", tags: d && d.tags || [] };
+          return { label: it.label, url: it.url, done: !!(d && d.t), emoji: d ? d.e : "❓", title: d && d.t ? trx(d.t) : tr("아직 안 했어요"), tags: (d && d.tags || []).map(tr) };
         });
         return out;
       }
@@ -104,15 +113,15 @@
       function render() {
         var items = collect();
         var doneCount = items.filter(function (i) { return i.done; }).length;
-        var nm = nick() || "이름 모를 goblub";
+        var nm = nick() || tr("이름 모를 goblub");
         var tags = [];
         items.forEach(function (i) { (i.tags || []).forEach(function (t) { if (tags.indexOf(t) < 0 && tags.length < 8) tags.push(t); }); });
 
         var html = '<div class="pc-head"><p class="who">🧑‍🚀 ' + esc(nm) + '</p>' +
-          '<p class="sub">완성도 ' + doneCount + '/' + items.length + '</p></div>' +
+          '<p class="sub">' + tr("완성도") + ' ' + doneCount + '/' + items.length + '</p></div>' +
           '<div class="pc-grid">' + items.map(function (i) {
             return '<div class="pc-tile' + (i.done ? "" : " empty") + '"><span class="em">' + i.emoji + '</span>' +
-              '<span class="tx"><span class="lb">' + esc(i.label) + '</span><span class="vl">' + esc(i.title) + '</span></span></div>';
+              '<span class="tx"><span class="lb">' + esc(tr(i.label)) + '</span><span class="vl">' + esc(i.title) + '</span></span></div>';
           }).join("") + "</div>" +
           (tags.length ? '<div class="pc-tags">' + tags.map(function (t) { return '<span class="tag">#' + esc(t) + "</span>"; }).join("") + "</div>" : "");
         $("pcard").innerHTML = html;
@@ -120,7 +129,7 @@
         var todo = items.filter(function (i) { return !i.done; });
         if (todo.length) {
           $("todo-panel").style.display = "block";
-          $("todo").innerHTML = todo.map(function (i) { return '<a class="todo-a" href="' + i.url + '">' + i.emoji + " " + esc(i.label) + " 하러 가기 →</a>"; }).join("");
+          $("todo").innerHTML = todo.map(function (i) { return '<a class="todo-a" href="' + i.url + '">' + i.emoji + " " + esc(tr("{L} 하러 가기 →").replace("{L}", tr(i.label))) + "</a>"; }).join("");
         } else $("todo-panel").style.display = "none";
         window.__cardState = { items: items, nm: nm, tags: tags, doneCount: doneCount };
       }
@@ -163,7 +172,7 @@
         c.fillText("🧑‍🚀 " + s.nm, W / 2, 116); c.fillText("🧑‍🚀 " + s.nm, W / 2, 116);
         c.restore();
         c.fillStyle = "#cdbdf6"; c.font = "27px 'Jua','Malgun Gothic',sans-serif";
-        c.fillText("goblub 종합 프로필 · 완성도 " + s.doneCount + "/" + s.items.length, W / 2, 164);
+        c.fillText(tr("goblub 종합 프로필 · 완성도 {D}").replace("{D}", s.doneCount + "/" + s.items.length), W / 2, 164);
         // tiles 2 cols — 어두운 라운드 타일
         var tx = 40, ty = 206, tw = (W - 80 - 20) / 2, th = 126, gap = 22;
         s.items.forEach(function (it, n) {
@@ -195,13 +204,13 @@
         c.fillText("👾", W / 2, afterTiles + 200);
         c.restore();
         c.fillStyle = "#cdbdf6"; c.font = "28px 'Jua','Malgun Gothic',sans-serif";
-        c.fillText("고브럽과 함께", W / 2, afterTiles + 258);
+        c.fillText(tr("고브럽과 함께"), W / 2, afterTiles + 258);
         // 하단 CTA
         c.font = "26px 'Jua','Malgun Gothic',sans-serif"; c.fillStyle = "#b9a8e8";
-        c.fillText("🌃 goblub · 종합 프로필 카드", W / 2, H - 116);
+        c.fillText(tr("🌃 goblub · 종합 프로필 카드"), W / 2, H - 116);
         c.font = "28px 'Jua','Malgun Gothic',sans-serif"; c.fillStyle = "#4deeea";
         c.save(); c.shadowColor = "#4deeea"; c.shadowBlur = 12;
-        c.fillText("나도 해보기 ▶ goblub-2.vercel.app", W / 2, H - 72);
+        c.fillText(tr("나도 해보기 ▶") + " goblub-2.vercel.app", W / 2, H - 72);
         c.restore();
         var dl = function (url) { var a = document.createElement("a"); a.href = url; a.download = "goblub-profile.png"; document.body.appendChild(a); a.click(); a.remove(); };
         if (g.toBlob) g.toBlob(function (b) { if (!b) { dl(g.toDataURL("image/png")); return; } var u = URL.createObjectURL(b); dl(u); setTimeout(function () { URL.revokeObjectURL(u); }, 5000); }, "image/png");

@@ -126,11 +126,14 @@
   </main>
   <div id="site-footer"></div>
   <script src="../js/common.js?v=27" data-root=".."></script>
+  <script src="js/i18n-letter.js?v=1"></script>
   <script src="js/feed.js?v=14"></script>
   <script src="js/goblub-art.js"></script>
   <script>
     (function () {
       var $ = function (id) { return document.getElementById(id); };
+      var tr = window.GoblubI18n ? GoblubI18n.t : function (s) { return s; };
+      function i18nApply(el) { if (window.GoblubI18n && el) GoblubI18n.apply(el); }
 
       // ---- base64url(JSON) 인코딩 ----
       function enc(obj) {
@@ -214,12 +217,12 @@
           '<button class="btn-ghost" id="btn-preview">👀 미리보기</button></div>';
         var tg = $("type-grid");
         var chosen = "date";
-        function updQ() { $("in-q").placeholder = '질문 문구 바꾸기 (기본: "' + TYPES[chosen].q + '")'; }
+        function updQ() { $("in-q").placeholder = tr('질문 문구 바꾸기 (기본: "{Q}")').replace("{Q}", tr(TYPES[chosen].q)); }
         Object.keys(TYPES).forEach(function (k) {
           var t = TYPES[k];
           var b = document.createElement("button");
           b.className = "type-tile" + (k === chosen ? " sel" : "");
-          b.innerHTML = '<span class="em">' + t.emoji + "</span>" + t.label;
+          b.innerHTML = '<span class="em">' + t.emoji + "</span>" + tr(t.label);
           b.onclick = function () {
             chosen = k;
             tg.querySelectorAll(".type-tile").forEach(function (x) { x.classList.remove("sel"); });
@@ -236,7 +239,7 @@
           var q = $("in-q").value.trim();
           var msg = $("in-msg").value.trim();
           var err = $("mk-err");
-          if (!name) { err.textContent = "받는 사람 이름을 적어주세요!"; err.style.display = "block"; return; }
+          if (!name) { err.textContent = tr("받는 사람 이름을 적어주세요!"); err.style.display = "block"; return; }
           err.style.display = "none";
           var d = { t: chosen, n: name.slice(0, 20) };
           if (from) d.f = from.slice(0, 20);
@@ -249,10 +252,11 @@
           $("mk-actions").style.display = "flex";
           var btn = $("btn-make");
           (navigator.clipboard ? navigator.clipboard.writeText(madeUrl) : Promise.reject())
-            .then(function () { btn.textContent = "✅ 링크 복사됨! 상대에게 보내세요"; })
-            .catch(function () { btn.textContent = "아래 링크를 복사해 보내세요"; });
+            .then(function () { btn.textContent = tr("✅ 링크 복사됨! 상대에게 보내세요"); })
+            .catch(function () { btn.textContent = tr("아래 링크를 복사해 보내세요"); });
         };
         $("btn-preview").onclick = function () { if (madeUrl) window.open(madeUrl, "_blank"); };
+        i18nApply(p);
         show("make");
       }
 
@@ -278,24 +282,25 @@
           '<div class="no-taunt" id="taunt"></div>' +
           '<div id="steps"></div>' +
           '<p class="fine-print" style="margin-top:22px">💜 이 편지는 <b>goblub</b>(무료 운세·테스트·미니게임 놀이터)의 마음 배달로 만들어졌어요 · 로그인·개인정보 수집 없음, 링크 속 내용은 보낸 사람만 알아요</p>';
+        i18nApply(p);
         show("play");
-        $("yes").textContent = t.yes;
-        $("no").textContent = t.no;
+        $("yes").textContent = tr(t.yes);
+        $("no").textContent = tr(t.no);
 
         // ---- 편지 배달 애니메이션 시퀀스 ----
         var gob = $("gob"), env = $("env"), puff = $("puff"), cap = $("cap");
         function caption(txt) { cap.style.opacity = "0"; setTimeout(function () { cap.textContent = txt; cap.style.opacity = "1"; }, 200); }
-        caption("고브럽이 " + t.label + " 편지를 물고 오는 중...");
+        caption(tr("고브럽이 {L} 편지를 물고 오는 중...").replace("{L}", tr(t.label)));
         // 1) 고브럽 등장(0.8s) → 2) 씹기(0.9s) 시작하며 편지 뱉기
         setTimeout(function () {
           gob.classList.add("chew");
           puff.classList.add("show");
           env.classList.add("fly");
-          caption("😤 우웩— 편지를 뱉는 중!");
+          caption(tr("😤 우웩— 편지를 뱉는 중!"));
         }, 850);
         // 3) 편지 도착 + 메시지 태그
         setTimeout(function () {
-          caption("💌 " + d.n + "님에게 편지 도착!");
+          caption(tr("💌 {N}님에게 편지 도착!").replace("{N}", d.n));
           if (d.m) $("msgtag").innerHTML = '<span>💬 "' + d.m + '"</span>';
         }, 1950);
         // 4) 편지 펼치기 → 질문 등장
@@ -303,7 +308,7 @@
           env.classList.remove("fly");
           env.classList.add("open"); env.classList.add("pop");
           caption("");
-          $("ask").textContent = d.q || t.q;
+          $("ask").textContent = d.q || tr(t.q);
           $("ask").classList.add("show");
           $("yn").classList.add("show");
         }, 2750);
@@ -324,9 +329,9 @@
         var no = $("no"), yes = $("yes"), yn = $("yn");
         var TRIGGER = 140, SAFE = 120, fixed = false;
         var dodge = 0, lastDodge = 0, eaten = false;
-        var TAUNTS = { 2: "🙊 앗, 버튼이 미끄러졌네?", 3: "😏 어딜 도망가~",
-          5: "🤣 벌써 5번째… 포기하면 편해요", 7: "😮‍💨 고브럽: 나 슬슬 배고픈데…",
-          9: "👀 고브럽이 '" + t.no + "' 버튼을 노려보기 시작했다…" };
+        var TAUNTS = { 2: tr("🙊 앗, 버튼이 미끄러졌네?"), 3: tr("😏 어딜 도망가~"),
+          5: tr("🤣 벌써 5번째… 포기하면 편해요"), 7: tr("😮‍💨 고브럽: 나 슬슬 배고픈데…"),
+          9: tr("👀 고브럽이 '{B}' 버튼을 노려보기 시작했다…").replace("{B}", tr(t.no)) };
         function taunt(msg) {
           var el = $("taunt"); if (!el) return;
           el.classList.remove("show");
@@ -335,7 +340,7 @@
         function eatNo() {
           eaten = true;
           var nr = no.getBoundingClientRect();
-          taunt("😋 고브럽: 못 참겠다, 냠!!");
+          taunt(tr("😋 고브럽: 못 참겠다, 냠!!"));
           var g2 = document.createElement("div");
           g2.className = "gob-eater";
           g2.style.left = (nr.left + nr.width / 2 - 42) + "px";
@@ -346,7 +351,7 @@
           setTimeout(function () {
             g2.remove();
             no.style.display = "none";
-            taunt("😋 고브럽이 '" + t.no + "' 버튼을 먹어버렸어요! 이제 남은 선택지는 하나 뿐…");
+            taunt(tr("😋 고브럽이 '{B}' 버튼을 먹어버렸어요! 이제 남은 선택지는 하나 뿐…").replace("{B}", tr(t.no)));
             yes.style.boxShadow = "0 0 22px var(--coral)";
           }, 1800);
         }
@@ -413,21 +418,21 @@
         }
         function stepMenu(done) {
           var items = t.menus || (t.label === "술 한잔" ? DRINKS : MENUS);
-          box.innerHTML = '<div class="step-q">' + (t.menuQ || "🍴 뭐 먹으러 갈까?") + '</div><div class="choice-grid" id="mg"></div>';
+          box.innerHTML = '<div class="step-q">' + tr(t.menuQ || "🍴 뭐 먹으러 갈까?") + '</div><div class="choice-grid" id="mg"></div>';
           items.forEach(function (m) {
             var b = document.createElement("button");
-            b.className = "choice"; b.innerHTML = '<span class="em">' + m[0] + "</span>" + m[1];
-            b.onclick = function () { choice.menu = m[0] + " " + m[1]; done(); };
+            b.className = "choice"; b.innerHTML = '<span class="em">' + m[0] + "</span>" + tr(m[1]);
+            b.onclick = function () { choice.menu = m[0] + " " + tr(m[1]); done(); };
             $("mg").appendChild(b);
           });
         }
         function stepCond(done) {
-          box.innerHTML = '<div class="step-q">🤙 사과 받는 대신, 조건 하나 걸자!</div>' +
+          box.innerHTML = '<div class="step-q">' + tr("🤙 사과 받는 대신, 조건 하나 걸자!") + '</div>' +
             '<div class="choice-grid" style="grid-template-columns:repeat(2,1fr)" id="cd"></div>';
           CONDS.forEach(function (c2) {
             var b = document.createElement("button");
-            b.className = "choice"; b.innerHTML = '<span class="em">' + c2[0] + "</span>" + c2[1];
-            b.onclick = function () { choice.cond = c2[0] + " " + c2[1]; done(); };
+            b.className = "choice"; b.innerHTML = '<span class="em">' + c2[0] + "</span>" + tr(c2[1]);
+            b.onclick = function () { choice.cond = c2[0] + " " + tr(c2[1]); done(); };
             $("cd").appendChild(b);
           });
         }
@@ -435,8 +440,8 @@
           var gg = t.gauge;
           if (!gg) { done(); return; }
           box.innerHTML =
-            '<div class="step-q">' + gg.name + '</div>' +
-            '<p class="gauge-ask">' + gg.ask + ' 슬라이더로 솔직하게!</p>' +
+            '<div class="step-q">' + tr(gg.name) + '</div>' +
+            '<p class="gauge-ask">' + tr("{A} 슬라이더로 솔직하게!").replace("{A}", tr(gg.ask)) + '</p>' +
             '<div class="gauge-val" id="gv"></div>' +
             '<div class="gauge-band" id="gb"></div>' +
             '<input type="range" class="gauge-range" id="gr" min="0" max="100" value="50" />' +
@@ -445,28 +450,28 @@
           function upd() {
             var v = +gr.value;
             $("gv").textContent = v + "%";
-            $("gb").textContent = gaugeBand(t, v);
-            $("g-ok").textContent = "📤 " + v + "%로 확정!";
+            $("gb").textContent = tr(gaugeBand(t, v));
+            $("g-ok").textContent = tr("📤 {V}%로 확정!").replace("{V}", v);
           }
           gr.oninput = upd; upd();
           $("g-ok").onclick = function () { choice.g = +gr.value; done(); };
         }
         function stepReply(done) {
           box.innerHTML =
-            '<div class="step-q">💬 마지막으로, 한마디 답장!</div>' +
+            '<div class="step-q">' + tr("💬 마지막으로, 한마디 답장!") + '</div>' +
             '<div class="reply-list" id="rl"></div>' +
             '<div id="rw" style="display:none; margin-top:10px">' +
-            '<input class="txt-input" id="in-reply" maxlength="60" placeholder="하고 싶은 말을 적어줘 (60자)" />' +
-            '<button class="btn-primary" id="btn-reply-send" style="width:100%">📨 이 답장 보내기</button></div>';
+            '<input class="txt-input" id="in-reply" maxlength="60" placeholder="' + tr("하고 싶은 말을 적어줘 (60자)") + '" />' +
+            '<button class="btn-primary" id="btn-reply-send" style="width:100%">' + tr("📨 이 답장 보내기") + '</button></div>';
           var rl = $("rl");
           (t.replies || []).forEach(function (msg) {
             var b = document.createElement("button");
-            b.className = "reply-opt"; b.textContent = "💬 " + msg;
-            b.onclick = function () { choice.rm = msg; done(); };
+            b.className = "reply-opt"; b.textContent = "💬 " + tr(msg);
+            b.onclick = function () { choice.rm = tr(msg); done(); };
             rl.appendChild(b);
           });
           var w = document.createElement("button");
-          w.className = "reply-opt write"; w.textContent = "✍️ 직접 쓸래";
+          w.className = "reply-opt write"; w.textContent = tr("✍️ 직접 쓸래");
           w.onclick = function () { $("rw").style.display = "block"; w.style.display = "none"; $("in-reply").focus(); };
           rl.appendChild(w);
           $("btn-reply-send").onclick = function () {
@@ -477,15 +482,15 @@
         }
         function stepDate(done) {
           box.innerHTML =
-            '<div class="step-q">📅 언제 만날까?</div>' +
+            '<div class="step-q">' + tr("📅 언제 만날까?") + '</div>' +
             '<div class="cal-nav"><button id="cal-prev">◀</button><span id="cal-title"></span><button id="cal-next">▶</button></div>' +
-            '<div class="cal-head"><span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span></div>' +
+            '<div class="cal-head">' + (function () { var w = tr("달력요일"); var a = w === "달력요일" ? ["일","월","화","수","목","금","토"] : w.split("|"); return a.map(function (x) { return "<span>" + x + "</span>"; }).join(""); })() + '</div>' +
             '<div class="cal-grid" id="cg"></div>';
           var now = new Date();
           var view = { y: now.getFullYear(), m: now.getMonth() };
           var minY = now.getFullYear(), minM = now.getMonth();
           function draw() {
-            $("cal-title").textContent = view.y + "년 " + (view.m + 1) + "월";
+            $("cal-title").textContent = tr("{Y}년 {M}월").replace("{Y}", view.y).replace("{M}", view.m + 1);
             $("cal-prev").disabled = (view.y === minY && view.m === minM);
             $("cal-prev").style.opacity = $("cal-prev").disabled ? ".3" : "1";
             var g = $("cg"); g.innerHTML = "";
@@ -512,7 +517,7 @@
           draw();
         }
         function stepTime(done) {
-          box.innerHTML = '<div class="step-q">⏰ 몇 시에 볼까?</div><div class="time-grid" id="tg2"></div>';
+          box.innerHTML = '<div class="step-q">' + tr("⏰ 몇 시에 볼까?") + '</div><div class="time-grid" id="tg2"></div>';
           TIMES.forEach(function (tm) {
             var b = document.createElement("div"); b.className = "slot"; b.textContent = tm;
             b.onclick = function () { choice.time = tm; done(); };
@@ -537,7 +542,8 @@
 
       function weekday(ymd) {
         var p = ymd.split("-");
-        return ["일","월","화","수","목","금","토"][new Date(+p[0], +p[1] - 1, +p[2]).getDay()];
+        var w = tr("달력요일"); var a = w === "달력요일" ? ["일","월","화","수","목","금","토"] : w.split("|");
+        return a[new Date(+p[0], +p[1] - 1, +p[2]).getDay()];
       }
 
       function renderResult(d, r, doRain) {
@@ -546,22 +552,23 @@
         var p = $("result-panel");
         p.innerHTML =
           '<div style="text-align:center"><span class="result-emoji">' + t.emoji + '</span>' +
-          '<p class="result-name">' + t.success + '</p></div>' +
+          '<p class="result-name">' + tr(t.success) + '</p></div>' +
           '<div class="out-card" id="out"></div>' +
           '<div class="result-actions">' +
-          '<button class="btn-primary" id="btn-img">🖼 이미지 저장</button>' +
-          '<button class="btn-ghost" id="btn-reply">🔗 되답 링크 복사</button>' +
-          '<a class="btn-ghost" href="../index.html">🎡 다른 즐길거리</a></div>';
+          '<button class="btn-primary" id="btn-img">' + tr("🖼 이미지 저장") + '</button>' +
+          '<button class="btn-ghost" id="btn-reply">' + tr("🔗 되답 링크 복사") + '</button>' +
+          '<a class="btn-ghost" href="../index.html">' + tr("🎡 다른 즐길거리") + '</a></div>';
         var lines = ['💌 To. <b>' + d.n + '</b>'];
-        if (r.menu) lines.push((t.menuLine || "🍴 메뉴") + ': ' + r.menu);
-        if (r.day) lines.push('📅 날짜: ' + r.day + ' (' + wd + ')');
-        if (r.time) lines.push('⏰ 시간: ' + r.time);
-        if (r.c) lines.push('🤙 용서 조건: <b>' + r.c + '</b>');
-        if (r.g != null && t.gauge) lines.push(t.gauge.name + ': <b>' + r.g + '%</b> — ' + gaugeBand(t, r.g));
-        if (d.m) lines.push('💬 보낸 한마디: "' + d.m + '"');
-        if (r.rm) lines.push('📨 답장: <b>"' + r.rm + '"</b>');
+        if (r.menu) lines.push(tr(t.menuLine || "🍴 메뉴") + ': ' + r.menu);
+        if (r.day) lines.push(tr('📅 날짜:') + ' ' + r.day + ' (' + wd + ')');
+        if (r.time) lines.push(tr('⏰ 시간:') + ' ' + r.time);
+        if (r.c) lines.push(tr('🤙 용서 조건:') + ' <b>' + r.c + '</b>');
+        if (r.g != null && t.gauge) lines.push(tr(t.gauge.name) + ': <b>' + r.g + '%</b> — ' + tr(gaugeBand(t, r.g)));
+        if (d.m) lines.push(tr('💬 보낸 한마디:') + ' "' + d.m + '"');
+        if (r.rm) lines.push(tr('📨 답장:') + ' <b>"' + r.rm + '"</b>');
         if (d.f) lines.push('✍️ From. <b>' + d.f + '</b>');
         $("out").innerHTML = lines.join('<br>');
+        i18nApply(p);
         show("result");
         if (doRain) rain(d.t);
         if (window.GoblubFeed) GoblubFeed.grant("letter");
@@ -570,8 +577,8 @@
           var url = location.origin + location.pathname + "#d=" + enc(d) + "&r=" + enc(r);
           var b = $("btn-reply");
           (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject())
-            .then(function () { b.textContent = "복사됨! 보낸 사람에게 전하세요"; })
-            .catch(function () { prompt("이 링크를 보내세요:", url); });
+            .then(function () { b.textContent = tr("복사됨! 보낸 사람에게 전하세요"); })
+            .catch(function () { prompt(tr("이 링크를 보내세요:"), url); });
         };
         $("btn-img").onclick = function () { saveImage(d, r, wd); };
       }
@@ -633,7 +640,7 @@
         g.fillText("✦", 96, 200); g.fillText("✦", W - 90, 640); g.fillText("✧", W - 120, 160); g.fillText("✧", 110, 680);
         g.restore();
         // 상단 네온 pill 배지
-        var badge = "마음 배달 성공";
+        var badge = tr("마음 배달 성공");
         g.font = "30px 'Jua', 'Malgun Gothic', sans-serif";
         var bw = g.measureText(badge).width + 56;
         g.save(); g.shadowColor = neon; g.shadowBlur = 16; g.strokeStyle = neon; g.lineWidth = 3;
@@ -646,7 +653,7 @@
         // 성공 문구 — 핑크 네온
         g.font = "52px 'Jua', 'Malgun Gothic', sans-serif"; g.fillStyle = "#ffffff";
         g.save(); g.shadowColor = neon; g.shadowBlur = 26;
-        g.fillText(t.success, W / 2, 596); g.fillText(t.success, W / 2, 596);
+        g.fillText(tr(t.success), W / 2, 596); g.fillText(tr(t.success), W / 2, 596);
         g.restore();
         // To.
         g.font = "38px 'Jua', 'Malgun Gothic', sans-serif"; g.fillStyle = "#ffffff";
@@ -662,13 +669,13 @@
         if (r.c) {
           g.fillStyle = "#ffd93d";
           g.save(); g.shadowColor = "#ffd93d"; g.shadowBlur = 12;
-          g.fillText("🤙 조건: " + r.c, W / 2, y);
+          g.fillText(tr("🤙 조건:") + " " + r.c, W / 2, y);
           g.restore(); g.fillStyle = "#cdbdf6";
           y += 50;
         }
         // 게이지 — 네온 바
         if (r.g != null && t.gauge) {
-          g.fillText(t.gauge.name + " " + r.g + "%", W / 2, y); y += 18;
+          g.fillText(tr(t.gauge.name) + " " + r.g + "%", W / 2, y); y += 18;
           var bw2 = 400, bx = (W - bw2) / 2;
           rr(bx, y, bw2, 22, 11); g.fillStyle = "#241a52"; g.fill();
           if (r.g > 0) {
@@ -679,7 +686,7 @@
           }
           y += 46;
           g.fillStyle = "#ff9edb"; g.font = "26px 'Jua', 'Malgun Gothic', sans-serif";
-          g.fillText(gaugeBand(t, r.g), W / 2, y);
+          g.fillText(tr(gaugeBand(t, r.g)), W / 2, y);
           g.fillStyle = "#cdbdf6"; g.font = "30px 'Jua', 'Malgun Gothic', sans-serif";
           y += 52;
         }
@@ -695,7 +702,7 @@
         if (r.rm) {
           g.fillStyle = "#9df3ef"; g.font = "28px 'Jua', 'Malgun Gothic', sans-serif";
           g.save(); g.shadowColor = "#4deeea"; g.shadowBlur = 14;
-          g.fillText("📨 답장 “" + r.rm + "”", W / 2, y);
+          g.fillText(tr("📨 답장") + " “" + r.rm + "”", W / 2, y);
           g.restore();
           y += 50;
         }
@@ -705,10 +712,10 @@
         }
         // 하단 CTA
         g.font = "26px 'Jua', 'Malgun Gothic', sans-serif"; g.fillStyle = "#b9a8e8";
-        g.fillText("🌃 goblub · 대환장 놀이터", W / 2, H - 116);
+        g.fillText(tr("🌃 goblub · 대환장 놀이터"), W / 2, H - 116);
         g.font = "28px 'Jua', 'Malgun Gothic', sans-serif"; g.fillStyle = "#4deeea";
         g.save(); g.shadowColor = "#4deeea"; g.shadowBlur = 12;
-        g.fillText("나도 해보기 ▶ goblub-2.vercel.app", W / 2, H - 72);
+        g.fillText(tr("나도 해보기 ▶") + " goblub-2.vercel.app", W / 2, H - 72);
         g.restore();
         c.toBlob(function (blob) {
           if (!blob) { window.open(c.toDataURL("image/png")); return; }

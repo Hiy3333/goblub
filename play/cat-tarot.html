@@ -186,9 +186,12 @@ video::-webkit-media-controls-overlay-play-button{display:none!important;-webkit
   <p class="hintbar" id="hintbar">고민을 적고 카드를 펼치면, 끌리는 한 장을 고를 수 있다옹.</p>
 </div>
 
+<script src="../js/i18n.js?v=1"></script>
+<script src="js/i18n-tarot.js?v=1"></script>
 <script src="js/feed.js?v=14"></script>
 <script src="js/dosa.js?v=3"></script>
 <script>
+var tr=window.GoblubI18n?GoblubI18n.t:function(s){return s;};
 var SPREAD="img/cat/cat2-spread.mp4", CAT_IDLE="img/cat/cat2-start.webp",
     TABLE="img/cat/cat2-tablecat.mp4",
     BACK="img/cat/cat2-back.webp?v=2", LOCK_KEY="goblub_cattarot_v2";
@@ -247,7 +250,7 @@ $("goBtn").onclick=function(){
 };
 
 function startSpread(){
-  phase="spread"; show(scSpread); hintbar.textContent="고양이가 앞발로 카드를 펼치는 중…";
+  phase="spread"; show(scSpread); hintbar.textContent=tr("고양이가 앞발로 카드를 펼치는 중…");
   vid.onended=null; vid.onplaying=null; vid.loop=false; vid.src=SPREAD;
   vid.onplaying=function(){ still.classList.remove("on"); };
   vid.onended=function(){ toPick(); };
@@ -265,7 +268,7 @@ function toPick(){
   var tvid=$("tvid");
   if(tvid && !tvid.src){ tvid.src=TABLE; }
   if(tvid){ var pp=tvid.play(); if(pp&&pp.catch) pp.catch(function(){}); }
-  hintbar.textContent="테이블 위 카드 중 끌리는 한 장을 톡 눌러보라옹.";
+  hintbar.textContent=tr("테이블 위 카드 중 끌리는 한 장을 톡 눌러보라옹.");
 }
 
 // 14장(두 줄 아크) — 테이블 앞쪽에 펼쳐 놓기 (무대 폭에 비례해 스케일)
@@ -332,7 +335,7 @@ function replay(){
   still.style.backgroundImage="url('"+CAT_IDLE+"')"; still.classList.add("on");
   var w=$("worry"); if(w) w.value="";   // 새 질문을 받도록 비워 둔다
   show(scIntro);
-  hintbar.textContent="다른 게 궁금하면 새로 물어보라냥 — 고민이 바뀌면 카드도 바뀐다옹.";
+  hintbar.textContent=tr("다른 게 궁금하면 새로 물어보라냥 — 고민이 바뀌면 카드도 바뀐다옹.");
 }
 
 function revealResult(cardIdx, orient, fromLock){
@@ -342,14 +345,14 @@ function revealResult(cardIdx, orient, fromLock){
   var pad=(cardIdx<10?"0":"")+cardIdx;
   $("rimg").src="img/cat/arcana/"+pad+".webp?v=2";
   $("rimg").classList.toggle("rev", orient.indexOf("역")>=0);
-  $("rname").textContent=c[0]+" · "+c[1];
-  $("rorient").textContent="— "+orient+" —";
-  $("rkw").textContent=c[2];
-  $("worryEcho").textContent=myWorry ? "“"+myWorry+"”" : "오늘 하루의 운을 물었다옹";
+  $("rname").textContent=c[0]+" · "+tr(c[1]);
+  $("rorient").textContent="— "+tr(orient)+" —";
+  $("rkw").textContent=tr(c[2]);
+  $("worryEcho").textContent=myWorry ? "“"+myWorry+"”" : tr("오늘 하루의 운을 물었다옹");
   hintbar.textContent="";
   var readingEl=$("reading"), statusEl=$("rstatus"), onceBar=$("oncebar");
   readingEl.style.display="none"; readingEl.innerHTML=""; onceBar.style.display="none";
-  statusEl.style.display="block"; statusEl.innerHTML='<span class="spin"></span>고양이가 카드를 읽는 중…';
+  statusEl.style.display="block"; statusEl.innerHTML='<span class="spin"></span>'+tr("고양이가 카드를 읽는 중…");
 
   // 같은 고민의 해석이 저장돼 있으면 API 없이 즉시 표시 — 다시 보기는 공짜.
   // 고민이 바뀌었으면 캐시를 쓰지 않는다.
@@ -379,10 +382,10 @@ function revealResult(cardIdx, orient, fromLock){
       },
       onError:function(code, sec){
         statusEl.style.display="block";
-        statusEl.innerHTML = (code==="not_configured" ? "점술묘가 아직 낮잠 중이라옹… 곧 깨어난다냥." :
-          code==="cooldown" ? "숨 좀 고르고… "+sec+"초 뒤에 다시 보라옹." :
-          "오늘은 손님이 많구나옹. 잠시 뒤 다시 와보라냥.") +
-          '<br/><button class="again" style="margin-top:12px" onclick="revealResult('+cardIdx+',\''+orient+'\',true)">🐾 다시 불러오기</button>';
+        statusEl.innerHTML = (code==="not_configured" ? tr("점술묘가 아직 낮잠 중이라옹… 곧 깨어난다냥.") :
+          code==="cooldown" ? tr("숨 좀 고르고…")+" "+sec+tr("초 뒤에 다시 보라옹.") :
+          tr("오늘은 손님이 많구나옹. 잠시 뒤 다시 와보라냥.")) +
+          '<br/><button class="again" style="margin-top:12px" onclick="revealResult('+cardIdx+',\''+orient+'\',true)">'+tr("🐾 다시 불러오기")+'</button>';
         onceBar.style.display="block";
       }
     });
@@ -436,11 +439,11 @@ function loadImg(src){
 function saveCard(){
   if(curIdx===null) return;
   var btn=document.getElementById("btn-save"), old=btn.textContent;
-  btn.disabled=true; btn.textContent="카드 만드는 중…";
+  btn.disabled=true; btn.textContent=tr("카드 만드는 중…");
   var pad=(curIdx<10?"0":"")+curIdx;
   Promise.all([ loadImg(CAT_IDLE), loadImg("img/cat/arcana/"+pad+".webp?v=2"), ensureFonts() ])
     .then(function(r){ draw(r[0], r[1]); })
-    .catch(function(){ alert("이미지를 불러오지 못했다옹… 잠시 뒤 다시 해보라냥."); })
+    .catch(function(){ alert(tr("이미지를 불러오지 못했다옹… 잠시 뒤 다시 해보라냥.")); })
     .then(function(){ btn.disabled=false; btn.textContent=old; });
 
   function draw(cat, card){
@@ -480,7 +483,7 @@ function saveCard(){
     fd.addColorStop(0,"rgba(12,9,24,0)"); fd.addColorStop(1,"rgba(12,9,24,.94)");
     g.fillStyle=fd; g.fillRect(PAD,PY+PH*0.55,CW,PH*0.45);
     g.textAlign="left"; g.fillStyle="#e9c877"; g.font="30px "+MJ;
-    g.fillText("🐱 점술묘가 뽑아준 카드", PAD+34, PY+PH-46);
+    g.fillText(tr("🐱 점술묘가 뽑아준 카드"), PAD+34, PY+PH-46);
     g.restore();
     g.strokeStyle="rgba(233,200,119,.3)"; g.lineWidth=2; rr(g,PAD,PY,CW,PH,26); g.stroke();
 
@@ -504,18 +507,18 @@ function saveCard(){
     // 글
     g.textAlign="center";
     g.fillStyle="#e9c877"; g.font="700 42px "+MJ;
-    g.fillText(c0[0]+" · "+c0[1], W/2, top+22);
+    g.fillText(c0[0]+" · "+tr(c0[1]), W/2, top+22);
     g.fillStyle="#a184e8"; g.font="26px "+MJ;
-    g.fillText("— "+curOrient+" — "+c0[2], W/2, top+22+46);
+    g.fillText("— "+tr(curOrient)+" — "+tr(c0[2]), W/2, top+22+46);
     g.fillStyle="#efe7d6"; g.font="700 42px "+MJ;
     var y=top+22+46+62;
     lines.forEach(function(ln){ g.fillText(ln,W/2,y); y+=LH; });
     g.fillStyle="#b6acc9"; g.font="24px "+MJ;
     var dd=new Date();
-    g.fillText(dd.getFullYear()+". "+(dd.getMonth()+1)+". "+dd.getDate()+" · 하루 한 장", W/2, y+2);
+    g.fillText(dd.getFullYear()+". "+(dd.getMonth()+1)+". "+dd.getDate()+tr(" · 하루 한 장"), W/2, y+2);
 
     g.fillStyle="#b6acc9"; g.font="28px "+MJ;
-    g.fillText("🔮 goblub · 고양이 타로", W/2, H-84);
+    g.fillText(tr("🔮 goblub · 고양이 타로"), W/2, H-84);
     g.fillStyle="#e9c877"; g.font="26px "+MJ;
     g.fillText("goblub-2.vercel.app", W/2, H-44);
 
@@ -534,6 +537,7 @@ function saveCard(){
 // 소제목 3개를 골드 헤딩으로
 function fmt(s){
   var subs=["카드가 말하길","지금의 너에게","발자국 하나"];
+  subs=subs.concat(subs.map(tr).filter(function(x){ return subs.indexOf(x)<0; }));
   var out=s.replace(/</g,"&lt;");
   subs.forEach(function(h){ out=out.replace(h, '<span class="sub">'+h+'</span>'); });
   return out;
