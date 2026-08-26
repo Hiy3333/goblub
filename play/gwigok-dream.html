@@ -111,6 +111,10 @@ button.fire:hover{background:rgba(190,55,25,.36)}
 </div>
 
 <script src="js/saju.js"></script>
+<script src="../js/i18n.js?v=1"></script>
+<script src="../js/i18n-more.js?v=2"></script>
+<script src="js/i18n-gwigok.js?v=1"></script>
+<script>var tr=window.GoblubI18n?GoblubI18n.t:function(s){return s;};</script>
 <script src="js/dosa.js?v=3"></script>
 <script src="js/gwigok-log.js?v=1"></script>
 <script>
@@ -122,7 +126,8 @@ button.fire:hover{background:rgba(190,55,25,.36)}
 
   function fmt(s){
     var out=s.replace(/</g,"&lt;");
-    ["꿈의 정체","명부와 겹쳐 보니","액막이 하나"].forEach(function(h){
+    var subs=["꿈의 정체","명부와 겹쳐 보니","액막이 하나"];
+    subs.concat(subs.map(tr).filter(function(x){return subs.indexOf(x)<0;})).forEach(function(h){
       out=out.replace(h,'<span class="hd">'+h+'</span>');
     });
     return out;
@@ -151,7 +156,7 @@ button.fire:hover{background:rgba(190,55,25,.36)}
     myDream=q;
     showAnswer(q,null,false);
     $("status").style.display="block";
-    $("status").innerHTML='<span class="spin"></span>귀곡이 꿈의 문을 여는 중…';
+    $("status").innerHTML='<span class="spin"></span>'+tr("귀곡이 꿈의 문을 여는 중…");
     var body={ dream:{ text:q } };
     var ilju=myIlju(); if(ilju) body.dream.ilju=ilju;
     var acc="";
@@ -164,9 +169,9 @@ button.fire:hover{background:rgba(190,55,25,.36)}
       },
       onError:function(code,sec){
         $("status").style.display="block";
-        $("status").innerHTML = (code==="not_configured" ? "귀곡이 아직 자리를 비웠다. 곧 돌아온다." :
-          code==="cooldown" ? "귀곡이 숨을 고른다… "+sec+"초 후에 다시 오너라." :
-          "지금은 해몽소에 줄이 길다. 잠시 후 다시 오너라.");
+        $("status").innerHTML = (code==="not_configured" ? tr("귀곡이 아직 자리를 비웠다. 곧 돌아온다.") :
+          code==="cooldown" ? tr("귀곡이 숨을 고른다…")+" "+sec+tr("초 후에 다시 오너라.") :
+          tr("지금은 해몽소에 줄이 길다. 잠시 후 다시 오너라."));
         $("againBtn").style.display="inline-block";
         $("oncebar").style.display="block";
         $("againBtn").onclick=function(){ $("againBtn").style.display="none"; $("oncebar").style.display="none"; ask(myDream); };
@@ -176,7 +181,7 @@ button.fire:hover{background:rgba(190,55,25,.36)}
 
   $("askBtn").onclick=function(){
     var q=($("q").value||"").trim();
-    if(q.length<5){ $("q-err").textContent="너무 짧다. 장면 하나라도 더 적어라."; $("q-err").style.display="block"; return; }
+    if(q.length<5){ $("q-err").textContent=tr("너무 짧다. 장면 하나라도 더 적어라."); $("q-err").style.display="block"; return; }
     $("q-err").style.display="none";
     ask(q);
   };
@@ -185,21 +190,21 @@ button.fire:hover{background:rgba(190,55,25,.36)}
   var birth=null;
   function fillSelects(){
     var y=$("g-year"),m=$("g-month"),d=$("g-day"),h=$("g-hour"),now=new Date().getFullYear();
-    for(var i=now;i>=1930;i--) y.add(new Option(i+"년",i));
-    for(var j=1;j<=12;j++) m.add(new Option(j+"월",j));
-    for(var k=1;k<=31;k++) d.add(new Option(k+"일",k));
-    for(var t=0;t<24;t++) h.add(new Option(("0"+t).slice(-2)+"시",t));
+    for(var i=now;i>=1930;i--) y.add(new Option(tr("{N}년").replace("{N}",i),i));
+    for(var j=1;j<=12;j++) m.add(new Option(tr("{N}월").replace("{N}",j),j));
+    for(var k=1;k<=31;k++) d.add(new Option(tr("{N}일").replace("{N}",k),k));
+    for(var t=0;t<24;t++) h.add(new Option(tr("{N}시").replace("{N}",("0"+t).slice(-2)),t));
     y.value=1995;
   }
   function showPill(){
     if(!birth||!birth.y){ $("who").style.display="none"; return; }
-    var bs=birth.y+"."+birth.m+"."+birth.d+(birth.hour!=null?" "+("0"+birth.hour).slice(-2)+":"+("0"+(birth.min||0)).slice(-2):"")+"생";
+    var bs=birth.y+"."+birth.m+"."+birth.d+(birth.hour!=null?" "+("0"+birth.hour).slice(-2)+":"+("0"+(birth.min||0)).slice(-2):"")+(!window.GoblubI18n||GoblubI18n.lang==="ko"?"생":"");
     var tail="";
     try{
       if(window.__sajuData){
         var r=Saju.compute(window.__sajuData,{y:birth.y,m:birth.m,d:birth.d,hour:birth.hour,min:birth.min||0},{trueSolar:true});
         var t=Saju.pillarText(r.pillars.day);
-        tail=" · "+t.hanja+"("+t.hangul+") · "+r.zodiac+"띠";
+        tail=" · "+t.hanja+(!window.GoblubI18n||GoblubI18n.lang==="ko"?"("+t.hangul+")":"")+" · "+tr("{Z}띠").replace("{Z}",tr(r.zodiac));
       }
     }catch(e){}
     $("me-pill").textContent=bs+tail;
@@ -216,7 +221,7 @@ button.fire:hover{background:rgba(190,55,25,.36)}
     var y=+$("g-year").value,m=+$("g-month").value,d=+$("g-day").value,hv=$("g-hour").value;
     var dt=new Date(y,m-1,d);
     if(dt.getFullYear()!==y||dt.getMonth()!==m-1||dt.getDate()!==d){
-      $("g-err").textContent="없는 날짜다. 다시 보아라."; $("g-err").style.display="block"; return;
+      $("g-err").textContent=tr("없는 날짜다. 다시 보아라."); $("g-err").style.display="block"; return;
     }
     birth={y:y,m:m,d:d}; if(hv!==""){ birth.hour=+hv; birth.min=Math.max(0,Math.min(59,+($("g-min").value)||0)); }
     try{ localStorage.setItem("goblub_birth",JSON.stringify(birth)); }catch(e){}

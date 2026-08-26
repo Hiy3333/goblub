@@ -114,6 +114,8 @@
   </main>
   <div id="site-footer"></div>
   <script src="../js/common.js?v=28" data-root=".."></script>
+  <script src="js/i18n-gwigok.js?v=1"></script>
+  <script src="js/i18n-bujeok.js?v=1"></script>
   <script src="js/saju.js"></script>
   <script src="js/saju-deep.js"></script>
   <script src="js/dosa.js?v=3"></script>
@@ -121,6 +123,7 @@
   <script>
     (function () {
       var $ = function (id) { return document.getElementById(id); };
+      var tr = window.GoblubI18n ? GoblubI18n.t : function (x) { return x; };
       var RELS = ["연인", "썸·짝사랑", "부부", "친구", "가족", "회사 동료", "사업 파트너"];
       // 관계별 세부 카테고리 — 선택에 따라 풀이 관점이 달라진다
       var SUBS = {
@@ -156,7 +159,7 @@
         if (subs.indexOf(relationDetail) < 0) relationDetail = subs[0];
         subs.forEach(function (s2) {
           var c2 = document.createElement("button");
-          c2.textContent = s2; if (s2 === relationDetail) c2.className = "on";
+          c2.textContent = tr(s2); if (s2 === relationDetail) c2.className = "on";
           c2.onclick = function () {
             relationDetail = s2;
             [].slice.call(box.children).forEach(function (c) { c.className = ""; });
@@ -169,7 +172,7 @@
       // 관계 칩
       RELS.forEach(function (r2) {
         var b2 = document.createElement("button");
-        b2.textContent = r2; if (r2 === relation) b2.className = "on";
+        b2.textContent = tr(r2); if (r2 === relation) b2.className = "on";
         b2.onclick = function () {
           relation = r2; relationDetail = "";
           [].slice.call($("rel-chips").children).forEach(function (c) { c.className = ""; });
@@ -190,8 +193,8 @@
         var P = c.r.pillars;
         var gj = ["year","month","day","hour"].filter(function (k) { return P[k]; })
           .map(function (k) { return GAN[P[k][0]] + JI[P[k][1]]; }).join(" · ");
-        var hTxt = b.hour == null ? "시 모름" : b.hour + "시 " + (b.min || 0) + "분";
-        var gTxt = b.gender === "M" ? "남" : b.gender === "F" ? "여" : "";
+        var hTxt = b.hour == null ? tr("시 모름") : tr("{H}시 {M}분").replace("{H}", b.hour).replace("{M}", b.min || 0);
+        var gTxt = b.gender === "M" ? tr("남") : b.gender === "F" ? tr("여") : "";
         return "✅ <b>" + b.y + "." + b.m + "." + b.d + "</b> " + hTxt + " " + gTxt +
           '<br><span class="gj">' + gj + "</span>";
       }
@@ -201,7 +204,7 @@
       }
 
       function readSlot(file, stEl, slotEl, setter) {
-        stEl.innerHTML = "귀곡의 인장을 읽는 중…";
+        stEl.innerHTML = tr("귀곡의 인장을 읽는 중…");
         var url = URL.createObjectURL(file);
         var img = new Image();
         img.onload = function () {
@@ -210,7 +213,7 @@
             if (!birth) {
               slotEl.classList.remove("ok");
               setter(null);
-              stEl.innerHTML = "⚠️ 인장이 흐릿하다…<br>귀곡의 <b>원본 부적</b>을 올려라<br>(자르거나 필터 씌우면 못 읽는다)";
+              stEl.innerHTML = tr("⚠️ 인장이 흐릿하다…<br>귀곡의 <b>원본 부적</b>을 올려라<br>(자르거나 필터 씌우면 못 읽는다)");
             } else {
               setter(birth);
               slotEl.classList.add("ok");
@@ -219,7 +222,7 @@
             refresh();
           });
         };
-        img.onerror = function () { URL.revokeObjectURL(url); stEl.innerHTML = "⚠️ 이미지를 열 수 없다."; };
+        img.onerror = function () { URL.revokeObjectURL(url); stEl.innerHTML = tr("⚠️ 이미지를 열 수 없다."); };
         img.src = url;
       }
 
@@ -232,7 +235,7 @@
         try {
           var b = JSON.parse(localStorage.getItem("goblub_birth"));
           if (b && b.y && data) { A = b; $("slot-a").classList.add("ok"); $("st-a").innerHTML = miniSummary(b); refresh(); }
-          else if (!b || !b.y) $("st-a").innerHTML = "저장된 명부가 없다.<br><a href='saju-premium.html' style='color:var(--sky)'>귀곡에게 사주 보러 가기</a>";
+          else if (!b || !b.y) $("st-a").innerHTML = tr("저장된 명부가 없다.") + "<br><a href='saju-premium.html' style='color:var(--sky)'>" + tr("귀곡에게 사주 보러 가기") + "</a>";
         } catch (err) {}
       };
 
@@ -270,7 +273,7 @@
           else if (s.charAt(0) === "▸") html += '<span class="kv">' + e.replace(/^▸\s*/, "▸ ") + "</span>";
           else html += e + "\n";
         });
-        html += '\n<p style="text-align:right;color:#9a7f8a;font-family:\'Nanum Myeongjo\',serif">— 귀곡 선생</p>';
+        html += '\n<p style="text-align:right;color:#9a7f8a;font-family:\'Nanum Myeongjo\',serif">' + tr("— 귀곡 선생") + '</p>';
         return html;
       }
 
@@ -287,7 +290,7 @@
         }
         if (v != null && v >= 0 && v <= 100) {
           $("gh-score").style.display = "flex";
-          $("gh-score-num").textContent = v + "점";
+          $("gh-score-num").textContent = tr("{V}점").replace("{V}", v);
         }
       }
 
@@ -307,7 +310,7 @@
         $("gh-frame").style.display = "block";
         $("gh-score").style.display = "none";
         $("gh-body").innerHTML = "";
-        $("gh-writing").textContent = "귀곡이 두 명부를 겹쳐 읽는 중"; $("gh-writing").classList.add("on");
+        $("gh-writing").textContent = tr("귀곡이 두 명부를 겹쳐 읽는 중"); $("gh-writing").classList.add("on");
         Dosa.fetchAI("/api/saju-report", body, "goblub_gh_", {
           accept: function (full) { return signed(full); },
           cooldownMs: 5000, cooldownKey: "goblub_gh_cd",
@@ -315,12 +318,12 @@
           onDone: function () {
             $("gh-body").innerHTML = fmt(buffer);
             updateScore(buffer);
-            $("gh-writing").textContent = "🕯 대조가 끝났다."; $("gh-writing").classList.remove("on");
+            $("gh-writing").textContent = tr("🕯 대조가 끝났다."); $("gh-writing").classList.remove("on");
             $("btn-go").disabled = false;
           },
           onError: function (code, sec) {
             $("gh-writing").classList.remove("on");
-            $("gh-writing").textContent = code === "cooldown" ? "귀곡이 숨을 고른다… " + sec + "초 후 다시 눌러라." : "⚠️ 잠시 후 다시 시도해라.";
+            $("gh-writing").textContent = code === "cooldown" ? tr("귀곡이 숨을 고른다…") + " " + sec + tr("초 후 다시 눌러라.") : tr("⚠️ 잠시 후 다시 시도해라.");
             $("btn-go").disabled = false;
           }
         });

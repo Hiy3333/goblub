@@ -7,6 +7,7 @@
   var IMG = "img/tale/";
   var IMGV = "?v=8";                    // 이미지 캐시버스트(귀곡 8초 무한루프 idle)
   var RITUAL_VID = IMG + "ritual.mp4?v=3";
+  var tr = function (x) { return window.GoblubI18n ? GoblubI18n.t(x) : x; };
   var GAN_H = { 갑: "甲", 을: "乙", 병: "丙", 정: "丁", 무: "戊", 기: "己", 경: "庚", 신: "辛", 임: "壬", 계: "癸" };
   var JI_H = { 자: "子", 축: "丑", 인: "寅", 묘: "卯", 진: "辰", 사: "巳", 오: "午", 미: "未", 신: "申", 유: "酉", 술: "戌", 해: "亥" };
 
@@ -154,18 +155,19 @@ box-shadow:0 0 0 100vmax #040308,0 0 70px rgba(0,0,0,.8)}}";
     var base = opts.base || null, deep = opts.deep || null;
 
     function coldRead() {
-      if (!base) return { ilju: null, strengthLine: "…네 팔자, 아직 흐릿하구나.", missLine: "" };
+      if (!base) return { ilju: null, strengthLine: tr("…네 팔자, 아직 흐릿하구나."), missLine: "" };
       var ilju = base.pillars.day.ganji;
       var strengthLine = {
         신약: "겉으론 아무렇지 않은 척… 속은 여린 아이로군.",
         신강: "고집이 산맥 같은 아이로군. 제 힘을 반도 못 쓰면서.",
         중화: "균형 잡힌 팔자… 허나 그래서 더 헤매고 있지."
-      }[base.strength.label] || "…흥미로운 팔자야.";
+      }[base.strength.label];
+      strengthLine = strengthLine ? tr(strengthLine) : tr("…흥미로운 팔자야.");
       var missFlavor = { 금: "결정 앞에서 늘 서성였겠지", 수: "마음이 쉽게 말라붙었겠지", 화: "속불이 좀처럼 안 붙었겠지", 목: "시작이 유난히 어려웠겠지", 토: "뿌리내릴 곳을 찾아 헤맸겠지" };
       var miss = (deep && deep.missing && deep.missing[0]) || null;
       return {
         ilju: ilju, strengthLine: strengthLine,
-        missLine: miss ? ("…오행에 [" + miss + "]이 비었어.\n그래서 " + (missFlavor[miss] || "늘 허전했겠지") + ".") : "…팔자의 결이 또렷하군."
+        missLine: miss ? tr("…오행에 [{M}]이 비었어.\n그래서 {F}.").replace("{M}", tr(miss)).replace("{F}", tr(missFlavor[miss] || "늘 허전했겠지")) : tr("…팔자의 결이 또렷하군.")
       };
     }
 
@@ -218,10 +220,10 @@ box-shadow:0 0 0 100vmax #040308,0 0 70px rgba(0,0,0,.8)}}";
       { id: 22, name: "귀곡", cls: "n-gwi", text: "산 자여. 네 이름을 이 명부에\n똑똑히 남겨라.",
         input: { kind: "text", key: "name", placeholder: "이름 (또는 불리고 싶은 이름)", maxlen: 12, submit: "🖊 이름을 새긴다" } },
       // 생년월일 입력
-      { id: 23, name: "귀곡", cls: "n-gwi", text: function () { return (collected.name ? collected.name + "… " : "") + "언제 이 세상에 왔느냐.\n한 치도 틀리지 말고 아뢰라."; },
+      { id: 23, name: "귀곡", cls: "n-gwi", text: function () { return (collected.name ? collected.name + "… " : "") + tr("언제 이 세상에 왔느냐.\n한 치도 틀리지 말고 아뢰라."); },
         input: { kind: "birth", key: "birth", submit: "🔮 명(命)을 아뢴다" } },
       // 콜드리딩 (생년월일 확정 후 재계산된 base/deep 사용)
-      { id: 24, name: "귀곡", cls: "n-gwi", text: function () { var c = coldRead(); return c.ilju ? ("[" + hj(c.ilju) + "(" + c.ilju + ")] 일주.\n" + c.strengthLine) : c.strengthLine; } },
+      { id: 24, name: "귀곡", cls: "n-gwi", text: function () { var c = coldRead(); var ko = !window.GoblubI18n || GoblubI18n.lang === "ko"; return c.ilju ? (tr("[{HJ}({KO})] 일주.").replace("{HJ}", hj(c.ilju)).replace("({KO})", ko ? "(" + c.ilju + ")" : "") + "\n" + c.strengthLine) : c.strengthLine; } },
       { id: 25, name: "귀곡", cls: "n-gwi", text: function () { return coldRead().missLine; } },
       { id: 26, name: "귀곡", cls: "n-gwi", text: "내 이름은 [귀곡(鬼哭)].\n산 자의 팔자를 읽는 저승의 사자다.", goto: 261 },
       // 생업·연분 — 팔자를 산 자의 형편에 맞춰 읽기 위한 문답
@@ -249,8 +251,8 @@ box-shadow:0 0 0 100vmax #040308,0 0 70px rgba(0,0,0,.8)}}";
       { id: 29, name: "귀곡", cls: "n-gwi",
         text: function () {
           // 같은 폰으로 여러 명이 볼 수 있으니 '또 왔구나' 같은 재방문 대사는 쓰지 않는다
-          if (opts.costText) return "네 팔자를 뼛속까지 들춰주마.\n대신 [" + opts.costText + "]을 바쳐야 한다.\n…자세히 알고 싶으냐?";
-          return "네 팔자를 뼛속까지 들춰주마.\n지금은 값을 받지 않으마.\n…자세히 알고 싶으냐?";
+          if (opts.costText) return tr("네 팔자를 뼛속까지 들춰주마.\n대신 [{C}]을 바쳐야 한다.\n…자세히 알고 싶으냐?").replace("{C}", opts.costText);
+          return tr("네 팔자를 뼛속까지 들춰주마.\n지금은 값을 받지 않으마.\n…자세히 알고 싶으냐?");
         },
         choices: [
           { label: "🩸 낱낱이 보여주시오", enter: true },
@@ -276,9 +278,10 @@ box-shadow:0 0 0 100vmax #040308,0 0 70px rgba(0,0,0,.8)}}";
       '<div class="tale-vortex"></div>' +
       '<video class="tale-vid" playsinline webkit-playsinline muted preload="auto"></video>' +
       '<p class="tale-vcap"></p>' +
-      '<div class="tale-top"><button class="t-mute">🔊</button><button class="t-skip">건너뛰기 ➤</button></div>' +
+      '<div class="tale-top"><button class="t-mute">🔊</button><button class="t-skip"></button></div>' +
       '<div class="tale-box"><p class="tale-name"></p><p class="tale-text"></p>' +
       '<div class="tale-next">▼</div><div class="tale-choices"></div><div class="tale-inp" style="display:none"></div></div>';
+    root.querySelector(".t-skip").textContent = tr("건너뛰기 ➤");
     document.body.appendChild(root);
     document.body.style.overflow = "hidden";
     if (opts.gobIn !== false) root.querySelector(".tale-gob").style.animation = "gob-in .7s cubic-bezier(.34,1.56,.64,1) .1s forwards";
@@ -384,7 +387,7 @@ box-shadow:0 0 0 100vmax #040308,0 0 70px rgba(0,0,0,.8)}}";
       chEl.innerHTML = "";
       list.forEach(function (c) {
         var b = document.createElement("button");
-        b.innerHTML = c.label;
+        b.innerHTML = tr(c.label);
         b.onclick = function (e) { e.stopPropagation(); kickBGM(); proceedChoice(c); };
         chEl.appendChild(b);
       });
@@ -398,13 +401,13 @@ box-shadow:0 0 0 100vmax #040308,0 0 70px rgba(0,0,0,.8)}}";
         // 드롭다운 하나 + 확인. 고르지 않으면 흔들며 재촉한다.
         var sl = document.createElement("select");
         var ph = document.createElement("option");
-        ph.value = ""; ph.textContent = inp.placeholder || "…고르라"; ph.disabled = true; ph.selected = true;
+        ph.value = ""; ph.textContent = tr(inp.placeholder || "…고르라"); ph.disabled = true; ph.selected = true;
         sl.appendChild(ph);
         (inp.options || []).forEach(function (o) {
-          var op = document.createElement("option"); op.value = o; op.textContent = o; sl.appendChild(op);
+          var op = document.createElement("option"); op.value = o; op.textContent = tr(o); sl.appendChild(op);
         });
         if (collected[inp.key]) sl.value = collected[inp.key];
-        var okS = document.createElement("button"); okS.className = "ok"; okS.textContent = inp.submit || "확인";
+        var okS = document.createElement("button"); okS.className = "ok"; okS.textContent = tr(inp.submit || "확인");
         okS.onclick = function (e) {
           e.stopPropagation(); kickBGM();
           if (!sl.value) { sl.classList.remove("err"); void sl.offsetWidth; sl.classList.add("err"); return; }
@@ -414,15 +417,15 @@ box-shadow:0 0 0 100vmax #040308,0 0 70px rgba(0,0,0,.8)}}";
         inpEl.appendChild(sl); inpEl.appendChild(okS);
       } else if (inp.kind === "text") {
         var i = document.createElement("input");
-        i.type = "text"; i.maxLength = inp.maxlen || 20; i.placeholder = inp.placeholder || "";
+        i.type = "text"; i.maxLength = inp.maxlen || 20; i.placeholder = tr(inp.placeholder || "");
         if (inp.key === "name" && collected.name) i.value = collected.name;
-        var ok = document.createElement("button"); ok.className = "ok"; ok.textContent = inp.submit || "확인";
+        var ok = document.createElement("button"); ok.className = "ok"; ok.textContent = tr(inp.submit || "확인");
         function done() {
           var v = (i.value || "").trim();
           kickBGM();
           if (inp.key === "name" && !v) { // 이름은 반드시 남겨야 한다
             i.classList.remove("err"); void i.offsetWidth; i.classList.add("err");
-            i.placeholder = "…이름을 남기지 않으면 명부를 펼 수 없다";
+            i.placeholder = tr("…이름을 남기지 않으면 명부를 펼 수 없다");
             return;
           }
           if (inp.key === "name") collected.name = v.slice(0, inp.maxlen || 20);
@@ -446,7 +449,7 @@ box-shadow:0 0 0 100vmax #040308,0 0 70px rgba(0,0,0,.8)}}";
         function syncMin() { wrapMi.el.disabled = (wrapH.el.value === ""); if (wrapMi.el.disabled) wrapMi.el.value = 0; }
         wrapH.el.addEventListener("change", syncMin); syncMin();
         function shake(el2) { el2.classList.remove("err"); void el2.offsetWidth; el2.classList.add("err"); setTimeout(function () { el2.classList.remove("err"); }, 700); }
-        var ok2 = document.createElement("button"); ok2.className = "ok"; ok2.textContent = inp.submit || "확인";
+        var ok2 = document.createElement("button"); ok2.className = "ok"; ok2.textContent = tr(inp.submit || "확인");
         ok2.onclick = function (e) {
           e.stopPropagation(); kickBGM();
           var iy = +wrapY.el.value, im = +wrapM.el.value, id = +wrapD.el.value;
@@ -474,19 +477,19 @@ box-shadow:0 0 0 100vmax #040308,0 0 70px rgba(0,0,0,.8)}}";
         function sel(kind) {
           var s = document.createElement("select"); var o;
           if (kind === "c") {
-            s.add(new Option("양력으로 아뢴다", ""));
-            s.add(new Option("음력으로 아뢴다", "L"));
-            s.add(new Option("음력 윤달로 아뢴다", "LL"));
+            s.add(new Option(tr("양력으로 아뢴다"), ""));
+            s.add(new Option(tr("음력으로 아뢴다"), "L"));
+            s.add(new Option(tr("음력 윤달로 아뢴다"), "LL"));
             s.value = pre.cal === "lunar" ? (pre.leap ? "LL" : "L") : "";
           }
-          if (kind === "y") { for (var y = new Date().getFullYear(); y >= 1930; y--) { o = new Option(y + "년", y); s.add(o); } s.value = (pre.cal === "lunar" ? pre.ly : pre.y) || 1995; }
-          if (kind === "m") { for (var m = 1; m <= 12; m++) s.add(new Option(m + "월", m)); s.value = (pre.cal === "lunar" ? pre.lm : pre.m) || 1; }
-          if (kind === "d") { for (var d = 1; d <= 31; d++) s.add(new Option(d + "일", d)); s.value = (pre.cal === "lunar" ? pre.ld : pre.d) || 1; }
-          if (kind === "h") { s.add(new Option("태어난 시 모름", "")); for (var h = 0; h < 24; h++) s.add(new Option(h + "시", h)); s.value = (pre.hour == null ? "" : pre.hour); }
-          if (kind === "mi") { for (var mi2 = 0; mi2 < 60; mi2++) s.add(new Option(mi2 + "분", mi2)); s.value = (pre.min == null ? 0 : pre.min); }
+          if (kind === "y") { for (var y = new Date().getFullYear(); y >= 1930; y--) { o = new Option(tr("{N}년").replace("{N}", y), y); s.add(o); } s.value = (pre.cal === "lunar" ? pre.ly : pre.y) || 1995; }
+          if (kind === "m") { for (var m = 1; m <= 12; m++) s.add(new Option(tr("{N}월").replace("{N}", m), m)); s.value = (pre.cal === "lunar" ? pre.lm : pre.m) || 1; }
+          if (kind === "d") { for (var d = 1; d <= 31; d++) s.add(new Option(tr("{N}일").replace("{N}", d), d)); s.value = (pre.cal === "lunar" ? pre.ld : pre.d) || 1; }
+          if (kind === "h") { s.add(new Option(tr("태어난 시 모름"), "")); for (var h = 0; h < 24; h++) s.add(new Option(tr("{N}시").replace("{N}", h), h)); s.value = (pre.hour == null ? "" : pre.hour); }
+          if (kind === "mi") { for (var mi2 = 0; mi2 < 60; mi2++) s.add(new Option(tr("{N}분").replace("{N}", mi2), mi2)); s.value = (pre.min == null ? 0 : pre.min); }
           if (kind === "g") {
-            var gp = new Option("성별", ""); gp.disabled = true;
-            s.add(gp); s.add(new Option("남", "M")); s.add(new Option("여", "F"));
+            var gp = new Option(tr("성별"), ""); gp.disabled = true;
+            s.add(gp); s.add(new Option(tr("남"), "M")); s.add(new Option(tr("여"), "F"));
             s.value = pre.gender || "";
           }
           return { el: s };
@@ -514,7 +517,7 @@ box-shadow:0 0 0 100vmax #040308,0 0 70px rgba(0,0,0,.8)}}";
       [1300, 3000].forEach(function (ms) {
         setTimeout(function () { if (!vid.paused) vid.classList.add("on"); else { var p2 = vid.play(); if (p2 && p2.catch) p2.catch(function () {}); } }, ms);
       });
-      setTimeout(function () { vcap.innerHTML = '🕯 귀곡이 네 명부(冥府)를 펼친다<span class="dot">…</span>'; vcap.classList.add("on"); }, 900);
+      setTimeout(function () { vcap.innerHTML = tr('🕯 귀곡이 네 명부(冥府)를 펼친다') + '<span class="dot">…</span>'; vcap.classList.add("on"); }, 900);
       setTimeout(proceed, 8000);
     }
 
@@ -551,7 +554,7 @@ box-shadow:0 0 0 100vmax #040308,0 0 70px rgba(0,0,0,.8)}}";
         void gob.offsetWidth;              // 리플로우 강제 — 애니메이션 재시작
         gob.style.animation = "gob-peek 2s cubic-bezier(.2,.7,.3,1) forwards";
       } else { gob.classList.remove("peek"); }
-      nameEl.textContent = (typeof s.name === "function" ? s.name() : s.name) || "";
+      nameEl.textContent = tr((typeof s.name === "function" ? s.name() : s.name) || "");
       nameEl.className = "tale-name " + (s.cls || "n-nar");
 
       if (s.fx === "swallow") {
@@ -565,7 +568,7 @@ box-shadow:0 0 0 100vmax #040308,0 0 70px rgba(0,0,0,.8)}}";
       }
 
       var txt = typeof s.text === "function" ? s.text() : s.text;
-      type(txt, function () {
+      type(txt && tr(txt), function () {
         if (s.input) { renderInput(s.input); }
         else if (s.choices) { renderChoices(s.choices); }
         else { canTap = true; nextEl.style.visibility = "visible"; }

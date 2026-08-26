@@ -118,10 +118,17 @@ a{color:inherit;text-decoration:none}
 </div>
 
 <script src="js/saju.js"></script>
+<script src="../js/i18n.js?v=1"></script>
+<script src="../js/i18n-more.js?v=2"></script>
+<script src="js/i18n-gwigok.js?v=1"></script>
+<script src="js/i18n-gwigok-cal.js?v=1"></script>
 <script src="js/gwigok-log.js?v=1"></script>
 <script>
 (function(){
   var $=function(id){return document.getElementById(id);};
+  var tr=window.GoblubI18n?GoblubI18n.t:function(x){return x;};
+  var isKo=!window.GoblubI18n||GoblubI18n.lang==="ko";
+  var GAN_RO=["Gap","Eul","Byeong","Jeong","Mu","Gi","Gyeong","Sin","Im","Gye"],JI_RO=["Ja","Chuk","In","Myo","Jin","Sa","O","Mi","Sin","Yu","Sul","Hae"];
   var GAN="갑을병정무기경신임계", JI="자축인묘진사오미신유술해";
   var GAN_HJ="甲乙丙丁戊己庚辛壬癸", JI_HJ="子丑寅卯辰巳午未申酉戌亥";
   var CHUNG={0:6,6:0,1:7,7:1,2:8,8:2,3:9,9:3,4:10,10:4,5:11,11:5};
@@ -232,10 +239,10 @@ a{color:inherit;text-decoration:none}
 
   function fillSelects(){
     var y=$("g-year"),m=$("g-month"),d=$("g-day"),h=$("g-hour"),now=new Date().getFullYear();
-    for(var i=now;i>=1930;i--) y.add(new Option(i+"년",i));
-    for(var j=1;j<=12;j++) m.add(new Option(j+"월",j));
-    for(var k=1;k<=31;k++) d.add(new Option(k+"일",k));
-    for(var t=0;t<24;t++) h.add(new Option(("0"+t).slice(-2)+"시",t));
+    for(var i=now;i>=1930;i--) y.add(new Option(tr("{N}년").replace("{N}",i),i));
+    for(var j=1;j<=12;j++) m.add(new Option(tr("{N}월").replace("{N}",j),j));
+    for(var k=1;k<=31;k++) d.add(new Option(tr("{N}일").replace("{N}",k),k));
+    for(var t=0;t<24;t++) h.add(new Option(tr("{N}시").replace("{N}",("0"+t).slice(-2)),t));
     y.value=1995;
   }
 
@@ -269,14 +276,14 @@ a{color:inherit;text-decoration:none}
     if(GANHAP[String(myIlgan)]===g){ score+=2; parts.push(GANHAP_TXT); }
     else if(GCHUNG[myIlgan]===g){ score-=2; parts.push(GCHUNG_TXT); }
     var kind = score<=-3 ? "red" : score>=3 ? "gold" : "plain";
-    return { g:g, j:j, gz:GAN[g]+JI[j], hj:GAN_HJ[g]+JI_HJ[j], kind:kind, parts:parts };
+    return { g:g, j:j, gz:(isKo?GAN[g]+JI[j]:GAN_RO[g]+"-"+JI_RO[j]), hj:GAN_HJ[g]+JI_HJ[j], kind:kind, parts:parts };
   }
 
   function renderMonth(){
     var y=cur.getFullYear(), m=cur.getMonth()+1;
-    $("mon-t").textContent=y+"년 "+m+"월";
+    $("mon-t").textContent=tr("{Y}년 {M}월").replace("{Y}",y).replace("{M}",m);
     var grid=$("grid"); grid.innerHTML="";
-    ["일","월","화","수","목","금","토"].forEach(function(w){
+    (function(){var w0=tr("달력요일");return w0==="달력요일"?["일","월","화","수","목","금","토"]:w0.split("|");})().forEach(function(w){
       var e=document.createElement("div"); e.className="dow"; e.textContent=w; grid.appendChild(e);
     });
     var first=new Date(y,m-1,1).getDay(), days=new Date(y,m,0).getDate();
@@ -294,16 +301,16 @@ a{color:inherit;text-decoration:none}
           '<span class="gz">'+inf.gz+"</span>";
         e.onclick=function(){
           // dayInfo가 이미 요인별 풀이를 전부 모아 두었다 — 판정 한 줄을 머리에 얹는다
-          var verdict = inf.kind==="red" ? "⚠ 흉한 기운이 겹쳐 붉게 물든 날이다. 몸을 낮춰라."
-            : inf.kind==="gold" ? "✦ 길한 기운이 겹쳐 금빛으로 차오른 날이다. 움직여라." : "";
-          $("read").innerHTML="<b>"+m+"월 "+d+"일 · "+inf.gz+"("+inf.hj+")일</b>"+
-            (verdict?"<br>"+verdict:"")+"<br>"+inf.parts.join("<br>");
+          var verdict = inf.kind==="red" ? tr("⚠ 흉한 기운이 겹쳐 붉게 물든 날이다. 몸을 낮춰라.")
+            : inf.kind==="gold" ? tr("✦ 길한 기운이 겹쳐 금빛으로 차오른 날이다. 움직여라.") : "";
+          $("read").innerHTML="<b>"+tr("{M}월 {D}일 · {GZ}({HJ})일").replace("{M}",m).replace("{D}",d).replace("{GZ}",inf.gz).replace("{HJ}",inf.hj)+"</b>"+
+            (verdict?"<br>"+verdict:"")+"<br>"+inf.parts.map(tr).join("<br>");
         };
         grid.appendChild(e);
       })(d);
     }
-    $("cnt").innerHTML=m+"월엔 붉은 날이 <b>"+reds+"일</b>, 금빛 날이 <b>"+golds+"일</b> 적혀 있다.";
-    $("read").textContent="날짜를 짚으면, 그날의 일진을 읽어 주마.";
+    $("cnt").innerHTML=tr("{M}월엔 붉은 날이 <b>{R}일</b>, 금빛 날이 <b>{G}일</b> 적혀 있다.").replace("{M}",m).replace("{R}",reds).replace("{G}",golds);
+    $("read").textContent=tr("날짜를 짚으면, 그날의 일진을 읽어 주마.");
   }
 
   function boot(birth){
@@ -315,8 +322,8 @@ a{color:inherit;text-decoration:none}
     var dec=Math.floor(p60/10);
     myGongmang=[((10-2*dec)%12+12)%12, ((11-2*dec)%12+12)%12];
     var t=Saju.pillarText(me.pillars.day);
-    var bs=birth.y+"."+birth.m+"."+birth.d+(birth.hour!=null?" "+("0"+birth.hour).slice(-2)+":"+("0"+(birth.min||0)).slice(-2):"")+"생";
-    $("me-pill").textContent=bs+" · "+t.hanja+"("+t.hangul+") · "+me.zodiac+"띠";
+    var bs=birth.y+"."+birth.m+"."+birth.d+(birth.hour!=null?" "+("0"+birth.hour).slice(-2)+":"+("0"+(birth.min||0)).slice(-2):"")+(!window.GoblubI18n||GoblubI18n.lang==="ko"?"생":"");
+    $("me-pill").textContent=bs+(isKo?"":"")+" · "+t.hanja+(isKo?"("+t.hangul+")":"")+" · "+tr("{Z}띠").replace("{Z}",tr(me.zodiac));
     $("gate").style.display="none"; $("board").style.display="block";
     cur=new Date();
     renderMonth();
@@ -332,7 +339,7 @@ a{color:inherit;text-decoration:none}
     var y=+$("g-year").value,m=+$("g-month").value,d=+$("g-day").value,hv=$("g-hour").value;
     var dt=new Date(y,m-1,d);
     if(dt.getFullYear()!==y||dt.getMonth()!==m-1||dt.getDate()!==d){
-      $("g-err").textContent="없는 날짜다. 다시 보아라."; $("g-err").style.display="block"; return;
+      $("g-err").textContent=tr("없는 날짜다. 다시 보아라."); $("g-err").style.display="block"; return;
     }
     var b={y:y,m:m,d:d}; if(hv!==""){ b.hour=+hv; b.min=Math.max(0,Math.min(59,+(document.getElementById("g-min").value)||0)); }
     try{ localStorage.setItem("goblub_birth",JSON.stringify(b)); }catch(e){}
@@ -346,7 +353,7 @@ a{color:inherit;text-decoration:none}
       if(b&&b.y) boot(b); else $("gate").style.display="block";
     })
     .catch(function(){ $("gate").style.display="block";
-      $("g-err").textContent="장부를 못 펼쳤다. 새로고침 해보아라."; $("g-err").style.display="block"; });
+      $("g-err").textContent=tr("장부를 못 펼쳤다. 새로고침 해보아라."); $("g-err").style.display="block"; });
 })();
 </script>
 </body>

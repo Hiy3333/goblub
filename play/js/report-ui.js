@@ -1,6 +1,8 @@
 // 프리미엄 리포트 공용 UI — 명식 대시보드 · 대운 타임라인 · 본문 렌더(강조/항목/스포일러/처방 카드/도사 연출)
 // window.ReportUI = { dashboard(el, base, deep), timeline(el, deep), render(el, text, opts), flashYear(y) }
 (function () {
+  var tr = window.GoblubI18n ? GoblubI18n.t : function (x) { return x; };
+  var isKo = !window.GoblubI18n || GoblubI18n.lang === "ko";
   var GAN_H = { 갑: "甲", 을: "乙", 병: "丙", 정: "丁", 무: "戊", 기: "己", 경: "庚", 신: "辛", 임: "壬", 계: "癸" };
   var JI_H = { 자: "子", 축: "丑", 인: "寅", 묘: "卯", 진: "辰", 사: "巳", 오: "午", 미: "未", 신: "申", 유: "酉", 술: "戌", 해: "亥" };
   var OH_COLOR = { 목: "#4c9c78", 화: "#c0455a", 토: "#c99a4e", 금: "#8a90aa", 수: "#4a6fae" };
@@ -102,24 +104,24 @@
     var avoid = (deep && deep.yongshin && deep.yongshin.avoid) || [];
 
     // 1행 머리 / 2행 천간십성 / 3행 천간 / 4행 지지 / 5행 지지십성
-    var rowHd = '<div class="hd"></div>', rowGS = '<div class="lb">십성</div>',
-        rowG = '<div class="lb">천간</div>', rowJ = '<div class="lb">지지</div>',
-        rowJS = '<div class="lb">십성</div>';
+    var rowHd = '<div class="hd"></div>', rowGS = '<div class="lb">' + tr("십성") + '</div>',
+        rowG = '<div class="lb">' + tr("천간") + '</div>', rowJ = '<div class="lb">' + tr("지지") + '</div>',
+        rowJS = '<div class="lb">' + tr("십성") + '</div>';
     cols.forEach(function (c) {
       var p = base.pillars[c[0]], me = (c[0] === "day") ? " me" : "";
-      rowHd += '<div class="hd' + me + '">' + c[1] + (c[0] === "day" ? " (我)" : "") + "</div>";
+      rowHd += '<div class="hd' + me + '">' + tr(c[1]) + (c[0] === "day" ? " (我)" : "") + "</div>";
       if (!p) {
         rowGS += '<div class="ss">—</div>'; rowG += '<div class="gz" style="color:#5a5266">·</div>';
-        rowJ += '<div class="gz" style="color:#5a5266">·</div>'; rowJS += '<div class="ss">시 모름</div>';
+        rowJ += '<div class="gz" style="color:#5a5266">·</div>'; rowJS += '<div class="ss">' + tr("시 모름") + '</div>';
         return;
       }
       var gOh = GAN_OH[p.gan] || "토", jOh = JI_OH[p.ji] || "토";
-      rowGS += '<div class="ss' + me + '">' + (c[0] === "day" ? "일간(我)" : p.ganSipseong) + "</div>";
+      rowGS += '<div class="ss' + me + '">' + (c[0] === "day" ? tr("일간(我)") : tr(p.ganSipseong)) + "</div>";
       rowG += '<div class="gz' + me + '" style="color:' + OH_COLOR[gOh] + '">' + (GAN_H[p.gan] || p.gan) +
         "<u>" + p.gan + gOh + "</u></div>";
       rowJ += '<div class="gz' + me + '" style="color:' + OH_COLOR[jOh] + '">' + (JI_H[p.ji] || p.ji) +
         "<u>" + p.ji + jOh + "</u></div>";
-      rowJS += '<div class="ss' + me + '">' + p.jiSipseong + "</div>";
+      rowJS += '<div class="ss' + me + '">' + tr(p.jiSipseong) + "</div>";
     });
 
     // 일간 요약 + 신강/신약 게이지
@@ -134,22 +136,22 @@
     var ohHtml = keys.map(function (k) {
       var v = base.oheng[k] || 0;
       var w = Math.max(3, Math.round(v / maxOh * 100));
-      var tag = use.indexOf(k) >= 0 ? '<span class="tg use">용신</span>'
-              : avoid.indexOf(k) >= 0 ? '<span class="tg avd">기신</span>'
-              : v === 0 ? '<span class="tg non">없음</span>' : '<span class="tg gap">·</span>';
-      return '<div class="oh-r"><span class="k" style="color:' + OH_COLOR[k] + '">' + OH_HJ[k] + " " + k + "</span>" +
+      var tag = use.indexOf(k) >= 0 ? '<span class="tg use">' + tr("용신") + '</span>'
+              : avoid.indexOf(k) >= 0 ? '<span class="tg avd">' + tr("기신") + '</span>'
+              : v === 0 ? '<span class="tg non">' + tr("없음") + '</span>' : '<span class="tg gap">·</span>';
+      return '<div class="oh-r"><span class="k" style="color:' + OH_COLOR[k] + '">' + OH_HJ[k] + (isKo ? " " + k : "") + "</span>" +
         '<div class="bar"><i style="width:' + w + "%;background:" + OH_COLOR[k] + ";color:" + OH_COLOR[k] + '"></i></div>' +
         '<span class="n">' + (Math.round(v * 10) / 10) + "</span>" + tag + "</div>";
     }).join("");
 
     el.className = "rdash";
     el.innerHTML =
-      "<h4>命 式<em>귀곡이 읽어낸 네 여덟 글자</em></h4>" +
+      "<h4>命 式<em>" + tr("귀곡이 읽어낸 네 여덟 글자") + "</em></h4>" +
       '<div class="ms">' + rowHd + rowGS + rowG + rowJ + rowJS + "</div>" +
-      (dayP ? '<p class="ms-ilgan"><b>' + (GAN_H[dayP.gan] || "") + OH_HJ[ilOh] + " " + dayP.gan + ilOh +
-        '</b> 일간 · <span>' + base.strength.label + " (" + pct + "%)</span></p>" : "") +
+      (dayP ? '<p class="ms-ilgan"><b>' + (GAN_H[dayP.gan] || "") + OH_HJ[ilOh] + (isKo ? " " + dayP.gan + ilOh : "") +
+        '</b> ' + tr("일간") + ' · <span>' + tr(base.strength.label) + " (" + pct + "%)</span></p>" : "") +
       '<div class="gau"><div class="tr"><span class="pin" style="left:' + pct + '%"></span></div>' +
-      '<div class="sc"><span>← 신약 (도움이 필요)</span><span>중화</span><span>(스스로 밀어붙임) 신강 →</span></div></div>' +
+      '<div class="sc"><span>' + tr("← 신약 (도움이 필요)") + '</span><span>' + tr("중화") + '</span><span>' + tr("(스스로 밀어붙임) 신강 →") + '</span></div></div>' +
       '<div class="oh-list">' + ohHtml + "</div>";
   }
 
@@ -165,9 +167,9 @@
       var hj = hanja(d.ganji);
       return '<div class="c' + cls + '" data-i="' + i + '">' +
         '<span class="hj">' + hj + "</span>" +
-        '<span class="ko">' + d.ganji + "</span>" +
-        '<span class="ag">' + d.age + "세</span>" +
-        (d.current ? '<span class="nowtag">지금 ' + age + "세</span>" : "") + "</div>";
+        '<span class="ko">' + (isKo ? d.ganji : "") + "</span>" +
+        '<span class="ag">' + tr("{A}세").replace("{A}", d.age) + "</span>" +
+        (d.current ? '<span class="nowtag">' + tr("지금 {A}세").replace("{A}", age) + "</span>" : "") + "</div>";
     }).join("");
 
     // 주목할 해 — 합충 등 기운이 겹치는 해만, 올해 이후 우선
@@ -176,15 +178,15 @@
     var upcoming = notable.filter(function (s2) { return s2.year >= now; });
     var pick = (upcoming.length ? upcoming : notable).slice(0, 5);
     var chips = pick.map(function (s2) {
-      return '<button class="y" data-year="' + s2.year + '" data-note="' + esc(s2.notes.join(" · ")) + '">' +
-        "<b>" + s2.year + " " + s2.ganji + "</b><em>" + esc(s2.notes[0]) + "</em></button>";
+      return '<button class="y" data-year="' + s2.year + '" data-note="' + esc(s2.notes.map(tr).join(" · ")) + '">' +
+        "<b>" + s2.year + " " + hanja(s2.ganji) + "</b><em>" + esc(tr(s2.notes[0])) + "</em></button>";
     }).join("");
 
     el.className = "rtl";
     el.innerHTML =
-      "<h4>大 運<em>10년마다 판이 바뀐다 · 지금 서 있는 자리</em></h4>" +
+      "<h4>大 運<em>" + tr("10년마다 판이 바뀐다 · 지금 서 있는 자리") + "</em></h4>" +
       '<div class="du-wrap"><div class="du">' + cards + "</div></div>" +
-      (chips ? '<p class="lg" style="margin:10px 0 0">주목할 해 — 눌러서 무엇이 겹치는지 보라</p><div class="ys">' + chips + "</div>" : "") +
+      (chips ? '<p class="lg" style="margin:10px 0 0">' + tr("주목할 해 — 눌러서 무엇이 겹치는지 보라") + '</p><div class="ys">' + chips + "</div>" : "") +
       '<p class="tip" id="tl-tip"></p>';
 
     el.addEventListener("click", function (e) {
@@ -199,7 +201,7 @@
   }
   function showYear(t) {
     var tip = document.getElementById("tl-tip");
-    if (tip) tip.textContent = "🕯 " + t.getAttribute("data-year") + "년 — " + t.getAttribute("data-note");
+    if (tip) tip.textContent = "🕯 " + tr("{Y}년 — {N}").replace("{Y}", t.getAttribute("data-year")).replace("{N}", t.getAttribute("data-note"));
     t.classList.remove("pulse"); void t.offsetWidth; t.classList.add("pulse");
   }
   function flashYear(y) {
@@ -209,7 +211,7 @@
     if (t) setTimeout(function () { showYear(t); }, 350);
     else {
       var tip = document.getElementById("tl-tip");
-      if (tip) tip.textContent = y + "년 — 대운 흐름에서 위치를 가늠해보라";
+      if (tip) tip.textContent = y + tr("년 — 대운 흐름에서 위치를 가늠해보라");
     }
   }
 
@@ -226,7 +228,7 @@
       if (m) {
         var idx = body.indexOf("·");
         var key = body.slice(0, idx).trim(), val = body.slice(idx + 1).trim();
-        return { rx: true, html: '<div class="rx"><span class="ic">' + (RX_ICON[key] || "✨") + "</span><b>" + key + "</b><span>" + val + "</span></div>" };
+        return { rx: true, html: '<div class="rx"><span class="ic">' + (RX_ICON[key] || "✨") + "</span><b>" + tr(key) + "</b><span>" + val + "</span></div>" };
       }
       return { kv: true, html: '<span class="kv">' + body + "</span>" };
     }
@@ -243,7 +245,7 @@
     }
     function flushSum() {
       if (!sumLines) return;
-      if (sumLines.length) html += '<div class="sum"><span class="sum-t">▣ 이 장의 요점</span><ul>' +
+      if (sumLines.length) html += '<div class="sum"><span class="sum-t">' + tr("▣ 이 장의 요점") + '</span><ul>' +
         sumLines.map(function (s) { return "<li>" + s + "</li>"; }).join("") + "</ul></div>";
       sumLines = null;
     }

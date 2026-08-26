@@ -58,6 +58,8 @@
   </main>
   <div id="site-footer"></div>
   <script src="../js/common.js?v=28" data-root=".."></script>
+  <script src="js/i18n-gwigok.js?v=1"></script>
+  <script src="js/i18n-bujeok.js?v=1"></script>
   <script src="js/saju.js"></script>
   <script src="js/saju-deep.js"></script>
   <script src="js/bujeok.js?v=6"></script>
@@ -73,6 +75,7 @@
       fetch("data/saju-terms.json").then(function (r) { return r.json(); }).then(function (data) {
         var r = Saju.compute(data, { y: b.y, m: b.m, d: b.d, hour: b.hour, min: b.min || 0 }, { trueSolar: true, gender: b.gender || null });
         var deep = SajuDeep.facts(r, b, b.gender || null);
+        var tr = window.GoblubI18n ? GoblubI18n.t : function (x) { return x; };
         var elem = (deep.yongshin && deep.yongshin.use[0]) || ["목","화","토","금","수"][Math.floor(r.ilgan / 2)];
         var el = BujeokArt.ELEM[elem];
 
@@ -87,13 +90,13 @@
         var ilganKo = Saju.GAN[r.ilgan];
         var missing = (deep.missing || []).join("·");
         $("gwi-msg").innerHTML =
-          "<b>" + ilganKo + "(" + BujeokArt.GAN_HJ[r.ilgan] + ")</b> 일간, " + r.strength.label + "한 명(命)이군.<br>" +
-          "네게 <b>" + elem + "(" + el.hj + ")</b>이 목마르니 그 기운을 부적 한가운데 봉했다." +
-          (missing ? "<br><span style='opacity:.8'>…네 팔자에 없는 " + missing + "은 빈자리로 새겨두었다.</span>" : "");
+          tr("<b>{G}({HJ})</b> 일간, {S}한 명(命)이군.").replace("{G}", tr(ilganKo)).replace("{HJ}", BujeokArt.GAN_HJ[r.ilgan]).replace("{S}", tr(r.strength.label)) + "<br>" +
+          tr("네게 <b>{E}({EH})</b>이 목마르니 그 기운을 부적 한가운데 봉했다.").replace("{E}", tr(elem)).replace("{EH}", el.hj) +
+          (missing ? "<br><span style='opacity:.8'>" + tr("…네 팔자에 없는 {M}은 빈자리로 새겨두었다.").replace("{M}", missing.split("·").map(tr).join("·")) + "</span>" : "");
         $("elem-info").innerHTML =
-          '<span class="elem-chip">' + ilganKo + " 일간 · " + r.strength.label + "</span>" +
-          '<span class="elem-chip">용신 ' + ((deep.yongshin && deep.yongshin.use.join("·")) || "—") + "</span>" +
-          (deep.yongshin && deep.yongshin.avoid.length ? '<span class="elem-chip">기신 ' + deep.yongshin.avoid.join("·") + "</span>" : "");
+          '<span class="elem-chip">' + tr("{G} 일간 · {S}").replace("{G}", tr(ilganKo)).replace("{S}", tr(r.strength.label)) + "</span>" +
+          '<span class="elem-chip">' + tr("용신 {Y}").replace("{Y}", ((deep.yongshin && deep.yongshin.use.map(tr).join("·")) || "—")) + "</span>" +
+          (deep.yongshin && deep.yongshin.avoid.length ? '<span class="elem-chip">' + tr("기신 {A}").replace("{A}", deep.yongshin.avoid.map(tr).join("·")) + "</span>" : "");
 
         var pillars = {};
         ["year","month","day","hour"].forEach(function (k) {
@@ -122,10 +125,10 @@
           var ov = document.createElement("div");
           ov.style.cssText = "position:fixed;inset:0;z-index:99;background:rgba(5,4,10,.97);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;overflow:auto;";
           ov.innerHTML =
-            '<p style="color:#ffb08a;font-family:\'Nanum Myeongjo\',serif;font-weight:800;margin-bottom:12px;font-size:1.05rem">🧧 부적을 <span style="color:#ff5a3a">길게 꾹</span> 눌러라</p>' +
+            '<p style="color:#ffb08a;font-family:\'Nanum Myeongjo\',serif;font-weight:800;margin-bottom:12px;font-size:1.05rem">' + tr('🧧 부적을 <span style="color:#ff5a3a">길게 꾹</span> 눌러라') + '</p>' +
             '<img src="' + url + '" style="max-height:64vh;max-width:86vw;border-radius:10px;box-shadow:0 14px 44px rgba(0,0,0,.7)" alt="부적" />' +
-            '<p style="color:#e8dcc8;font-family:\'Nanum Myeongjo\',serif;margin:14px 0 0;text-align:center;line-height:1.7;font-size:.95rem">누르고 있으면 메뉴가 뜬다<br>→ <b style="color:#ff8a5a">[이미지 저장 / 사진에 추가]</b> 선택</p>' +
-            '<button style="margin-top:16px;background:rgba(40,26,40,.9);color:#e0d4e8;border:1px solid rgba(150,80,90,.5);border-radius:10px;padding:11px 22px;font-family:inherit;font-size:1rem;cursor:pointer">닫기</button>';
+            '<p style="color:#e8dcc8;font-family:\'Nanum Myeongjo\',serif;margin:14px 0 0;text-align:center;line-height:1.7;font-size:.95rem">' + tr('누르고 있으면 메뉴가 뜬다') + '<br>→ <b style="color:#ff8a5a">' + tr('[이미지 저장 / 사진에 추가]') + '</b> ' + tr('선택') + '</p>' +
+            '<button style="margin-top:16px;background:rgba(40,26,40,.9);color:#e0d4e8;border:1px solid rgba(150,80,90,.5);border-radius:10px;padding:11px 22px;font-family:inherit;font-size:1rem;cursor:pointer">' + tr('닫기') + '</button>';
           ov.querySelector("button").onclick = function () { ov.remove(); };
           document.body.appendChild(ov);
         }
@@ -145,7 +148,7 @@
               if (!tip) {
                 tip = document.createElement("p"); tip.id = "save-tip"; tip.className = "fine-print";
                 tip.style.marginTop = "10px";
-                tip.innerHTML = '📥 알림바 또는 갤러리·다운로드 폴더를 확인해라. 저장이 안 보이면 → <a href="#" id="lp-alt" style="color:var(--sky)">길게 눌러 저장하기</a>';
+                tip.innerHTML = tr('📥 알림바 또는 갤러리·다운로드 폴더를 확인해라. 저장이 안 보이면 → <a href="#" id="lp-alt" style="color:var(--sky)">길게 눌러 저장하기</a>');
                 $("btn-save").parentElement.insertAdjacentElement("afterend", tip);
                 document.getElementById("lp-alt").onclick = function (e) {
                   e.preventDefault();

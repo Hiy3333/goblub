@@ -306,18 +306,21 @@
   </div>
   <div id="site-footer"></div>
   <script src="../js/common.js?v=28" data-root=".."></script>
+  <script src="js/i18n-premium.js?v=1"></script>
+  <script src="js/i18n-tale.js?v=1"></script>
   <script src="js/saju.js"></script>
   <script src="js/saju-deep.js"></script>
   <script src="js/dosa.js?v=3"></script>
   <script src="js/feed.js?v=14"></script>
   <script src="js/goblub-art.js"></script>
-  <script src="js/report-ui.js?v=7"></script>
+  <script src="js/report-ui.js?v=8"></script>
   <script src="js/gwigok-audio.js?v=1"></script>
   <script src="js/lunar.js?v=1"></script>
-  <script src="js/tale.js?v=32"></script>
+  <script src="js/tale.js?v=33"></script>
   <script>
     (function () {
       var $ = function (id) { return document.getElementById(id); };
+      var tr = window.GoblubI18n ? GoblubI18n.t : function (x) { return x; };
       var COST = 0; // 런칭 기념 무료 — 추후 별 가격 부여 예정
       var PARTS = [
         { id: "p1", title: "제1장 · 혼(魂)의 감정서" },
@@ -381,24 +384,24 @@
           wrap.className = "arch-row";
           var row = document.createElement("button");
           row.className = "arch-item";
-          row.innerHTML = "<b>📖 " + esc(e2.name) + "의 명부</b><span>" + e2.y + "." + e2.m + "." + e2.d +
-            " 생 · " + (d2.getMonth() + 1) + "/" + d2.getDate() + " 새김</span>";
+          row.innerHTML = "<b>" + tr("📖 {N}의 명부").replace("{N}", esc(e2.name)) + "</b><span>" +
+            tr("{B} 생 · {D} 새김").replace("{B}", e2.y + "." + e2.m + "." + e2.d).replace("{D}", (d2.getMonth() + 1) + "/" + d2.getDate()) + "</span>";
           row.onclick = function () { viewSnapshot(e2.key); };
           // 삭제 — 누르면 행이 통째로 확인 질문으로 바뀐다 (즉시 지우지 않는다)
           var del = document.createElement("button");
           del.className = "arch-del"; del.textContent = "🔥";
-          del.setAttribute("aria-label", "이 명부 태우기");
+          del.setAttribute("aria-label", tr("이 명부 태우기"));
           del.onclick = function (ev) {
             ev.stopPropagation();
             var ask = document.createElement("div");
             ask.className = "arch-confirm";
             var msg = document.createElement("b");
-            msg.textContent = (e2.name || "") + "의 명부를 태울까? 되살릴 수 없다.";
+            msg.textContent = tr("{N}의 명부를 태울까? 되살릴 수 없다.").replace("{N}", e2.name || "");
             var yes = document.createElement("button");
-            yes.className = "yes"; yes.textContent = "🔥 태운다";
+            yes.className = "yes"; yes.textContent = tr("🔥 태운다");
             yes.onclick = function (ev2) { ev2.stopPropagation(); deleteSnapshot(e2.key); };
             var no = document.createElement("button");
-            no.className = "no"; no.textContent = "남겨둔다";
+            no.className = "no"; no.textContent = tr("남겨둔다");
             no.onclick = function (ev2) { ev2.stopPropagation(); list.replaceChild(wrap, ask); };
             ask.appendChild(msg); ask.appendChild(yes); ask.appendChild(no);
             list.replaceChild(ask, wrap);
@@ -482,10 +485,10 @@
         $("gate").style.display = "block";
         $("report-panel").style.display = "none";
         if (COST === 0) {
-          document.querySelector(".cost-row").innerHTML = '지금은 <span class="cost">🎁 무료 공개</span>';
-          document.querySelector(".wallet-mini").textContent = "오픈 기념 무료! 나중에 별 상품으로 바뀔 예정이에요.";
+          document.querySelector(".cost-row").innerHTML = tr('지금은 <span class="cost">🎁 무료 공개</span>');
+          document.querySelector(".wallet-mini").textContent = tr("오픈 기념 무료! 나중에 별 상품으로 바뀔 예정이에요.");
           $("btn-unlock").style.display = "inline-block";
-          $("btn-unlock").textContent = "🎁 무료로 심층 리포트 받기";
+          $("btn-unlock").textContent = tr("🎁 무료로 심층 리포트 받기");
           $("need-more").style.display = "none";
           return;
         }
@@ -520,7 +523,7 @@
           var el = $("an-cap"); el.style.opacity = "0";
           setTimeout(function () {
             if (!anTimer) { el.style.opacity = "1"; return; } // 정지 후 잔여 타이머가 문구를 덮지 않게
-            anIdx = (anIdx + 1) % AN_CAPS.length; el.textContent = AN_CAPS[anIdx]; el.style.opacity = "1";
+            anIdx = (anIdx + 1) % AN_CAPS.length; el.textContent = tr(AN_CAPS[anIdx]); el.style.opacity = "1";
           }, 500);
         }, 6500);   // ~하는 중 문구가 충분히 오래 머물도록
       }
@@ -529,8 +532,8 @@
       function showAnalyzing() {
         analyzing = true; anIdx = 0;
         var ov = $("analyzing"); ov.classList.remove("fading"); ov.classList.add("on");
-        $("an-cap").textContent = AN_CAPS[0];
-        $("an-sub").textContent = "귀곡이 명부를 펼친다…";
+        $("an-cap").textContent = tr(AN_CAPS[0]);
+        $("an-sub").textContent = tr("귀곡이 명부를 펼친다…");
         $("an-flame").style.display = "";
         $("an-take").style.display = "none";
         var v = $("an-vid");
@@ -650,17 +653,17 @@
         setTimeout(function () {
           if (!pg) { el.classList.remove("turning"); return; }
           if (pg.type === "cover") {
-            el.innerHTML = '<div class="pg-plabel">冥簿 · 序 — 저승의 기록부</div>' +
-              '<div class="pg-title">' + esc(userName || "이름 없는 자") + '의 명부</div>' +
-              (userFocus ? '<p class="pg-cover-name">🕯 특히 궁금해한 것<br>' + esc(userFocus.length > 40 ? userFocus.slice(0, 40) + "…" : userFocus) + '</p>' : "") +
+            el.innerHTML = '<div class="pg-plabel">' + tr("冥簿 · 序 — 저승의 기록부") + '</div>' +
+              '<div class="pg-title">' + tr("{N}의 명부").replace("{N}", esc(userName || tr("이름 없는 자"))) + '</div>' +
+              (userFocus ? '<p class="pg-cover-name">' + tr("🕯 특히 궁금해한 것") + '<br>' + esc(tr(userFocus).length > 40 ? tr(userFocus).slice(0, 40) + "…" : tr(userFocus)) + '</p>' : "") +
               '<div id="pg-dash"></div><div id="pg-tl"></div>';
             ReportUI.dashboard($("pg-dash"), base, deep);
             ReportUI.timeline($("pg-tl"), deep);
           } else {
             el.innerHTML =
               (pg.img ? '<div class="pg-himg"><img src="' + pg.img + '" alt="" onerror="this.parentElement.style.display=\'none\'"></div>' : "") +
-              '<div class="pg-plabel">' + esc(pg.label) + '</div>' +
-              (pg.title ? '<div class="pg-title">' + esc(pg.title) + '</div>' : "") +
+              '<div class="pg-plabel">' + esc(tr(pg.label)) + '</div>' +
+              (pg.title ? '<div class="pg-title">' + esc(tr(pg.title)) + '</div>' : "") +
               '<div class="pg-body">' + pg.html + '</div>';
           }
           el.classList.remove("turning");
@@ -675,7 +678,7 @@
         var ni = cur + d;
         if (ni < 0) return;
         if (ni >= pages.length) {
-          if (!allDone) { $("pg-writing").textContent = "귀곡이 다음 장을 새기는 중"; $("pg-writing").classList.add("on"); }
+          if (!allDone) { $("pg-writing").textContent = tr("귀곡이 다음 장을 새기는 중"); $("pg-writing").classList.add("on"); }
           return;
         }
         cur = ni; renderPage();
@@ -695,9 +698,12 @@
             var dg = base.pillars.day.gan, dj = base.pillars.day.ji;
             var hj = (GH[dg] || "") + (JH[dj] || "");
             var ws = wb.y + "." + wb.m + "." + wb.d +
-              (wb.hour != null ? " " + ("0" + wb.hour).slice(-2) + ":" + ("0" + (wb.min || 0)).slice(-2) : "") + "생";
-            $("rp-whose").textContent = "🕯 " + (userName ? userName + " · " : "") + ws +
-              " · " + hj + "(" + dg + dj + ") · " + base.zodiac + "띠의 명부";
+              (wb.hour != null ? " " + ("0" + wb.hour).slice(-2) + ":" + ("0" + (wb.min || 0)).slice(-2) : "") +
+              (!window.GoblubI18n || GoblubI18n.lang === "ko" ? "생" : "");
+            $("rp-whose").textContent = tr("🕯 {W} · {HJ}({GJ}) · {Z}띠의 명부")
+              .replace("{W}", (userName ? userName + " · " : "") + ws)
+              .replace("{HJ}", hj).replace("{GJ}", (!window.GoblubI18n || GoblubI18n.lang === "ko") ? dg + dj : hj)
+              .replace("{Z}", tr(base.zodiac));
             $("rp-whose").style.display = "block";
           }
         } catch (e) {}
@@ -714,13 +720,13 @@
         if (done >= TOTAL) {
           allDone = true;
           saveSnapshot();   // 완성된 명부를 보관함에 저장(다시 보기용)
-          $("pg-writing").textContent = "🕯 명부 완성. 페이지를 넘겨 끝까지 읽어라."; $("pg-writing").classList.remove("on");
+          $("pg-writing").textContent = tr("🕯 명부 완성. 페이지를 넘겨 끝까지 읽어라."); $("pg-writing").classList.remove("on");
           if (analyzing) playEnding();
           else renderPage();
         } else {
-          $("pg-writing").textContent = "귀곡이 " + (done) + "/" + TOTAL + "부를 새기는 중";
+          $("pg-writing").textContent = tr("귀곡이 {D}/{T}부를 새기는 중").replace("{D}", done).replace("{T}", TOTAL);
           $("pg-writing").classList.add("on");
-          if (analyzing) $("an-sub").textContent = "네 명부 " + done + " / " + TOTAL + " 장을 새기는 중…";
+          if (analyzing) $("an-sub").textContent = tr("네 명부 {D} / {T} 장을 새기는 중…").replace("{D}", done).replace("{T}", TOTAL);
         }
       }
 
@@ -728,8 +734,8 @@
         if (i >= PARTS.length) { progressMsg(); return; }
         attempt = attempt || 0;
         var p = PARTS[i];
-        $("pg-writing").textContent = "귀곡이 " + (i + 1) + "/" + TOTAL + "부를 새기는 중"; $("pg-writing").classList.add("on");
-        if (analyzing) $("an-sub").textContent = "네 명부 " + i + " / " + TOTAL + " 장을 새기는 중…";
+        $("pg-writing").textContent = tr("귀곡이 {D}/{T}부를 새기는 중").replace("{D}", i + 1).replace("{T}", TOTAL); $("pg-writing").classList.add("on");
+        if (analyzing) $("an-sub").textContent = tr("네 명부 {D} / {T} 장을 새기는 중…").replace("{D}", i).replace("{T}", TOTAL);
         var buffer = "";
         function failSoft() {
           if (attempt >= 1) return false;
@@ -750,7 +756,7 @@
               setTimeout(function () { genPart(i + 1); }, fromCache ? 30 : 700);
             } else {
               if (failSoft()) return;
-              retryFail(i, "⚠️ 이 장을 끝까지 받지 못했다.");
+              retryFail(i, tr("⚠️ 이 장을 끝까지 받지 못했다."));
             }
           },
           onError: function (code, sec2) {
@@ -762,9 +768,9 @@
               renderGate(); return;
             }
             retryFail(i,
-              code === "cooldown" ? "귀곡이 숨을 고른다… " + sec2 + "초 후 이어진다." :
-              code === "not_configured" ? "귀곡이 아직 붓을 들지 않았다." :
-              "⚠️ 잠시 후 이어진다.");
+              code === "cooldown" ? tr("귀곡이 숨을 고른다… ") + sec2 + tr("초 후 이어진다.") :
+              code === "not_configured" ? tr("귀곡이 아직 붓을 들지 않았다.") :
+              tr("⚠️ 잠시 후 이어진다."));
           }
         });
       }
@@ -773,13 +779,13 @@
         genFailed = true;
         if (analyzing) {
           stopCaptions();
-          $("an-cap").textContent = "귀곡이 잠시 붓을 멈췄다";
-          $("an-sub").innerHTML = esc(msg) + ' <button class="pg-btn" id="an-retry" style="padding:6px 12px;font-size:.85rem;margin-left:6px">📜 이어서</button>';
+          $("an-cap").textContent = tr("귀곡이 잠시 붓을 멈췄다");
+          $("an-sub").innerHTML = esc(msg) + ' <button class="pg-btn" id="an-retry" style="padding:6px 12px;font-size:.85rem;margin-left:6px">' + tr("📜 이어서") + '</button>';
           $("an-retry").onclick = function () { genFailed = false; startCaptions(); genPart(i); };
           return;
         }
         var w = $("pg-writing"); w.classList.remove("on");
-        w.innerHTML = msg + ' <button class="pg-btn" id="pg-retry" style="padding:6px 12px;font-size:.85rem">📜 이어서 받기</button>';
+        w.innerHTML = msg + ' <button class="pg-btn" id="pg-retry" style="padding:6px 12px;font-size:.85rem">' + tr("📜 이어서 받기") + '</button>';
         $("pg-retry").onclick = function () { genFailed = false; genPart(i); };
       }
 
@@ -794,10 +800,10 @@
         });
         // 강조 마커가 부족하면(구버전 캐시) 엔진 팩트로 보충
         if (out.length < 3 && deep) {
-          if (deep.yongshin && deep.yongshin.use.length) out.push("네 운을 여는 기운은 " + deep.yongshin.use.join("·"));
-          if (deep.spouse && deep.spouse.sipseong) out.push("배우자 자리 " + deep.spouse.ji + "에 앉은 " + deep.spouse.sipseong);
+          if (deep.yongshin && deep.yongshin.use.length) out.push(tr("네 운을 여는 기운은 {E}").replace("{E}", deep.yongshin.use.map(tr).join("·")));
+          if (deep.spouse && deep.spouse.sipseong) out.push(tr("배우자 자리 {J}에 앉은 {S}").replace("{J}", tr(deep.spouse.ji)).replace("{S}", tr(deep.spouse.sipseong)));
           var cur = (deep.daeun || []).filter(function (d) { return d.current; })[0];
-          if (cur) out.push("지금은 " + cur.ganji + " 대운, " + cur.ganSipseong + "의 시간");
+          if (cur) out.push(tr("지금은 {GJ} 대운, {SS}의 시간").replace("{GJ}", cur.ganji).replace("{SS}", tr(cur.ganSipseong)));
         }
         return out.slice(0, 5);
       }
@@ -847,7 +853,7 @@
         // 배지
         g.textAlign = "center";
         g.font = "26px 'Jua','Malgun Gothic',sans-serif";
-        var btxt = "🕯 귀곡의 명부(冥府)", bw = g.measureText(btxt).width + 52;
+        var btxt = tr("🕯 귀곡의 명부(冥府)"), bw = g.measureText(btxt).width + 52;
         var bg2 = g.createLinearGradient((W - bw) / 2, 0, (W + bw) / 2, 0);
         bg2.addColorStop(0, "#7a1f2e"); bg2.addColorStop(1, "#b0384a");
         rr((W - bw) / 2, 200, bw, 52, 26); g.fillStyle = bg2; g.fill();
@@ -855,17 +861,17 @@
         // 제목·명식
         g.save(); g.shadowColor = "rgba(200,50,70,.5)"; g.shadowBlur = 18;
         g.fillStyle = "#efe4f2"; g.font = "54px 'Jua','Malgun Gothic',sans-serif";
-        g.fillText("프리미엄 심층 리포트", W / 2, 330); g.restore();
+        g.fillText(tr("프리미엄 심층 리포트"), W / 2, 330); g.restore();
         g.fillStyle = "#9a8ba8"; g.font = "28px 'Jua','Malgun Gothic',sans-serif";
-        var sub = base.pillars.day.ganji + "일주 · " + base.strength.label +
-          (deep && deep.yongshin && deep.yongshin.use.length ? " · 용신 " + deep.yongshin.use.join("·") : "");
+        var sub = tr("{G}일주 · {S}").replace("{G}", base.pillars.day.ganji).replace("{S}", tr(base.strength.label)) +
+          (deep && deep.yongshin && deep.yongshin.use.length ? tr(" · 용신 {Y}").replace("{Y}", deep.yongshin.use.map(tr).join("·")) : "");
         g.fillText(sub, W / 2, 378);
         g.strokeStyle = "rgba(150,80,90,.4)"; g.lineWidth = 1.5;
         g.beginPath(); g.moveTo(110, 412); g.lineTo(W - 110, 412); g.stroke();
         // 콕 집은 대목
         g.save(); g.shadowColor = "rgba(255,60,80,.5)"; g.shadowBlur = 14;
         g.fillStyle = "#ff6b7e"; g.font = "30px 'Jua','Malgun Gothic',sans-serif";
-        g.fillText("🩸 귀곡이 콕 집은 대목", W / 2, 468); g.restore();
+        g.fillText(tr("🩸 귀곡이 콕 집은 대목"), W / 2, 468); g.restore();
         var hs = collectHighlights();
         var y = 528;
         g.textAlign = "left";
@@ -883,12 +889,12 @@
         // 카드 하단 서명
         g.textAlign = "center";
         g.fillStyle = "#9a8ba8"; g.font = "26px 'Jua','Malgun Gothic',sans-serif";
-        g.fillText("— 귀곡(鬼哭)", W / 2, 1062);
+        g.fillText(tr("— 귀곡(鬼哭)"), W / 2, 1062);
         // CTA
         g.fillStyle = "#cdc2e0"; g.font = "28px 'Jua','Malgun Gothic',sans-serif";
-        g.fillText("네 팔자도 보러 오라 ▶ goblub-2.vercel.app", W / 2, 1176);
+        g.fillText(tr("네 팔자도 보러 오라 ▶ goblub-2.vercel.app"), W / 2, 1176);
         g.fillStyle = "#ffb84a"; g.font = "24px 'Jua','Malgun Gothic',sans-serif";
-        g.fillText("지금은 오픈 기념 무료 🕯", W / 2, 1216);
+        g.fillText(tr("지금은 오픈 기념 무료 🕯"), W / 2, 1216);
         c.toBlob(function (blob2) {
           if (!blob2) { window.open(c.toDataURL("image/png")); return; }
           var a = document.createElement("a");

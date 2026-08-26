@@ -122,6 +122,10 @@ a{color:inherit;text-decoration:none}
 </div>
 
 <script src="js/saju.js"></script>
+<script src="../js/i18n.js?v=1"></script>
+<script src="../js/i18n-more.js?v=2"></script>
+<script src="js/i18n-gwigok.js?v=1"></script>
+<script src="js/i18n-sinsal.js?v=1"></script>
 <script src="js/sinsal.js?v=1"></script>
 <script src="js/gwigok-log.js?v=1"></script>
 <script>
@@ -129,6 +133,11 @@ a{color:inherit;text-decoration:none}
   var $=function(id){return document.getElementById(id);};
 
   // 도감 — 귀곡 톤 (신살 명칭은 js/sinsal.js 의 고전 표와 1:1 대응)
+  var tr=window.GoblubI18n?GoblubI18n.t:function(x){return x;};
+  var isKo=!window.GoblubI18n||GoblubI18n.lang==="ko";
+  var JI_RO2=["Ja","Chuk","In","Myo","Jin","Sa","O","Mi","Sin","Yu","Sul","Hae"];
+  function roHan(s){ var GA="갑을병정무기경신임계", JA="자축인묘진사오미신유술해", G2=["Gap","Eul","Byeong","Jeong","Mu","Gi","Gyeong","Sin","Im","Gye"]; var out="", prev=false; for(var i2=0;i2<s.length;i2++){ var c=s[i2], gi=GA.indexOf(c), ji2=JA.indexOf(c); if(gi>=0||ji2>=0){ out+=(prev?"-":"")+(gi>=0?G2[gi]:JI_RO2[ji2]); prev=true; } else { out+=c; prev=false; } } return out; }
+  function trHit(h){ if(isKo) return h; var m=h.match(/^(년지|월지|일지|시지|년주|월주|일주|시주)\s+(.+)$/); if(m) return tr(m[1])+" "+roHan(m[2]); return roHan(h).replace("동주", tr("동주")); }
   var BOOK={
     /* ── 대살 ── */
     "백호대살":{hj:"虎",als:"흰 호랑이의 이빨",
@@ -242,10 +251,10 @@ a{color:inherit;text-decoration:none}
 
   function fillSelects(){
     var y=$("g-year"),m=$("g-month"),d=$("g-day"),h=$("g-hour"),now=new Date().getFullYear();
-    for(var i=now;i>=1930;i--) y.add(new Option(i+"년",i));
-    for(var j=1;j<=12;j++) m.add(new Option(j+"월",j));
-    for(var k=1;k<=31;k++) d.add(new Option(k+"일",k));
-    for(var t=0;t<24;t++) h.add(new Option(("0"+t).slice(-2)+"시",t));
+    for(var i=now;i>=1930;i--) y.add(new Option(tr("{N}년").replace("{N}",i),i));
+    for(var j=1;j<=12;j++) m.add(new Option(tr("{N}월").replace("{N}",j),j));
+    for(var k=1;k<=31;k++) d.add(new Option(tr("{N}일").replace("{N}",k),k));
+    for(var t=0;t<24;t++) h.add(new Option(tr("{N}시").replace("{N}",("0"+t).slice(-2)),t));
     y.value=1995;
   }
 
@@ -255,17 +264,17 @@ a{color:inherit;text-decoration:none}
   function boot(birth){
     var r=Saju.compute(data,{y:birth.y,m:birth.m,d:birth.d,hour:birth.hour,min:birth.min||0},{trueSolar:true});
     var t=Saju.pillarText(r.pillars.day);
-    var bs=birth.y+"."+birth.m+"."+birth.d+(birth.hour!=null?" "+("0"+birth.hour).slice(-2)+":"+("0"+(birth.min||0)).slice(-2):"")+"생";
-    $("me-pill").textContent=bs+" · "+t.hanja+"("+t.hangul+") · "+r.zodiac+"띠";
+    var bs=birth.y+"."+birth.m+"."+birth.d+(birth.hour!=null?" "+("0"+birth.hour).slice(-2)+":"+("0"+(birth.min||0)).slice(-2):"")+(!window.GoblubI18n||GoblubI18n.lang==="ko"?"생":"");
+    $("me-pill").textContent=bs+" · "+t.hanja+(isKo?"("+t.hangul+")":"")+" · "+tr("{Z}띠").replace("{Z}",tr(r.zodiac));
 
     // 원국 표기 — 계산 근거를 눈으로 확인할 수 있게
     var wg=Sinsal.wongook(r), gm=Sinsal.gongmangJi(r);
     $("wongook").innerHTML='<div class="row">'+wg.map(function(p){
-        return '<span class="p"><span class="lb">'+p.pos+'</span><span class="hj">'+p.hj+'</span>'+
-               '<span class="ko">'+p.ko+'</span><span class="us">'+p.unseong+'</span></span>';
+        return '<span class="p"><span class="lb">'+tr(p.pos)+'</span><span class="hj">'+p.hj+'</span>'+
+               '<span class="ko">'+(isKo?p.ko:"")+'</span><span class="us">'+tr("운성·"+p.unseong)+'</span></span>';
       }).join("")+'</div>'+
-      '<p class="gm">이 명부의 공망은 <b>'+gm.hj+'('+gm.ko+')</b>다. 작은 글씨는 십이운성(十二運星).'+
-      (r.pillars.hour ? "" : "<br>태어난 시를 모르니 시주는 비워 두었다 — 시지에 붙는 살은 빠진다.")+'</p>';
+      '<p class="gm">'+tr("이 명부의 공망은 <b>{HJ}({KO})</b>다. 작은 글씨는 십이운성(十二運星).").replace("{HJ}",gm.hj).replace("{KO}",isKo?gm.ko:roHan(gm.ko))+
+      (r.pillars.hour ? "" : "<br>"+tr("태어난 시를 모르니 시주는 비워 두었다 — 시지에 붙는 살은 빠진다."))+'</p>';
 
     var found={}; // 이름 → {hits, basis}
     Sinsal.list(r).forEach(function(s){ found[s.name]=s; });
@@ -277,11 +286,11 @@ a{color:inherit;text-decoration:none}
       if(!hit.length) return;
       var head=document.createElement("div");
       head.className="grp";
-      head.innerHTML='<span class="hj">'+g.hj+'</span><span class="ko">'+g.ko+'</span><span class="ds">'+g.ds+'</span>';
+      head.innerHTML='<span class="hj">'+g.hj+'</span><span class="ko">'+tr(g.ko)+'</span><span class="ds">'+tr(g.ds)+'</span>';
       cards.appendChild(head);
       if(g.note){
         var nt=document.createElement("p");
-        nt.className="gnote"; nt.innerHTML=g.note;
+        nt.className="gnote"; nt.innerHTML=tr(g.note);
         cards.appendChild(nt);
       }
       hit.forEach(function(n){
@@ -289,23 +298,23 @@ a{color:inherit;text-decoration:none}
         total++; names.push(n);
         var el=document.createElement("div");
         el.className="card"; el.setAttribute("data-hj",b.hj);
-        el.innerHTML='<div class="in"><div class="top"><span class="nm">'+n+'</span>'+
-          '<span class="als">'+b.als+'</span>'+
-          '<span class="basis">'+esc(f.basis)+'</span></div>'+
-          '<div class="top" style="margin-top:8px"><span class="pos">'+esc(f.hits.join(" · "))+'</span></div>'+
-          '<p class="tx">'+b.tx+'</p>'+
-          '<p class="cure"><b>다스리는 법</b> — '+b.cure+'</p></div>';
+        el.innerHTML='<div class="in"><div class="top"><span class="nm">'+tr(n)+'</span>'+
+          '<span class="als">'+tr(b.als)+'</span>'+
+          '<span class="basis">'+esc(f.basis.split(" · ").map(tr).join(" · "))+'</span></div>'+
+          '<div class="top" style="margin-top:8px"><span class="pos">'+esc(f.hits.map(trHit).join(" · "))+'</span></div>'+
+          '<p class="tx">'+tr(b.tx)+'</p>'+
+          '<p class="cure"><b>'+tr("다스리는 법")+'</b> — '+tr(b.cure)+'</p></div>';
         cards.appendChild(el);
       });
     });
 
     if(!total){
-      $("intro").innerHTML="네 명부를 샅샅이 뒤졌다.";
-      cards.innerHTML='<div class="none">붙은 살이 없다 — 드물게 깨끗한 명부다.<br>'+
-        "다만 명심해라. 살이 없다는 건 무기도 없다는 뜻이다.<br>네 길은 순전히 네 걸음으로 가야 한다.</div>";
+      $("intro").innerHTML=tr("네 명부를 샅샅이 뒤졌다.");
+      cards.innerHTML='<div class="none">'+tr("붙은 살이 없다 — 드물게 깨끗한 명부다.")+'<br>'+
+        tr("다만 명심해라. 살이 없다는 건 무기도 없다는 뜻이다.")+"<br>"+tr("네 길은 순전히 네 걸음으로 가야 한다.")+"</div>";
     }else{
-      $("intro").innerHTML="네 명부에서 <b>"+total+"가지</b>가 나왔다.<br>"+
-        "십이신살은 흉한 것만이 아니라 자리마다 하나씩 붙는 것이니, 이름만 보고 겁먹지 마라.";
+      $("intro").innerHTML=tr("네 명부에서 <b>{N}가지</b>가 나왔다.").replace("{N}",total)+"<br>"+
+        tr("십이신살은 흉한 것만이 아니라 자리마다 하나씩 붙는 것이니, 이름만 보고 겁먹지 마라.");
     }
     $("gate").style.display="none"; $("board").style.display="block";
     if(window.GwigokLog) GwigokLog.add("sinsal","신살 도감",
@@ -317,7 +326,7 @@ a{color:inherit;text-decoration:none}
     var y=+$("g-year").value,m=+$("g-month").value,d=+$("g-day").value,hv=$("g-hour").value;
     var dt=new Date(y,m-1,d);
     if(dt.getFullYear()!==y||dt.getMonth()!==m-1||dt.getDate()!==d){
-      $("g-err").textContent="없는 날짜다. 다시 보아라."; $("g-err").style.display="block"; return;
+      $("g-err").textContent=tr("없는 날짜다. 다시 보아라."); $("g-err").style.display="block"; return;
     }
     var b={y:y,m:m,d:d}; if(hv!==""){ b.hour=+hv; b.min=Math.max(0,Math.min(59,+(document.getElementById("g-min").value)||0)); }
     try{ localStorage.setItem("goblub_birth",JSON.stringify(b)); }catch(e){}
@@ -332,7 +341,7 @@ a{color:inherit;text-decoration:none}
       if(b&&b.y) boot(b); else $("gate").style.display="block";
     })
     .catch(function(){ $("gate").style.display="block";
-      $("g-err").textContent="장부를 못 펼쳤다. 새로고침 해보아라."; $("g-err").style.display="block"; });
+      $("g-err").textContent=tr("장부를 못 펼쳤다. 새로고침 해보아라."); $("g-err").style.display="block"; });
 })();
 </script>
 </body>
