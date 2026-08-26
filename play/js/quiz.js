@@ -22,6 +22,7 @@
         '<p class="result-desc" style="text-align:center; margin:12px 0 20px">' + config.intro + "</p>" +
         '<div class="result-actions"><button class="btn-primary" id="qz-start">시작하기</button></div>';
       el.querySelector("#qz-start").onclick = renderQ;
+      if (window.GoblubI18n) GoblubI18n.apply(el);
     }
 
     // 어느 문항에서 이탈하는지 보려면 문항마다 도달을 남겨야 한다.
@@ -39,11 +40,12 @@
       var pct = Math.round(idx / config.questions.length * 100);
       var html =
         '<div class="progress-track"><div class="progress-fill" style="width:' + pct + '%"></div></div>' +
-        '<p class="quiz-q">Q' + (idx + 1) + ". " + q.q + "</p>";
+        '<p class="quiz-q">Q' + (idx + 1) + ". <span>" + q.q + "</span></p>";  // 질문을 별도 노드로 — 번역 키 매칭용
       q.choices.forEach(function (c, i) {
         html += '<button class="choice-btn" data-i="' + i + '">' + c.text + "</button>";
       });
       el.innerHTML = html;
+      if (window.GoblubI18n) GoblubI18n.apply(el);
       Array.prototype.forEach.call(el.querySelectorAll(".choice-btn"), function (btn) {
         btn.onclick = function () {
           var ci = +btn.dataset.i;
@@ -59,6 +61,7 @@
     function finish() {
       if (window.GoblubFeed && config.feedSrc) GoblubFeed.grant(config.feedSrc);
       config.renderResult(totals, el, { restart: renderStart, shareLink: shareLink, picks: picks.slice() });
+      if (window.GoblubI18n) GoblubI18n.apply(el);
       // 결과 유형은 테스트마다 판정 로직이 달라서, 화면에 찍힌 이름을 그대로 집계한다.
       var nameEl = el.querySelector(".result-name");
       track("test_complete", { result: nameEl ? nameEl.textContent.trim() : "(미상)" });

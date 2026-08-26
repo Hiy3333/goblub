@@ -34,8 +34,9 @@
   <div id="site-footer"></div>
   <script src="../js/common.js?v=26" data-root=".."></script>
   <script src="js/feed.js?v=14"></script>
-  <script src="js/quiz.js?v=4"></script>
+  <script src="js/quiz.js?v=6"></script>
   <script src="js/sharecard.js?v=2"></script>
+  <script src="js/i18n-zombie.js?v=2"></script>
   <script>
     var TYPES = {
       leader:   { emoji:"🛡️", name:"인간 내비게이션 리더형", short:"리더", tag:"패닉? 그건 제 담당이 아닌데요", surv:87, item:"확성기 (없으면 목청)",
@@ -131,26 +132,27 @@
       var key = Quiz.top(totals, ORDER);
       var r = TYPES[key];
       var fr = TYPES[r.match], en = TYPES[r.clash];
+      var t = window.GoblubI18n ? GoblubI18n.t : function (s) { return s; };
       el.innerHTML =
         '<span class="result-emoji">' + r.emoji + "</span>" +
         '<p class="result-name">' + r.name + "</p>" +
-        '<p class="z-tag">“' + r.tag + '”</p>' +
+        '<p class="z-tag">“' + t(r.tag) + '”</p>' +
         '<div class="z-surv"><span>생존 확률</span>' +
           '<div class="z-bar"><i style="width:' + r.surv + '%"></i></div><b>' + r.surv + '%</b></div>' +
         '<p class="result-desc">' + r.desc + "</p>" +
         '<ul class="z-traits">' + r.traits.map(function (t) { return "<li>" + t + "</li>"; }).join("") + '</ul>' +
         '<p class="z-item">🎒 생존 필수템 — <b>' + r.item + '</b></p>' +
         '<div class="z-chemi">' +
-          '<span>🤝 같은 조 하고 싶은 <b>' + fr.emoji + ' ' + fr.short + '형</b></span>' +
-          '<span>💥 같은 조 되면 대환장 <b>' + en.emoji + ' ' + en.short + '형</b></span>' +
+          '<span>🤝 같은 조 하고 싶은 <b>' + fr.emoji + ' ' + t(fr.short + '형') + '</b></span>' +
+          '<span>💥 같은 조 되면 대환장 <b>' + en.emoji + ' ' + t(en.short + '형') + '</b></span>' +
         '</div>' +
         '<div id="card-slot"></div>' +
         '<div class="result-actions">' +
         '<button class="btn-primary" id="qz-retry">다시하기</button>' +
         '<button class="btn-ghost" id="qz-share">링크 복사</button></div>';
       el.querySelector("#card-slot").appendChild(ShareCard.render({
-        palette: "mint", emoji: r.emoji, badge: "좀비 생존 유형", title: r.name,
-        lines: ["“" + r.tag + "”", "생존 확률 " + r.surv + "%", "필수템: " + r.item]
+        palette: "mint", emoji: r.emoji, badge: t("좀비 생존 유형"), title: t(r.name),
+        lines: ["“" + t(r.tag) + "”", t("생존 확률") + " " + r.surv + "%", t("필수템:") + " " + t(r.item)]
       }));
       el.querySelector("#qz-retry").onclick = api.restart;
       el.querySelector("#qz-share").onclick = function () { api.shareLink(el.querySelector("#qz-share")); };

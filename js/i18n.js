@@ -161,6 +161,14 @@
   S("모든 데이터는 이 브라우저에 저장돼요", "All data is stored in this browser", "Todos los datos se guardan en este navegador", "Semua data tersimpan di peramban ini", "すべてのデータはこのブラウザに保存されます", "ข้อมูลทั้งหมดถูกเก็บในเบราว์เซอร์นี้", "所有数据仅保存在此浏览器", "所有數據僅保存在此瀏覽器");
   S("가볍게 즐겨주세요 🙂", "Just for fun 🙂", "Solo por diversión 🙂", "Sekadar hiburan 🙂", "気軽に楽しんでね 🙂", "เล่นเพลิน ๆ นะ 🙂", "轻松一玩就好 🙂", "輕鬆一玩就好 🙂");
 
+  // --- 퀴즈 공통 UI ---
+  S("시작하기", "Start", "Empezar", "Mulai", "スタート", "เริ่มเลย", "开始", "開始");
+  S("다시하기", "Try again", "Otra vez", "Ulangi", "もう一回", "เล่นอีกครั้ง", "再来一次", "再來一次");
+  S("링크 복사", "Copy link", "Copiar enlace", "Salin tautan", "リンクをコピー", "คัดลอกลิงก์", "复制链接", "複製連結");
+  S("공유 완료!", "Shared!", "¡Compartido!", "Terbagikan!", "共有しました！", "แชร์แล้ว!", "已分享！", "已分享！");
+  S("복사됨!", "Copied!", "¡Copiado!", "Tersalin!", "コピーしました！", "คัดลอกแล้ว!", "已复制！", "已複製！");
+  S("🖼 결과 짤 저장", "🖼 Save result image", "🖼 Guardar imagen", "🖼 Simpan gambar hasil", "🖼 結果画像を保存", "🖼 บันทึกรูปผลลัพธ์", "🖼 保存结果图", "🖼 保存結果圖");
+
   // --- 버디 대사 ---
   S("냠냠, 나쁜 기분 없어?", "Nom nom, got any bad moods?", "Ñam ñam, ¿tienes malos ánimos?", "Nyam nyam, ada mood buruk?", "むしゃむしゃ、嫌な気分ない？", "งั่ม ๆ มีอารมณ์แย่ ๆ ไหม?", "吧唧吧唧，有坏心情吗？", "吧唧吧唧，有壞心情嗎？");
   S("오늘도 잘 놀다 가!", "Have fun again today!", "¡Diviértete hoy también!", "Hari ini juga bersenang-senanglah!", "今日も楽しんでいってね！", "วันนี้ก็ขอให้สนุกนะ!", "今天也玩得开心！", "今天也玩得開心！");
@@ -247,5 +255,12 @@
     window.addEventListener("load", function () { apply(); });
   });
 
-  window.GoblubI18n = { t: t, lang: lang, apply: apply, LANGS: LANGS };
+  // 페이지별 언어팩 등록: { "한국어 키": [en,es,id,ja,th,zh,tw] } 또는 객체형
+  function add(pairs) {
+    for (var k in pairs) {
+      var v = pairs[k];
+      D[k] = Array.isArray(v) ? { en: v[0], es: v[1], id: v[2], ja: v[3], th: v[4], zh: v[5], tw: v[6] } : v;
+    }
+  }
+  window.GoblubI18n = { t: t, lang: lang, apply: apply, add: add, LANGS: LANGS };
 })();
