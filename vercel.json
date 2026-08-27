@@ -9,11 +9,5 @@
     "api/decide.js": {
       "maxDuration": 300
     }
-  },
-  "rewrites": [
-    {
-      "source": "/api/notice",
-      "destination": "/api/admin"
-    }
-  ]
+  }
 }
