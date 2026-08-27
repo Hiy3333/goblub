@@ -65,8 +65,9 @@
   // el 안에 구글 로그인 버튼 렌더. 로그인 성공 시 onLogin(user) 호출.
   function renderButton(el, onLogin) {
     if (!CLIENT_ID) {
+      var _t0 = window.GoblubI18n ? GoblubI18n.t : function (x) { return x; };
       el.innerHTML = '<p style="color:var(--ink-soft); line-height:1.7; text-align:center">' +
-        '🔧 구글 로그인 연동 준비 중이에요.<br>곧 간편하게 로그인할 수 있어요!</p>';
+        _t0('🔧 구글 로그인 연동 준비 중이에요.') + '<br>' + _t0('곧 간편하게 로그인할 수 있어요!') + '</p>';
       return;
     }
     function init() {
@@ -86,9 +87,10 @@
     if (window.google && google.accounts && google.accounts.id) init();
     else {
       var s = document.createElement("script");
-      s.src = "https://accounts.google.com/gsi/client";
+      var hl = { ko: "ko", en: "en", es: "es", id: "id", ja: "ja", th: "th", zh: "zh-CN", tw: "zh-TW" }[(window.GoblubI18n && GoblubI18n.lang) || "ko"] || "ko";
+      s.src = "https://accounts.google.com/gsi/client?hl=" + hl;
       s.onload = init;
-      s.onerror = function () { el.innerHTML = '<p style="color:var(--ink-soft)">로그인 모듈을 불러오지 못했어요. 새로고침 해주세요.</p>'; };
+      s.onerror = function () { var _t = window.GoblubI18n ? GoblubI18n.t : function (x) { return x; }; el.innerHTML = '<p style="color:var(--ink-soft)">' + _t("로그인 모듈을 불러오지 못했어요. 새로고침 해주세요.") + '</p>'; };
       document.head.appendChild(s);
     }
   }
