@@ -187,7 +187,7 @@ video::-webkit-media-controls-overlay-play-button{display:none!important;-webkit
 </div>
 
 <script src="../js/i18n.js?v=1"></script>
-<script src="js/i18n-tarot.js?v=1"></script>
+<script src="js/i18n-tarot.js?v=2"></script>
 <script src="js/feed.js?v=14"></script>
 <script src="js/dosa.js?v=3"></script>
 <script>
@@ -302,40 +302,30 @@ window.addEventListener("resize", function(){
   if(scPick.classList.contains("on") && phase==="pick") buildFan();
 });
 
-// 위치 idx → 그날의 카드/방향(시드 셔플)
+// 위치 idx → 카드/방향. 뽑을 때마다 새로 섞는다 — 다시 보기를 해도 늘 새 카드.
 function planFor(pickIdx){
-  // 시드에 고민을 넣는다. 날짜만으로 뽑으면 새 질문을 해도 같은 카드가 나온다.
-  var r=rng(seedFromStr(todayStr()+"|"+pickIdx+"|"+myWorry));
-  var cardIdx=Math.floor(r()*MAJOR.length);
-  var orient=(r()<0.62)?"정방향":"역방향";     // 정방향 조금 더 잦게
+  var cardIdx=Math.floor(Math.random()*MAJOR.length);
+  var orient=(Math.random()<0.62)?"정방향":"역방향";     // 정방향 조금 더 잦게
   return {cardIdx:cardIdx, orient:orient};
 }
 
 function pick(pickIdx){
   if(phase!=="pick") return;
   phase="result";
-  // 같은 고민을 다시 물으면 오늘의 카드 그대로(잠금 유지).
-  // 고민을 바꿨으면 새로 뽑는다 — 예전엔 날짜만 봐서 새 질문에도 같은 답이 나왔다.
-  var saved=null;
-  try{ saved=JSON.parse(localStorage.getItem(LOCK_KEY)); }catch(e){}
-  if(saved && saved.date===todayStr() && typeof saved.cardIdx==="number"
-     && (saved.worry||"")===myWorry){
-    revealResult(saved.cardIdx, saved.orient, true);
-    return;
-  }
+  // 뽑을 때마다 새 카드 — 같은 고민을 다시 물어도 결과가 바뀐다.
   var pl=planFor(pickIdx);
   try{ localStorage.setItem(LOCK_KEY, JSON.stringify({date:todayStr(), cardIdx:pl.cardIdx, orient:pl.orient, worry:myWorry})); }catch(e){}
   revealResult(pl.cardIdx, pl.orient, false);
 }
 
-// 타로 다시 보기 — 오늘의 카드·해석은 그대로 두고 과정(고양이→펼치기→선택)만 재체험
+// 타로 다시 보기 — 처음부터 다시 뽑는다(카드도 해석도 새로)
 function replay(){
   phase="intro";
   try{ vid.pause(); vid.removeAttribute("src"); vid.load(); }catch(e){}
   still.style.backgroundImage="url('"+CAT_IDLE+"')"; still.classList.add("on");
   var w=$("worry"); if(w) w.value="";   // 새 질문을 받도록 비워 둔다
   show(scIntro);
-  hintbar.textContent=tr("다른 게 궁금하면 새로 물어보라냥 — 고민이 바뀌면 카드도 바뀐다옹.");
+  hintbar.textContent=tr("다시 뽑으면 새 카드가 나온다냥 — 마음에 들 때까지 뽑아 보라옹.");
 }
 
 function revealResult(cardIdx, orient, fromLock){
@@ -358,7 +348,8 @@ function revealResult(cardIdx, orient, fromLock){
   // 고민이 바뀌었으면 캐시를 쓰지 않는다.
   var saved=null;
   try{ saved=JSON.parse(localStorage.getItem(LOCK_KEY)); }catch(e){}
-  if(saved && saved.date===todayStr() && saved.reading && (saved.worry||"")===myWorry){
+  if(saved && saved.date===todayStr() && saved.reading && (saved.worry||"")===myWorry
+     && saved.cardIdx===cardIdx && saved.orient===orient){
     readingEl.style.display="block"; statusEl.style.display="none";
     readingEl.innerHTML=fmt(saved.reading); lastReading=saved.reading;
     onceBar.style.display="block";

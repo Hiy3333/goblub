@@ -77,6 +77,7 @@
     "심판 · Judgement": ["Judgement", "El Juicio", "Penghakiman · Judgement", "審判 · Judgement", "การพิพากษา · Judgement", "审判 · Judgement", "審判 · Judgement"],
     "각성·결단·부활": ["Awakening · resolve · rebirth", "Despertar · decisión · renacer", "Kebangkitan · keputusan · kelahiran kembali", "覚醒・決断・復活", "การตื่นรู้ · การตัดสินใจ · การเกิดใหม่", "觉醒·决断·重生", "覺醒·決斷·重生"],
     "세계 · The World": ["The World", "El Mundo", "Dunia · The World", "世界 · The World", "โลก · The World", "世界 · The World", "世界 · The World"],
-    "완성·통합·성취": ["Completion · integration · fulfillment", "Culminación · integración · logro", "Kesempurnaan · integrasi · pencapaian", "完成・統合・達成", "ความสมบูรณ์ · การหลอมรวม · ความสำเร็จ", "完成·整合·圆满", "完成·整合·圓滿"]
+    "완성·통합·성취": ["Completion · integration · fulfillment", "Culminación · integración · logro", "Kesempurnaan · integrasi · pencapaian", "完成・統合・達成", "ความสมบูรณ์ · การหลอมรวม · ความสำเร็จ", "完成·整合·圆满", "完成·整合·圓滿"],
+    "다시 뽑으면 새 카드가 나온다냥 — 마음에 들 때까지 뽑아 보라옹.": ["Draw again and a new card appears, meow — keep drawing till one feels right!", "Si vuelves a sacar, sale una carta nueva, miau — ¡saca hasta que te convenza!", "Tarik lagi dan kartu baru muncul, meong — tarik sampai sreg!", "もう一度引けば新しいカードが出るにゃ — 気に入るまで引いてみるにゃ。", "จั่วใหม่ก็ได้ไพ่ใบใหม่เมี๊ยว — จั่วจนกว่าจะถูกใจเลย", "再抽就会出新牌喵——抽到满意为止喵。", "再抽就會出新牌喵——抽到滿意為止喵。"]
   });
 })();
