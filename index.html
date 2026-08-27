@@ -876,9 +876,14 @@
       glass.style.transform = "translate(" + (gcx - gd / 2) + "px," + (gcy - gd / 2) + "px)";
       peek.style.width = pd + "px"; peek.style.height = pd + "px";
       peek.style.transform = "translate(" + (gcx - pd / 2) + "px," + (gcy - pd / 2) + "px)";
-      // 몸통 이름표 — 창 왼쪽에 세로쓰기(정자)
+      // 몸통 이름표 — 창 왼쪽에 세로쓰기. CJK는 정자 세움, 라틴 등은 옆으로 눕혀
+      // 흐르게 하고(mixed) 글자 수가 많으면 로켓 높이에 맞춰 축소한다.
       var nx = ow * (0.315 - 0.5) * rsx, ny = oh * (0.50 - 1) * rsy;
-      rname.style.fontSize = (ow * 0.084) + "px";
+      var rnTxt = rname.textContent || "";
+      var rnCjk = /[가-힣一-龥ぁ-んァ-ヶー]/.test(rnTxt);
+      rname.style.textOrientation = rnCjk ? "upright" : "mixed";
+      var rnScale = rnCjk ? 1 : Math.min(1, 5.3 / (Math.max(1, rnTxt.length) * 0.55));
+      rname.style.fontSize = (ow * 0.084 * rnScale) + "px";
       rname.style.transform = "translate(" + (pivx + nx * cosr - ny * sinr) + "px," +
         (pivy + nx * sinr + ny * cosr) + "px) translate(-50%,-50%) rotate(" + rrot + "deg)";
       // 정면 이미지의 눈알 중심(0.565, 0.155)이 창 정중앙에 오도록
