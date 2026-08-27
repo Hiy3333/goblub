@@ -62,11 +62,28 @@ a{color:inherit;text-decoration:none}
 
 <script src="../js/i18n.js?v=1"></script>
 <script src="../js/i18n-more.js?v=3"></script>
+<script src="js/i18n-gwigok.js?v=2"></script>
+<script src="js/i18n-sinsal.js?v=2"></script>
 <script src="js/gwigok-log.js?v=1"></script>
 <script>
 (function(){
   var $=function(id){return document.getElementById(id);};
   var tr=window.GoblubI18n?GoblubI18n.t:function(s){return s;};
+  var isKo=!window.GoblubI18n||GoblubI18n.lang==="ko";
+  function roHan(x){ var GA="갑을병정무기경신임계", JA="자축인묘진사오미신유술해", G2=["Gap","Eul","Byeong","Jeong","Mu","Gi","Gyeong","Sin","Im","Gye"], J2=["Ja","Chuk","In","Myo","Jin","Sa","O","Mi","Sin","Yu","Sul","Hae"]; var out="", prev=false; for(var i=0;i<x.length;i++){ var c=x[i], gi=GA.indexOf(c), ji=JA.indexOf(c); if(gi>=0||ji>=0){ out+=(prev?"-":"")+(gi>=0?G2[gi]:J2[ji]); prev=true; } else { out+=c; prev=false; } } return out; }
+  function trDetail(x){
+    if(isKo) return x;
+    var m;
+    if((m=x.match(/^(\d+)월의 길흉을 짚었다$/))) return tr("{M}월의 길흉을 짚었다").replace("{M}",m[1]);
+    if((m=x.match(/^([가-힣]{2})일 — 혼·곳간·연·문서를 읽었다$/))) return tr("{GZ}일 — 혼·곳간·연·문서를 읽었다").replace("{GZ}",roHan(m[1]));
+    if((m=x.match(/^(.+) — (\d+)가지가 붙어 있었다$/))){
+      var names=m[1].replace(/ 외$/,""), more=/ 외$/.test(m[1]);
+      return tr("{S} — {N}가지가 붙어 있었다").replace("{S}",names.split("·").map(tr).join("·")+(more?" "+tr("외"):"")).replace("{N}",m[2]);
+    }
+    if((m=x.match(/^“([\s\S]*)”라 물었다$/))) return tr("“{Q}”라 물었다").replace("{Q}",m[1]);
+    if((m=x.match(/^“([\s\S]*)” 꿈을 두고 갔다$/))) return tr("“{Q}” 꿈을 두고 갔다").replace("{Q}",m[1]);
+    return tr(x);
+  }
   var ICON={ day:"日", cal:"曆", sinsal:"煞", ask:"問", dream:"夢", bujeok:"符", myeongbu:"對", book:"冥" };
 
   function render(){
@@ -82,7 +99,7 @@ a{color:inherit;text-decoration:none}
       return '<div class="entry"><span class="d">'+e.d+'</span>'+
         '<span class="ic">'+(ICON[e.t]||"·")+'</span>'+
         '<span class="h">'+tr(String(e.h)).replace(/</g,"&lt;")+'</span>'+
-        '<span class="l">'+String(e.l).replace(/</g,"&lt;")+'</span></div>';
+        '<span class="l">'+trDetail(String(e.l)).replace(/</g,"&lt;")+'</span></div>';
     }).join("");
     $("cnt").innerHTML=tr("지금까지 <b>{N}건</b>이 적혀 있다.").replace("{N}",list.length);
     $("burnWrap").style.display="flex";

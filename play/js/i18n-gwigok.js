@@ -157,6 +157,14 @@
     "액막이 하나": ["One ward against ill", "Un amuleto protector", "Satu penangkal sial", "厄除け一つ", "เครื่องกันเคราะห์หนึ่งอย่าง", "一道解厄", "一道解厄"],
     "초 후에 다시 오너라.": ["sec — then come again.", "seg — vuelve entonces.", "detik lagi — datanglah lagi.", "秒後にまた来い。", "วิ แล้วค่อยมาใหม่", "秒后再来。", "秒後再來。"],
     "지금은 해몽소에 줄이 길다. 잠시 후 다시 오너라.": ["The line at the dream house is long right now. Come again shortly.", "La fila en la casa de sueños es larga. Vuelve en un momento.", "Antrean di rumah tafsir mimpi sedang panjang. Datanglah lagi sebentar lagi.", "今は夢解き所の列が長い。少し後にまた来い。", "ตอนนี้คิวที่โรงทำนายฝันยาว อีกสักครู่ค่อยมาใหม่", "眼下解梦处排长队。稍后再来。", "眼下解夢處排長隊。稍後再來。"],
-    "너무 짧다. 장면 하나라도 더 적어라.": ["Too short. Write at least one more scene.", "Muy corto. Escribe al menos una escena más.", "Terlalu pendek. Tulis setidaknya satu adegan lagi.", "短すぎる。場面を一つでも多く記せ。", "สั้นเกินไป เขียนเพิ่มอีกสักฉาก", "太短了。至少再写一个画面。", "太短了。至少再寫一個畫面。"]
+    "너무 짧다. 장면 하나라도 더 적어라.": ["Too short. Write at least one more scene.", "Muy corto. Escribe al menos una escena más.", "Terlalu pendek. Tulis setidaknya satu adegan lagi.", "短すぎる。場面を一つでも多く記せ。", "สั้นเกินไป เขียนเพิ่มอีกสักฉาก", "太短了。至少再写一个画面。", "太短了。至少再寫一個畫面。"],
+    "정보가 돈보다 비싼 날이다. 다만 달콤한 제안일수록 한 번 더 뒤집어 보아라.": ["A day when information is worth more than money. But the sweeter the offer, the more you should turn it over once more.", "Un día en que la información vale más que el dinero. Pero cuanto más dulce la oferta, más debes examinarla de nuevo.", "Hari saat informasi lebih mahal dari uang. Tapi makin manis tawarannya, makin perlu kaubolak-balik sekali lagi.", "情報が金より高くつく日だ。ただし甘い提案ほどもう一度ひっくり返して見よ。", "วันที่ข้อมูลแพงกว่าเงิน แต่ยิ่งข้อเสนอหวานเท่าไร ยิ่งต้องพลิกดูอีกสักรอบ", "这天信息比钱更值钱。但提案越甜，越要再翻过来看一遍。", "這天信息比錢更值錢。但提案越甜，越要再翻過來看一遍。"],
+    "{M}월의 길흉을 짚었다": ["Read the omens of month {M}", "Leyó los presagios del mes {M}", "Membaca untung-malang bulan {M}", "{M}月の吉凶を占った", "ทายดีร้ายของเดือน {M}", "掐算了{M}月的吉凶", "掐算了{M}月的吉凶"],
+    "{GZ}일 — 혼·곳간·연·문서를 읽었다": ["{GZ} day — read soul, storehouse, bonds, documents", "Día {GZ}: leyó alma, granero, lazos y documentos", "Hari {GZ} — membaca jiwa, lumbung, jodoh, dokumen", "{GZ}日 — 魂・蔵・縁・文書を読んだ", "วัน{GZ} — อ่านวิญญาณ·ยุ้งฉาง·บุพเพ·เอกสาร", "{GZ}日——读了魂·仓·缘·文书", "{GZ}日——讀了魂·倉·緣·文書"],
+    "{S} — {N}가지가 붙어 있었다": ["{S} — {N} kinds were attached", "{S}: había {N} tipos adheridos", "{S} — {N} macam menempel", "{S} — {N}種が付いていた", "{S} — ติดอยู่ {N} อย่าง", "{S}——附着{N}种", "{S}——附著{N}種"],
+    "붙은 살이 없는 깨끗한 명부였다": ["A clean ledger with no sinsal attached", "Un libro limpio, sin sinsal adherido", "Buku yang bersih tanpa sinsal menempel", "殺の付いていない綺麗な冥簿だった", "เป็นบัญชีสะอาดไร้ชินซัลเกาะ", "是一本没有煞附着的干净名簿", "是一本沒有煞附著的乾淨名簿"],
+    "“{Q}”라 물었다": ["Asked: “{Q}”", "Preguntó: “{Q}”", "Bertanya: “{Q}”", "「{Q}」と尋ねた", "ถามว่า “{Q}”", "问了“{Q}”", "問了「{Q}」"],
+    "“{Q}” 꿈을 두고 갔다": ["Left behind a dream: “{Q}”", "Dejó un sueño: “{Q}”", "Meninggalkan mimpi: “{Q}”", "「{Q}」という夢を置いていった", "ทิ้งความฝัน “{Q}” ไว้", "留下了“{Q}”的梦", "留下了「{Q}」的夢"],
+    "외": ["+ more", "y más", "dll.", "ほか", "และอื่น ๆ", "等", "等"]
   });
 })();

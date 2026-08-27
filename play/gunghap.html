@@ -737,7 +737,7 @@ function drawSky(t, withPlate){
     ctx.shadowBlur=0; ctx.fillStyle="#a9bed8";
     try{ ctx.letterSpacing=(1*S)+"px"; }catch(e){}
     ctx.font=(16*S)+"px Jua, 'Malgun Gothic', sans-serif";
-    ctx.fillText(star.sub, W/2, H-16*S);
+    ctx.fillText(tr(star.sub), W/2, H-16*S);
     ctx.restore();
   }
 
