@@ -204,6 +204,7 @@
     #analyzing .an-wrap { position:relative; text-align:center; padding:0 26px calc(9vh + env(safe-area-inset-bottom)); max-width:560px; }
     #an-cap { font-family:"Nanum Myeongjo", serif; font-weight:800; font-size:1.4rem; line-height:1.55; color:#f3e9dd; letter-spacing:.02em; text-shadow:0 2px 20px rgba(0,0,0,.95), 0 0 34px rgba(140,20,20,.35); }
     #an-sub { margin-top:18px; color:#c24040; font-size:.92rem; letter-spacing:.09em; font-family:"Nanum Myeongjo", serif; }
+    .pnum { font-family:"Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-weight:800; font-size:1.12em; letter-spacing:0; font-style:normal; }
     #an-flame { margin-top:24px; font-size:1.5rem; animation: an-flick 1.4s ease-in-out infinite; }
     @keyframes an-flick { 0%,100%{opacity:1;transform:translateY(0) rotate(-2deg)} 45%{opacity:.55;transform:translateY(1px) rotate(3deg)} }
     /* 완성 — 명부를 받아 드는 버튼 */
@@ -724,9 +725,9 @@
           if (analyzing) playEnding();
           else renderPage();
         } else {
-          $("pg-writing").textContent = tr("귀곡이 {D}/{T}부를 새기는 중").replace("{D}", done).replace("{T}", TOTAL);
+          $("pg-writing").innerHTML = tr("귀곡이 {D}/{T}부를 새기는 중").replace("{D}", '<span class="pnum">' + done + "</span>").replace("{T}", '<span class="pnum">' + TOTAL + "</span>");
           $("pg-writing").classList.add("on");
-          if (analyzing) $("an-sub").textContent = tr("네 명부 {D} / {T} 장을 새기는 중…").replace("{D}", done).replace("{T}", TOTAL);
+          if (analyzing) $("an-sub").innerHTML = tr("네 명부 {D} / {T} 장을 새기는 중…").replace("{D}", '<span class="pnum">' + done + "</span>").replace("{T}", '<span class="pnum">' + TOTAL + "</span>");
         }
       }
 
@@ -734,8 +735,8 @@
         if (i >= PARTS.length) { progressMsg(); return; }
         attempt = attempt || 0;
         var p = PARTS[i];
-        $("pg-writing").textContent = tr("귀곡이 {D}/{T}부를 새기는 중").replace("{D}", i + 1).replace("{T}", TOTAL); $("pg-writing").classList.add("on");
-        if (analyzing) $("an-sub").textContent = tr("네 명부 {D} / {T} 장을 새기는 중…").replace("{D}", i).replace("{T}", TOTAL);
+        $("pg-writing").innerHTML = tr("귀곡이 {D}/{T}부를 새기는 중").replace("{D}", '<span class="pnum">' + (i + 1) + "</span>").replace("{T}", '<span class="pnum">' + TOTAL + "</span>"); $("pg-writing").classList.add("on");
+        if (analyzing) $("an-sub").innerHTML = tr("네 명부 {D} / {T} 장을 새기는 중…").replace("{D}", '<span class="pnum">' + i + "</span>").replace("{T}", '<span class="pnum">' + TOTAL + "</span>");
         var buffer = "";
         function failSoft() {
           if (attempt >= 1) return false;
