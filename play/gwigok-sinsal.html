@@ -127,7 +127,6 @@ a{color:inherit;text-decoration:none}
 <script src="js/i18n-gwigok.js?v=2"></script>
 <script src="js/i18n-sinsal.js?v=2"></script>
 <script src="js/sinsal.js?v=1"></script>
-<script src="js/gwigok-log.js?v=1"></script>
 <script>
 (function(){
   var $=function(id){return document.getElementById(id);};
@@ -317,8 +316,6 @@ a{color:inherit;text-decoration:none}
         tr("십이신살은 흉한 것만이 아니라 자리마다 하나씩 붙는 것이니, 이름만 보고 겁먹지 마라.");
     }
     $("gate").style.display="none"; $("board").style.display="block";
-    if(window.GwigokLog) GwigokLog.add("sinsal","신살 도감",
-      total ? names.slice(0,6).join("·")+(names.length>6?" 외":"")+" — "+total+"가지가 붙어 있었다" : "붙은 살이 없는 깨끗한 명부였다");
   }
 
   fillSelects();

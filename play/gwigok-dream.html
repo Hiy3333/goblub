@@ -116,7 +116,6 @@ button.fire:hover{background:rgba(190,55,25,.36)}
 <script src="js/i18n-gwigok.js?v=2"></script>
 <script>var tr=window.GoblubI18n?GoblubI18n.t:function(s){return s;};</script>
 <script src="js/dosa.js?v=3"></script>
-<script src="js/gwigok-log.js?v=1"></script>
 <script>
 (function(){
   var $=function(id){return document.getElementById(id);};
@@ -165,7 +164,6 @@ button.fire:hover{background:rgba(190,55,25,.36)}
         $("status").style.display="none"; $("reading").innerHTML=fmt(acc); },
       onDone:function(){ showAnswer(q,acc,true);
         try{ localStorage.setItem(todayKey(),JSON.stringify({q:q,a:acc})); }catch(e){}
-        if(window.GwigokLog) GwigokLog.add("dream","간밤의 장부","“"+q.slice(0,40)+(q.length>40?"…":"")+"” 꿈을 두고 갔다");
       },
       onError:function(code,sec){
         $("status").style.display="block";

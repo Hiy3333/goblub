@@ -122,7 +122,6 @@ a{color:inherit;text-decoration:none}
 <script src="../js/i18n-more.js?v=3"></script>
 <script src="js/i18n-gwigok.js?v=2"></script>
 <script src="js/i18n-gwigok-cal.js?v=1"></script>
-<script src="js/gwigok-log.js?v=1"></script>
 <script>
 (function(){
   var $=function(id){return document.getElementById(id);};
@@ -327,7 +326,6 @@ a{color:inherit;text-decoration:none}
     $("gate").style.display="none"; $("board").style.display="block";
     cur=new Date();
     renderMonth();
-    if(window.GwigokLog) GwigokLog.add("cal","붉은 날 달력",(cur.getMonth()+1)+"월의 길흉을 짚었다");
   }
 
   $("prev").onclick=function(){ cur=new Date(cur.getFullYear(),cur.getMonth()-1,1); renderMonth(); };

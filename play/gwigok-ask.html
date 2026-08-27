@@ -117,7 +117,6 @@ button.fire:disabled{opacity:.5;cursor:default}
 <script src="js/i18n-gwigok.js?v=2"></script>
 <script>var tr=window.GoblubI18n?GoblubI18n.t:function(s){return s;};</script>
 <script src="js/dosa.js?v=3"></script>
-<script src="js/gwigok-log.js?v=1"></script>
 <script>
 (function(){
   var $=function(id){return document.getElementById(id);};
@@ -183,7 +182,6 @@ button.fire:disabled{opacity:.5;cursor:default}
           $("status").style.display="none"; $("reading").innerHTML=fmt(acc); },
         onDone:function(){ showAnswer(q,acc,true);
           try{ localStorage.setItem(todayKey(),JSON.stringify({q:q,a:acc})); }catch(e){}
-          if(window.GwigokLog) GwigokLog.add("ask","귀곡 문답","“"+q.slice(0,40)+(q.length>40?"…":"")+"”라 물었다");
         },
         onError:function(code,sec){
           $("status").style.display="block";
